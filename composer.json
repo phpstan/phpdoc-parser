@@ -1,0 +1,7 @@
+{
+	"name": "phpstan/type-parser",
+	"license": "MIT",
+	"autoload": {
+		"classmap": ["src"]
+	}
+}
