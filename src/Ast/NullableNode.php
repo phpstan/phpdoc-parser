@@ -3,7 +3,7 @@
 namespace PhpStan\TypeParser\Ast;
 
 
-class NullableType implements Node
+class NullableNode implements Node
 {
 	/** @var Node */
 	public $type;
