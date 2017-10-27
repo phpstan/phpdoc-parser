@@ -1,11 +1,15 @@
 Type
   = Atomic (Union / Intersection)?
+  / Nullable
 
 Union
   = ('|' Atomic)+
 
 Intersection
   = ('&' Atomic)+
+
+Nullable
+  = '?' Identifier Generic?
 
 Atomic
   = Identifier (Generic / Array)?

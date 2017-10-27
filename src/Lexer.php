@@ -10,7 +10,7 @@ class Lexer
 	const TOKEN_IDENTIFIER = 0;
 	const TOKEN_UNION = 1;
 	const TOKEN_INTERSECTION = 2;
-	const TOKEN_COMPLEMENT = 3;
+	const TOKEN_NULLABLE = 3;
 	const TOKEN_OPEN_PARENTHESES = 4;
 	const TOKEN_CLOSE_PARENTHESES = 5;
 	const TOKEN_OPEN_ANGLE_BRACKET = 6;
@@ -64,7 +64,7 @@ class Lexer
 			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x7F-\\xFF][0-9a-z_\\x7F-\\xFF]*+)++',
 			self::TOKEN_UNION => '\\|',
 			self::TOKEN_INTERSECTION => '&',
-			self::TOKEN_COMPLEMENT => '\\~',
+			self::TOKEN_NULLABLE => '\\?',
 			self::TOKEN_OPEN_PARENTHESES => '\\(',
 			self::TOKEN_CLOSE_PARENTHESES => '\\)',
 			self::TOKEN_OPEN_ANGLE_BRACKET => '<',

@@ -67,13 +67,18 @@ class Parser
 
 	private function parseType(): Ast\Node
 	{
-		$type = $this->parseAtomic();
+		if ($this->tokenType === Lexer::TOKEN_NULLABLE) {
+			$type = $this->parseNullable();
 
-		if ($this->tokenType === Lexer::TOKEN_UNION) {
-			$type = $this->parseUnion($type);
+		} else {
+			$type = $this->parseAtomic();
 
-		} elseif ($this->tokenType === Lexer::TOKEN_INTERSECTION) {
-			$type = $this->parseIntersection($type);
+			if ($this->tokenType === Lexer::TOKEN_UNION) {
+				$type = $this->parseUnion($type);
+
+			} elseif ($this->tokenType === Lexer::TOKEN_INTERSECTION) {
+				$type = $this->parseIntersection($type);
+			}
 		}
 
 		return $type;
@@ -132,6 +137,21 @@ class Parser
 		} while ($this->tokenType === Lexer::TOKEN_INTERSECTION) ;
 
 		return new Ast\IntersectionNode($types);
+	}
+
+
+	private function parseNullable(): Ast\Node
+	{
+		$this->consume(Lexer::TOKEN_NULLABLE);
+
+		$type = new Ast\SimpleNode($this->value());
+		$this->consume(Lexer::TOKEN_IDENTIFIER);
+
+		if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
+			$type = $this->parseGeneric($type);
+		}
+
+		return new Ast\NullableNode($type);
 	}
 
 
