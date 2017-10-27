@@ -14,21 +14,54 @@ class Parser
 	private $tokenType;
 
 
-	public function parse(array $tokens): Ast\Node
+	public function parseUntilEnd(array $tokens): Ast\Node
 	{
-		$this->tokens = $tokens;
-		$this->tokenIndex = 0;
-		$this->tokenType = $tokens[0][Lexer::TYPE_OFFSET] ?? Lexer::TOKEN_OTHER;
+		try {
+			$this->setUp($tokens);
+			$type = $this->parseType();
+			$this->consumeEnd();
 
-		if ($this->tokenType === Lexer::TOKEN_WS) {
-			$this->consume(Lexer::TOKEN_WS);
+		} finally {
+			$this->tearDown();
 		}
 
-		$type = $this->parseType();
-//		$this->consume(Lexer::TOKEN_OTHER);
-		$this->tokens = [];
+		return $type;
+	}
+
+
+	public function parseUntilBoundary(array $tokens): Ast\Node
+	{
+		try {
+			$this->setUp($tokens);
+			$type = $this->parseType();
+			$this->consumeBoundary();
+
+		} finally {
+			$this->tearDown();
+		}
 
 		return $type;
+	}
+
+
+	private function setUp(array $tokens): void
+	{
+		$this->tokens = $tokens;
+
+		if ($tokens[0][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_WS) {
+			$this->tokenIndex = 0;
+			$this->tokenType = $tokens[0][Lexer::TYPE_OFFSET];
+
+		} else {
+			$this->tokenIndex = 1;
+			$this->tokenType = $tokens[1][Lexer::TYPE_OFFSET];
+		}
+	}
+
+
+	private function tearDown(): void
+	{
+		$this->tokens = []; // release memory
 	}
 
 
@@ -142,15 +175,33 @@ class Parser
 	}
 
 
-	private function consume(int $tokenType): void
+	private function consume(int $consumedTokenType): void
 	{
-		if ($this->tokenType === $tokenType) {
-			do {
-				$this->tokenType = $this->tokens[++$this->tokenIndex][Lexer::TYPE_OFFSET] ?? Lexer::TOKEN_OTHER;
+		if ($this->tokenType !== $consumedTokenType) {
+			$this->error();
+		}
 
-			} while ($this->tokenType === Lexer::TOKEN_WS);
+		$this->tokenIndex++;
 
-		} else {
+		if ($this->tokens[$this->tokenIndex][Lexer::TYPE_OFFSET] === Lexer::TOKEN_WS) {
+			$this->tokenIndex++;
+		}
+
+		$this->tokenType = $this->tokens[$this->tokenIndex][Lexer::TYPE_OFFSET];
+	}
+
+
+	private function consumeEnd(): void
+	{
+		if ($this->tokenType !== Lexer::TOKEN_END) {
+			$this->error();
+		}
+	}
+
+
+	private function consumeBoundary(): void
+	{
+		if ($this->tokenType !== Lexer::TOKEN_END && $this->tokens[$this->tokenIndex - 1][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_WS) {
 			$this->error();
 		}
 	}
@@ -158,15 +209,15 @@ class Parser
 
 	private function value(): string
 	{
-		return $this->tokens[$this->tokenIndex][Lexer::VALUE_OFFSET] ?? 'END';
+		return $this->tokens[$this->tokenIndex][Lexer::VALUE_OFFSET];
 	}
 
 
 	private function offset(): int
 	{
-		$offset = -1;
-		for ($i = 0; $i <= $this->tokenIndex; $i++) {
-			$offset += strlen($this->tokens[$i][Lexer::VALUE_OFFSET] ?? '');
+		$offset = 0;
+		for ($i = 0; $i < $this->tokenIndex; $i++) {
+			$offset += strlen($this->tokens[$i][Lexer::VALUE_OFFSET]);
 		}
 
 		return $offset;

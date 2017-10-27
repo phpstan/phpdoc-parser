@@ -21,21 +21,22 @@ class Lexer
 	const TOKEN_VARIABLE = 11;
 	const TOKEN_WS = 12;
 	const TOKEN_OTHER = 13;
+	const TOKEN_END = 14;
 
 	const VALUE_OFFSET = 0;
 	const TYPE_OFFSET = 1;
 
 
-	/** @var string|null */
+	/** @var null|string */
 	private $regexp;
 
-	/** @var array|NULL */
+	/** @var null|array */
 	private $types;
 
 
 	public function tokenize(string $s): array
 	{
-		if ($this->regexp === NULL) {
+		if ($this->regexp === null) {
 			$this->initialize();
 		}
 
@@ -44,12 +45,14 @@ class Lexer
 
 		foreach ($tokens as &$match) {
 			for ($i = 1; $i <= $count; $i++) {
-				if ($match[$i] != NULL) {
-					$match = [$match[0], $this->types[$i - 1]];
+				if ($match[$i] != null) {
+					$match = [$match[0], self::TYPE_OFFSET => $this->types[$i - 1]];
 					break;
 				}
 			}
 		}
+
+		$tokens[] = ['', self::TOKEN_END];
 
 		return $tokens;
 	}
@@ -74,7 +77,7 @@ class Lexer
 			self::TOKEN_OTHER => '.++',
 		];
 
-		$this->regexp = '~(' . implode(')|(', $patterns) . ')~Ai';
+		$this->regexp = '~(' . implode(')|(', $patterns) . ')~Asi';
 		$this->types = array_keys($patterns);
 	}
 }
