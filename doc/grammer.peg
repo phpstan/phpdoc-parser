@@ -1,15 +1,11 @@
 Type
   = Atomic (Union / Intersection)?
-  / Complement
 
 Union
   = ('|' Atomic)+
 
 Intersection
   = ('&' Atomic)+
-
-Complement
-  = '~' Atomic
 
 Atomic
   = Identifier (Generic / Array)?

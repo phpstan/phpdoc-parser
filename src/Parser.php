@@ -67,18 +67,13 @@ class Parser
 
 	private function parseType(): Ast\Node
 	{
-		if ($this->tokenType === Lexer::TOKEN_COMPLEMENT) {
-			$type = $this->parseComplement();
+		$type = $this->parseAtomic();
 
-		} else {
-			$type = $this->parseAtomic();
+		if ($this->tokenType === Lexer::TOKEN_UNION) {
+			$type = $this->parseUnion($type);
 
-			if ($this->tokenType === Lexer::TOKEN_UNION) {
-				$type = $this->parseUnion($type);
-
-			} elseif ($this->tokenType === Lexer::TOKEN_INTERSECTION) {
-				$type = $this->parseIntersection($type);
-			}
+		} elseif ($this->tokenType === Lexer::TOKEN_INTERSECTION) {
+			$type = $this->parseIntersection($type);
 		}
 
 		return $type;
@@ -137,13 +132,6 @@ class Parser
 		} while ($this->tokenType === Lexer::TOKEN_INTERSECTION) ;
 
 		return new Ast\IntersectionNode($types);
-	}
-
-
-	private function parseComplement(): Ast\Node
-	{
-		$this->consume(Lexer::TOKEN_COMPLEMENT);
-		return new Ast\ComplementNode($this->parseAtomic());
 	}
 
 
