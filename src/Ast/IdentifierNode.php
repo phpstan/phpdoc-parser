@@ -3,7 +3,7 @@
 namespace PhpStan\TypeParser\Ast;
 
 
-class SimpleNode implements Node
+class IdentifierNode implements Node
 {
 	/** @var string */
 	public $name;

@@ -5,14 +5,14 @@ namespace PhpStan\TypeParser\Ast;
 
 class GenericNode implements Node
 {
-	/** @var SimpleNode */
+	/** @var IdentifierNode */
 	public $type;
 
 	/** @var Node[] */
 	public $genericTypes;
 
 
-	public function __construct(SimpleNode $type, array $genericTypes)
+	public function __construct(IdentifierNode $type, array $genericTypes)
 	{
 		$this->type = $type;
 		$this->genericTypes = $genericTypes;

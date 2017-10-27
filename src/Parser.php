@@ -97,7 +97,7 @@ class Parser
 			}
 
 		} else {
-			$type = new Ast\SimpleNode($this->value());
+			$type = new Ast\IdentifierNode($this->value());
 			$this->consume(Lexer::TOKEN_IDENTIFIER);
 
 			if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
@@ -144,7 +144,7 @@ class Parser
 	{
 		$this->consume(Lexer::TOKEN_NULLABLE);
 
-		$type = new Ast\SimpleNode($this->value());
+		$type = new Ast\IdentifierNode($this->value());
 		$this->consume(Lexer::TOKEN_IDENTIFIER);
 
 		if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
@@ -155,7 +155,7 @@ class Parser
 	}
 
 
-	private function parseGeneric(Ast\SimpleNode $baseType): Ast\Node
+	private function parseGeneric(Ast\IdentifierNode $baseType): Ast\Node
 	{
 		$this->consume(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
 		$genericTypes[] = $this->parseType();
