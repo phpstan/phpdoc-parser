@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast;
+namespace PhpStan\TypeParser\Ast\Type;
 
 
-class UnionNode implements Node
+class UnionTypeNode implements TypeNode
 {
-	/** @var Node[] */
+	/** @var TypeNode[] */
 	public $types;
 
 

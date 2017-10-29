@@ -1,18 +1,18 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast;
+namespace PhpStan\TypeParser\Ast\Type;
 
 
-class GenericNode implements Node
+class GenericTypeNode implements TypeNode
 {
-	/** @var IdentifierNode */
+	/** @var IdentifierTypeNode */
 	public $type;
 
-	/** @var Node[] */
+	/** @var TypeNode[] */
 	public $genericTypes;
 
 
-	public function __construct(IdentifierNode $type, array $genericTypes)
+	public function __construct(IdentifierTypeNode $type, array $genericTypes)
 	{
 		$this->type = $type;
 		$this->genericTypes = $genericTypes;

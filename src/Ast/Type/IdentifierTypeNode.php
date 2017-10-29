@@ -1,9 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast;
+namespace PhpStan\TypeParser\Ast\Type;
 
 
-class IdentifierNode implements Node
+class IdentifierTypeNode implements TypeNode
 {
 	/** @var string */
 	public $name;

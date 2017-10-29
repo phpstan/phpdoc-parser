@@ -1,15 +1,15 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast;
+namespace PhpStan\TypeParser\Ast\Type;
 
 
-class ArrayNode implements Node
+class ArrayTypeNode implements TypeNode
 {
-	/** @var Node */
+	/** @var TypeNode */
 	public $type;
 
 
-	public function __construct(Node $type)
+	public function __construct(TypeNode $type)
 	{
 		$this->type = $type;
 	}

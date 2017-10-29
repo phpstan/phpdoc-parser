@@ -12,7 +12,7 @@ class TypeParser
 	private $tokenType;
 
 
-	public function parser(TokenIterator $tokens): Ast\Node
+	public function parser(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		try {
 			$this->setUp($tokens);
@@ -41,7 +41,7 @@ class TypeParser
 	}
 
 
-	private function parseType(): Ast\Node
+	private function parseType(): Ast\Type\TypeNode
 	{
 		if ($this->tokenType === Lexer::TOKEN_NULLABLE) {
 			$type = $this->parseNullable();
@@ -61,7 +61,7 @@ class TypeParser
 	}
 
 
-	private function parseAtomic(): Ast\Node
+	private function parseAtomic(): Ast\Type\TypeNode
 	{
 		if ($this->tokenType === Lexer::TOKEN_OPEN_PARENTHESES) {
 			$this->consume(Lexer::TOKEN_OPEN_PARENTHESES);
@@ -73,7 +73,7 @@ class TypeParser
 			}
 
 		} else {
-			$type = new Ast\IdentifierNode($this->tokens->currentTokenValue());
+			$type = new Ast\Type\IdentifierTypeNode($this->tokens->currentTokenValue());
 			$this->consume(Lexer::TOKEN_IDENTIFIER);
 
 			if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
@@ -88,7 +88,7 @@ class TypeParser
 	}
 
 
-	private function parseUnion(Ast\Node $type): Ast\Node
+	private function parseUnion(Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		$types = [$type];
 
@@ -98,11 +98,11 @@ class TypeParser
 
 		} while ($this->tokenType === Lexer::TOKEN_UNION) ;
 
-		return new Ast\UnionNode($types);
+		return new Ast\Type\UnionTypeNode($types);
 	}
 
 
-	private function parseIntersection(Ast\Node $type): Ast\Node
+	private function parseIntersection(Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		$types = [$type];
 
@@ -112,26 +112,27 @@ class TypeParser
 
 		} while ($this->tokenType === Lexer::TOKEN_INTERSECTION) ;
 
-		return new Ast\IntersectionNode($types);
+		return new Ast\Type\IntersectionTypeNode($types);
 	}
 
 
-	private function parseNullable(): Ast\Node
+	private function parseNullable(): Ast\Type\TypeNode
 	{
 		$this->consume(Lexer::TOKEN_NULLABLE);
 
-		$type = new Ast\IdentifierNode($this->tokens->currentTokenValue());
+		$type = new Ast\Type\IdentifierTypeNode($this->tokens->currentTokenValue());
 		$this->consume(Lexer::TOKEN_IDENTIFIER);
 
 		if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
 			$type = $this->parseGeneric($type);
 		}
 
-		return new Ast\NullableNode($type);
+		return new Ast\Type\NullableTypeNode($type);
 	}
 
 
-	private function parseGeneric(Ast\IdentifierNode $baseType): Ast\Node
+	private function parseGeneric(
+		Ast\Type\IdentifierTypeNode $baseType): Ast\Type\TypeNode
 	{
 		$this->consume(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
 		$genericTypes[] = $this->parseType();
@@ -142,16 +143,16 @@ class TypeParser
 		}
 
 		$this->consume(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
-		return new Ast\GenericNode($baseType, $genericTypes);
+		return new Ast\Type\GenericTypeNode($baseType, $genericTypes);
 	}
 
 
-	private function parseArray(Ast\Node $type): Ast\Node
+	private function parseArray(Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		do {
 			$this->consume(Lexer::TOKEN_OPEN_SQUARE_BRACKET);
 			$this->consume(Lexer::TOKEN_CLOSE_SQUARE_BRACKET);
-			$type = new Ast\ArrayNode($type);
+			$type = new Ast\Type\ArrayTypeNode($type);
 
 		} while ($this->tokenType === Lexer::TOKEN_OPEN_SQUARE_BRACKET);
 

@@ -1,9 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast;
+namespace PhpStan\TypeParser\Ast\Type;
 
 
-interface Node
+interface TypeNode
 {
 	public function __toString(): string;
 }
