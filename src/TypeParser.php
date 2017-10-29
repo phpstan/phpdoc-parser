@@ -2,66 +2,42 @@
 
 namespace PhpStan\TypeParser;
 
-class Parser
-{
-	/** @var array */
-	private $tokens;
 
-	/** @var int */
-	private $tokenIndex;
+class TypeParser
+{
+	/** @var TokenIterator */
+	private $tokens;
 
 	/** @var int */
 	private $tokenType;
 
 
-	public function parseUntilEnd(array $tokens): Ast\Node
+	public function parser(TokenIterator $tokens): Ast\Node
 	{
 		try {
 			$this->setUp($tokens);
-			$type = $this->parseType();
-			$this->consumeEnd();
+			return $this->parseType();
 
 		} finally {
 			$this->tearDown();
 		}
-
-		return $type;
 	}
 
 
-	public function parseUntilBoundary(array $tokens): Ast\Node
+	private function setUp(TokenIterator $tokens): void
 	{
-		try {
-			$this->setUp($tokens);
-			$type = $this->parseType();
-			$this->consumeBoundary();
-
-		} finally {
-			$this->tearDown();
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_WS)) {
+			$tokens->next();
 		}
 
-		return $type;
-	}
-
-
-	private function setUp(array $tokens): void
-	{
 		$this->tokens = $tokens;
-
-		if ($tokens[0][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_WS) {
-			$this->tokenIndex = 0;
-			$this->tokenType = $tokens[0][Lexer::TYPE_OFFSET];
-
-		} else {
-			$this->tokenIndex = 1;
-			$this->tokenType = $tokens[1][Lexer::TYPE_OFFSET];
-		}
+		$this->tokenType = $tokens->currentTokenType();
 	}
 
 
 	private function tearDown(): void
 	{
-		$this->tokens = []; // release memory
+		$this->tokens = null; // release memory
 	}
 
 
@@ -97,7 +73,7 @@ class Parser
 			}
 
 		} else {
-			$type = new Ast\IdentifierNode($this->value());
+			$type = new Ast\IdentifierNode($this->tokens->currentTokenValue());
 			$this->consume(Lexer::TOKEN_IDENTIFIER);
 
 			if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
@@ -144,7 +120,7 @@ class Parser
 	{
 		$this->consume(Lexer::TOKEN_NULLABLE);
 
-		$type = new Ast\IdentifierNode($this->value());
+		$type = new Ast\IdentifierNode($this->tokens->currentTokenValue());
 		$this->consume(Lexer::TOKEN_IDENTIFIER);
 
 		if ($this->tokenType === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
@@ -189,46 +165,13 @@ class Parser
 			$this->error();
 		}
 
-		$this->tokenIndex++;
+		$this->tokens->next();
 
-		if ($this->tokens[$this->tokenIndex][Lexer::TYPE_OFFSET] === Lexer::TOKEN_WS) {
-			$this->tokenIndex++;
+		if ($this->tokens->isCurrentTokenType(Lexer::TOKEN_WS)) {
+			$this->tokens->next();
 		}
 
-		$this->tokenType = $this->tokens[$this->tokenIndex][Lexer::TYPE_OFFSET];
-	}
-
-
-	private function consumeEnd(): void
-	{
-		if ($this->tokenType !== Lexer::TOKEN_END) {
-			$this->error();
-		}
-	}
-
-
-	private function consumeBoundary(): void
-	{
-		if ($this->tokenType !== Lexer::TOKEN_END && $this->tokens[$this->tokenIndex - 1][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_WS) {
-			$this->error();
-		}
-	}
-
-
-	private function value(): string
-	{
-		return $this->tokens[$this->tokenIndex][Lexer::VALUE_OFFSET];
-	}
-
-
-	private function offset(): int
-	{
-		$offset = 0;
-		for ($i = 0; $i < $this->tokenIndex; $i++) {
-			$offset += strlen($this->tokens[$i][Lexer::VALUE_OFFSET]);
-		}
-
-		return $offset;
+		$this->tokenType = $this->tokens->currentTokenType();
 	}
 
 
@@ -236,8 +179,8 @@ class Parser
 	{
 		throw new ParserException(sprintf(
 			'Unexpected token \'%s\' at offset %d',
-			$this->value(),
-			$this->offset()
+			$this->tokens->currentTokenValue(),
+			$this->tokens->currentTokenOffset()
 		));
 	}
 }
