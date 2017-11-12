@@ -2,8 +2,9 @@
 
 namespace PhpStan\TypeParser\Ast\Type;
 
+use PhpStan\TypeParser\Ast\Node;
 
-interface TypeNode
+
+interface TypeNode extends Node
 {
-	public function __toString(): string;
 }
