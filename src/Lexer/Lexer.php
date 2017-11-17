@@ -131,8 +131,8 @@ class Lexer
 			self::TOKEN_CLOSE_PHPDOC => '\\*/',
 			self::TOKEN_PHPDOC_TAG => '@[a-z-]++',
 
-			self::TOKEN_FLOAT => '(?:[0-9]++\\.[0-9]*+(?:e[0-9]++)?)|(?:[0-9]*+\\.[0-9]++(?:e[0-9]++)?)|(?:[0-9]++e[0-9]++)',
-			self::TOKEN_INTEGER => '[0-9]++',
+			self::TOKEN_FLOAT => '(?:-?[0-9]++\\.[0-9]*+(?:e-?[0-9]++)?)|(?:-?[0-9]*+\\.[0-9]++(?:e-?[0-9]++)?)|(?:-?[0-9]++e-?[0-9]++)',
+			self::TOKEN_INTEGER => '-?[0-9]++',
 			self::TOKEN_SINGLE_QUOTED_STRING => '\'(?:\\\\.|[^\'])*+\'',
 			self::TOKEN_DOUBLE_QUOTED_STRING => '"(?:\\\\.|[^"])*+"',
 
