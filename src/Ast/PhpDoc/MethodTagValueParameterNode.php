@@ -25,7 +25,7 @@ class MethodTagValueParameterNode implements Node
 	public $defaultValue;
 
 
-	public function __construct(?TypeNode $type, bool $isReference, bool $isVariadic, string $parameterName, ?ConstExprNode $defaultValue)
+	public function __construct(TypeNode $type = null, bool $isReference, bool $isVariadic, string $parameterName, ConstExprNode $defaultValue = null)
 	{
 		$this->type = $type;
 		$this->isReference = $isReference;

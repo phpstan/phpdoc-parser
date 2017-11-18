@@ -105,7 +105,7 @@ class Lexer
 	}
 
 
-	private function initialize(): void
+	private function initialize()
 	{
 		$patterns = [
 			// '&' followed by TOKEN_VARIADIC or TOKEN_VARIABLE

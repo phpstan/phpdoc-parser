@@ -78,7 +78,7 @@ class TokenIterator
 	/**
 	 * @throws ParserException
 	 */
-	public function consumeTokenType(int $tokenType): void
+	public function consumeTokenType(int $tokenType)
 	{
 		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType) {
 			$this->throwError($tokenType);
@@ -140,7 +140,7 @@ class TokenIterator
 	}
 
 
-	public function next(): void
+	public function next()
 	{
 		$this->index++;
 
@@ -150,19 +150,19 @@ class TokenIterator
 	}
 
 
-	public function pushSavePoint(): void
+	public function pushSavePoint()
 	{
 		$this->savePoints[] = $this->index;
 	}
 
 
-	public function dropSavePoint(): void
+	public function dropSavePoint()
 	{
 		array_pop($this->savePoints);
 	}
 
 
-	public function rollback(): void
+	public function rollback()
 	{
 		$this->index = array_pop($this->savePoints);
 	}
@@ -171,7 +171,7 @@ class TokenIterator
 	/**
 	 * @throws ParserException
 	 */
-	private function throwError(int $expectedTokenType): void
+	private function throwError(int $expectedTokenType)
 	{
 		throw new ParserException(sprintf(
 			'Unexpected token \'%s\', expected %s at offset %d',

@@ -12,7 +12,7 @@ class ConstExprArrayItemNode implements ConstExprNode
 	public $value;
 
 
-	public function __construct(?ConstExprNode $key, ConstExprNode $value)
+	public function __construct(ConstExprNode $key = null, ConstExprNode $value)
 	{
 		$this->key = $key;
 		$this->value = $value;

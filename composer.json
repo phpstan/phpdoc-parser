@@ -1,6 +1,9 @@
 {
 	"name": "phpstan/phpdoc-parser",
 	"license": "MIT",
+	"require": {
+		"php": "~7.0"
+	},
 	"autoload": {
 		"psr-4": {"PHPStan\\PhpDocParser\\": ["src/"]}
 	}
