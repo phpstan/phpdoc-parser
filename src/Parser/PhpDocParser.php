@@ -23,25 +23,34 @@ class PhpDocParser
 
 	public function parse(TokenIterator $tokens): Ast\PhpDoc\PhpDocNode
 	{
+		$textNode = '';
 		$children = [];
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PHPDOC);
 
 		if ($tokens->tryConsumeHorizontalWhiteSpace()) {
-			$children[] = new Ast\PhpDoc\PhpDocTextNode($tokens->prevTokenValue());
+			$textNode .= $tokens->prevTokenValue();
 		}
 
 		while (!$tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
+				if ($textNode !== '') {
+					$children[] = new Ast\PhpDoc\PhpDocTextNode($textNode);
+					$textNode = '';
+				}
 				$children[] = $this->parseTag($tokens);
 
 			} else {
-				$children[] = new Ast\PhpDoc\PhpDocTextNode($tokens->currentTokenValue());
+				$textNode .= $tokens->currentTokenValue();
 				$tokens->next();
 			}
 
 			if ($tokens->tryConsumeHorizontalWhiteSpace()) {
-				$children[] = new Ast\PhpDoc\PhpDocTextNode($tokens->prevTokenValue());
+				$textNode .= $tokens->prevTokenValue();
 			}
+		}
+
+		if ($textNode !== '') {
+			$children[] = new Ast\PhpDoc\PhpDocTextNode($textNode);
 		}
 
 		return new Ast\PhpDoc\PhpDocNode($children);
