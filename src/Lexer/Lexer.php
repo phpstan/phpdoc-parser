@@ -143,8 +143,8 @@ class Lexer
 			self::TOKEN_HORIZONTAL_WS => '\\h++',
 			self::TOKEN_EOL => '(?:\\r?+\\n)++',
 
-			// anything but TOKEN_PHPDOC_TAG or TOKEN_EOL
-			self::TOKEN_OTHER => '(?:(?!@[a-z-])(?!\\r?+\\n).)++',
+			// anything but TOKEN_PHPDOC_TAG or TOKEN_CLOSE_PHPDOC or TOKEN_EOL
+			self::TOKEN_OTHER => '(?:(?!@[a-z-])(?!\\*/)(?!\\r?+\\n).)++',
 		];
 
 		$this->regexp = '~(' . implode(')|(', $patterns) . ')~Asi';
