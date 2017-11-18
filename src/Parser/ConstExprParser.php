@@ -49,7 +49,7 @@ class ConstExprParser
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
 				$classConstantName = $tokens->currentTokenValue();
 				$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
-				return new Ast\ConstExpr\ConstFetchNode($classConstantName, $identifier);
+				return new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName);
 
 			} else {
 				return new Ast\ConstExpr\ConstFetchNode('', $identifier);
