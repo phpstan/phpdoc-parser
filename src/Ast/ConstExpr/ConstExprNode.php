@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast\ConstExpr;
+namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-use PhpStan\TypeParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\Node;
 
 
 interface ConstExprNode extends Node

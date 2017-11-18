@@ -1,9 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Parser;
+namespace PHPStan\PhpDocParser\Parser;
 
-use PhpStan\TypeParser\Ast;
-use PhpStan\TypeParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\Ast;
+use PHPStan\PhpDocParser\Lexer\Lexer;
 
 
 class PhpDocParser

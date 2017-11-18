@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast\PhpDoc;
+namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 
 class GeneralTagValueNode implements PhpDocTagValueNode

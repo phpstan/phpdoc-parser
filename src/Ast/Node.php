@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast;
+namespace PHPStan\PhpDocParser\Ast;
 
 
 interface Node

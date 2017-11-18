@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast\PhpDoc;
+namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-use PhpStan\TypeParser\Ast\ConstExpr\ConstExprNode;
-use PhpStan\TypeParser\Ast\Node;
-use PhpStan\TypeParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
+use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
 
 class MethodTagValueParameterNode implements Node

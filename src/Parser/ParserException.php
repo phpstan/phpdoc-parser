@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Parser;
+namespace PHPStan\PhpDocParser\Parser;
 
 
 class ParserException extends \Exception

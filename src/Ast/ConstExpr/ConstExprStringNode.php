@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast\ConstExpr;
+namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
 
 class ConstExprStringNode implements ConstExprNode

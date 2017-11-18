@@ -2,6 +2,6 @@
 	"name": "phpstan/type-parser",
 	"license": "MIT",
 	"autoload": {
-		"classmap": ["src"]
+		"psr-4": {"PHPStan\\PhpDocParser\\": ["src/"]}
 	}
 }

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PhpStan\TypeParser\Ast\Type;
+namespace PHPStan\PhpDocParser\Ast\Type;
 
 
 class IntersectionTypeNode implements TypeNode
