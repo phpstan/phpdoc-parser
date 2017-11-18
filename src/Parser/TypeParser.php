@@ -35,7 +35,7 @@ class TypeParser
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-				$type = $this->parseArray($tokens, $type);
+				$type = $this->tryParseArray($tokens, $type);
 			}
 
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
@@ -49,7 +49,7 @@ class TypeParser
 				$type = $this->parseGeneric($tokens, $type);
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-				$type = $this->parseArray($tokens, $type);
+				$type = $this->tryParseArray($tokens, $type);
 			}
 		}
 
@@ -110,11 +110,19 @@ class TypeParser
 	}
 
 
-	private function parseArray(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
+	private function tryParseArray(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
-		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_SQUARE_BRACKET);
-			$type = new Ast\Type\ArrayTypeNode($type);
+		try {
+			while ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+				$tokens->pushSavePoint();
+				$tokens->consumeTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET);
+				$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_SQUARE_BRACKET);
+				$tokens->dropSavePoint();
+				$type = new Ast\Type\ArrayTypeNode($type);
+			}
+
+		} catch (ParserException $e) {
+			$tokens->rollback();
 		}
 
 		return $type;
