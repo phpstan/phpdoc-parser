@@ -3,7 +3,7 @@
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 
-class GeneralTagValueNode implements PhpDocTagValueNode
+class GenericTagValueNode implements PhpDocTagValueNode
 {
 	/** @var string (may be empty) */
 	public $value;

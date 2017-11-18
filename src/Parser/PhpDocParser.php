@@ -81,7 +81,7 @@ class PhpDocParser
 				return $this->parseMethodTagValue($tokens);
 
 			default:
-				return new Ast\PhpDoc\GeneralTagValueNode($this->parseOptionalDescription($tokens));
+				return new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
 		}
 	}
 
