@@ -8,6 +8,12 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 class PhpDocParser
 {
 
+	const DISALLOWED_DESCRIPTION_START_TOKENS = [
+		Lexer::TOKEN_UNION,
+		Lexer::TOKEN_INTERSECTION,
+		Lexer::TOKEN_OPEN_ANGLE_BRACKET,
+	];
+
 	/** @var TypeParser */
 	private $typeParser;
 
@@ -116,7 +122,7 @@ class PhpDocParser
 	{
 		$type = $this->typeParser->parse($tokens);
 		$parameterName = $this->parseOptionalVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, $parameterName === '');
 		return new Ast\PhpDoc\ParamTagValueNode($type, $parameterName, $description);
 	}
 
@@ -124,16 +130,16 @@ class PhpDocParser
 	private function parseVarTagValue(TokenIterator $tokens): Ast\PhpDoc\VarTagValueNode
 	{
 		$type = $this->typeParser->parse($tokens);
-		$parameterName = $this->parseOptionalVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\VarTagValueNode($type, $parameterName, $description);
+		$variableName = $this->parseOptionalVariableName($tokens);
+		$description = $this->parseOptionalDescription($tokens, $variableName === '');
+		return new Ast\PhpDoc\VarTagValueNode($type, $variableName, $description);
 	}
 
 
 	private function parseReturnTagValue(TokenIterator $tokens): Ast\PhpDoc\ReturnTagValueNode
 	{
 		$type = $this->typeParser->parse($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
 		return new Ast\PhpDoc\ReturnTagValueNode($type, $description);
 	}
 
@@ -235,8 +241,16 @@ class PhpDocParser
 	}
 
 
-	private function parseOptionalDescription(TokenIterator $tokens): string
+	private function parseOptionalDescription(TokenIterator $tokens, bool $limitStartToken = false): string
 	{
+		if ($limitStartToken) {
+			foreach (self::DISALLOWED_DESCRIPTION_START_TOKENS as $disallowedStartToken) {
+				if ($tokens->isCurrentTokenType($disallowedStartToken)) {
+					$tokens->consumeTokenType(Lexer::TOKEN_OTHER); // will throw exception
+				}
+			}
+		}
+
 		// description MUST separated from any previous node by horizontal whitespace
 		if ($tokens->tryConsumeHorizontalWhiteSpace()) {
 			return $tokens->joinUntil(Lexer::TOKEN_EOL, Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_CLOSE_PHPDOC);
