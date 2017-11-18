@@ -2,15 +2,14 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-
 class ConstFetchNode implements ConstExprNode
 {
+
 	/** @var string class name for class constants or empty string for non-class constants */
 	public $className;
 
 	/** @var string */
 	public $name;
-
 
 	public function __construct(string $className, string $name)
 	{
@@ -28,4 +27,5 @@ class ConstFetchNode implements ConstExprNode
 			return "{$this->className}::{$this->name}";
 		}
 	}
+
 }

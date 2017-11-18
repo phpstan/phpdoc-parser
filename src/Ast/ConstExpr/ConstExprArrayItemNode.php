@@ -2,15 +2,14 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-
 class ConstExprArrayItemNode implements ConstExprNode
 {
+
 	/** @var null|ConstExprNode */
 	public $key;
 
 	/** @var ConstExprNode */
 	public $value;
-
 
 	public function __construct(ConstExprNode $key = null, ConstExprNode $value)
 	{
@@ -28,4 +27,5 @@ class ConstExprArrayItemNode implements ConstExprNode
 			return "{$this->value}";
 		}
 	}
+
 }

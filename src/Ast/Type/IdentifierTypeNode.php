@@ -2,12 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-
 class IdentifierTypeNode implements TypeNode
 {
+
 	/** @var string */
 	public $name;
-
 
 	public function __construct(string $name)
 	{
@@ -19,4 +18,5 @@ class IdentifierTypeNode implements TypeNode
 	{
 		return $this->name;
 	}
+
 }

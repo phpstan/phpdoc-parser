@@ -4,9 +4,9 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
-
 class MethodTagValueNode implements PhpDocTagValueNode
 {
+
 	/** @var bool */
 	public $isStatic;
 
@@ -21,7 +21,6 @@ class MethodTagValueNode implements PhpDocTagValueNode
 
 	/** @var string (may be empty) */
 	public $description;
-
 
 	public function __construct(bool $isStatic, TypeNode $returnType = null, string $methodName, array $parameters, string $description)
 	{
@@ -41,4 +40,5 @@ class MethodTagValueNode implements PhpDocTagValueNode
 		$description = $this->description !== '' ? " {$this->description}" : '';
 		return "{$static}{$returnType}{$this->methodName}({$parameters}){$description}";
 	}
+
 }

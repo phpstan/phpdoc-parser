@@ -4,9 +4,9 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
 
-
 class TokenIterator
 {
+
 	/** @var array */
 	private $tokens;
 
@@ -15,7 +15,6 @@ class TokenIterator
 
 	/** @var int[] */
 	private $savePoints = [];
-
 
 	public function __construct(array $tokens, int $index = 0)
 	{
@@ -180,4 +179,5 @@ class TokenIterator
 			$this->currentTokenOffset()
 		));
 	}
+
 }

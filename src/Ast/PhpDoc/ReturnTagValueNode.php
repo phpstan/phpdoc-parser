@@ -4,15 +4,14 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
-
 class ReturnTagValueNode implements PhpDocTagValueNode
 {
+
 	/** @var TypeNode */
 	public $type;
 
 	/** @var string (may be empty) */
 	public $description;
-
 
 	public function __construct(TypeNode $type, string $description)
 	{
@@ -25,4 +24,5 @@ class ReturnTagValueNode implements PhpDocTagValueNode
 	{
 		return trim("{$this->type} {$this->description}");
 	}
+
 }

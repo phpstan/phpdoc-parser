@@ -4,9 +4,9 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
-
 class ParamTagValueNode implements PhpDocTagValueNode
 {
+
 	/** @var TypeNode */
 	public $type;
 
@@ -15,7 +15,6 @@ class ParamTagValueNode implements PhpDocTagValueNode
 
 	/** @var string (may be empty) */
 	public $description;
-
 
 	public function __construct(TypeNode $type, string $parameterName, string $description)
 	{
@@ -29,4 +28,5 @@ class ParamTagValueNode implements PhpDocTagValueNode
 	{
 		return trim("{$this->type} {$this->parameterName} {$this->description}");
 	}
+
 }

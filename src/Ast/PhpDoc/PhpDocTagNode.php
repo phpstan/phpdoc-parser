@@ -2,15 +2,14 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-
 class PhpDocTagNode implements PhpDocChildNode
 {
+
 	/** @var string */
 	public $name;
 
 	/** @var PhpDocTagValueNode */
 	public $value;
-
 
 	public function __construct(string $name, PhpDocTagValueNode $value)
 	{
@@ -23,4 +22,5 @@ class PhpDocTagNode implements PhpDocChildNode
 	{
 		return trim("{$this->name} {$this->value}");
 	}
+
 }

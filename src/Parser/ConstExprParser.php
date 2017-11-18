@@ -5,9 +5,9 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 
-
 class ConstExprParser
 {
+
 	public function parse(TokenIterator $tokens): Ast\ConstExpr\ConstExprNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_FLOAT)) {
@@ -93,4 +93,5 @@ class ConstExprParser
 
 		return new Ast\ConstExpr\ConstExprArrayItemNode($key, $value);
 	}
+
 }

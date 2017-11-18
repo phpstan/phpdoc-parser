@@ -2,12 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-
 class IntersectionTypeNode implements TypeNode
 {
+
 	/** @var TypeNode[] */
 	public $types;
-
 
 	public function __construct(array $types)
 	{
@@ -19,4 +18,5 @@ class IntersectionTypeNode implements TypeNode
 	{
 		return '(' . implode(' & ', $this->types) . ')';
 	}
+
 }

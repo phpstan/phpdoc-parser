@@ -2,12 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-
 class GenericTagValueNode implements PhpDocTagValueNode
 {
+
 	/** @var string (may be empty) */
 	public $value;
-
 
 	public function __construct(string $value)
 	{
@@ -19,4 +18,5 @@ class GenericTagValueNode implements PhpDocTagValueNode
 	{
 		return $this->value;
 	}
+
 }

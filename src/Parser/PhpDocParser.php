@@ -5,15 +5,14 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 
-
 class PhpDocParser
 {
+
 	/** @var TypeParser */
 	private $typeParser;
 
 	/** @var ConstExprParser */
 	private $constantExprParser;
-
 
 	public function __construct(TypeParser $typeParser, ConstExprParser $constantExprParser)
 	{
@@ -155,7 +154,7 @@ class PhpDocParser
 
 		} else {
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER); // will throw exception
-			exit();
+			exit;
 		}
 
 		$parameters = [];
@@ -236,4 +235,5 @@ class PhpDocParser
 
 		return '';
 	}
+
 }

@@ -2,12 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-
 class ConstExprArrayNode implements ConstExprNode
 {
+
 	/** @var ConstExprArrayItemNode[] */
 	public $items;
-
 
 	/**
 	 * @param ConstExprArrayItemNode[] $items
@@ -22,4 +21,5 @@ class ConstExprArrayNode implements ConstExprNode
 	{
 		return '[' . implode(', ', $this->items) . ']';
 	}
+
 }

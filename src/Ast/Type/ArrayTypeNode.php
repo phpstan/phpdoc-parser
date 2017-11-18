@@ -2,12 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-
 class ArrayTypeNode implements TypeNode
 {
+
 	/** @var TypeNode */
 	public $type;
-
 
 	public function __construct(TypeNode $type)
 	{
@@ -19,4 +18,5 @@ class ArrayTypeNode implements TypeNode
 	{
 		return $this->type . '[]';
 	}
+
 }

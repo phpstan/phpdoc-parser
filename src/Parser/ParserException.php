@@ -2,7 +2,6 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
-
 class ParserException extends \Exception
 {
 

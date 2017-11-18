@@ -4,12 +4,11 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\Node;
 
-
 class PhpDocNode implements Node
 {
+
 	/** @var PhpDocChildNode[] */
 	public $children;
-
 
 	/**
 	 * @param PhpDocChildNode[] $children
@@ -142,6 +141,7 @@ class PhpDocNode implements Node
 
 	public function __toString(): string
 	{
-		return '/**' . implode('', $this->children) . "*/";
+		return '/**' . implode('', $this->children) . '*/';
 	}
+
 }

@@ -5,9 +5,9 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 
-
 class TypeParser
 {
+
 	public function parse(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
@@ -127,4 +127,5 @@ class TypeParser
 
 		return $type;
 	}
+
 }

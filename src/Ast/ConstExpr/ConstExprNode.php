@@ -4,7 +4,7 @@ namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
 use PHPStan\PhpDocParser\Ast\Node;
 
-
 interface ConstExprNode extends Node
 {
+
 }

@@ -2,18 +2,16 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-
 use PHPStan\PhpDocParser\Parser\ParserException;
-
 
 class InvalidTagValueNode implements PhpDocTagValueNode
 {
+
 	/** @var string (may be empty) */
 	public $value;
 
 	/** @var ParserException */
 	public $exception;
-
 
 	public function __construct(string $value, ParserException $exception)
 	{
@@ -26,4 +24,5 @@ class InvalidTagValueNode implements PhpDocTagValueNode
 	{
 		return $this->value;
 	}
+
 }

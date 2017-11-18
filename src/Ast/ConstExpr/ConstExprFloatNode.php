@@ -2,12 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-
 class ConstExprFloatNode implements ConstExprNode
 {
+
 	/** @var string */
 	public $value;
-
 
 	public function __construct(string $value)
 	{
@@ -19,4 +18,5 @@ class ConstExprFloatNode implements ConstExprNode
 	{
 		return $this->value;
 	}
+
 }

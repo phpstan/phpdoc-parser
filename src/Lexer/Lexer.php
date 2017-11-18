@@ -2,12 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Lexer;
 
-
 /**
  * Implementation based on Nette Tokenizer (New BSD License; https://github.com/nette/tokenizer)
  */
 class Lexer
 {
+
 	const TOKEN_REFERENCE = 0;
 	const TOKEN_UNION = 1;
 	const TOKEN_INTERSECTION = 2;
@@ -73,13 +73,11 @@ class Lexer
 	const VALUE_OFFSET = 0;
 	const TYPE_OFFSET = 1;
 
-
 	/** @var null|string */
 	private $regexp;
 
 	/** @var null|array */
 	private $types;
-
 
 	public function tokenize(string $s): array
 	{
@@ -92,7 +90,7 @@ class Lexer
 
 		foreach ($tokens as &$match) {
 			for ($i = 1; $i <= $count; $i++) {
-				if ($match[$i] != null) {
+				if ($match[$i] !== null && $match[$i] !== '') {
 					$match = [$match[0], $this->types[$i - 1]];
 					break;
 				}
@@ -150,4 +148,5 @@ class Lexer
 		$this->regexp = '~(' . implode(')|(', $patterns) . ')~Asi';
 		$this->types = array_keys($patterns);
 	}
+
 }
