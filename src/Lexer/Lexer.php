@@ -76,7 +76,7 @@ class Lexer
 	/** @var null|string */
 	private $regexp;
 
-	/** @var null|array */
+	/** @var null|int[] */
 	private $types;
 
 	public function tokenize(string $s): array

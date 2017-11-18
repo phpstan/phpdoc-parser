@@ -7,7 +7,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 class TokenIterator
 {
 
-	/** @var array */
+	/** @var mixed[][] */
 	private $tokens;
 
 	/** @var int */
@@ -75,7 +75,8 @@ class TokenIterator
 
 
 	/**
-	 * @throws ParserException
+	 * @param  int $tokenType
+	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
 	 */
 	public function consumeTokenType(int $tokenType)
 	{
@@ -168,11 +169,12 @@ class TokenIterator
 
 
 	/**
-	 * @throws ParserException
+	 * @param  int $expectedTokenType
+	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
 	 */
 	private function throwError(int $expectedTokenType)
 	{
-		throw new ParserException(
+		throw new \PHPStan\PhpDocParser\Parser\ParserException(
 			$this->currentTokenValue(),
 			$this->currentTokenType(),
 			$this->currentTokenOffset(),

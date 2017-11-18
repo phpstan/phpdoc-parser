@@ -31,6 +31,7 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @param  string $tagName
 	 * @return PhpDocTagNode[]
 	 */
 	public function getTagsByName(string $tagName): array

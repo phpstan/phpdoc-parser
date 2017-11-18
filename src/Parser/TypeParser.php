@@ -121,7 +121,7 @@ class TypeParser
 				$type = new Ast\Type\ArrayTypeNode($type);
 			}
 
-		} catch (ParserException $e) {
+		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
 			$tokens->rollback();
 		}
 

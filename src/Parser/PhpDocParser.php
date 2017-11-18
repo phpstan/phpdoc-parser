@@ -109,7 +109,7 @@ class PhpDocParser
 
 			$tokens->dropSavePoint();
 
-		} catch (ParserException $e) {
+		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
 			$tokens->rollback();
 			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens), $e);
 		}
