@@ -133,8 +133,8 @@ class Lexer
 
 			self::TOKEN_FLOAT => '(?:-?[0-9]++\\.[0-9]*+(?:e-?[0-9]++)?)|(?:-?[0-9]*+\\.[0-9]++(?:e-?[0-9]++)?)|(?:-?[0-9]++e-?[0-9]++)',
 			self::TOKEN_INTEGER => '-?[0-9]++',
-			self::TOKEN_SINGLE_QUOTED_STRING => '\'(?:\\\\.|[^\'])*+\'',
-			self::TOKEN_DOUBLE_QUOTED_STRING => '"(?:\\\\.|[^"])*+"',
+			self::TOKEN_SINGLE_QUOTED_STRING => '\'(?:\\\\.|[^\'\\r\\n])*+\'',
+			self::TOKEN_DOUBLE_QUOTED_STRING => '"(?:\\\\.|[^"\\r\\n])*+"',
 
 			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x7F-\\xFF][0-9a-z_\\x7F-\\xFF]*+)++',
 			self::TOKEN_THIS_VARIABLE => '\\$this\\b',
