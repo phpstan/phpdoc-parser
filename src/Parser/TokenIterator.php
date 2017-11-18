@@ -172,12 +172,12 @@ class TokenIterator
 	 */
 	private function throwError(int $expectedTokenType)
 	{
-		throw new ParserException(sprintf(
-			'Unexpected token \'%s\', expected %s at offset %d',
+		throw new ParserException(
 			$this->currentTokenValue(),
-			Lexer::TOKEN_LABELS[$expectedTokenType],
-			$this->currentTokenOffset()
-		));
+			$this->currentTokenType(),
+			$this->currentTokenOffset(),
+			$expectedTokenType
+		);
 	}
 
 }
