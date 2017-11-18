@@ -72,6 +72,9 @@ class TokenIterator
 	}
 
 
+	/**
+	 * @throws ParserException
+	 */
 	public function consumeTokenType(int $tokenType): void
 	{
 		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType) {
@@ -144,6 +147,9 @@ class TokenIterator
 	}
 
 
+	/**
+	 * @throws ParserException
+	 */
 	private function throwError(int $expectedTokenType): void
 	{
 		throw new ParserException(sprintf(
