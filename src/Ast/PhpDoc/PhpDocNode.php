@@ -42,6 +42,104 @@ class PhpDocNode implements Node
 	}
 
 
+	/**
+	 * @return VarTagValueNode[]
+	 */
+	public function getVarTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@var'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof VarTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return ParamTagValueNode[]
+	 */
+	public function getParamTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@param'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof ParamTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return ReturnTagValueNode[]
+	 */
+	public function getReturnTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@return'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof ReturnTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return PropertyTagValueNode[]
+	 */
+	public function getPropertyTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@property'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof PropertyTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return PropertyTagValueNode[]
+	 */
+	public function getPropertyReadTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@property-read'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof PropertyTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return PropertyTagValueNode[]
+	 */
+	public function getPropertyWriteTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@property-write'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof PropertyTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return MethodTagValueNode[]
+	 */
+	public function getMethodTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@method'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof MethodTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
 	public function __toString(): string
 	{
 		return '/**' . implode('', $this->children) . "*/";
