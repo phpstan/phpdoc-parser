@@ -1,0 +1,40 @@
+language: php
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+  - master
+
+matrix:
+  include:
+    - php: 7.0
+      env: dependencies=lowest
+    - php: 7.0
+      env: dependencies=highest
+    - php: 7.1
+      env: dependencies=lowest
+    - php: 7.1
+      env: dependencies=highest
+    - php: 7.2
+      env: dependencies=lowest
+    - php: 7.2
+      env: dependencies=highest
+    - php: master
+      env: dependencies=lowest
+    - php: master
+      env: dependencies=highest
+  allow_failures:
+    - php: master
+    - php: master
+      env: dependencies=lowest
+    - php: master
+      env: dependencies=highest
+
+before_script:
+  - composer self-update
+  - if [ -z "$dependencies" ]; then composer install; fi;
+  - if [ "$dependencies" = "lowest" ]; then composer update --prefer-lowest -n; fi;
+  - if [ "$dependencies" = "highest" ]; then composer update -n; fi;
+
+script:
+  - vendor/bin/phing
