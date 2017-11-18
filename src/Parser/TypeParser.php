@@ -38,6 +38,9 @@ class TypeParser
 				$type = $this->parseArray($tokens, $type);
 			}
 
+		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+			return new Ast\Type\ThisTypeNode();
+
 		} else {
 			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);

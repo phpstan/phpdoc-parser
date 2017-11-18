@@ -13,6 +13,7 @@ Nullable
 
 Atomic
   ::= Identifier (Generic | Array)?
+    | ThisType
     | '(' Type ')' Array?
 
 Generic
@@ -21,8 +22,11 @@ Generic
 Array
   ::= ('[' ']')+
 
+ThisType
+  ::= '$this'
+
 Identifier
-  ::= ('\'? Word)+
+  ::= ('\\'? Word)+
 
 Word
   ::= [a-zA-Z_#x7F-#x10FFFF][0-9a-zA-Z_#x7F-#x10FFFF]*
