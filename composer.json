@@ -1,5 +1,5 @@
 {
-	"name": "phpstan/type-parser",
+	"name": "phpstan/phpdoc-parser",
 	"license": "MIT",
 	"autoload": {
 		"psr-4": {"PHPStan\\PhpDocParser\\": ["src/"]}
