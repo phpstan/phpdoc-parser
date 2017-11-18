@@ -43,15 +43,16 @@ class PhpDocParser
 					$children[] = new Ast\PhpDoc\PhpDocTextNode($textNode);
 					$textNode = '';
 				}
+
 				$children[] = $this->parseTag($tokens);
 
 			} else {
 				$textNode .= $tokens->currentTokenValue();
 				$tokens->next();
-			}
 
-			if ($tokens->tryConsumeHorizontalWhiteSpace()) {
-				$textNode .= $tokens->prevTokenValue();
+				if ($tokens->tryConsumeHorizontalWhiteSpace()) {
+					$textNode .= $tokens->prevTokenValue();
+				}
 			}
 		}
 
