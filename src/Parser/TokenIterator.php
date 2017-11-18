@@ -13,6 +13,9 @@ class TokenIterator
 	/** @var int */
 	private $index;
 
+	/** @var int[] */
+	private $savePoints = [];
+
 
 	public function __construct(array $tokens, int $index = 0)
 	{
@@ -144,6 +147,24 @@ class TokenIterator
 		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
 			$this->index++;
 		}
+	}
+
+
+	public function pushSavePoint(): void
+	{
+		$this->savePoints[] = $this->index;
+	}
+
+
+	public function dropSavePoint(): void
+	{
+		array_pop($this->savePoints);
+	}
+
+
+	public function rollback(): void
+	{
+		$this->index = array_pop($this->savePoints);
 	}
 
 
