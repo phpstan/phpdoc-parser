@@ -61,28 +61,46 @@ class PhpDocParser
 
 	private function parseTagValue(TokenIterator $tokens, string $tag): Ast\PhpDoc\PhpDocTagValueNode
 	{
-		switch ($tag) {
-			case '@param':
-				return $this->parseParamTagValue($tokens);
+		try {
+			$tokens->pushSavePoint();
 
-			case '@var':
-				return $this->parseVarTagValue($tokens);
+			switch ($tag) {
+				case '@param':
+					$tagValue = $this->parseParamTagValue($tokens);
+					break;
 
-			case '@return':
-			case '@returns':
-				return $this->parseReturnTagValue($tokens);
+				case '@var':
+					$tagValue = $this->parseVarTagValue($tokens);
+					break;
 
-			case '@property':
-			case '@property-read':
-			case '@property-write':
-				return $this->parsePropertyTagValue($tokens);
+				case '@return':
+				case '@returns':
+					$tagValue = $this->parseReturnTagValue($tokens);
+					break;
 
-			case '@method':
-				return $this->parseMethodTagValue($tokens);
+				case '@property':
+				case '@property-read':
+				case '@property-write':
+					$tagValue = $this->parsePropertyTagValue($tokens);
+					break;
 
-			default:
-				return new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
+				case '@method':
+					$tagValue = $this->parseMethodTagValue($tokens);
+					break;
+
+				default:
+					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
+					break;
+			}
+
+			$tokens->dropSavePoint();
+
+		} catch (ParserException $e) {
+			$tokens->rollback();
+			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens), $e);
 		}
+
+		return $tagValue;
 	}
 
 
