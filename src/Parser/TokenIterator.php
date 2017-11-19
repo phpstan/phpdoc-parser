@@ -86,7 +86,7 @@ class TokenIterator
 
 		$this->index++;
 
-		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
+		if (($this->tokens[$this->index][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS) {
 			$this->index++;
 		}
 	}
