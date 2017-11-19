@@ -102,6 +102,24 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'/** @param Foo optional description */',
+				new PhpDocNode([
+					new PhpDocTextNode(' '),
+					new PhpDocTagNode(
+						'@param',
+						new InvalidTagValueNode(
+							'Foo optional description ',
+							new \PHPStan\PhpDocParser\Parser\ParserException(
+								'optional',
+								Lexer::TOKEN_IDENTIFIER,
+								15,
+								Lexer::TOKEN_VARIABLE
+							)
+						)
+					),
+				]),
+			],
+			[
 				'/** @param Foo $foo optional description */',
 				new PhpDocNode([
 					new PhpDocTextNode(' '),
