@@ -122,9 +122,10 @@ class PhpDocParser
 	private function parseParamTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamTagValueNode
 	{
 		$type = $this->typeParser->parse($tokens);
+		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
 		$parameterName = $this->parseRequiredVariableName($tokens);
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\ParamTagValueNode($type, $parameterName, $description);
+		return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description);
 	}
 
 

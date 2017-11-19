@@ -10,15 +10,19 @@ class ParamTagValueNode implements PhpDocTagValueNode
 	/** @var TypeNode */
 	public $type;
 
+	/** @var bool */
+	public $isVariadic;
+
 	/** @var string (may be empty) */
 	public $parameterName;
 
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(TypeNode $type, string $parameterName, string $description)
+	public function __construct(TypeNode $type, bool $isVariadic, string $parameterName, string $description)
 	{
 		$this->type = $type;
+		$this->isVariadic = $isVariadic;
 		$this->parameterName = $parameterName;
 		$this->description = $description;
 	}
@@ -26,7 +30,8 @@ class ParamTagValueNode implements PhpDocTagValueNode
 
 	public function __toString(): string
 	{
-		return trim("{$this->type} {$this->parameterName} {$this->description}");
+		$variadic = $this->isVariadic ? '...' : '';
+		return trim("{$this->type} {$variadic}{$this->parameterName} {$this->description}");
 	}
 
 }

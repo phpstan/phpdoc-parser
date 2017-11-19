@@ -95,6 +95,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
+							false,
 							'$foo',
 							''
 						)
@@ -127,6 +128,22 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
+							false,
+							'$foo',
+							'optional description '
+						)
+					),
+				]),
+			],
+			[
+				'/** @param Foo ...$foo optional description */',
+				new PhpDocNode([
+					new PhpDocTextNode(' '),
+					new PhpDocTagNode(
+						'@param',
+						new ParamTagValueNode(
+							new IdentifierTypeNode('Foo'),
+							true,
 							'$foo',
 							'optional description '
 						)
@@ -289,6 +306,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
+							false,
 							'$foo',
 							'1st multi world description'
 						)
@@ -298,6 +316,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Bar'),
+							false,
 							'$bar',
 							'2nd multi world description'
 						)
@@ -317,6 +336,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
+							false,
 							'$foo',
 							'1st multi world description'
 						)
@@ -326,6 +346,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Bar'),
+							false,
 							'$bar',
 							'2nd multi world description'
 						)
