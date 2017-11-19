@@ -32,8 +32,8 @@ class ParserException extends \Exception
 		$this->expectedTokenType = $expectedTokenType;
 
 		parent::__construct(sprintf(
-			'Unexpected token \'%s\', expected %s at offset %d',
-			$currentTokenValue,
+			'Unexpected token %s, expected %s at offset %d',
+			json_encode($currentTokenValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 			Lexer::TOKEN_LABELS[$expectedTokenType],
 			$currentOffset
 		));
