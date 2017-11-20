@@ -6,7 +6,8 @@
 		composer-install,
 		lint,
 		cs,
-		tests
+		tests,
+		phpstan
 	"/>
 
 	<target name="composer-validate">
@@ -92,6 +93,21 @@
 		>
 			<arg value="-c"/>
 			<arg value="tests/phpunit.xml"/>
+			<arg path="tests"/>
+		</exec>
+	</target>
+
+	<target name="phpstan">
+		<exec
+			executable="vendor/bin/phpstan"
+			logoutput="true"
+			passthru="true"
+			checkreturn="true"
+		>
+			<arg value="analyse"/>
+			<arg value="--level"/>
+			<arg value="7"/>
+			<arg path="src"/>
 			<arg path="tests"/>
 		</exec>
 	</target>

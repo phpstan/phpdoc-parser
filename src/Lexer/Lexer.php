@@ -86,6 +86,8 @@ class Lexer
 		}
 
 		preg_match_all($this->regexp, $s, $tokens, PREG_SET_ORDER);
+
+		assert($this->types !== null);
 		$count = count($this->types);
 
 		foreach ($tokens as &$match) {
