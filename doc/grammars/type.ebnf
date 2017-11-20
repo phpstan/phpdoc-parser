@@ -1,32 +1,66 @@
+/* Written in W3C's EBNF notation (https://www.w3.org/TR/xml/#sec-notation) */
+
 Type
   ::= Atomic (Union | Intersection)?
     | Nullable
 
 Union
-  ::= ('|' Atomic)+
+  ::= (TUnion Atomic)+
 
 Intersection
-  ::= ('&' Atomic)+
+  ::= (TIntersection Atomic)+
 
 Nullable
-  ::= '?' Identifier Generic?
+  ::= TNullable Identifier Generic?
 
 Atomic
-  ::= Identifier (Generic | Array)?
-    | ThisType
-    | '(' Type ')' Array?
+  ::= TIdentifier (Generic | Array)?
+    | TThisVariable
+    | TOpenParentheses Type TCloseParentheses Array?
 
 Generic
-  ::= '<' Type (',' Type)* '>'
+  ::= TOpenAngleBracket Type (TComma Type)* TCloseAngleBracket
 
 Array
-  ::= ('[' ']')+
+  ::= (TOpenSquareBracket TCloseSquareBracket)+
 
-ThisType
-  ::= '$this'
 
-Identifier
-  ::= ('\\'? Word)+
+/* Tokens */
+TUnion
+  ::= '|' THorizontalWs*
 
-Word
-  ::= [a-zA-Z_#x7F-#x10FFFF][0-9a-zA-Z_#x7F-#x10FFFF]*
+TIntersection
+  ::= '&' THorizontalWs*
+
+TNullable
+  ::= '?' THorizontalWs*
+
+TOpenParentheses
+  ::= '(' THorizontalWs*
+
+TCloseParentheses
+  ::= ')' THorizontalWs*
+
+TOpenAngleBracket
+  ::= '<' THorizontalWs*
+
+TCloseAngleBracket
+  ::= '>' THorizontalWs*
+
+TOpenSquareBracket
+  ::= '[' THorizontalWs*
+
+TCloseSquareBracket
+  ::= ']' THorizontalWs*
+
+TComma
+  ::= ',' THorizontalWs*
+
+TThisVariable
+  ::= '$this' THorizontalWs*
+
+TIdentifier
+  ::= ('\\'? [a-zA-Z_#x7F-#x10FFFF][0-9a-zA-Z_#x7F-#x10FFFF]*)+ THorizontalWs*
+
+THorizontalWs
+  ::= #x09 | #x20
