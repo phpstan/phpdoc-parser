@@ -73,8 +73,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@foo',
-						new GenericTagValueNode('lorem ')
+						new GenericTagValueNode('lorem')
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -83,8 +84,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@foo',
-						new GenericTagValueNode('lorem ipsum ')
+						new GenericTagValueNode('lorem ipsum')
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -100,6 +102,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -109,7 +112,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@param',
 						new InvalidTagValueNode(
-							'Foo optional description ',
+							'Foo optional description',
 							new \PHPStan\PhpDocParser\Parser\ParserException(
 								'optional',
 								Lexer::TOKEN_IDENTIFIER,
@@ -118,6 +121,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -130,9 +134,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'optional description '
+							'optional description'
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -145,9 +150,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('Foo'),
 							true,
 							'$foo',
-							'optional description '
+							'optional description'
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -161,6 +167,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -171,9 +178,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@return',
 						new ReturnTagValueNode(
 							new IdentifierTypeNode('Foo'),
-							'optional description '
+							'optional description'
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -184,9 +192,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@return',
 						new ReturnTagValueNode(
 							new IdentifierTypeNode('array'),
-							'[int] '
+							'[int]'
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -196,7 +205,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
-							'[int, string] ',
+							'[int, string]',
 							new \PHPStan\PhpDocParser\Parser\ParserException(
 								'[',
 								Lexer::TOKEN_OPEN_SQUARE_BRACKET,
@@ -205,6 +214,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -214,7 +224,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
-							'A & B | C ',
+							'A & B | C',
 							new \PHPStan\PhpDocParser\Parser\ParserException(
 								'|',
 								Lexer::TOKEN_UNION,
@@ -223,6 +233,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -232,7 +243,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
-							'A | B & C ',
+							'A | B & C',
 							new \PHPStan\PhpDocParser\Parser\ParserException(
 								'&',
 								Lexer::TOKEN_INTERSECTION,
@@ -241,6 +252,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -250,7 +262,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
-							'A | B < 123 ',
+							'A | B < 123',
 							new \PHPStan\PhpDocParser\Parser\ParserException(
 								'123',
 								Lexer::TOKEN_INTEGER,
@@ -259,6 +271,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -272,9 +285,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 								new IdentifierTypeNode('callable')
 							),
 							'',
-							'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created '
+							'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created'
 						)
 					),
+					new PhpDocTextNode(' '),
 				]),
 			],
 			[
@@ -289,10 +303,74 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
+					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@inject',
 						new GenericTagValueNode('')
 					),
+					new PhpDocTextNode(' '),
+				]),
+			],
+			[
+				'/** @var \\\\Foo $foo */',
+				new PhpDocNode([
+					new PhpDocTextNode(' '),
+					new PhpDocTagNode(
+						'@var',
+						new InvalidTagValueNode(
+							'\\\\Foo $foo',
+							new \PHPStan\PhpDocParser\Parser\ParserException(
+								'\\\\Foo',
+								Lexer::TOKEN_OTHER,
+								9,
+								Lexer::TOKEN_IDENTIFIER
+							)
+						)
+					),
+					new PhpDocTextNode(' '),
+				]),
+			],
+			[
+				'/** @varFoo $foo */',
+				new PhpDocNode([
+					new PhpDocTextNode(' '),
+					new PhpDocTagNode(
+						'@varFoo',
+						new GenericTagValueNode(
+							'$foo'
+						)
+					),
+					new PhpDocTextNode(' '),
+				]),
+			],
+			[
+				'/** @var Foo$foo */',
+				new PhpDocNode([
+					new PhpDocTextNode(' '),
+					new PhpDocTagNode(
+						'@var',
+						new VarTagValueNode(
+							new IdentifierTypeNode('Foo'),
+							'$foo',
+							''
+						)
+					),
+					new PhpDocTextNode(' '),
+				]),
+			],
+			[
+				'/**@var(Foo)$foo#desc*/',
+				new PhpDocNode([
+					new PhpDocTextNode(''),
+					new PhpDocTagNode(
+						'@var',
+						new VarTagValueNode(
+							new IdentifierTypeNode('Foo'),
+							'$foo',
+							'#desc'
+						)
+					),
+					new PhpDocTextNode(''),
 				]),
 			],
 			[

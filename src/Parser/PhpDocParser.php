@@ -29,38 +29,28 @@ class PhpDocParser
 
 	public function parse(TokenIterator $tokens): Ast\PhpDoc\PhpDocNode
 	{
-		$textNode = '';
-		$children = [];
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PHPDOC);
 
-		if ($tokens->tryConsumeHorizontalWhiteSpace()) {
-			$textNode .= $tokens->prevTokenValue();
+		$children = [];
+		$children[] = $this->parseText($tokens);
+
+		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC) && !$tokens->isCurrentTokenType(Lexer::TOKEN_END)) {
+			$children[] = $this->parseTag($tokens);
+			$children[] = $this->parseText($tokens);
 		}
 
-		while (!$tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
-				if ($textNode !== '') {
-					$children[] = new Ast\PhpDoc\PhpDocTextNode($textNode);
-					$textNode = '';
-				}
+		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC);
 
-				$children[] = $this->parseTag($tokens);
+		return new Ast\PhpDoc\PhpDocNode(array_values($children));
+	}
 
-			} else {
-				$textNode .= $tokens->currentTokenValue();
-				$tokens->next();
 
-				if ($tokens->tryConsumeHorizontalWhiteSpace()) {
-					$textNode .= $tokens->prevTokenValue();
-				}
-			}
-		}
+	private function parseText(TokenIterator $tokens): Ast\PhpDoc\PhpDocTextNode
+	{
+		$text = $tokens->getSkippedHorizontalWhiteSpaceIfAny();
+		$text .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_CLOSE_PHPDOC);
 
-		if ($textNode !== '') {
-			$children[] = new Ast\PhpDoc\PhpDocTextNode($textNode);
-		}
-
-		return new Ast\PhpDoc\PhpDocNode($children);
+		return new Ast\PhpDoc\PhpDocTextNode($text);
 	}
 
 
@@ -222,7 +212,7 @@ class PhpDocParser
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
 	{
-		if ($tokens->tryConsumeHorizontalWhiteSpace() && $tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
 			$parameterName = $tokens->currentTokenValue();
 			$tokens->next();
 
@@ -235,7 +225,6 @@ class PhpDocParser
 
 	private function parseRequiredVariableName(TokenIterator $tokens): string
 	{
-		$tokens->tryConsumeHorizontalWhiteSpace();
 		$parameterName = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
 
@@ -253,12 +242,14 @@ class PhpDocParser
 			}
 		}
 
-		// description MUST separated from any previous node by horizontal whitespace
-		if ($tokens->tryConsumeHorizontalWhiteSpace()) {
-			return $tokens->joinUntil(Lexer::TOKEN_EOL, Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_CLOSE_PHPDOC);
-		}
+		$description = $tokens->joinUntil(
+			Lexer::TOKEN_EOL,
+			Lexer::TOKEN_PHPDOC_TAG,
+			Lexer::TOKEN_CLOSE_PHPDOC
+		);
 
-		return '';
+		// the trimmed characters MUST match Lexer::TOKEN_HORIZONTAL_WS
+		return rtrim($description, " \t");
 	}
 
 }

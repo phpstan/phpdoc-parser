@@ -27,18 +27,6 @@ class TokenIterator
 	}
 
 
-	public function prevTokenValue(): string
-	{
-		return $this->tokens[$this->index - 1][Lexer::VALUE_OFFSET];
-	}
-
-
-	public function prevTokenType(): int
-	{
-		return $this->tokens[$this->index - 1][Lexer::TYPE_OFFSET];
-	}
-
-
 	public function currentTokenValue(): string
 	{
 		return $this->tokens[$this->index][Lexer::VALUE_OFFSET];
@@ -124,9 +112,13 @@ class TokenIterator
 	}
 
 
-	public function tryConsumeHorizontalWhiteSpace(): bool
+	public function getSkippedHorizontalWhiteSpaceIfAny(): string
 	{
-		return $this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS;
+		if ($this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
+			return $this->tokens[$this->index - 1][Lexer::VALUE_OFFSET];
+		}
+
+		return '';
 	}
 
 
