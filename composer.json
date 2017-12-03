@@ -20,5 +20,10 @@
 	},
 	"autoload-dev": {
 		"psr-4": {"PHPStan\\PhpDocParser\\": ["tests/PHPStan"]}
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "0.1-dev"
+		}
 	}
 }
