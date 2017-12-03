@@ -58,7 +58,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'/** nothing */',
 				new PhpDocNode([
-					new PhpDocTextNode(' nothing '),
+					new PhpDocTextNode('nothing'),
 				]),
 			],
 			[
@@ -70,29 +70,24 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'/** @foo lorem */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@foo',
 						new GenericTagValueNode('lorem')
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @foo lorem ipsum */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@foo',
 						new GenericTagValueNode('lorem ipsum')
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @param Foo $foo */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -102,13 +97,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @param Foo optional description */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@param',
 						new InvalidTagValueNode(
@@ -121,13 +114,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @param Foo $foo optional description */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -137,13 +128,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'optional description'
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @param Foo ...$foo optional description */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -153,13 +142,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'optional description'
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return Foo */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new ReturnTagValueNode(
@@ -167,13 +154,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return Foo optional description */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new ReturnTagValueNode(
@@ -181,13 +166,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'optional description'
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return array [int] */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new ReturnTagValueNode(
@@ -195,13 +178,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'[int]'
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return [int, string] */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
@@ -214,13 +195,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return A & B | C */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
@@ -233,13 +212,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return A | B & C */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
@@ -252,13 +229,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @return A | B < 123 */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@return',
 						new InvalidTagValueNode(
@@ -271,13 +246,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @var callable[] function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@var',
 						new VarTagValueNode(
@@ -288,33 +261,30 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created'
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @var Foo @inject */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@var',
 						new VarTagValueNode(
 							new IdentifierTypeNode('Foo'),
 							'',
-							''
+							'@inject'
 						)
 					),
-					new PhpDocTextNode(' '),
-					new PhpDocTagNode(
-						'@inject',
-						new GenericTagValueNode('')
-					),
-					new PhpDocTextNode(' '),
+				]),
+			],
+			[
+				'/** stuff before @var Foo */',
+				new PhpDocNode([
+					new PhpDocTextNode('stuff before @var Foo'),
 				]),
 			],
 			[
 				'/** @var \\\\Foo $foo */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@var',
 						new InvalidTagValueNode(
@@ -327,26 +297,22 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							)
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @varFoo $foo */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@varFoo',
 						new GenericTagValueNode(
 							'$foo'
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/** @var Foo$foo */',
 				new PhpDocNode([
-					new PhpDocTextNode(' '),
 					new PhpDocTagNode(
 						'@var',
 						new VarTagValueNode(
@@ -355,13 +321,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode(' '),
 				]),
 			],
 			[
 				'/**@var(Foo)$foo#desc*/',
 				new PhpDocNode([
-					new PhpDocTextNode(''),
 					new PhpDocTagNode(
 						'@var',
 						new VarTagValueNode(
@@ -370,7 +334,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'#desc'
 						)
 					),
-					new PhpDocTextNode(''),
 				]),
 			],
 			[
@@ -379,7 +342,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
                   * @param Bar $bar 2nd multi world description
                   */',
 				new PhpDocNode([
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -389,7 +351,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'1st multi world description'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -399,7 +360,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'2nd multi world description'
 						)
 					),
-					new PhpDocTextNode("\n                  "),
 				]),
 			],
 			[
@@ -409,7 +369,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
                   * @param Bar $bar 2nd multi world description
                   */',
 				new PhpDocNode([
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -419,7 +378,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'1st multi world description'
 						)
 					),
-					new PhpDocTextNode("\n                  * some text in the middle\n                  * "),
+					new PhpDocTextNode('some text in the middle'),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -429,7 +388,78 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'2nd multi world description'
 						)
 					),
-					new PhpDocTextNode("\n                  "),
+				]),
+			],
+			[
+				'/**
+                  *
+                  *
+                  * @param Foo $foo 1st multi world description
+                  *
+                  *
+                  * some text in the middle
+                  *
+                  *
+                  * @param Bar $bar 2nd multi world description
+                  *
+                  *
+                  */',
+				new PhpDocNode([
+					new PhpDocTextNode(''),
+					new PhpDocTextNode(''),
+					new PhpDocTagNode(
+						'@param',
+						new ParamTagValueNode(
+							new IdentifierTypeNode('Foo'),
+							false,
+							'$foo',
+							'1st multi world description'
+						)
+					),
+					new PhpDocTextNode(''),
+					new PhpDocTextNode(''),
+					new PhpDocTextNode('some text in the middle'),
+					new PhpDocTextNode(''),
+					new PhpDocTextNode(''),
+					new PhpDocTagNode(
+						'@param',
+						new ParamTagValueNode(
+							new IdentifierTypeNode('Bar'),
+							false,
+							'$bar',
+							'2nd multi world description'
+						)
+					),
+					new PhpDocTextNode(''),
+					new PhpDocTextNode(''),
+				]),
+			],
+			[
+				'/**
+                  *
+                  *
+                  */',
+				new PhpDocNode([
+					new PhpDocTextNode(''),
+					new PhpDocTextNode(''),
+				]),
+			],
+			[
+				'/**
+                  * Lets talk about @param
+                  * @param int $foo @param string $bar
+                  */',
+				new PhpDocNode([
+					new PhpDocTextNode('Lets talk about @param'),
+					new PhpDocTagNode(
+						'@param',
+						new ParamTagValueNode(
+							new IdentifierTypeNode('int'),
+							false,
+							'$foo',
+							'@param string $bar'
+						)
+					),
 				]),
 			],
 			[
@@ -473,7 +503,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
                   * @method Foo overridenMethod()
                   */',
 				new PhpDocNode([
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -499,7 +528,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -525,7 +553,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -539,7 +566,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -550,7 +576,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -576,7 +601,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -602,7 +626,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -616,7 +639,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -627,7 +649,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -653,7 +674,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get an integer with a description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -679,7 +699,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Do something with a description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -693,7 +712,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get a Foo or a Bar with a description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -704,7 +722,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Do something with a description but what, who knows!'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -730,7 +747,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get an integer with a description statically.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -756,7 +772,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Do something with a description statically.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -770,7 +785,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get a Foo or a Bar with a description statically.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -781,7 +795,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Do something with a description statically, but what, who knows!'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -792,7 +805,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -803,7 +815,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'A Description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -814,7 +825,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -825,7 +835,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -839,7 +848,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -850,7 +858,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -861,7 +868,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -872,7 +878,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -886,7 +891,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -897,7 +901,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -908,7 +911,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get an integer with a description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -919,7 +921,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Do something with a description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -933,7 +934,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get a Foo or a Bar with a description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -944,7 +944,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get an integer with a description statically.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -955,7 +954,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Do something with a description statically.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -969,7 +967,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'Get a Foo or a Bar with a description statically.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -983,7 +980,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -997,7 +993,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							'A Description.'
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -1016,7 +1011,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -1042,7 +1036,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  * "),
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
@@ -1053,7 +1046,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							''
 						)
 					),
-					new PhpDocTextNode("\n                  "),
 				]),
 			],
 		];

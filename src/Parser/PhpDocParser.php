@@ -30,13 +30,15 @@ class PhpDocParser
 	public function parse(TokenIterator $tokens): Ast\PhpDoc\PhpDocNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PHPDOC);
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 		$children = [];
-		$children[] = $this->parseText($tokens);
 
-		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC) && !$tokens->isCurrentTokenType(Lexer::TOKEN_END)) {
-			$children[] = $this->parseTag($tokens);
-			$children[] = $this->parseText($tokens);
+		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+			$children[] = $this->parseChild($tokens);
+			while ($tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL) && !$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+				$children[] = $this->parseChild($tokens);
+			}
 		}
 
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC);
@@ -45,10 +47,21 @@ class PhpDocParser
 	}
 
 
+	private function parseChild(TokenIterator $tokens): Ast\PhpDoc\PhpDocChildNode
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
+			return $this->parseTag($tokens);
+
+		} else {
+			return $this->parseText($tokens);
+		}
+	}
+
+
 	private function parseText(TokenIterator $tokens): Ast\PhpDoc\PhpDocTextNode
 	{
-		$text = $tokens->getSkippedHorizontalWhiteSpaceIfAny();
-		$text .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_CLOSE_PHPDOC);
+		$text = $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+		$text = rtrim($text, " \t"); // the trimmed characters MUST match Lexer::TOKEN_HORIZONTAL_WS
 
 		return new Ast\PhpDoc\PhpDocTextNode($text);
 	}
@@ -223,6 +236,7 @@ class PhpDocParser
 		return $parameterName;
 	}
 
+
 	private function parseRequiredVariableName(TokenIterator $tokens): string
 	{
 		$parameterName = $tokens->currentTokenValue();
@@ -242,14 +256,7 @@ class PhpDocParser
 			}
 		}
 
-		$description = $tokens->joinUntil(
-			Lexer::TOKEN_EOL,
-			Lexer::TOKEN_PHPDOC_TAG,
-			Lexer::TOKEN_CLOSE_PHPDOC
-		);
-
-		// the trimmed characters MUST match Lexer::TOKEN_HORIZONTAL_WS
-		return rtrim($description, " \t");
+		return $this->parseText($tokens)->text;
 	}
 
 }

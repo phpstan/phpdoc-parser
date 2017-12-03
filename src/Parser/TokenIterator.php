@@ -125,7 +125,7 @@ class TokenIterator
 	public function joinUntil(int ...$tokenType): string
 	{
 		$s = '';
-		while (isset($this->tokens[$this->index]) && !in_array($this->tokens[$this->index][Lexer::TYPE_OFFSET], $tokenType, true)) {
+		while (!in_array($this->tokens[$this->index][Lexer::TYPE_OFFSET], $tokenType, true)) {
 			$s .= $this->tokens[$this->index++][Lexer::VALUE_OFFSET];
 		}
 		return $s;

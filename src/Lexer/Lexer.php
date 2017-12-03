@@ -26,6 +26,7 @@ class Lexer
 	const TOKEN_OPEN_PHPDOC = 15;
 	const TOKEN_CLOSE_PHPDOC = 16;
 	const TOKEN_PHPDOC_TAG = 17;
+	const TOKEN_PHPDOC_EOL = 26;
 	const TOKEN_FLOAT = 18;
 	const TOKEN_INTEGER = 19;
 	const TOKEN_SINGLE_QUOTED_STRING = 20;
@@ -34,7 +35,6 @@ class Lexer
 	const TOKEN_THIS_VARIABLE = 23;
 	const TOKEN_VARIABLE = 24;
 	const TOKEN_HORIZONTAL_WS = 25;
-	const TOKEN_EOL = 26;
 	const TOKEN_OTHER = 27;
 	const TOKEN_END = 28;
 
@@ -65,7 +65,6 @@ class Lexer
 		self::TOKEN_THIS_VARIABLE => '\'$this\'',
 		self::TOKEN_VARIABLE => 'TOKEN_VARIABLE',
 		self::TOKEN_HORIZONTAL_WS => 'TOKEN_HORIZONTAL_WS',
-		self::TOKEN_EOL => 'TOKEN_EOL',
 		self::TOKEN_OTHER => 'TOKEN_OTHER',
 		self::TOKEN_END => 'TOKEN_END',
 	];
@@ -130,6 +129,7 @@ class Lexer
 			self::TOKEN_OPEN_PHPDOC => '/\\*\\*',
 			self::TOKEN_CLOSE_PHPDOC => '\\*/',
 			self::TOKEN_PHPDOC_TAG => '@[a-z-]++',
+			self::TOKEN_PHPDOC_EOL => '\\r?+\\n\\h*+(?:\\*(?!/)\\h*+)?',
 
 			self::TOKEN_FLOAT => '(?:-?[0-9]++\\.[0-9]*+(?:e-?[0-9]++)?)|(?:-?[0-9]*+\\.[0-9]++(?:e-?[0-9]++)?)|(?:-?[0-9]++e-?[0-9]++)',
 			self::TOKEN_INTEGER => '-?[0-9]++',
@@ -141,10 +141,9 @@ class Lexer
 			self::TOKEN_VARIABLE => '\\$[a-z_\\x7F-\\xFF][0-9a-z_\\x7F-\\xFF]*+',
 
 			self::TOKEN_HORIZONTAL_WS => '\\h++',
-			self::TOKEN_EOL => '(?:\\r?+\\n)++',
 
-			// anything but TOKEN_PHPDOC_TAG or TOKEN_CLOSE_PHPDOC or TOKEN_HORIZONTAL_WS or TOKEN_EOL
-			self::TOKEN_OTHER => '(?:(?!@[a-z-])(?!\\*/)[^\\s])++',
+			// anything but TOKEN_CLOSE_PHPDOC or TOKEN_HORIZONTAL_WS or TOKEN_EOL
+			self::TOKEN_OTHER => '(?:(?!\\*/)[^\\s])++',
 		];
 
 		$this->regexp = '~(' . implode(')|(', $patterns) . ')~Asi';
