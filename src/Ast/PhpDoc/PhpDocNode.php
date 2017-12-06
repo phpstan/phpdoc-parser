@@ -145,4 +145,13 @@ class PhpDocNode implements Node
 		return "/**\n * " . implode("\n * ", $this->children) . '*/';
 	}
 
+
+	/**
+	 * @return PhpDocChildNode[]
+	 */
+	public function getNodes(): array
+	{
+		return $this->children;
+	}
+
 }
