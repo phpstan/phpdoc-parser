@@ -16,10 +16,10 @@ class VarTagValueNode implements PhpDocTagValueNode
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(TypeNode $type, string $parameterName, string $description)
+	public function __construct(TypeNode $type, string $variableName, string $description)
 	{
 		$this->type = $type;
-		$this->variableName = $parameterName;
+		$this->variableName = $variableName;
 		$this->description = $description;
 	}
 
