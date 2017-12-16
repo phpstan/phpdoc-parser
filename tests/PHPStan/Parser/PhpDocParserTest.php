@@ -63,7 +63,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideParamTagsData(): iterable
+	public function provideParamTagsData(): \Iterator
 	{
 		yield [
 			'OK without description',
@@ -283,7 +283,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideVarTagsData(): iterable
+	public function provideVarTagsData(): \Iterator
 	{
 		yield [
 			'OK without description and variable name',
@@ -523,7 +523,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function providePropertyTagsData(): iterable
+	public function providePropertyTagsData(): \Iterator
 	{
 		yield [
 			'OK without description',
@@ -709,7 +709,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideReturnTagsData(): iterable
+	public function provideReturnTagsData(): \Iterator
 	{
 		yield [
 			'OK without description',
@@ -869,7 +869,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideThrowsTagsData(): iterable
+	public function provideThrowsTagsData(): \Iterator
 	{
 		yield [
 			'OK without description',
@@ -953,7 +953,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideMethodTagsData(): iterable
+	public function provideMethodTagsData(): \Iterator
 	{
 		yield [
 			'OK non-static, without return type',
@@ -1330,7 +1330,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideSingleLinePhpDocData(): iterable
+	public function provideSingleLinePhpDocData(): \Iterator
 	{
 		yield [
 			'empty',
