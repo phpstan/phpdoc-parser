@@ -92,7 +92,6 @@ class PhpDocParser
 					break;
 
 				case '@return':
-				case '@returns':
 					$tagValue = $this->parseReturnTagValue($tokens);
 					break;
 
