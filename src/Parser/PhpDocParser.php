@@ -96,6 +96,10 @@ class PhpDocParser
 					$tagValue = $this->parseReturnTagValue($tokens);
 					break;
 
+				case '@throws':
+					$tagValue = $this->parseThrowsTagValue($tokens);
+					break;
+
 				case '@property':
 				case '@property-read':
 				case '@property-write':
@@ -146,6 +150,14 @@ class PhpDocParser
 		$type = $this->typeParser->parse($tokens);
 		$description = $this->parseOptionalDescription($tokens, true);
 		return new Ast\PhpDoc\ReturnTagValueNode($type, $description);
+	}
+
+
+	private function parseThrowsTagValue(TokenIterator $tokens): Ast\PhpDoc\ThrowsTagValueNode
+	{
+		$type = $this->typeParser->parse($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
+		return new Ast\PhpDoc\ThrowsTagValueNode($type, $description);
 	}
 
 
