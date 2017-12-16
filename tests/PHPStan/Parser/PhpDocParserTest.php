@@ -11,7 +11,9 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
@@ -36,307 +38,1010 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 
 
 	/**
-	 * @dataProvider provideParseData
+	 * @dataProvider provideParamTagsData
+	 * @dataProvider provideVarTagsData
+	 * @dataProvider provideReturnTagsData
+	 * @dataProvider provideThrowsTagsData
+	 * @dataProvider providePropertyTagsData
+	 * @dataProvider provideSingleLinePhpDocData
+	 * @dataProvider provideMultiLinePhpDocData
+	 * @param string     $label
 	 * @param string     $input
 	 * @param PhpDocNode $expectedPhpDocNode
 	 * @param int        $nextTokenType
 	 */
-	public function testParse(string $input, PhpDocNode $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END)
+	public function testParse(string $label, string $input, PhpDocNode $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END)
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$actualPhpDocNode = $this->phpDocParser->parse($tokens);
 
-		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode);
+		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
 
 
-	public function provideParseData(): array
+	public function provideParamTagsData(): iterable
+	{
+		yield [
+			'OK without description',
+			'/** @param Foo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						false,
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @param Foo $foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						false,
+						'$foo',
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK variadic without description',
+			'/** @param Foo ...$foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						true,
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK variadic with description',
+			'/** @param Foo ...$foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						true,
+						'$foo',
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type, parameter name and description',
+			'/** @param */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							11,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and parameter name and with description (1)',
+			'/** @param #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'#desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							11,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and parameter name and with description (2)',
+			'/** @param (Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'(Foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							16,
+							Lexer::TOKEN_CLOSE_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (1)',
+			'/** @param (Foo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'(Foo $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							16,
+							Lexer::TOKEN_CLOSE_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (2)',
+			'/** @param Foo<Bar $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'Foo<Bar $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							19,
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (3)',
+			'/** @param Foo| $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'Foo| $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							16,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without parameter name and description',
+			'/** @param Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'Foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							15,
+							Lexer::TOKEN_VARIABLE
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without parameter name and with description',
+			'/** @param Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'Foo optional description',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'optional',
+							Lexer::TOKEN_IDENTIFIER,
+							15,
+							Lexer::TOKEN_VARIABLE
+						)
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function provideVarTagsData(): iterable
+	{
+		yield [
+			'OK without description and variable name',
+			'/** @var Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description',
+			'/** @var Foo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description and with no space between type and variable name',
+			'/** @var Foo$foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without variable name',
+			'/** @var Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'',
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without variable name and complex description',
+			'/** @var callable[] function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new ArrayTypeNode(
+							new IdentifierTypeNode('callable')
+						),
+						'',
+						'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without variable name and tag in the middle of description',
+			'/** @var Foo @inject */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'',
+						'@inject'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with variable name and description',
+			'/** @var Foo $foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with variable name and description and without all optional spaces',
+			'/** @var(Foo)$foo#desc*/',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						'#desc'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type, variable name and description',
+			'/** @var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							9,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and variable name and with description (1)',
+			'/** @var #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new InvalidTagValueNode(
+						'#desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							9,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and variable name and with description (2)',
+			'/** @var (Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new InvalidTagValueNode(
+						'(Foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							14,
+							Lexer::TOKEN_CLOSE_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (1)',
+			'/** @var (Foo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new InvalidTagValueNode(
+						'(Foo $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							14,
+							Lexer::TOKEN_CLOSE_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (2)',
+			'/** @var Foo<Bar $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new InvalidTagValueNode(
+						'Foo<Bar $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							17,
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (3)',
+			'/** @var Foo| $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new InvalidTagValueNode(
+						'Foo| $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							14,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function providePropertyTagsData(): iterable
+	{
+		yield [
+			'OK without description',
+			'/** @property Foo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new PropertyTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @property Foo $foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new PropertyTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type, property name and description',
+			'/** @property */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							14,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and property name and with description (1)',
+			'/** @property #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'#desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							14,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and property name and with description (2)',
+			'/** @property (Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'(Foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							19,
+							Lexer::TOKEN_CLOSE_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (1)',
+			'/** @property (Foo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'(Foo $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							19,
+							Lexer::TOKEN_CLOSE_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (2)',
+			'/** @property Foo<Bar $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'Foo<Bar $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							22,
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with broken type (3)',
+			'/** @property Foo| $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'Foo| $foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'$foo',
+							Lexer::TOKEN_VARIABLE,
+							19,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without property name and description',
+			'/** @property Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'Foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							18,
+							Lexer::TOKEN_VARIABLE
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without property name and with description',
+			'/** @property Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@property',
+					new InvalidTagValueNode(
+						'Foo optional description',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'optional',
+							Lexer::TOKEN_IDENTIFIER,
+							18,
+							Lexer::TOKEN_VARIABLE
+						)
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function provideReturnTagsData(): iterable
+	{
+		yield [
+			'OK without description',
+			'/** @return Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @return Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description that starts with TOKEN_OPEN_SQUARE_BRACKET',
+			'/** @return Foo [Bar] */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'[Bar]'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @return */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							12,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type',
+			'/** @return [int, string] */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'[int, string]',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'[',
+							Lexer::TOKEN_OPEN_SQUARE_BRACKET,
+							12,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with type and disallowed description start token (1)',
+			'/** @return Foo | #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'Foo | #desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							18,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with type and disallowed description start token (2)',
+			'/** @return A & B | C */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'A & B | C',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'|',
+							Lexer::TOKEN_UNION,
+							18,
+							Lexer::TOKEN_OTHER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with type and disallowed description start token (3)',
+			'/** @return A | B & C */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'A | B & C',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'&',
+							Lexer::TOKEN_INTERSECTION,
+							18,
+							Lexer::TOKEN_OTHER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with type and disallowed description start token (4)',
+			'/** @return A | B < 123 */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'A | B < 123',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'123',
+							Lexer::TOKEN_INTEGER,
+							20,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function provideThrowsTagsData(): iterable
+	{
+		yield [
+			'OK without description',
+			'/** @throws Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@throws',
+					new ThrowsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @throws Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@throws',
+					new ThrowsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description that starts with TOKEN_OPEN_SQUARE_BRACKET',
+			'/** @throws Foo [Bar] */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@throws',
+					new ThrowsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'[Bar]'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @throws */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@throws',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							12,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with type and disallowed description start token',
+			'/** @throws Foo | #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@throws',
+					new InvalidTagValueNode(
+						'Foo | #desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							18,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function provideSingleLinePhpDocData(): iterable
+	{
+		yield [
+			'empty',
+			'/** */',
+			new PhpDocNode([]),
+		];
+
+		yield [
+			'edge-case',
+			'/** /**/',
+			new PhpDocNode([
+				new PhpDocTextNode(
+					'/*'
+				),
+			]),
+		];
+
+		yield [
+			'single text node',
+			'/** text */',
+			new PhpDocNode([
+				new PhpDocTextNode(
+					'text'
+				),
+			]),
+		];
+
+		yield [
+			'single text node with tag in the middle',
+			'/** text @foo bar */',
+			new PhpDocNode([
+				new PhpDocTextNode(
+					'text @foo bar'
+				),
+			]),
+		];
+
+		yield [
+			'single tag node without value',
+			'/** @foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@foo',
+					new GenericTagValueNode('')
+				),
+			]),
+		];
+
+		yield [
+			'single tag node with value',
+			'/** @foo lorem ipsum */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@foo',
+					new GenericTagValueNode('lorem ipsum')
+				),
+			]),
+		];
+
+		yield [
+			'single tag node with tag in the middle of value',
+			'/** @foo lorem @bar ipsum */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@foo',
+					new GenericTagValueNode('lorem @bar ipsum')
+				),
+			]),
+		];
+
+		yield [
+			'single tag node without space between tag name and its value',
+			'/** @varFoo $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@varFoo',
+					new GenericTagValueNode(
+						'$foo'
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function provideMultiLinePhpDocData(): array
 	{
 		return [
 			[
-				'/** nothing */',
-				new PhpDocNode([
-					new PhpDocTextNode('nothing'),
-				]),
-			],
-			[
-				'/**nothing*/',
-				new PhpDocNode([
-					new PhpDocTextNode('nothing'),
-				]),
-			],
-			[
-				'/** @foo lorem */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@foo',
-						new GenericTagValueNode('lorem')
-					),
-				]),
-			],
-			[
-				'/** @foo lorem ipsum */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@foo',
-						new GenericTagValueNode('lorem ipsum')
-					),
-				]),
-			],
-			[
-				'/** @param Foo $foo */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@param',
-						new ParamTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							false,
-							'$foo',
-							''
-						)
-					),
-				]),
-			],
-			[
-				'/** @param Foo optional description */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@param',
-						new InvalidTagValueNode(
-							'Foo optional description',
-							new \PHPStan\PhpDocParser\Parser\ParserException(
-								'optional',
-								Lexer::TOKEN_IDENTIFIER,
-								15,
-								Lexer::TOKEN_VARIABLE
-							)
-						)
-					),
-				]),
-			],
-			[
-				'/** @param Foo $foo optional description */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@param',
-						new ParamTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							false,
-							'$foo',
-							'optional description'
-						)
-					),
-				]),
-			],
-			[
-				'/** @param Foo ...$foo optional description */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@param',
-						new ParamTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							true,
-							'$foo',
-							'optional description'
-						)
-					),
-				]),
-			],
-			[
-				'/** @return Foo */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new ReturnTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							''
-						)
-					),
-				]),
-			],
-			[
-				'/** @return Foo optional description */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new ReturnTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							'optional description'
-						)
-					),
-				]),
-			],
-			[
-				'/** @return array [int] */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new ReturnTagValueNode(
-							new IdentifierTypeNode('array'),
-							'[int]'
-						)
-					),
-				]),
-			],
-			[
-				'/** @return [int, string] */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new InvalidTagValueNode(
-							'[int, string]',
-							new \PHPStan\PhpDocParser\Parser\ParserException(
-								'[',
-								Lexer::TOKEN_OPEN_SQUARE_BRACKET,
-								12,
-								Lexer::TOKEN_IDENTIFIER
-							)
-						)
-					),
-				]),
-			],
-			[
-				'/** @return A & B | C */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new InvalidTagValueNode(
-							'A & B | C',
-							new \PHPStan\PhpDocParser\Parser\ParserException(
-								'|',
-								Lexer::TOKEN_UNION,
-								18,
-								Lexer::TOKEN_OTHER
-							)
-						)
-					),
-				]),
-			],
-			[
-				'/** @return A | B & C */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new InvalidTagValueNode(
-							'A | B & C',
-							new \PHPStan\PhpDocParser\Parser\ParserException(
-								'&',
-								Lexer::TOKEN_INTERSECTION,
-								18,
-								Lexer::TOKEN_OTHER
-							)
-						)
-					),
-				]),
-			],
-			[
-				'/** @return A | B < 123 */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@return',
-						new InvalidTagValueNode(
-							'A | B < 123',
-							new \PHPStan\PhpDocParser\Parser\ParserException(
-								'123',
-								Lexer::TOKEN_INTEGER,
-								20,
-								Lexer::TOKEN_IDENTIFIER
-							)
-						)
-					),
-				]),
-			],
-			[
-				'/** @var callable[] function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@var',
-						new VarTagValueNode(
-							new ArrayTypeNode(
-								new IdentifierTypeNode('callable')
-							),
-							'',
-							'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created'
-						)
-					),
-				]),
-			],
-			[
-				'/** @var Foo @inject */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@var',
-						new VarTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							'',
-							'@inject'
-						)
-					),
-				]),
-			],
-			[
-				'/** stuff before @var Foo */',
-				new PhpDocNode([
-					new PhpDocTextNode('stuff before @var Foo'),
-				]),
-			],
-			[
-				'/** @var \\\\Foo $foo */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@var',
-						new InvalidTagValueNode(
-							'\\\\Foo $foo',
-							new \PHPStan\PhpDocParser\Parser\ParserException(
-								'\\\\Foo',
-								Lexer::TOKEN_OTHER,
-								9,
-								Lexer::TOKEN_IDENTIFIER
-							)
-						)
-					),
-				]),
-			],
-			[
-				'/** @varFoo $foo */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@varFoo',
-						new GenericTagValueNode(
-							'$foo'
-						)
-					),
-				]),
-			],
-			[
-				'/** @var Foo$foo */',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@var',
-						new VarTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							'$foo',
-							''
-						)
-					),
-				]),
-			],
-			[
-				'/**@var(Foo)$foo#desc*/',
-				new PhpDocNode([
-					new PhpDocTagNode(
-						'@var',
-						new VarTagValueNode(
-							new IdentifierTypeNode('Foo'),
-							'$foo',
-							'#desc'
-						)
-					),
-				]),
-			],
-			[
+				'multi-line with two tags',
 				'/**
                   * @param Foo $foo 1st multi world description
                   * @param Bar $bar 2nd multi world description
@@ -363,6 +1068,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'multi-line with two tags and text in the middle',
 				'/**
                   * @param Foo $foo 1st multi world description
                   * some text in the middle
@@ -391,6 +1097,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'multi-line with two tags, text in the middle and some empty lines',
 				'/**
                   *
                   *
@@ -435,6 +1142,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'multi-line with just empty lines',
 				'/**
                   *
                   *
@@ -445,6 +1153,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'multi-line with tag mentioned as part of text node',
 				'/**
                   * Lets talk about @param
                   * @param int $foo @param string $bar
@@ -463,6 +1172,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'multi-line with a lot of @method tags',
 				'/**
                   * @method int getInteger(int $a, int $b)
                   * @method void doSomething(int $a, $b)
