@@ -190,15 +190,14 @@ class PhpDocParser
 		}
 
 		$parameters = [];
-		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-			if (!$tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
+		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
+		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
+			$parameters[] = $this->parseMethodTagValueParameter($tokens);
+			while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 				$parameters[] = $this->parseMethodTagValueParameter($tokens);
-				while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
-					$parameters[] = $this->parseMethodTagValueParameter($tokens);
-				}
-				$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 			}
 		}
+		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 		$description = $this->parseOptionalDescription($tokens);
 		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description);

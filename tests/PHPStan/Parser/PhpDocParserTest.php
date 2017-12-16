@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
@@ -955,7 +956,41 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	public function provideMethodTagsData(): iterable
 	{
 		yield [
-			'OK',
+			'OK non-static, without return type',
+			'/** @method foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						null,
+						'foo',
+						[],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type',
+			'/** @method Foo foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return static type',
 			'/** @method static foo() */',
 			new PhpDocNode([
 				new PhpDocTagNode(
@@ -966,6 +1001,328 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'foo',
 						[],
 						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK static, with return type',
+			'/** @method static Foo foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						true,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK static, with return static type',
+			'/** @method static static foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						true,
+						new IdentifierTypeNode('static'),
+						'foo',
+						[],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and description',
+			'/** @method Foo foo() optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[],
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single parameter without type',
+			'/** @method Foo foo($a) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								null,
+								false,
+								false,
+								'$a',
+								null
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single parameter with type',
+			'/** @method Foo foo(A $a) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('A'),
+								false,
+								false,
+								'$a',
+								null
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single parameter with type that is passed by reference',
+			'/** @method Foo foo(A &$a) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('A'),
+								true,
+								false,
+								'$a',
+								null
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single variadic parameter with type',
+			'/** @method Foo foo(A ...$a) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('A'),
+								false,
+								true,
+								'$a',
+								null
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single variadic parameter with type that is passed by reference',
+			'/** @method Foo foo(A &...$a) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('A'),
+								true,
+								true,
+								'$a',
+								null
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single parameter with default value',
+			'/** @method Foo foo($a = 123) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								null,
+								false,
+								false,
+								'$a',
+								new ConstExprIntegerNode('123')
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and single variadic parameter with type that is passed by reference and default value',
+			'/** @method Foo foo(A &...$a = 123) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('A'),
+								true,
+								true,
+								'$a',
+								new ConstExprIntegerNode('123')
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with return type and multiple parameters without type',
+			'/** @method Foo foo($a, $b, $c) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[
+							new MethodTagValueParameterNode(
+								null,
+								false,
+								false,
+								'$a',
+								null
+							),
+							new MethodTagValueParameterNode(
+								null,
+								false,
+								false,
+								'$b',
+								null
+							),
+							new MethodTagValueParameterNode(
+								null,
+								false,
+								false,
+								'$c',
+								null
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid non-static method without parentheses',
+			'/** @method a b */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new InvalidTagValueNode(
+						'a b',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							16,
+							Lexer::TOKEN_OPEN_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid static method without parentheses',
+			'/** @method static a b */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new InvalidTagValueNode(
+						'static a b',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							23,
+							Lexer::TOKEN_OPEN_PARENTHESES
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid non-static method without parameter name',
+			'/** @method a b(x) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new InvalidTagValueNode(
+						'a b(x)',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							')',
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							17,
+							Lexer::TOKEN_VARIABLE
+						)
 					)
 				),
 			]),
@@ -1214,22 +1571,22 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
                   * @method static methodWithNoReturnTypeStaticallyWithDescription() Do something with a description statically, but what, who knows!
                   * @method static bool aStaticMethodThatHasAUniqueReturnTypeInThisClass()
                   * @method static string aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescription() A Description.
-                  * @method int getIntegerNoParams
-                  * @method void doSomethingNoParams
-                  * @method self|Bar getFooOrBarNoParams
-                  * @method methodWithNoReturnTypeNoParams
-                  * @method static int getIntegerStaticallyNoParams
-                  * @method static void doSomethingStaticallyNoParams
-                  * @method static self|Bar getFooOrBarStaticallyNoParams
-                  * @method static methodWithNoReturnTypeStaticallyNoParams
-                  * @method int getIntegerWithDescriptionNoParams Get an integer with a description.
-                  * @method void doSomethingWithDescriptionNoParams Do something with a description.
-                  * @method self|Bar getFooOrBarWithDescriptionNoParams Get a Foo or a Bar with a description.
-                  * @method static int getIntegerStaticallyWithDescriptionNoParams Get an integer with a description statically.
-                  * @method static void doSomethingStaticallyWithDescriptionNoParams Do something with a description statically.
-                  * @method static self|Bar getFooOrBarStaticallyWithDescriptionNoParams Get a Foo or a Bar with a description statically.
-                  * @method static bool|string aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams
-                  * @method static string|float aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams A Description.
+                  * @method int getIntegerNoParams()
+                  * @method void doSomethingNoParams()
+                  * @method self|Bar getFooOrBarNoParams()
+                  * @method methodWithNoReturnTypeNoParams()
+                  * @method static int getIntegerStaticallyNoParams()
+                  * @method static void doSomethingStaticallyNoParams()
+                  * @method static self|Bar getFooOrBarStaticallyNoParams()
+                  * @method static methodWithNoReturnTypeStaticallyNoParams()
+                  * @method int getIntegerWithDescriptionNoParams() Get an integer with a description.
+                  * @method void doSomethingWithDescriptionNoParams() Do something with a description.
+                  * @method self|Bar getFooOrBarWithDescriptionNoParams() Get a Foo or a Bar with a description.
+                  * @method static int getIntegerStaticallyWithDescriptionNoParams() Get an integer with a description statically.
+                  * @method static void doSomethingStaticallyWithDescriptionNoParams() Do something with a description statically.
+                  * @method static self|Bar getFooOrBarStaticallyWithDescriptionNoParams() Get a Foo or a Bar with a description statically.
+                  * @method static bool|string aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams()
+                  * @method static string|float aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams() A Description.
                   * @method \Aws\Result publish(array $args)
                   * @method Image rotate(float & ... $angle = array(), $backgroundColor)
                   * @method Foo overridenMethod()
