@@ -126,7 +126,7 @@ class Lexer
 			self::TOKEN_DOUBLE_ARROW => '=>',
 			self::TOKEN_EQUAL => '=',
 
-			self::TOKEN_OPEN_PHPDOC => '/\\*\\*',
+			self::TOKEN_OPEN_PHPDOC => '/\\*\\*(?=\\s)',
 			self::TOKEN_CLOSE_PHPDOC => '\\*/',
 			self::TOKEN_PHPDOC_TAG => '@[a-z-]++',
 			self::TOKEN_PHPDOC_EOL => '\\r?+\\n\\h*+(?:\\*(?!/)\\h*+)?',
