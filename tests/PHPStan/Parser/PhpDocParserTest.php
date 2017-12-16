@@ -43,6 +43,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
 	 * @dataProvider providePropertyTagsData
+	 * @dataProvider provideMethodTagsData
 	 * @dataProvider provideSingleLinePhpDocData
 	 * @dataProvider provideMultiLinePhpDocData
 	 * @param string     $label
@@ -951,6 +952,27 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
+	public function provideMethodTagsData(): iterable
+	{
+		yield [
+			'OK',
+			'/** @method static foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('static'),
+						'foo',
+						[],
+						''
+					)
+				),
+			]),
+		];
+	}
+
+
 	public function provideSingleLinePhpDocData(): iterable
 	{
 		yield [
@@ -1352,8 +1374,8 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
-							true,
-							null,
+							false,
+							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStatically',
 							[],
 							''
@@ -1498,8 +1520,8 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
-							true,
-							null,
+							false,
+							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStaticallyWithDescription',
 							[],
 							'Do something with a description statically, but what, who knows!'
@@ -1604,8 +1626,8 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new PhpDocTagNode(
 						'@method',
 						new MethodTagValueNode(
-							true,
-							null,
+							false,
+							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStaticallyNoParams',
 							[],
 							''

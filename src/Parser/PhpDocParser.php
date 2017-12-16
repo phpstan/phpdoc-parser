@@ -181,8 +181,9 @@ class PhpDocParser
 			$tokens->next();
 
 		} elseif ($returnTypeOrMethodName instanceof Ast\Type\IdentifierTypeNode) {
-			$returnType = null;
+			$returnType = $isStatic ? new Ast\Type\IdentifierTypeNode('static') : null;
 			$methodName = $returnTypeOrMethodName->name;
+			$isStatic = false;
 
 		} else {
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER); // will throw exception
