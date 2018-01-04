@@ -299,6 +299,12 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				new IdentifierTypeNode('array'),
 				Lexer::TOKEN_OPEN_SQUARE_BRACKET,
 			],
+			[
+				"?\t\xA009", // edge-case with \h
+				new NullableTypeNode(
+					new IdentifierTypeNode("\xA009")
+				),
+			],
 		];
 	}
 

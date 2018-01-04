@@ -129,7 +129,7 @@ class Lexer
 			self::TOKEN_OPEN_PHPDOC => '/\\*\\*(?=\\s)',
 			self::TOKEN_CLOSE_PHPDOC => '\\*/',
 			self::TOKEN_PHPDOC_TAG => '@[a-z-]++',
-			self::TOKEN_PHPDOC_EOL => '\\r?+\\n\\h*+(?:\\*(?!/)\\h*+)?',
+			self::TOKEN_PHPDOC_EOL => '\\r?+\\n[\\x09\\x20]*+(?:\\*(?!/))?',
 
 			self::TOKEN_FLOAT => '(?:-?[0-9]++\\.[0-9]*+(?:e-?[0-9]++)?)|(?:-?[0-9]*+\\.[0-9]++(?:e-?[0-9]++)?)|(?:-?[0-9]++e-?[0-9]++)',
 			self::TOKEN_INTEGER => '-?[0-9]++',
@@ -140,7 +140,7 @@ class Lexer
 			self::TOKEN_THIS_VARIABLE => '\\$this\\b',
 			self::TOKEN_VARIABLE => '\\$[a-z_\\x7F-\\xFF][0-9a-z_\\x7F-\\xFF]*+',
 
-			self::TOKEN_HORIZONTAL_WS => '\\h++',
+			self::TOKEN_HORIZONTAL_WS => '[\\x09\\x20]++',
 
 			// anything but TOKEN_CLOSE_PHPDOC or TOKEN_HORIZONTAL_WS or TOKEN_EOL
 			self::TOKEN_OTHER => '(?:(?!\\*/)[^\\s])++',
