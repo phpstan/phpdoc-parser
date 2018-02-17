@@ -109,6 +109,10 @@ class PhpDocParser
 					$tagValue = $this->parseMethodTagValue($tokens);
 					break;
 
+				case '@generic':
+					$tagValue = $this->parseGenericTagValue($tokens);
+					break;
+
 				default:
 					$tagValue = new Ast\PhpDoc\UnknownTagValueNode($this->parseOptionalDescription($tokens));
 					break;
@@ -231,6 +235,38 @@ class PhpDocParser
 		}
 
 		return new Ast\PhpDoc\MethodTagValueParameterNode($parameterType, $isReference, $isVariadic, $parameterName, $defaultValue);
+	}
+
+
+	private function parseGenericTagValue(TokenIterator $tokens): Ast\PhpDoc\GenericTagValueNode
+	{
+		if ($tokens->tryConsumeTokenValue('in')) {
+			$varianceType = 'in';
+
+		} elseif ($tokens->tryConsumeTokenValue('out')) {
+			$varianceType = 'out';
+
+		} else {
+			$varianceType = '';
+		}
+
+		$type = $this->typeParser->parse($tokens);
+
+		if ($tokens->tryConsumeTokenValue('extends')) {
+			$constraintType = 'extends';
+			$constraint = $this->typeParser->parse($tokens);
+
+		} elseif ($tokens->tryConsumeTokenValue('implements')) {
+			$constraintType = 'implements';
+			$constraint = $this->typeParser->parse($tokens);
+
+		} else {
+			$constraintType = '';
+			$constraint = null;
+		}
+
+		$description = $this->parseOptionalDescription($tokens);
+		return new Ast\PhpDoc\GenericTagValueNode($varianceType, $type, $constraintType, $constraint, $description);
 	}
 
 

@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UnknownTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
@@ -45,6 +46,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideThrowsTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
+	 * @dataProvider provideGenericTagsData
 	 * @dataProvider provideSingleLinePhpDocData
 	 * @dataProvider provideMultiLinePhpDocData
 	 * @param string     $label
@@ -1323,6 +1325,95 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							17,
 							Lexer::TOKEN_VARIABLE
 						)
+					)
+				),
+			]),
+		];
+	}
+
+
+	public function provideGenericTagsData(): \Iterator
+	{
+		yield [
+			'OK without description',
+			'/** @generic T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@generic',
+					new GenericTagValueNode(
+						'',
+						new IdentifierTypeNode('T'),
+						'',
+						null,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description and with contravariance',
+			'/** @generic in T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@generic',
+					new GenericTagValueNode(
+						'in',
+						new IdentifierTypeNode('T'),
+						'',
+						null,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description and with covariance',
+			'/** @generic out T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@generic',
+					new GenericTagValueNode(
+						'out',
+						new IdentifierTypeNode('T'),
+						'',
+						null,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description and with constraint',
+			'/** @generic T extends IEntity */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@generic',
+					new GenericTagValueNode(
+						'',
+						new IdentifierTypeNode('T'),
+						'extends',
+						new IdentifierTypeNode('IEntity'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description and with constraint',
+			'/** @generic T extends IEntity some description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@generic',
+					new GenericTagValueNode(
+						'',
+						new IdentifierTypeNode('T'),
+						'extends',
+						new IdentifierTypeNode('IEntity'),
+						'some description'
 					)
 				),
 			]),
