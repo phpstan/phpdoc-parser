@@ -4,7 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\UnknownTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
@@ -1374,7 +1374,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('')
+					new UnknownTagValueNode('')
 				),
 			]),
 		];
@@ -1385,7 +1385,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('lorem ipsum')
+					new UnknownTagValueNode('lorem ipsum')
 				),
 			]),
 		];
@@ -1396,7 +1396,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('lorem @bar ipsum')
+					new UnknownTagValueNode('lorem @bar ipsum')
 				),
 			]),
 		];
@@ -1407,7 +1407,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@varFoo',
-					new GenericTagValueNode(
+					new UnknownTagValueNode(
 						'$foo'
 					)
 				),

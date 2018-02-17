@@ -110,7 +110,7 @@ class PhpDocParser
 					break;
 
 				default:
-					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
+					$tagValue = new Ast\PhpDoc\UnknownTagValueNode($this->parseOptionalDescription($tokens));
 					break;
 			}
 
