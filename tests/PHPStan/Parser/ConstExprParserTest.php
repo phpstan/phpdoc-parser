@@ -80,6 +80,26 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 				new ConstExprIntegerNode('123'),
 			],
 			[
+				'0b0110101',
+				new ConstExprIntegerNode('0b0110101'),
+			],
+			[
+				'0o777',
+				new ConstExprIntegerNode('0o777'),
+			],
+			[
+				'0x7Fb4',
+				new ConstExprIntegerNode('0x7Fb4'),
+			],
+			[
+				'-0O777',
+				new ConstExprIntegerNode('-0O777'),
+			],
+			[
+				'-0X7Fb4',
+				new ConstExprIntegerNode('-0X7Fb4'),
+			],
+			[
 				'123.4',
 				new ConstExprFloatNode('123.4'),
 			],

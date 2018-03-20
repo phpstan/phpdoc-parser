@@ -132,7 +132,7 @@ class Lexer
 			self::TOKEN_PHPDOC_EOL => '\\r?+\\n[\\x09\\x20]*+(?:\\*(?!/))?',
 
 			self::TOKEN_FLOAT => '(?:-?[0-9]++\\.[0-9]*+(?:e-?[0-9]++)?)|(?:-?[0-9]*+\\.[0-9]++(?:e-?[0-9]++)?)|(?:-?[0-9]++e-?[0-9]++)',
-			self::TOKEN_INTEGER => '-?[0-9]++',
+			self::TOKEN_INTEGER => '-?(?:(?:0b[0-1]++)|(?:0o[0-7]++)|(?:0x[0-9a-f]++)|(?:[0-9]++))',
 			self::TOKEN_SINGLE_QUOTED_STRING => '\'(?:\\\\.|[^\'\\r\\n])*+\'',
 			self::TOKEN_DOUBLE_QUOTED_STRING => '"(?:\\\\.|[^"\\r\\n])*+"',
 
