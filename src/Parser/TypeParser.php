@@ -48,6 +48,9 @@ class TypeParser
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 				$type = $this->parseGeneric($tokens, $type);
 
+			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+				$type = $this->parseCallable($tokens, $type);
+
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$type = $this->tryParseArray($tokens, $type);
 			}
@@ -107,6 +110,67 @@ class TypeParser
 
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 		return new Ast\Type\GenericTypeNode($baseType, $genericTypes);
+	}
+
+
+	private function parseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
+
+		$parameters = [];
+		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
+			$parameters[] = $this->parseCallableParameter($tokens);
+			while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+				$parameters[] = $this->parseCallableParameter($tokens);
+			}
+		}
+
+		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
+		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+		$returnType = $this->parseCallableReturnType($tokens);
+
+		return new Ast\Type\CallableTypeNode($identifier, $parameters, $returnType);
+	}
+
+
+	private function parseCallableParameter(TokenIterator $tokens): Ast\Type\CallableTypeParameterNode
+	{
+		$type = $this->parse($tokens);
+		$isReference = $tokens->tryConsumeTokenType(Lexer::TOKEN_REFERENCE);
+		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
+
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
+			$parameterName = $tokens->currentTokenValue();
+			$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
+
+		} else {
+			$parameterName = '';
+		}
+
+		$isOptional = $tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
+		return new Ast\Type\CallableTypeParameterNode($type, $isReference, $isVariadic, $parameterName, $isOptional);
+	}
+
+
+	private function parseCallableReturnType(TokenIterator $tokens): Ast\Type\TypeNode
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
+			$type = $this->parseNullable($tokens);
+
+		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+			$type = $this->parse($tokens);
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
+
+		} else {
+			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+				$type = $this->parseGeneric($tokens, $type);
+			}
+		}
+
+		return $type;
 	}
 
 

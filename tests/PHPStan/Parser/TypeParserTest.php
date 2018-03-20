@@ -3,6 +3,8 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
@@ -260,6 +262,111 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('Foo\\Bar'),
 					]
+				),
+			],
+			[
+				'callable(): Foo',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new IdentifierTypeNode('Foo')
+				),
+			],
+			[
+				'callable(): ?Foo',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new NullableTypeNode(
+						new IdentifierTypeNode('Foo')
+					)
+				),
+			],
+			[
+				'callable(): Foo<Bar>',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new GenericTypeNode(
+						new IdentifierTypeNode('Foo'),
+						[
+							new IdentifierTypeNode('Bar'),
+						]
+					)
+				),
+			],
+			[
+				'callable(): Foo|Bar',
+				new UnionTypeNode([
+					new CallableTypeNode(
+						new IdentifierTypeNode('callable'),
+						[],
+						new IdentifierTypeNode('Foo')
+					),
+					new IdentifierTypeNode('Bar'),
+				]),
+			],
+			[
+				'callable(): Foo&Bar',
+				new IntersectionTypeNode([
+					new CallableTypeNode(
+						new IdentifierTypeNode('callable'),
+						[],
+						new IdentifierTypeNode('Foo')
+					),
+					new IdentifierTypeNode('Bar'),
+				]),
+			],
+			[
+				'callable(): (Foo|Bar)',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new UnionTypeNode([
+						new IdentifierTypeNode('Foo'),
+						new IdentifierTypeNode('Bar'),
+					])
+				),
+			],
+			[
+				'callable(): (Foo&Bar)',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new IntersectionTypeNode([
+						new IdentifierTypeNode('Foo'),
+						new IdentifierTypeNode('Bar'),
+					])
+				),
+			],
+			[
+				'callable(A&...$a=, B&...=, C): Foo',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('A'),
+							true,
+							true,
+							'$a',
+							true
+						),
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('B'),
+							true,
+							true,
+							'',
+							true
+						),
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('C'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new IdentifierTypeNode('Foo')
 				),
 			],
 			[

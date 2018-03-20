@@ -16,12 +16,38 @@ Nullable
 	= TokenNullable TokenIdentifier [Generic]
 
 Atomic
-	= TokenIdentifier [Generic / Array]
+	= TokenIdentifier [Generic / Callable / Array]
 	/ TokenThisVariable
 	/ TokenParenthesesOpen Type TokenParenthesesClose [Array]
 
 Generic
 	= TokenAngleBracketOpen Type *(TokenComma Type) TokenAngleBracketClose
+
+Callable
+	= TokenParenthesesOpen [CallableParameters] TokenParenthesesClose TokenColon CallableReturnType
+
+CallableParameters
+	= CallableParameter *(TokenComma CallableParameter)
+
+CallableParameter
+	= Type [CallableParameterIsReference] [CallableParameterIsVariadic] [CallableParameterName] [CallableParameterIsOptional]
+
+CallableParameterIsReference
+	= TokenIntersection
+
+CallableParameterIsVariadic
+	= TokenVariadic
+
+CallableParameterName
+	= TokenVariable
+
+CallableParameterIsOptional
+	= TokenEqualSign
+
+CallableReturnType
+	= TokenIdentifier [Generic]
+	/ Nullable
+	/ TokenParenthesesOpen Type TokenParenthesesClose
 
 Array
 	= 1*(TokenSquareBracketOpen TokenSquareBracketClose)
@@ -115,6 +141,18 @@ TokenSquareBracketClose
 
 TokenComma
 	= "," *ByteHorizontalWs
+
+TokenColon
+	= ":" *ByteHorizontalWs
+
+TokenVariadic
+	= "..." *ByteHorizontalWs
+
+TokenEqualSign
+	= "=" *ByteHorizontalWs
+
+TokenVariable
+	= "$" ByteIdentifierFirst *ByteIdentifierSecond *ByteHorizontalWs
 
 TokenDoubleArrow
 	= "=>" *ByteHorizontalWs

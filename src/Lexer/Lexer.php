@@ -19,6 +19,7 @@ class Lexer
 	const TOKEN_OPEN_SQUARE_BRACKET = 8;
 	const TOKEN_CLOSE_SQUARE_BRACKET = 9;
 	const TOKEN_COMMA = 10;
+	const TOKEN_COLON = 29;
 	const TOKEN_VARIADIC = 11;
 	const TOKEN_DOUBLE_COLON = 12;
 	const TOKEN_DOUBLE_ARROW = 13;
@@ -50,6 +51,7 @@ class Lexer
 		self::TOKEN_OPEN_SQUARE_BRACKET => '\'[\'',
 		self::TOKEN_CLOSE_SQUARE_BRACKET => '\']\'',
 		self::TOKEN_COMMA => '\',\'',
+		self::TOKEN_COLON => '\':\'',
 		self::TOKEN_VARIADIC => '\'...\'',
 		self::TOKEN_DOUBLE_COLON => '\'::\'',
 		self::TOKEN_DOUBLE_ARROW => '\'=>\'',
@@ -107,8 +109,8 @@ class Lexer
 	private function initialize()
 	{
 		$patterns = [
-			// '&' followed by TOKEN_VARIADIC or TOKEN_VARIABLE
-			self::TOKEN_REFERENCE => '&(?=\\s*+(?:(?:\\.\\.\\.)|(?:\\$(?!this\\b))))',
+			// '&' followed by TOKEN_VARIADIC, TOKEN_VARIABLE, TOKEN_EQUAL, TOKEN_EQUAL or TOKEN_CLOSE_PARENTHESES
+			self::TOKEN_REFERENCE => '&(?=\\s*+(?:[.,=)]|(?:\\$(?!this(?![0-9a-z_\\x80-\\xFF])))))',
 			self::TOKEN_UNION => '\\|',
 			self::TOKEN_INTERSECTION => '&',
 			self::TOKEN_NULLABLE => '\\?',
@@ -125,6 +127,7 @@ class Lexer
 			self::TOKEN_DOUBLE_COLON => '::',
 			self::TOKEN_DOUBLE_ARROW => '=>',
 			self::TOKEN_EQUAL => '=',
+			self::TOKEN_COLON => ':',
 
 			self::TOKEN_OPEN_PHPDOC => '/\\*\\*(?=\\s)',
 			self::TOKEN_CLOSE_PHPDOC => '\\*/',
@@ -137,7 +140,7 @@ class Lexer
 			self::TOKEN_DOUBLE_QUOTED_STRING => '"(?:\\\\[^\\r\\n]|[^"\\r\\n\\\\])*+"',
 
 			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x80-\\xFF][0-9a-z_\\x80-\\xFF]*+)++',
-			self::TOKEN_THIS_VARIABLE => '\\$this\\b',
+			self::TOKEN_THIS_VARIABLE => '\\$this(?![0-9a-z_\\x80-\\xFF])',
 			self::TOKEN_VARIABLE => '\\$[a-z_\\x80-\\xFF][0-9a-z_\\x80-\\xFF]*+',
 
 			self::TOKEN_HORIZONTAL_WS => '[\\x09\\x20]++',
