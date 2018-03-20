@@ -28,6 +28,61 @@ Array
 
 
 ; ---------------------------------------------------------------------------- ;
+;  ConstantExpr                                                                ;
+; ---------------------------------------------------------------------------- ;
+
+ConstantExpr
+	= ConstantFloat *ByteHorizontalWs
+	/ ConstantInt *ByteHorizontalWs
+	/ ConstantTrue *ByteHorizontalWs
+	/ ConstantFalse *ByteHorizontalWs
+	/ ConstantNull *ByteHorizontalWs
+	/ ConstantString *ByteHorizontalWs
+	/ ConstantArray *ByteHorizontalWs
+	/ ConstantFetch *ByteHorizontalWs
+
+ConstantFloat
+	= ["-"] 1*ByteDecDigit "." *ByteDecDigit [ConstantFloatExp]
+	/ ["-"] 1*ByteDecDigit ConstantFloatExp
+	/ ["-"] "." 1*ByteDecDigit [ConstantFloatExp]
+
+ConstantFloatExp
+	= "e" ["-"] 1*ByteDecDigit
+
+ConstantInt
+	= ["-"] "0b" 1*ByteBinDigit
+	/ ["-"] "0o" 1*ByteOctDigit
+	/ ["-"] "0x" 1*ByteHexDigit
+	/ ["-"] 1*ByteDecDigit
+
+ConstantTrue
+	= "true"
+
+ConstantFalse
+	= "false"
+
+ConstantNull
+	= "null"
+
+ConstantString
+	= ByteSingleQuote *(ByteBackslash ByteNotEol / ByteNotEolAndNotBackslashAndNotSingleQuote) ByteSingleQuote
+	/ ByteDoubleQuote *(ByteBackslash ByteNotEol / ByteNotEolAndNotBackslashAndNotDoubleQuote) ByteDoubleQuote
+
+ConstantArray
+	= TokenSquareBracketOpen [ConstantArrayItems] TokenSquareBracketClose
+	/ "array" TokenParenthesesOpen [ConstantArrayItems] TokenParenthesesClose
+
+ConstantArrayItems
+	= ConstantArrayItem *(TokenComma ConstantArrayItem) [TokenComma]
+
+ConstantArrayItem
+	= ConstantExpr [TokenDoubleArrow ConstantExpr]
+
+ConstantFetch
+	= TokenIdentifier [TokenDoubleColon ByteIdentifierFirst *ByteIdentifierSecond *ByteHorizontalWs]
+
+
+; ---------------------------------------------------------------------------- ;
 ;  Tokens                                                                      ;
 ; ---------------------------------------------------------------------------- ;
 
@@ -61,6 +116,12 @@ TokenSquareBracketClose
 TokenComma
 	= "," *ByteHorizontalWs
 
+TokenDoubleArrow
+	= "=>" *ByteHorizontalWs
+
+TokenDoubleColon
+	= "::" *ByteHorizontalWs
+
 TokenThisVariable
 	= %x24.74.68.69.73 *ByteHorizontalWs
 
@@ -76,6 +137,19 @@ ByteHorizontalWs
 	= %x09 ; horizontal tab
 	/ %x20 ; space
 
+ByteBinDigit
+	= %x30-31 ; 0-1
+
+ByteOctDigit
+	= %x30-37 ; 0-7
+
+ByteDecDigit
+	= %x30-39 ; 0-9
+
+ByteHexDigit
+	= %x30-39 ; 0-9
+	/ %x41-46 ; A-F
+	/ %x61-66 ; a-f
 
 ByteIdentifierFirst
 	= %x41-5A ; A-Z
@@ -90,6 +164,30 @@ ByteIdentifierSecond
 	/ %x61-7A ; a-z
 	/ %x80-FF
 
+ByteSingleQuote
+	= %x27    ; '
+
+ByteDoubleQuote
+	= %x22    ; "
 
 ByteBackslash
 	= %x5C    ; \
+
+ByteNotEol
+	= %x00-09 ; skip LF
+	/ %x0B-0C ; skip CR
+	/ %x0E-FF
+
+ByteNotEolAndNotBackslashAndNotSingleQuote
+	= %x00-09 ; skip LF
+	/ %x0B-0C ; skip CR
+	/ %x0E-26 ; skip single quote
+	/ %x28-5B ; skip backslash
+	/ %x5D-FF
+
+ByteNotEolAndNotBackslashAndNotDoubleQuote
+	= %x00-09 ; skip LF
+	/ %x0B-0C ; skip CR
+	/ %x0E-21 ; skip double quote
+	/ %x23-5B ; skip backslash
+	/ %x5D-FF
