@@ -136,9 +136,9 @@ class Lexer
 			self::TOKEN_SINGLE_QUOTED_STRING => '\'(?:\\\\[^\\r\\n]|[^\'\\r\\n\\\\])*+\'',
 			self::TOKEN_DOUBLE_QUOTED_STRING => '"(?:\\\\[^\\r\\n]|[^"\\r\\n\\\\])*+"',
 
-			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x7F-\\xFF][0-9a-z_\\x7F-\\xFF]*+)++',
+			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x80-\\xFF][0-9a-z_\\x80-\\xFF]*+)++',
 			self::TOKEN_THIS_VARIABLE => '\\$this\\b',
-			self::TOKEN_VARIABLE => '\\$[a-z_\\x7F-\\xFF][0-9a-z_\\x7F-\\xFF]*+',
+			self::TOKEN_VARIABLE => '\\$[a-z_\\x80-\\xFF][0-9a-z_\\x80-\\xFF]*+',
 
 			self::TOKEN_HORIZONTAL_WS => '[\\x09\\x20]++',
 
