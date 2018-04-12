@@ -8,38 +8,38 @@ namespace PHPStan\PhpDocParser\Lexer;
 class Lexer
 {
 
-	const TOKEN_REFERENCE = 0;
-	const TOKEN_UNION = 1;
-	const TOKEN_INTERSECTION = 2;
-	const TOKEN_NULLABLE = 3;
-	const TOKEN_OPEN_PARENTHESES = 4;
-	const TOKEN_CLOSE_PARENTHESES = 5;
-	const TOKEN_OPEN_ANGLE_BRACKET = 6;
-	const TOKEN_CLOSE_ANGLE_BRACKET = 7;
-	const TOKEN_OPEN_SQUARE_BRACKET = 8;
-	const TOKEN_CLOSE_SQUARE_BRACKET = 9;
-	const TOKEN_COMMA = 10;
-	const TOKEN_COLON = 29;
-	const TOKEN_VARIADIC = 11;
-	const TOKEN_DOUBLE_COLON = 12;
-	const TOKEN_DOUBLE_ARROW = 13;
-	const TOKEN_EQUAL = 14;
-	const TOKEN_OPEN_PHPDOC = 15;
-	const TOKEN_CLOSE_PHPDOC = 16;
-	const TOKEN_PHPDOC_TAG = 17;
-	const TOKEN_PHPDOC_EOL = 26;
-	const TOKEN_FLOAT = 18;
-	const TOKEN_INTEGER = 19;
-	const TOKEN_SINGLE_QUOTED_STRING = 20;
-	const TOKEN_DOUBLE_QUOTED_STRING = 21;
-	const TOKEN_IDENTIFIER = 22;
-	const TOKEN_THIS_VARIABLE = 23;
-	const TOKEN_VARIABLE = 24;
-	const TOKEN_HORIZONTAL_WS = 25;
-	const TOKEN_OTHER = 27;
-	const TOKEN_END = 28;
+	public const TOKEN_REFERENCE = 0;
+	public const TOKEN_UNION = 1;
+	public const TOKEN_INTERSECTION = 2;
+	public const TOKEN_NULLABLE = 3;
+	public const TOKEN_OPEN_PARENTHESES = 4;
+	public const TOKEN_CLOSE_PARENTHESES = 5;
+	public const TOKEN_OPEN_ANGLE_BRACKET = 6;
+	public const TOKEN_CLOSE_ANGLE_BRACKET = 7;
+	public const TOKEN_OPEN_SQUARE_BRACKET = 8;
+	public const TOKEN_CLOSE_SQUARE_BRACKET = 9;
+	public const TOKEN_COMMA = 10;
+	public const TOKEN_COLON = 29;
+	public const TOKEN_VARIADIC = 11;
+	public const TOKEN_DOUBLE_COLON = 12;
+	public const TOKEN_DOUBLE_ARROW = 13;
+	public const TOKEN_EQUAL = 14;
+	public const TOKEN_OPEN_PHPDOC = 15;
+	public const TOKEN_CLOSE_PHPDOC = 16;
+	public const TOKEN_PHPDOC_TAG = 17;
+	public const TOKEN_PHPDOC_EOL = 26;
+	public const TOKEN_FLOAT = 18;
+	public const TOKEN_INTEGER = 19;
+	public const TOKEN_SINGLE_QUOTED_STRING = 20;
+	public const TOKEN_DOUBLE_QUOTED_STRING = 21;
+	public const TOKEN_IDENTIFIER = 22;
+	public const TOKEN_THIS_VARIABLE = 23;
+	public const TOKEN_VARIABLE = 24;
+	public const TOKEN_HORIZONTAL_WS = 25;
+	public const TOKEN_OTHER = 27;
+	public const TOKEN_END = 28;
 
-	const TOKEN_LABELS = [
+	public const TOKEN_LABELS = [
 		self::TOKEN_REFERENCE => '\'&\'',
 		self::TOKEN_UNION => '\'|\'',
 		self::TOKEN_INTERSECTION => '\'&\'',
@@ -72,8 +72,8 @@ class Lexer
 		self::TOKEN_END => 'TOKEN_END',
 	];
 
-	const VALUE_OFFSET = 0;
-	const TYPE_OFFSET = 1;
+	public const VALUE_OFFSET = 0;
+	public const TYPE_OFFSET = 1;
 
 	/** @var null|string */
 	private $regexp;

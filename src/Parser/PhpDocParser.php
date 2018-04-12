@@ -8,7 +8,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 class PhpDocParser
 {
 
-	const DISALLOWED_DESCRIPTION_START_TOKENS = [
+	private const DISALLOWED_DESCRIPTION_START_TOKENS = [
 		Lexer::TOKEN_UNION,
 		Lexer::TOKEN_INTERSECTION,
 		Lexer::TOKEN_OPEN_ANGLE_BRACKET,
