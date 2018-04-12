@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use Iterator;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFalseNode;
@@ -55,7 +56,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideTrueNodeParseData(): iterable
+	public function provideTrueNodeParseData(): Iterator
 	{
 		yield [
 			'true',
@@ -74,7 +75,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideFalseNodeParseData(): iterable
+	public function provideFalseNodeParseData(): Iterator
 	{
 		yield [
 			'false',
@@ -93,7 +94,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideNullNodeParseData(): iterable
+	public function provideNullNodeParseData(): Iterator
 	{
 		yield [
 			'null',
@@ -112,7 +113,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideIntegerNodeParseData(): iterable
+	public function provideIntegerNodeParseData(): Iterator
 	{
 		yield [
 			'123',
@@ -146,7 +147,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideFloatNodeParseData(): iterable
+	public function provideFloatNodeParseData(): Iterator
 	{
 		yield [
 			'123.4',
@@ -210,7 +211,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideStringNodeParseData(): iterable
+	public function provideStringNodeParseData(): Iterator
 	{
 		yield [
 			'"foo"',
@@ -234,7 +235,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideArrayNodeParseData(): iterable
+	public function provideArrayNodeParseData(): Iterator
 	{
 		yield [
 			'[]',
@@ -336,7 +337,7 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideFetchNodeParseData(): iterable
+	public function provideFetchNodeParseData(): Iterator
 	{
 		yield [
 			'GLOBAL_CONSTANT',
