@@ -32,7 +32,14 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 
 
 	/**
-	 * @dataProvider provideParseData
+	 * @dataProvider provideTrueNodeParseData
+	 * @dataProvider provideFalseNodeParseData
+	 * @dataProvider provideNullNodeParseData
+	 * @dataProvider provideIntegerNodeParseData
+	 * @dataProvider provideFloatNodeParseData
+	 * @dataProvider provideStringNodeParseData
+	 * @dataProvider provideArrayNodeParseData
+	 * @dataProvider provideFetchNodeParseData
 	 * @param string        $input
 	 * @param ConstExprNode $expectedExpr
 	 * @param int           $nextTokenType
@@ -48,216 +55,307 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideParseData(): array
+	public function provideTrueNodeParseData(): iterable
 	{
-		return [
-			[
-				'true',
-				new ConstExprTrueNode(),
-			],
-			[
-				'True',
-				new ConstExprTrueNode(),
-			],
-			[
-				'false',
-				new ConstExprFalseNode(),
-			],
-			[
-				'False',
-				new ConstExprFalseNode(),
-			],
-			[
-				'null',
-				new ConstExprNullNode(),
-			],
-			[
-				'Null',
-				new ConstExprNullNode(),
-			],
-			[
-				'123',
-				new ConstExprIntegerNode('123'),
-			],
-			[
-				'0b0110101',
-				new ConstExprIntegerNode('0b0110101'),
-			],
-			[
-				'0o777',
-				new ConstExprIntegerNode('0o777'),
-			],
-			[
-				'0x7Fb4',
-				new ConstExprIntegerNode('0x7Fb4'),
-			],
-			[
-				'-0O777',
-				new ConstExprIntegerNode('-0O777'),
-			],
-			[
-				'-0X7Fb4',
-				new ConstExprIntegerNode('-0X7Fb4'),
-			],
-			[
-				'123.4',
-				new ConstExprFloatNode('123.4'),
-			],
-			[
-				'.123',
-				new ConstExprFloatNode('.123'),
-			],
-			[
-				'123.',
-				new ConstExprFloatNode('123.'),
-			],
-			[
-				'123e4',
-				new ConstExprFloatNode('123e4'),
-			],
-			[
-				'12.3e4',
-				new ConstExprFloatNode('12.3e4'),
-			],
-			[
-				'-123',
-				new ConstExprIntegerNode('-123'),
-			],
-			[
-				'-123.4',
-				new ConstExprFloatNode('-123.4'),
-			],
-			[
-				'-.123',
-				new ConstExprFloatNode('-.123'),
-			],
-			[
-				'-123.',
-				new ConstExprFloatNode('-123.'),
-			],
-			[
-				'-123e-4',
-				new ConstExprFloatNode('-123e-4'),
-			],
-			[
-				'-12.3e-4',
-				new ConstExprFloatNode('-12.3e-4'),
-			],
-			[
-				'"foo"',
-				new ConstExprStringNode('"foo"'),
-			],
-			[
-				'\'bar\'',
-				new ConstExprStringNode('\'bar\''),
-			],
-			[
-				'GLOBAL_CONSTANT',
-				new ConstFetchNode('', 'GLOBAL_CONSTANT'),
-			],
-			[
-				'Foo\\Bar\\GLOBAL_CONSTANT',
-				new ConstFetchNode('', 'Foo\\Bar\\GLOBAL_CONSTANT'),
-			],
-			[
-				'Foo\\Bar::CLASS_CONSTANT',
-				new ConstFetchNode('Foo\\Bar', 'CLASS_CONSTANT'),
-			],
-			[
-				'self::CLASS_CONSTANT',
-				new ConstFetchNode('self', 'CLASS_CONSTANT'),
-			],
-			[
-				'[]',
-				new ConstExprArrayNode([]),
-			],
-			[
-				'[123]',
-				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('123')
-					),
-				]),
-			],
-			[
-				'[1, 2, 3]',
-				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('1')
-					),
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('2')
-					),
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('3')
-					),
-				]),
-			],
-			[
-				'[1, 2, 3, ]',
-				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('1')
-					),
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('2')
-					),
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('3')
-					),
-				]),
-			],
-			[
-				'[1 => 2]',
-				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(
-						new ConstExprIntegerNode('1'),
-						new ConstExprIntegerNode('2')
-					),
-				]),
-			],
-			[
-				'[1 => 2, 3]',
-				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(
-						new ConstExprIntegerNode('1'),
-						new ConstExprIntegerNode('2')
-					),
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('3')
-					),
-				]),
-			],
-			[
-				'[1, [2, 3]]',
-				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprIntegerNode('1')
-					),
-					new ConstExprArrayItemNode(
-						null,
-						new ConstExprArrayNode([
-							new ConstExprArrayItemNode(
-								null,
-								new ConstExprIntegerNode('2')
-							),
-							new ConstExprArrayItemNode(
-								null,
-								new ConstExprIntegerNode('3')
-							),
-						])
-					),
-				]),
-			],
+		yield [
+			'true',
+			new ConstExprTrueNode(),
+		];
+
+		yield [
+			'TRUE',
+			new ConstExprTrueNode(),
+		];
+
+		yield [
+			'tRUe',
+			new ConstExprTrueNode(),
+		];
+	}
+
+
+	public function provideFalseNodeParseData(): iterable
+	{
+		yield [
+			'false',
+			new ConstExprFalseNode(),
+		];
+
+		yield [
+			'FALSE',
+			new ConstExprFalseNode(),
+		];
+
+		yield [
+			'fALse',
+			new ConstExprFalseNode(),
+		];
+	}
+
+
+	public function provideNullNodeParseData(): iterable
+	{
+		yield [
+			'null',
+			new ConstExprNullNode(),
+		];
+
+		yield [
+			'NULL',
+			new ConstExprNullNode(),
+		];
+
+		yield [
+			'nULl',
+			new ConstExprNullNode(),
+		];
+	}
+
+
+	public function provideIntegerNodeParseData(): iterable
+	{
+		yield [
+			'123',
+			new ConstExprIntegerNode('123'),
+		];
+
+		yield [
+			'0b0110101',
+			new ConstExprIntegerNode('0b0110101'),
+		];
+
+		yield [
+			'0o777',
+			new ConstExprIntegerNode('0o777'),
+		];
+
+		yield [
+			'0x7Fb4',
+			new ConstExprIntegerNode('0x7Fb4'),
+		];
+
+		yield [
+			'-0O777',
+			new ConstExprIntegerNode('-0O777'),
+		];
+
+		yield [
+			'-0X7Fb4',
+			new ConstExprIntegerNode('-0X7Fb4'),
+		];
+	}
+
+
+	public function provideFloatNodeParseData(): iterable
+	{
+		yield [
+			'123.4',
+			new ConstExprFloatNode('123.4'),
+		];
+
+		yield [
+			'.123',
+			new ConstExprFloatNode('.123'),
+		];
+
+		yield [
+			'123.',
+			new ConstExprFloatNode('123.'),
+		];
+
+		yield [
+			'123e4',
+			new ConstExprFloatNode('123e4'),
+		];
+
+		yield [
+			'123E4',
+			new ConstExprFloatNode('123E4'),
+		];
+
+		yield [
+			'12.3e4',
+			new ConstExprFloatNode('12.3e4'),
+		];
+
+		yield [
+			'-123',
+			new ConstExprIntegerNode('-123'),
+		];
+
+		yield [
+			'-123.4',
+			new ConstExprFloatNode('-123.4'),
+		];
+
+		yield [
+			'-.123',
+			new ConstExprFloatNode('-.123'),
+		];
+
+		yield [
+			'-123.',
+			new ConstExprFloatNode('-123.'),
+		];
+
+		yield [
+			'-123e-4',
+			new ConstExprFloatNode('-123e-4'),
+		];
+
+		yield [
+			'-12.3e-4',
+			new ConstExprFloatNode('-12.3e-4'),
+		];
+	}
+
+
+	public function provideStringNodeParseData(): iterable
+	{
+		yield [
+			'"foo"',
+			new ConstExprStringNode('"foo"'),
+		];
+
+		yield [
+			'"Foo \\n\\"\\r Bar"',
+			new ConstExprStringNode('"Foo \\n\\"\\r Bar"'),
+		];
+
+		yield [
+			'\'bar\'',
+			new ConstExprStringNode('\'bar\''),
+		];
+
+		yield [
+			'\'Foo \\\' Bar\'',
+			new ConstExprStringNode('\'Foo \\\' Bar\''),
+		];
+	}
+
+
+	public function provideArrayNodeParseData(): iterable
+	{
+		yield [
+			'[]',
+			new ConstExprArrayNode([]),
+		];
+
+		yield [
+			'[123]',
+			new ConstExprArrayNode([
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('123')
+				),
+			]),
+		];
+
+		yield [
+			'[1, 2, 3]',
+			new ConstExprArrayNode([
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('1')
+				),
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('2')
+				),
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('3')
+				),
+			]),
+		];
+
+		yield [
+			'[1, 2, 3, ]',
+			new ConstExprArrayNode([
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('1')
+				),
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('2')
+				),
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('3')
+				),
+			]),
+		];
+
+		yield [
+			'[1 => 2]',
+			new ConstExprArrayNode([
+				new ConstExprArrayItemNode(
+					new ConstExprIntegerNode('1'),
+					new ConstExprIntegerNode('2')
+				),
+			]),
+		];
+
+		yield [
+			'[1 => 2, 3]',
+			new ConstExprArrayNode([
+				new ConstExprArrayItemNode(
+					new ConstExprIntegerNode('1'),
+					new ConstExprIntegerNode('2')
+				),
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('3')
+				),
+			]),
+		];
+
+		yield [
+			'[1, [2, 3]]',
+			new ConstExprArrayNode([
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprIntegerNode('1')
+				),
+				new ConstExprArrayItemNode(
+					null,
+					new ConstExprArrayNode([
+						new ConstExprArrayItemNode(
+							null,
+							new ConstExprIntegerNode('2')
+						),
+						new ConstExprArrayItemNode(
+							null,
+							new ConstExprIntegerNode('3')
+						),
+					])
+				),
+			]),
+		];
+	}
+
+
+	public function provideFetchNodeParseData(): iterable
+	{
+		yield [
+			'GLOBAL_CONSTANT',
+			new ConstFetchNode('', 'GLOBAL_CONSTANT'),
+		];
+
+		yield [
+			'Foo\\Bar\\GLOBAL_CONSTANT',
+			new ConstFetchNode('', 'Foo\\Bar\\GLOBAL_CONSTANT'),
+		];
+
+		yield [
+			'Foo\\Bar::CLASS_CONSTANT',
+			new ConstFetchNode('Foo\\Bar', 'CLASS_CONSTANT'),
+		];
+
+		yield [
+			'self::CLASS_CONSTANT',
+			new ConstFetchNode('self', 'CLASS_CONSTANT'),
 		];
 	}
 
