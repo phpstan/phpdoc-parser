@@ -84,7 +84,7 @@
 		</exec>
 	</target>
 
-	<target name="tests">
+	<target name="tests" depends="build-abnfgen">
 		<exec
 				executable="vendor/bin/phpunit"
 				logoutput="true"
@@ -109,6 +109,16 @@
 			<arg value="7"/>
 			<arg path="src"/>
 			<arg path="tests"/>
+		</exec>
+	</target>
+
+	<target name="build-abnfgen">
+		<exec
+			executable="./build-abnfgen.sh"
+			logoutput="true"
+			passthru="true"
+			checkreturn="true"
+		>
 		</exec>
 	</target>
 </project>
