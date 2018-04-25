@@ -378,6 +378,21 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield [
+			'OK without variable name and description in parentheses',
+			'/** @var Foo (Bar) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'',
+						'(Bar)'
+					)
+				),
+			]),
+		];
+
+		yield [
 			'OK with variable name and description',
 			'/** @var Foo $foo optional description */',
 			new PhpDocNode([

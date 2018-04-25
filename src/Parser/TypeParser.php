@@ -49,7 +49,7 @@ class TypeParser
 				$type = $this->parseGeneric($tokens, $type);
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-				$type = $this->parseCallable($tokens, $type);
+				$type = $this->tryParseCallable($tokens, $type);
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$type = $this->tryParseArray($tokens, $type);
@@ -168,6 +168,22 @@ class TypeParser
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 				$type = $this->parseGeneric($tokens, $type);
 			}
+		}
+
+		return $type;
+	}
+
+
+	private function tryParseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
+	{
+		try {
+			$tokens->pushSavePoint();
+			$type = $this->parseCallable($tokens, $identifier);
+			$tokens->dropSavePoint();
+
+		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+			$tokens->rollback();
+			$type = $identifier;
 		}
 
 		return $type;
