@@ -83,15 +83,16 @@ class Lexer
 
 	public function tokenize(string $s): array
 	{
-		if ($this->regexp === null) {
+		if ($this->regexp === null || $this->types === null) {
 			$this->initialize();
 		}
 
+		assert($this->regexp !== null);
+		assert($this->types !== null);
+
 		preg_match_all($this->regexp, $s, $tokens, PREG_SET_ORDER);
 
-		assert($this->types !== null);
 		$count = count($this->types);
-
 		foreach ($tokens as &$match) {
 			for ($i = 1; $i <= $count; $i++) {
 				if ($match[$i] !== null && $match[$i] !== '') {
