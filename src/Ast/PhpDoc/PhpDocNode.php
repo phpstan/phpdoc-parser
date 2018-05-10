@@ -85,6 +85,20 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return ThrowsTagValueNode[]
+	 */
+	public function getThrowsTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@throws'), function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof ThrowsTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
 	 * @return PropertyTagValueNode[]
 	 */
 	public function getPropertyTagValues(): array
