@@ -2,8 +2,6 @@
 	"name": "phpstan/phpdoc-parser",
 	"description": "PHPDoc parser with support for nullable, intersection and generic types",
 	"license": "MIT",
-	"minimum-stability": "dev",
-	"prefer-stable": true,
 	"require": {
 		"php": "~7.1"
 	},
