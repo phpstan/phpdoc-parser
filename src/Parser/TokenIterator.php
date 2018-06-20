@@ -156,7 +156,9 @@ class TokenIterator
 
 	public function rollback()
 	{
-		$this->index = array_pop($this->savePoints);
+		$index = array_pop($this->savePoints);
+		assert($index !== null);
+		$this->index = $index;
 	}
 
 
