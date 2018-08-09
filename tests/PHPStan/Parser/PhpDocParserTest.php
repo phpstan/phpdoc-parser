@@ -27,7 +27,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	/** @var Lexer */
 	private $lexer;
 
-	/** @var PhpDocParser() */
+	/** @var PhpDocParser */
 	private $phpDocParser;
 
 	protected function setUp()
