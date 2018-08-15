@@ -88,11 +88,14 @@ class TypeParser
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
 
-		$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
-		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		$type = $this->tryParseCallable($tokens);
 
-		if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
-			$type = $this->parseGeneric($tokens, $type);
+		if ($type === null) {
+			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+				$type = $this->parseGeneric($tokens, $type);
+			}
 		}
 
 		return new Ast\Type\NullableTypeNode($type);
@@ -156,19 +159,22 @@ class TypeParser
 
 	private function parseCallableReturnType(TokenIterator $tokens): Ast\Type\TypeNode
 	{
-		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
-			$type = $this->parseNullable($tokens);
-
-		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
 			$type = $this->parse($tokens);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 		} else {
+			$nullable = $tokens->tryConsumeTokenType(Lexer::TOKEN_NULLABLE);
+
 			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 				$type = $this->parseGeneric($tokens, $type);
+			}
+
+			if ($nullable) {
+				$type = new Ast\Type\NullableTypeNode($type);
 			}
 		}
 

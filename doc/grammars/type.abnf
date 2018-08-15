@@ -14,7 +14,8 @@ Intersection
 	= 1*(TokenIntersection Atomic)
 
 Nullable
-	= TokenNullable TokenIdentifier [Generic]
+	= TokenNullable Callable
+	/ TokenNullable TokenIdentifier [Generic]
 
 Atomic
 	= TokenIdentifier [Generic / Array]
@@ -46,8 +47,7 @@ CallableParameterIsOptional
 	= TokenEqualSign
 
 CallableReturnType
-	= TokenIdentifier [Generic]
-	/ Nullable
+	= [TokenNullable] TokenIdentifier [Generic]
 	/ TokenParenthesesOpen Type TokenParenthesesClose
 
 Array

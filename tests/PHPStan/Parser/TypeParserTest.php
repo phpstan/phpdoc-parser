@@ -382,6 +382,16 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				Lexer::TOKEN_OPEN_PARENTHESES
 			],
 			[
+				'?callable(): Foo',
+				new NullableTypeNode(
+					new CallableTypeNode(
+						new IdentifierTypeNode('callable'),
+						[],
+						new IdentifierTypeNode('Foo')
+					)
+				)
+			],
+			[
 				'(Foo\\Bar<array<mixed, string>, (int | (string<foo> & bar)[])> | Lorem)',
 				new UnionTypeNode([
 					new GenericTypeNode(
