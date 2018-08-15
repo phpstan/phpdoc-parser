@@ -3,8 +3,9 @@
 ; ---------------------------------------------------------------------------- ;
 
 Type
-	= Atomic [Union / Intersection]
+	= Callable
 	/ Nullable
+	/ Atomic [Union / Intersection]
 
 Union
 	= 1*(TokenUnion Atomic)
@@ -16,7 +17,7 @@ Nullable
 	= TokenNullable TokenIdentifier [Generic]
 
 Atomic
-	= TokenIdentifier [Generic / Callable / Array]
+	= TokenIdentifier [Generic / Array]
 	/ TokenThisVariable
 	/ TokenParenthesesOpen Type TokenParenthesesClose [Array]
 
@@ -24,7 +25,7 @@ Generic
 	= TokenAngleBracketOpen Type *(TokenComma Type) TokenAngleBracketClose
 
 Callable
-	= TokenParenthesesOpen [CallableParameters] TokenParenthesesClose TokenColon CallableReturnType
+	= TokenIdentifier TokenParenthesesOpen [CallableParameters] TokenParenthesesClose TokenColon CallableReturnType
 
 CallableParameters
 	= CallableParameter *(TokenComma CallableParameter)

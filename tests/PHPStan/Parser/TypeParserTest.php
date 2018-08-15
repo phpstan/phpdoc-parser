@@ -297,25 +297,21 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 			[
 				'callable(): Foo|Bar',
-				new UnionTypeNode([
-					new CallableTypeNode(
-						new IdentifierTypeNode('callable'),
-						[],
-						new IdentifierTypeNode('Foo')
-					),
-					new IdentifierTypeNode('Bar'),
-				]),
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new IdentifierTypeNode('Foo')
+				),
+				Lexer::TOKEN_UNION
 			],
 			[
 				'callable(): Foo&Bar',
-				new IntersectionTypeNode([
-					new CallableTypeNode(
-						new IdentifierTypeNode('callable'),
-						[],
-						new IdentifierTypeNode('Foo')
-					),
-					new IdentifierTypeNode('Bar'),
-				]),
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new IdentifierTypeNode('Foo')
+				),
+				Lexer::TOKEN_INTERSECTION
 			],
 			[
 				'callable(): (Foo|Bar)',
@@ -368,6 +364,22 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					],
 					new IdentifierTypeNode('Foo')
 				),
+			],
+			[
+				'Foo|callable(): Bar',
+				new UnionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('callable')
+				]),
+				Lexer::TOKEN_OPEN_PARENTHESES
+			],
+			[
+				'Foo&callable(): Bar',
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('callable')
+				]),
+				Lexer::TOKEN_OPEN_PARENTHESES
 			],
 			[
 				'(Foo\\Bar<array<mixed, string>, (int | (string<foo> & bar)[])> | Lorem)',
