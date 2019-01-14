@@ -77,7 +77,7 @@ class PhpDocParser
 	}
 
 
-	private function parseTagValue(TokenIterator $tokens, string $tag): Ast\PhpDoc\PhpDocTagValueNode
+	public function parseTagValue(TokenIterator $tokens, string $tag): Ast\PhpDoc\PhpDocTagValueNode
 	{
 		try {
 			$tokens->pushSavePoint();
