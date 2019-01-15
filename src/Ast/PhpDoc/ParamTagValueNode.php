@@ -13,7 +13,7 @@ class ParamTagValueNode implements PhpDocTagValueNode
 	/** @var bool */
 	public $isVariadic;
 
-	/** @var string (may be empty) */
+	/** @var string */
 	public $parameterName;
 
 	/** @var string (may be empty) */
