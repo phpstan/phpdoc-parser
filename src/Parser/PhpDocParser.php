@@ -99,6 +99,10 @@ class PhpDocParser
 					$tagValue = $this->parseThrowsTagValue($tokens);
 					break;
 
+				case '@deprecated':
+					$tagValue = $this->parseDeprecatedTagValue($tokens);
+					break;
+
 				case '@property':
 				case '@property-read':
 				case '@property-write':
@@ -157,6 +161,12 @@ class PhpDocParser
 		$type = $this->typeParser->parse($tokens);
 		$description = $this->parseOptionalDescription($tokens, true);
 		return new Ast\PhpDoc\ThrowsTagValueNode($type, $description);
+	}
+
+	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode
+	{
+		$description = $this->parseOptionalDescription($tokens);
+		return new Ast\PhpDoc\DeprecatedTagValueNode($description);
 	}
 
 

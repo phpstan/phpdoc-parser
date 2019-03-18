@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
@@ -43,6 +44,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
+	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
 	 * @dataProvider provideSingleLinePhpDocData
@@ -967,6 +969,47 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 	}
 
+	public function provideDeprecatedTagsData(): \Iterator
+	{
+		yield [
+			'OK with no description',
+			'/** @deprecated */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode()
+				),
+			]),
+		];
+
+		yield [
+			'OK with simple description description',
+			'/** @deprecated text string */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('text string')
+				),
+			]),
+		];
+
+		yield [
+			'OK with long descriptions',
+			'/** @deprecated in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+			*   Drupal 9 there will be no way to set the status and in Drupal 8 this
+			*   ability has been removed because mb_*() functions are supplied using
+			*   Symfony\'s polyfill. */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In')
+				),
+				new PhpDocTextNode('Drupal 9 there will be no way to set the status and in Drupal 8 this'),
+				new PhpDocTextNode('ability has been removed because mb_*() functions are supplied using'),
+				new PhpDocTextNode('Symfony\'s polyfill.'),
+			]),
+		];
+	}
 
 	public function provideMethodTagsData(): \Iterator
 	{
@@ -1437,9 +1480,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'multi-line with two tags',
 				'/**
-                  * @param Foo $foo 1st multi world description
-                  * @param Bar $bar 2nd multi world description
-                  */',
+				  * @param Foo $foo 1st multi world description
+				  * @param Bar $bar 2nd multi world description
+				  */',
 				new PhpDocNode([
 					new PhpDocTagNode(
 						'@param',
@@ -1464,10 +1507,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'multi-line with two tags and text in the middle',
 				'/**
-                  * @param Foo $foo 1st multi world description
-                  * some text in the middle
-                  * @param Bar $bar 2nd multi world description
-                  */',
+				  * @param Foo $foo 1st multi world description
+				  * some text in the middle
+				  * @param Bar $bar 2nd multi world description
+				  */',
 				new PhpDocNode([
 					new PhpDocTagNode(
 						'@param',
@@ -1493,18 +1536,18 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'multi-line with two tags, text in the middle and some empty lines',
 				'/**
-                  *
-                  *
-                  * @param Foo $foo 1st multi world description
-                  *
-                  *
-                  * some text in the middle
-                  *
-                  *
-                  * @param Bar $bar 2nd multi world description
-                  *
-                  *
-                  */',
+				  *
+				  *
+				  * @param Foo $foo 1st multi world description
+				  *
+				  *
+				  * some text in the middle
+				  *
+				  *
+				  * @param Bar $bar 2nd multi world description
+				  *
+				  *
+				  */',
 				new PhpDocNode([
 					new PhpDocTextNode(''),
 					new PhpDocTextNode(''),
@@ -1538,9 +1581,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'multi-line with just empty lines',
 				'/**
-                  *
-                  *
-                  */',
+				  *
+				  *
+				  */',
 				new PhpDocNode([
 					new PhpDocTextNode(''),
 					new PhpDocTextNode(''),
@@ -1549,9 +1592,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'multi-line with tag mentioned as part of text node',
 				'/**
-                  * Lets talk about @param
-                  * @param int $foo @param string $bar
-                  */',
+				  * Lets talk about @param
+				  * @param int $foo @param string $bar
+				  */',
 				new PhpDocNode([
 					new PhpDocTextNode('Lets talk about @param'),
 					new PhpDocTagNode(
@@ -1568,44 +1611,44 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'multi-line with a lot of @method tags',
 				'/**
-                  * @method int getInteger(int $a, int $b)
-                  * @method void doSomething(int $a, $b)
-                  * @method self|Bar getFooOrBar()
-                  * @method methodWithNoReturnType()
-                  * @method static int getIntegerStatically(int $a, int $b)
-                  * @method static void doSomethingStatically(int $a, $b)
-                  * @method static self|Bar getFooOrBarStatically()
-                  * @method static methodWithNoReturnTypeStatically()
-                  * @method int getIntegerWithDescription(int $a, int $b) Get an integer with a description.
-                  * @method void doSomethingWithDescription(int $a, $b) Do something with a description.
-                  * @method self|Bar getFooOrBarWithDescription() Get a Foo or a Bar with a description.
-                  * @method methodWithNoReturnTypeWithDescription() Do something with a description but what, who knows!
-                  * @method static int getIntegerStaticallyWithDescription(int $a, int $b) Get an integer with a description statically.
-                  * @method static void doSomethingStaticallyWithDescription(int $a, $b) Do something with a description statically.
-                  * @method static self|Bar getFooOrBarStaticallyWithDescription() Get a Foo or a Bar with a description statically.
-                  * @method static methodWithNoReturnTypeStaticallyWithDescription() Do something with a description statically, but what, who knows!
-                  * @method static bool aStaticMethodThatHasAUniqueReturnTypeInThisClass()
-                  * @method static string aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescription() A Description.
-                  * @method int getIntegerNoParams()
-                  * @method void doSomethingNoParams()
-                  * @method self|Bar getFooOrBarNoParams()
-                  * @method methodWithNoReturnTypeNoParams()
-                  * @method static int getIntegerStaticallyNoParams()
-                  * @method static void doSomethingStaticallyNoParams()
-                  * @method static self|Bar getFooOrBarStaticallyNoParams()
-                  * @method static methodWithNoReturnTypeStaticallyNoParams()
-                  * @method int getIntegerWithDescriptionNoParams() Get an integer with a description.
-                  * @method void doSomethingWithDescriptionNoParams() Do something with a description.
-                  * @method self|Bar getFooOrBarWithDescriptionNoParams() Get a Foo or a Bar with a description.
-                  * @method static int getIntegerStaticallyWithDescriptionNoParams() Get an integer with a description statically.
-                  * @method static void doSomethingStaticallyWithDescriptionNoParams() Do something with a description statically.
-                  * @method static self|Bar getFooOrBarStaticallyWithDescriptionNoParams() Get a Foo or a Bar with a description statically.
-                  * @method static bool|string aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams()
-                  * @method static string|float aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams() A Description.
-                  * @method \Aws\Result publish(array $args)
-                  * @method Image rotate(float & ... $angle = array(), $backgroundColor)
-                  * @method Foo overridenMethod()
-                  */',
+				  * @method int getInteger(int $a, int $b)
+				  * @method void doSomething(int $a, $b)
+				  * @method self|Bar getFooOrBar()
+				  * @method methodWithNoReturnType()
+				  * @method static int getIntegerStatically(int $a, int $b)
+				  * @method static void doSomethingStatically(int $a, $b)
+				  * @method static self|Bar getFooOrBarStatically()
+				  * @method static methodWithNoReturnTypeStatically()
+				  * @method int getIntegerWithDescription(int $a, int $b) Get an integer with a description.
+				  * @method void doSomethingWithDescription(int $a, $b) Do something with a description.
+				  * @method self|Bar getFooOrBarWithDescription() Get a Foo or a Bar with a description.
+				  * @method methodWithNoReturnTypeWithDescription() Do something with a description but what, who knows!
+				  * @method static int getIntegerStaticallyWithDescription(int $a, int $b) Get an integer with a description statically.
+				  * @method static void doSomethingStaticallyWithDescription(int $a, $b) Do something with a description statically.
+				  * @method static self|Bar getFooOrBarStaticallyWithDescription() Get a Foo or a Bar with a description statically.
+				  * @method static methodWithNoReturnTypeStaticallyWithDescription() Do something with a description statically, but what, who knows!
+				  * @method static bool aStaticMethodThatHasAUniqueReturnTypeInThisClass()
+				  * @method static string aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescription() A Description.
+				  * @method int getIntegerNoParams()
+				  * @method void doSomethingNoParams()
+				  * @method self|Bar getFooOrBarNoParams()
+				  * @method methodWithNoReturnTypeNoParams()
+				  * @method static int getIntegerStaticallyNoParams()
+				  * @method static void doSomethingStaticallyNoParams()
+				  * @method static self|Bar getFooOrBarStaticallyNoParams()
+				  * @method static methodWithNoReturnTypeStaticallyNoParams()
+				  * @method int getIntegerWithDescriptionNoParams() Get an integer with a description.
+				  * @method void doSomethingWithDescriptionNoParams() Do something with a description.
+				  * @method self|Bar getFooOrBarWithDescriptionNoParams() Get a Foo or a Bar with a description.
+				  * @method static int getIntegerStaticallyWithDescriptionNoParams() Get an integer with a description statically.
+				  * @method static void doSomethingStaticallyWithDescriptionNoParams() Do something with a description statically.
+				  * @method static self|Bar getFooOrBarStaticallyWithDescriptionNoParams() Get a Foo or a Bar with a description statically.
+				  * @method static bool|string aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams()
+				  * @method static string|float aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams() A Description.
+				  * @method \Aws\Result publish(array $args)
+				  * @method Image rotate(float & ... $angle = array(), $backgroundColor)
+				  * @method Foo overridenMethod()
+				  */',
 				new PhpDocNode([
 					new PhpDocTagNode(
 						'@method',
