@@ -18,7 +18,7 @@ class FuzzyTest extends \PHPUnit\Framework\TestCase
 	/** @var ConstExprParser */
 	private $constExprParser;
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
@@ -30,7 +30,7 @@ class FuzzyTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideTypeParserData
 	 * @param string $input
 	 */
-	public function testTypeParser(string $input)
+	public function testTypeParser(string $input): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$this->typeParser->parse($tokens);
@@ -51,7 +51,7 @@ class FuzzyTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideConstExprParserData
 	 * @param string $input
 	 */
-	public function testConstExprParser(string $input)
+	public function testConstExprParser(string $input): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$this->constExprParser->parse($tokens);

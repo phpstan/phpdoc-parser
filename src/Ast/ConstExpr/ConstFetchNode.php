@@ -23,9 +23,9 @@ class ConstFetchNode implements ConstExprNode
 		if ($this->className === '') {
 			return $this->name;
 
-		} else {
-			return "{$this->className}::{$this->name}";
 		}
+
+		return "{$this->className}::{$this->name}";
 	}
 
 }

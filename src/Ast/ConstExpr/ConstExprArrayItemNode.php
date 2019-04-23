@@ -5,7 +5,7 @@ namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 class ConstExprArrayItemNode implements ConstExprNode
 {
 
-	/** @var null|ConstExprNode */
+	/** @var ConstExprNode|null */
 	public $key;
 
 	/** @var ConstExprNode */
@@ -23,9 +23,9 @@ class ConstExprArrayItemNode implements ConstExprNode
 		if ($this->key !== null) {
 			return "{$this->key} => {$this->value}";
 
-		} else {
-			return "{$this->value}";
 		}
+
+		return "{$this->value}";
 	}
 
 }

@@ -24,7 +24,7 @@ class PhpDocNode implements Node
 	 */
 	public function getTags(): array
 	{
-		return array_filter($this->children, function (PhpDocChildNode $child): bool {
+		return array_filter($this->children, static function (PhpDocChildNode $child): bool {
 			return $child instanceof PhpDocTagNode;
 		});
 	}
@@ -36,7 +36,7 @@ class PhpDocNode implements Node
 	 */
 	public function getTagsByName(string $tagName): array
 	{
-		return array_filter($this->getTags(), function (PhpDocTagNode $tag) use ($tagName): bool {
+		return array_filter($this->getTags(), static function (PhpDocTagNode $tag) use ($tagName): bool {
 			return $tag->name === $tagName;
 		});
 	}
@@ -48,7 +48,7 @@ class PhpDocNode implements Node
 	public function getVarTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@var'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@var'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof VarTagValueNode;
 			}),
 			'value'
@@ -62,7 +62,7 @@ class PhpDocNode implements Node
 	public function getParamTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@param'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@param'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof ParamTagValueNode;
 			}),
 			'value'
@@ -76,7 +76,7 @@ class PhpDocNode implements Node
 	public function getReturnTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@return'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@return'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof ReturnTagValueNode;
 			}),
 			'value'
@@ -90,7 +90,7 @@ class PhpDocNode implements Node
 	public function getThrowsTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@throws'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@throws'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof ThrowsTagValueNode;
 			}),
 			'value'
@@ -104,7 +104,7 @@ class PhpDocNode implements Node
 	public function getPropertyTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@property'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@property'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof PropertyTagValueNode;
 			}),
 			'value'
@@ -118,7 +118,7 @@ class PhpDocNode implements Node
 	public function getPropertyReadTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@property-read'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@property-read'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof PropertyTagValueNode;
 			}),
 			'value'
@@ -132,7 +132,7 @@ class PhpDocNode implements Node
 	public function getPropertyWriteTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@property-write'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@property-write'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof PropertyTagValueNode;
 			}),
 			'value'
@@ -146,7 +146,7 @@ class PhpDocNode implements Node
 	public function getMethodTagValues(): array
 	{
 		return array_column(
-			array_filter($this->getTagsByName('@method'), function (PhpDocTagNode $tag): bool {
+			array_filter($this->getTagsByName('@method'), static function (PhpDocTagNode $tag): bool {
 				return $tag->value instanceof MethodTagValueNode;
 			}),
 			'value'

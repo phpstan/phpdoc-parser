@@ -10,7 +10,7 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var bool */
 	public $isStatic;
 
-	/** @var null|TypeNode */
+	/** @var TypeNode|null */
 	public $returnType;
 
 	/** @var string */

@@ -30,7 +30,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	/** @var PhpDocParser */
 	private $phpDocParser;
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
@@ -52,7 +52,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @param PhpDocNode $expectedPhpDocNode
 	 * @param int        $nextTokenType
 	 */
-	public function testParse(string $label, string $input, PhpDocNode $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END)
+	public function testParse(string $label, string $input, PhpDocNode $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$actualPhpDocNode = $this->phpDocParser->parse($tokens);
@@ -1881,9 +1881,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							true,
 							new UnionTypeNode([
-									new IdentifierTypeNode('self'),
-									new IdentifierTypeNode('Bar'),
-								]),
+								new IdentifierTypeNode('self'),
+								new IdentifierTypeNode('Bar'),
+							]),
 							'getFooOrBarStaticallyWithDescription',
 							[],
 							'Get a Foo or a Bar with a description statically.'
@@ -1944,9 +1944,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							false,
 							new UnionTypeNode([
-									new IdentifierTypeNode('self'),
-									new IdentifierTypeNode('Bar'),
-								]),
+								new IdentifierTypeNode('self'),
+								new IdentifierTypeNode('Bar'),
+							]),
 							'getFooOrBarNoParams',
 							[],
 							''
@@ -1987,9 +1987,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							true,
 							new UnionTypeNode([
-									new IdentifierTypeNode('self'),
-									new IdentifierTypeNode('Bar'),
-								]),
+								new IdentifierTypeNode('self'),
+								new IdentifierTypeNode('Bar'),
+							]),
 							'getFooOrBarStaticallyNoParams',
 							[],
 							''
@@ -2030,9 +2030,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							false,
 							new UnionTypeNode([
-									new IdentifierTypeNode('self'),
-									new IdentifierTypeNode('Bar'),
-								]),
+								new IdentifierTypeNode('self'),
+								new IdentifierTypeNode('Bar'),
+							]),
 							'getFooOrBarWithDescriptionNoParams',
 							[],
 							'Get a Foo or a Bar with a description.'
@@ -2063,9 +2063,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							true,
 							new UnionTypeNode([
-									new IdentifierTypeNode('self'),
-									new IdentifierTypeNode('Bar'),
-								]),
+								new IdentifierTypeNode('self'),
+								new IdentifierTypeNode('Bar'),
+							]),
 							'getFooOrBarStaticallyWithDescriptionNoParams',
 							[],
 							'Get a Foo or a Bar with a description statically.'
@@ -2076,9 +2076,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							true,
 							new UnionTypeNode([
-									new IdentifierTypeNode('bool'),
-									new IdentifierTypeNode('string'),
-								]),
+								new IdentifierTypeNode('bool'),
+								new IdentifierTypeNode('string'),
+							]),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams',
 							[],
 							''
@@ -2089,9 +2089,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new MethodTagValueNode(
 							true,
 							new UnionTypeNode([
-									new IdentifierTypeNode('string'),
-									new IdentifierTypeNode('float'),
-								]),
+								new IdentifierTypeNode('string'),
+								new IdentifierTypeNode('float'),
+							]),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams',
 							[],
 							'A Description.'

@@ -75,10 +75,10 @@ class Lexer
 	public const VALUE_OFFSET = 0;
 	public const TYPE_OFFSET = 1;
 
-	/** @var null|string */
+	/** @var string|null */
 	private $regexp;
 
-	/** @var null|int[] */
+	/** @var int[]|null */
 	private $types;
 
 	public function tokenize(string $s): array
@@ -108,7 +108,7 @@ class Lexer
 	}
 
 
-	private function initialize()
+	private function initialize(): void
 	{
 		$patterns = [
 			// '&' followed by TOKEN_VARIADIC, TOKEN_VARIABLE, TOKEN_EQUAL, TOKEN_EQUAL or TOKEN_CLOSE_PARENTHESES

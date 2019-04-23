@@ -51,9 +51,9 @@ class ConstExprParser
 				$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 				return new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName);
 
-			} else {
-				return new Ast\ConstExpr\ConstFetchNode('', $identifier);
 			}
+
+			return new Ast\ConstExpr\ConstFetchNode('', $identifier);
 
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 			return $this->parseArray($tokens, Lexer::TOKEN_CLOSE_SQUARE_BRACKET);

@@ -9,7 +9,7 @@ use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 class MethodTagValueParameterNode implements Node
 {
 
-	/** @var null|TypeNode */
+	/** @var TypeNode|null */
 	public $type;
 
 	/** @var bool */
@@ -21,7 +21,7 @@ class MethodTagValueParameterNode implements Node
 	/** @var string */
 	public $parameterName;
 
-	/** @var null|ConstExprNode */
+	/** @var ConstExprNode|null */
 	public $defaultValue;
 
 	public function __construct(?TypeNode $type, bool $isReference, bool $isVariadic, string $parameterName, ?ConstExprNode $defaultValue)

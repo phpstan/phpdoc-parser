@@ -21,9 +21,11 @@ class TokenIterator
 		$this->tokens = $tokens;
 		$this->index = $index;
 
-		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
-			$this->index++;
+		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_HORIZONTAL_WS) {
+			return;
 		}
+
+		$this->index++;
 	}
 
 
@@ -66,7 +68,7 @@ class TokenIterator
 	 * @param  int $tokenType
 	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
 	 */
-	public function consumeTokenType(int $tokenType)
+	public function consumeTokenType(int $tokenType): void
 	{
 		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType) {
 			$this->throwError($tokenType);
@@ -74,9 +76,11 @@ class TokenIterator
 
 		$this->index++;
 
-		if (($this->tokens[$this->index][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS) {
-			$this->index++;
+		if (($this->tokens[$this->index][Lexer::TYPE_OFFSET] ?? -1) !== Lexer::TOKEN_HORIZONTAL_WS) {
+			return;
 		}
+
+		$this->index++;
 	}
 
 
@@ -132,29 +136,31 @@ class TokenIterator
 	}
 
 
-	public function next()
+	public function next(): void
 	{
 		$this->index++;
 
-		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
-			$this->index++;
+		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_HORIZONTAL_WS) {
+			return;
 		}
+
+		$this->index++;
 	}
 
 
-	public function pushSavePoint()
+	public function pushSavePoint(): void
 	{
 		$this->savePoints[] = $this->index;
 	}
 
 
-	public function dropSavePoint()
+	public function dropSavePoint(): void
 	{
 		array_pop($this->savePoints);
 	}
 
 
-	public function rollback()
+	public function rollback(): void
 	{
 		$index = array_pop($this->savePoints);
 		assert($index !== null);
@@ -166,7 +172,7 @@ class TokenIterator
 	 * @param  int $expectedTokenType
 	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
 	 */
-	private function throwError(int $expectedTokenType)
+	private function throwError(int $expectedTokenType): void
 	{
 		throw new \PHPStan\PhpDocParser\Parser\ParserException(
 			$this->currentTokenValue(),

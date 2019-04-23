@@ -23,7 +23,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 	/** @var TypeParser */
 	private $typeParser;
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
@@ -37,7 +37,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 	 * @param TypeNode $expectedType
 	 * @param int      $nextTokenType
 	 */
-	public function testParse(string $input, TypeNode $expectedType, int $nextTokenType = Lexer::TOKEN_END)
+	public function testParse(string $input, TypeNode $expectedType, int $nextTokenType = Lexer::TOKEN_END): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$typeNode = $this->typeParser->parse($tokens);

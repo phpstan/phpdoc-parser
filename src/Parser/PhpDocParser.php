@@ -52,9 +52,9 @@ class PhpDocParser
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
 			return $this->parseTag($tokens);
 
-		} else {
-			return $this->parseText($tokens);
 		}
+
+		return $this->parseText($tokens);
 	}
 
 
@@ -261,9 +261,11 @@ class PhpDocParser
 	{
 		if ($limitStartToken) {
 			foreach (self::DISALLOWED_DESCRIPTION_START_TOKENS as $disallowedStartToken) {
-				if ($tokens->isCurrentTokenType($disallowedStartToken)) {
-					$tokens->consumeTokenType(Lexer::TOKEN_OTHER); // will throw exception
+				if (!$tokens->isCurrentTokenType($disallowedStartToken)) {
+					continue;
 				}
+
+				$tokens->consumeTokenType(Lexer::TOKEN_OTHER); // will throw exception
 			}
 		}
 
