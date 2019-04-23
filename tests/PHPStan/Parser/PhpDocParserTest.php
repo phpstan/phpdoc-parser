@@ -977,7 +977,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode()
+					new DeprecatedTagValueNode('')
 				),
 			]),
 		];

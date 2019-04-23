@@ -5,10 +5,10 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 class DeprecatedTagValueNode implements PhpDocTagValueNode
 {
 
-	/** @var string|null (may be empty) */
+	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(?string $description = null)
+	public function __construct(string $description)
 	{
 		$this->description = $description;
 	}
@@ -16,7 +16,7 @@ class DeprecatedTagValueNode implements PhpDocTagValueNode
 
 	public function __toString(): string
 	{
-		return $this->description ? trim($this->description) : '';
+		return trim($this->description);
 	}
 
 }
