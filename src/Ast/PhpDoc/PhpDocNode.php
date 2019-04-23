@@ -99,6 +99,20 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return \PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode[]
+	 */
+	public function getDeprecatedTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@deprecated'), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof DeprecatedTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
 	 * @return PropertyTagValueNode[]
 	 */
 	public function getPropertyTagValues(): array
