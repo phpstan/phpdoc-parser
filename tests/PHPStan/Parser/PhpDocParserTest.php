@@ -1004,11 +1004,34 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In')
+					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In Drupal 9 there will be no way to set the status and in Drupal 8 this ability has been removed because mb_*() functions are supplied using Symfony\'s polyfill.')
 				),
-				new PhpDocTextNode('Drupal 9 there will be no way to set the status and in Drupal 8 this'),
-				new PhpDocTextNode('ability has been removed because mb_*() functions are supplied using'),
-				new PhpDocTextNode('Symfony\'s polyfill.'),
+			]),
+		];
+		yield [
+			'OK with multiple and long descriptions',
+			'/**
+      * Sample class
+      * 
+      * @author Foo Baz <foo@baz.com>
+      * 
+      * @deprecated in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+			*   Drupal 9 there will be no way to set the status and in Drupal 8 this
+			*   ability has been removed because mb_*() functions are supplied using
+			*   Symfony\'s polyfill. 
+			*/',
+			new PhpDocNode([
+				new PhpDocTextNode('Sample class'),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode(
+					'@author',
+					new GenericTagValueNode('Foo Baz <foo@baz.com>')
+				),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In Drupal 9 there will be no way to set the status and in Drupal 8 this ability has been removed because mb_*() functions are supplied using Symfony\'s polyfill.')
+				),
 			]),
 		];
 	}
