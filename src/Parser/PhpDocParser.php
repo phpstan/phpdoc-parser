@@ -170,7 +170,18 @@ class PhpDocParser
 
 	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode
 	{
-		$description = $this->parseOptionalDescription($tokens);
+		$description = '';
+		while ($tokens->currentTokenType() !== Lexer::TOKEN_CLOSE_PHPDOC) {
+			$description .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+			$description = rtrim($description, " \t");
+			if ($tokens->currentTokenType() !== Lexer::TOKEN_PHPDOC_EOL) {
+				break;
+			}
+			// There's more text on a new line, ensure spacing.
+			$description .= ' ';
+			$tokens->next();
+		}
+		$description = rtrim($description, " \t");
 		return new Ast\PhpDoc\DeprecatedTagValueNode($description);
 	}
 
