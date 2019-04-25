@@ -994,6 +994,41 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				),
 			]),
 		];
+		yield [
+			'OK with two simple description with break',
+			'/** @deprecated text first 
+        *
+        * @deprecated text second 
+        */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('text first')
+				),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('text second')
+				),
+			]),
+		];
+
+		yield [
+			'OK with two simple description without break',
+			'/** @deprecated text first 
+        * @deprecated text second 
+        */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('text first')
+				),
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('text second')
+				),
+			]),
+		];
 
 		yield [
 			'OK with long descriptions',
@@ -1543,10 +1578,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description'
+							'1st multi world description some text in the middle'
 						)
 					),
-					new PhpDocTextNode('some text in the middle'),
 					new PhpDocTagNode(
 						'@param',
 						new ParamTagValueNode(
@@ -1563,15 +1597,16 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				'/**
 				  *
 				  *
-				  * @param Foo $foo 1st multi world description
+				  * @param Foo $foo 1st multi world description with empty lines
 				  *
 				  *
 				  * some text in the middle
 				  *
 				  *
-				  * @param Bar $bar 2nd multi world description
+				  * @param Bar $bar 2nd multi world description with empty lines
 				  *
 				  *
+				  * test
 				  */',
 				new PhpDocNode([
 					new PhpDocTextNode(''),
@@ -1582,7 +1617,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description'
+							'1st multi world description with empty lines'
 						)
 					),
 					new PhpDocTextNode(''),
@@ -1596,11 +1631,12 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('Bar'),
 							false,
 							'$bar',
-							'2nd multi world description'
+							'2nd multi world description with empty lines'
 						)
 					),
 					new PhpDocTextNode(''),
 					new PhpDocTextNode(''),
+					new PhpDocTextNode('test'),
 				]),
 			],
 			[

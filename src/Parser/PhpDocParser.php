@@ -61,8 +61,38 @@ class PhpDocParser
 
 	private function parseText(TokenIterator $tokens): Ast\PhpDoc\PhpDocTextNode
 	{
-		$text = $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
-		$text = rtrim($text, " \t"); // the trimmed characters MUST match Lexer::TOKEN_HORIZONTAL_WS
+		$text = '';
+		while (true) {
+			// If we received a Lexer::TOKEN_PHPDOC_EOL, exit early to prevent
+			// them from being processed.
+			if ($tokens->currentTokenType() === Lexer::TOKEN_PHPDOC_EOL) {
+				break;
+			}
+			$text .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+			$text = rtrim($text, " \t");
+
+			// If we joined until TOKEN_PHPDOC_EOL, peak at the next tokens to see
+			// if we have a multiline string to join.
+			if ($tokens->currentTokenType() !== Lexer::TOKEN_PHPDOC_EOL) {
+				break;
+			}
+
+			// Peek at the next token to determine if it is more text that needs
+			// to be combined.
+			$tokens->pushSavePoint();
+			$tokens->next();
+			if ($tokens->currentTokenType() === Lexer::TOKEN_PHPDOC_EOL) {
+				$tokens->next();
+			}
+			if ($tokens->currentTokenType() !== Lexer::TOKEN_IDENTIFIER) {
+				$tokens->rollback();
+				break;
+			}
+
+			// There's more text on a new line, ensure spacing.
+			$text .= ' ';
+		}
+		$text = trim($text, " \t");
 
 		return new Ast\PhpDoc\PhpDocTextNode($text);
 	}
@@ -170,18 +200,7 @@ class PhpDocParser
 
 	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode
 	{
-		$description = '';
-		while ($tokens->currentTokenType() !== Lexer::TOKEN_CLOSE_PHPDOC) {
-			$description .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
-			$description = rtrim($description, " \t");
-			if ($tokens->currentTokenType() !== Lexer::TOKEN_PHPDOC_EOL) {
-				break;
-			}
-			// There's more text on a new line, ensure spacing.
-			$description .= ' ';
-			$tokens->next();
-		}
-		$description = rtrim($description, " \t");
+		$description = $this->parseOptionalDescription($tokens);
 		return new Ast\PhpDoc\DeprecatedTagValueNode($description);
 	}
 
