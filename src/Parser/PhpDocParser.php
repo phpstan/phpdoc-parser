@@ -81,9 +81,6 @@ class PhpDocParser
 			// to be combined.
 			$tokens->pushSavePoint();
 			$tokens->next();
-			if ($tokens->currentTokenType() === Lexer::TOKEN_PHPDOC_EOL) {
-				$tokens->next();
-			}
 			if ($tokens->currentTokenType() !== Lexer::TOKEN_IDENTIFIER) {
 				$tokens->rollback();
 				break;
