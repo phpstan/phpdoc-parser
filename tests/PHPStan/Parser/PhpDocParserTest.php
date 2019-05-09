@@ -51,7 +51,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideSingleLinePhpDocData
 	 * @dataProvider provideMultiLinePhpDocData
 	 * @dataProvider provideTemplateTagsData
-   * @dataProvider provideRealWorldExampleData
+	 * @dataProvider provideRealWorldExampleData
 	 * @param string     $label
 	 * @param string     $input
 	 * @param PhpDocNode $expectedPhpDocNode
@@ -2368,6 +2368,32 @@ some text in the middle'
 		];
 	}
 
+	public function providerDebug(): \Iterator
+	{
+		$sample = '/**
+			 * Returns the schema for the field.
+			 *
+			 * This method is static because the field schema information is needed on
+			 * creation of the field. FieldItemInterface objects instantiated at that
+			 * time are not reliable as field settings might be missing.
+			 *
+			 * Computed fields having no schema should return an empty array.
+			 */';
+		yield [
+			'OK class line',
+			$sample,
+			new PhpDocNode([
+				new PhpDocTextNode('Returns the schema for the field.'),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('This method is static because the field schema information is needed on
+creation of the field. FieldItemInterface objects instantiated at that
+time are not reliable as field settings might be missing.'),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('Computed fields having no schema should return an empty array.'),
+			]),
+		];
+	}
+
 	public function provideRealWorldExampleData(): \Iterator
 	{
 			$sample = "/**
@@ -2408,20 +2434,17 @@ some text in the middle'
 			 *     such as {taxonomy_term_data}.
 			 */";
 		yield [
-			'OK with two param and paragraph description',
+			'OK FieldItemInterface::schema',
 			$sample,
 			new PhpDocNode([
-				new PhpDocTextNode('Returns the schema for the field.
-This method is static because the field schema information is needed on
-creation of the field. FieldItemInterface objects instantiated at that
-time are not reliable as field settings might be missing.
-Computed fields having no schema should return an empty array.'),
-		  // @todo the commented out items should be correct.
-		  //new PhpDocTextNode('Returns the schema for the field.'),
+				new PhpDocTextNode('Returns the schema for the field.'),
 				new PhpDocTextNode(''),
-		  //new PhpDocTextNode('This method is static because the field schema information is needed on creation of the field. FieldItemInterface objects instantiated at that time are not reliable as field settings might be missing.'),
-		  //new PhpDocTextNode(''),
-		  //new PhpDocTextNode('Computed fields having no schema should return an empty array.'),
+				new PhpDocTextNode('This method is static because the field schema information is needed on
+creation of the field. FieldItemInterface objects instantiated at that
+time are not reliable as field settings might be missing.'),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('Computed fields having no schema should return an empty array.'),
+				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@param',
 					new ParamTagValueNode(
@@ -2463,6 +2486,59 @@ definitions. Note, however, that the field data is not necessarily
 stored in SQL. Also, the possible usage is limited, as you cannot
 specify another field as related, only existing SQL tables,
 such as {taxonomy_term_data}.'),
+			]),
+		];
+
+		$sample = '/**
+     *  Parses a chunked request and return relevant information.
+     *
+     *  This function must return an array containing the following
+     *  keys and their corresponding values:
+     *    - last: Wheter this is the last chunk of the uploaded file
+     *    - uuid: A unique id which distinguishes two uploaded files
+     *            This uuid must stay the same among the task of
+     *            uploading a chunked file.
+     *    - index: A numerical representation of the currently uploaded
+     *            chunk. Must be higher that in the previous request.
+     *    - orig: The original file name.
+     *
+     * @param Request $request - The request object
+     *
+     * @return array
+     */';
+		yield [
+			'OK AbstractChunkedController::parseChunkedRequest',
+			$sample,
+			new PhpDocNode([
+				new PhpDocTextNode('Parses a chunked request and return relevant information.'),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('This function must return an array containing the following
+keys and their corresponding values:'),
+				new PhpDocTextNode('- last: Wheter this is the last chunk of the uploaded file'),
+				new PhpDocTextNode('- uuid: A unique id which distinguishes two uploaded files
+This uuid must stay the same among the task of
+uploading a chunked file.'),
+				new PhpDocTextNode('- index: A numerical representation of the currently uploaded
+chunk. Must be higher that in the previous request.'),
+				new PhpDocTextNode('- orig: The original file name.'),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Request'),
+						false,
+						'$request',
+						'- The request object'
+					)
+				),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('array'),
+						''
+					)
+				),
 			]),
 		];
 	}
