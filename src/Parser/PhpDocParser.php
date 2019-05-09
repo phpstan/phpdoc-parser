@@ -90,7 +90,7 @@ class PhpDocParser
 			}
 
 			// There's more text on a new line, ensure spacing.
-			$text .= ' ';
+			$text .= "\n";
 		}
 		$text = trim($text, " \t");
 

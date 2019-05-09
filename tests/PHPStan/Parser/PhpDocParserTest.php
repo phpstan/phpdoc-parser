@@ -1040,7 +1040,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In Drupal 9 there will be no way to set the status and in Drupal 8 this ability has been removed because mb_*() functions are supplied using Symfony\'s polyfill.')
+					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+Drupal 9 there will be no way to set the status and in Drupal 8 this
+ability has been removed because mb_*() functions are supplied using
+Symfony\'s polyfill.')
 				),
 			]),
 		];
@@ -1066,7 +1069,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In Drupal 9 there will be no way to set the status and in Drupal 8 this ability has been removed because mb_*() functions are supplied using Symfony\'s polyfill.')
+					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+Drupal 9 there will be no way to set the status and in Drupal 8 this
+ability has been removed because mb_*() functions are supplied using
+Symfony\'s polyfill.')
 				),
 			]),
 		];
@@ -1579,7 +1585,8 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description some text in the middle'
+							'1st multi world description
+some text in the middle'
 						)
 					),
 					new PhpDocTagNode(
@@ -2404,7 +2411,11 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 			'OK with two param and paragraph description',
 			$sample,
 			new PhpDocNode([
-				new PhpDocTextNode('Returns the schema for the field. This method is static because the field schema information is needed on creation of the field. FieldItemInterface objects instantiated at that time are not reliable as field settings might be missing. Computed fields having no schema should return an empty array.'),
+				new PhpDocTextNode('Returns the schema for the field.
+This method is static because the field schema information is needed on
+creation of the field. FieldItemInterface objects instantiated at that
+time are not reliable as field settings might be missing.
+Computed fields having no schema should return an empty array.'),
 		  // @todo the commented out items should be correct.
 		  //new PhpDocTextNode('Returns the schema for the field.'),
 				new PhpDocTextNode(''),
@@ -2420,7 +2431,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						''
 					)
 				),
-			// @todo this should be the param description, but new line param descriptions are not handled.
 				new PhpDocTextNode('The field definition.'),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
@@ -2430,12 +2440,29 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						''
 					)
 				),
-			// @todo these are actually the @return description.
-				new PhpDocTextNode('An empty array if there is no schema, or an associative array with the following key/value pairs:'),
-				new PhpDocTextNode('- columns: An array of Schema API column specifications, keyed by column name. The columns need to be a subset of the properties defined in propertyDefinitions(). The \'not null\' property is ignored if present, as it is determined automatically by the storage controller depending on the table layout and the property definitions. It is recommended to avoid having the column definitions depend on field settings when possible. No assumptions should be made on how storage engines internally use the original column name to structure their storage.'),
-				new PhpDocTextNode('- unique keys: (optional) An array of Schema API unique key definitions. Only columns that appear in the \'columns\' array are allowed.'),
-				new PhpDocTextNode('- indexes: (optional) An array of Schema API index definitions. Only columns that appear in the \'columns\' array are allowed. Those indexes will be used as default indexes. Field definitions can specify additional indexes or, at their own risk, modify the default indexes specified by the field-type module. Some storage engines might not support indexes.'),
-				new PhpDocTextNode('- foreign keys: (optional) An array of Schema API foreign key definitions. Note, however, that the field data is not necessarily stored in SQL. Also, the possible usage is limited, as you cannot specify another field as related, only existing SQL tables, such as {taxonomy_term_data}.'),
+				new PhpDocTextNode('An empty array if there is no schema, or an associative array with the
+following key/value pairs:'),
+				new PhpDocTextNode('- columns: An array of Schema API column specifications, keyed by column
+name. The columns need to be a subset of the properties defined in
+propertyDefinitions(). The \'not null\' property is ignored if present,
+as it is determined automatically by the storage controller depending
+on the table layout and the property definitions. It is recommended to
+avoid having the column definitions depend on field settings when
+possible. No assumptions should be made on how storage engines
+internally use the original column name to structure their storage.'),
+				new PhpDocTextNode('- unique keys: (optional) An array of Schema API unique key definitions.
+Only columns that appear in the \'columns\' array are allowed.'),
+				new PhpDocTextNode('- indexes: (optional) An array of Schema API index definitions. Only
+columns that appear in the \'columns\' array are allowed. Those indexes
+will be used as default indexes. Field definitions can specify
+additional indexes or, at their own risk, modify the default indexes
+specified by the field-type module. Some storage engines might not
+support indexes.'),
+				new PhpDocTextNode('- foreign keys: (optional) An array of Schema API foreign key
+definitions. Note, however, that the field data is not necessarily
+stored in SQL. Also, the possible usage is limited, as you cannot
+specify another field as related, only existing SQL tables,
+such as {taxonomy_term_data}.'),
 			]),
 		];
 	}
