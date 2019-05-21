@@ -15,6 +15,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -49,6 +50,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideMethodTagsData
 	 * @dataProvider provideSingleLinePhpDocData
 	 * @dataProvider provideMultiLinePhpDocData
+	 * @dataProvider provideTemplateTagsData
 	 * @param string     $label
 	 * @param string     $input
 	 * @param PhpDocNode $expectedPhpDocNode
@@ -2195,6 +2197,108 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					),
 				]),
 			],
+		];
+	}
+
+
+	public function provideTemplateTagsData(): \Iterator
+	{
+		yield [
+			'OK without bound and description',
+			'/** @template T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('mixed'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without bound',
+			'/** @template T the value type*/',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('mixed'),
+						'the value type'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description',
+			'/** @template T of DateTime */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('DateTime'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with bound and description',
+			'/** @template T of DateTime the value type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('DateTime'),
+						'the value type'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without bound and description',
+			'/** @template */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							14,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without bound and with description',
+			'/** @template #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new InvalidTagValueNode(
+						'#desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							14,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
 		];
 	}
 
