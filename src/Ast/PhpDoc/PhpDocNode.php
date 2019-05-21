@@ -71,6 +71,20 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return TemplateTagValueNode[]
+	 */
+	public function getTemplateTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@template'), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof TemplateTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
 	 * @return ReturnTagValueNode[]
 	 */
 	public function getReturnTagValues(): array

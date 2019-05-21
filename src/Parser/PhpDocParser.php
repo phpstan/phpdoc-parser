@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 
 class PhpDocParser
@@ -111,6 +112,10 @@ class PhpDocParser
 
 				case '@method':
 					$tagValue = $this->parseMethodTagValue($tokens);
+					break;
+
+				case '@template':
+					$tagValue = $this->parseTemplateTagValue($tokens);
 					break;
 
 				default:
@@ -243,6 +248,22 @@ class PhpDocParser
 		return new Ast\PhpDoc\MethodTagValueParameterNode($parameterType, $isReference, $isVariadic, $parameterName, $defaultValue);
 	}
 
+	private function parseTemplateTagValue(TokenIterator $tokens): Ast\PhpDoc\TemplateTagValueNode
+	{
+		$name = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		if ($tokens->tryConsumeTokenValue('of')) {
+			$bound = $this->typeParser->parse($tokens);
+
+		} else {
+			$bound = new IdentifierTypeNode('mixed');
+		}
+
+		$description = $this->parseOptionalDescription($tokens);
+
+		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description);
+	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
 	{
