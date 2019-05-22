@@ -2300,6 +2300,25 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				),
 			]),
 		];
+
+		yield [
+			'invalid union bound',
+			'/** @template T of int|float */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new InvalidTagValueNode(
+						'T of int|float',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'|',
+							Lexer::TOKEN_UNION,
+							22,
+							Lexer::TOKEN_OTHER
+						)
+					)
+				),
+			]),
+		];
 	}
 
 }

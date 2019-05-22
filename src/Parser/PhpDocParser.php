@@ -254,13 +254,13 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
 		if ($tokens->tryConsumeTokenValue('of')) {
-			$bound = $this->typeParser->parse($tokens);
+			$bound = $this->typeParser->parseAtomic($tokens);
 
 		} else {
 			$bound = new IdentifierTypeNode('mixed');
 		}
 
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
 
 		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description);
 	}

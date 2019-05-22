@@ -28,7 +28,7 @@ class TypeParser
 	}
 
 
-	private function parseAtomic(TokenIterator $tokens): Ast\Type\TypeNode
+	public function parseAtomic(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
 			$type = $this->parse($tokens);
