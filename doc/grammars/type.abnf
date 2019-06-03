@@ -52,6 +52,12 @@ CallableReturnType
 Array
 	= 1*(TokenSquareBracketOpen TokenSquareBracketClose)
 
+ArrayShape
+    = TokenCurlyBracketOpen ArrayShapeItem *(TokenComma ArrayShapeItem) TokenCurlyBracketClose
+
+ArrayShapeItem
+    = (ConstantString / ConstantInt / TokenIdentifier) TokenNullable TokenColon Type
+    / Type
 
 ; ---------------------------------------------------------------------------- ;
 ;  ConstantExpr                                                                ;
@@ -138,6 +144,12 @@ TokenSquareBracketOpen
 
 TokenSquareBracketClose
 	= "]" *ByteHorizontalWs
+
+TokenCurlyBracketOpen
+    = "{" *ByteHorizontalWs
+
+TokenCurlyBracketClose
+    = "}" *ByteHorizontalWs
 
 TokenComma
 	= "," *ByteHorizontalWs

@@ -53,6 +53,9 @@ class TypeParser
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$type = $this->tryParseArray($tokens, $type);
+
+			} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET)) {
+				$type = $this->parseArrayShape($tokens, $type);
 			}
 		}
 
@@ -93,6 +96,9 @@ class TypeParser
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 			$type = $this->parseGeneric($tokens, $type);
+
+		} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET)) {
+			$type = $this->parseArrayShape($tokens, $type);
 		}
 
 		return new Ast\Type\NullableTypeNode($type);
@@ -167,6 +173,9 @@ class TypeParser
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 				$type = $this->parseGeneric($tokens, $type);
+
+			} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET)) {
+				$type = $this->parseArrayShape($tokens, $type);
 			}
 		}
 
@@ -206,6 +215,66 @@ class TypeParser
 		}
 
 		return $type;
+	}
+
+
+	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET);
+		$items = [$this->parseArrayShapeItem($tokens)];
+
+		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+			$items[] = $this->parseArrayShapeItem($tokens);
+		}
+
+		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
+
+		return new Ast\Type\ArrayShapeNode($items);
+	}
+
+
+	private function parseArrayShapeItem(TokenIterator $tokens): Ast\Type\ArrayShapeItemNode
+	{
+		try {
+			$tokens->pushSavePoint();
+			$key = $this->parseArrayShapeKey($tokens);
+			$optional = $tokens->tryConsumeTokenType(Lexer::TOKEN_NULLABLE);
+			$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+			$value = $this->parse($tokens);
+			$tokens->dropSavePoint();
+
+			return new Ast\Type\ArrayShapeItemNode($key, $optional, $value);
+		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+			$tokens->rollback();
+			$value = $this->parse($tokens);
+
+			return new Ast\Type\ArrayShapeItemNode(null, false, $value);
+		}
+	}
+
+	/**
+	 * @return Ast\ConstExpr\ConstExprStringNode|Ast\ConstExpr\ConstExprIntegerNode|Ast\Type\IdentifierTypeNode
+	 */
+	private function parseArrayShapeKey(TokenIterator $tokens)
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
+			$key = new Ast\ConstExpr\ConstExprStringNode($tokens->currentTokenValue());
+			$tokens->next();
+
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
+			$key = new Ast\ConstExpr\ConstExprStringNode($tokens->currentTokenValue());
+			$tokens->next();
+
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
+			$key = new Ast\ConstExpr\ConstExprIntegerNode($tokens->currentTokenValue());
+			$tokens->next();
+
+		} else {
+			$key = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		return $key;
 	}
 
 }

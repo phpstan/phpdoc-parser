@@ -2,6 +2,10 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -265,6 +269,142 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				),
 			],
 			[
+				'array{\'a\': int}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'a\''),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'array{\'a\': ?int}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'a\''),
+						false,
+						new NullableTypeNode(
+							new IdentifierTypeNode('int')
+						)
+					),
+				]),
+			],
+			[
+				'array{\'a\'?: ?int}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'a\''),
+						true,
+						new NullableTypeNode(
+							new IdentifierTypeNode('int')
+						)
+					),
+				]),
+			],
+			[
+				'array{\'a\': int, \'b\': string}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'a\''),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'b\''),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'array{int, string, "a": string}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('string')
+					),
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('"a"'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'array{"a"?: int, \'b\': string, 0: int, 1?: DateTime, hello: string}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('"a"'),
+						true,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'b\''),
+						false,
+						new IdentifierTypeNode('string')
+					),
+					new ArrayShapeItemNode(
+						new ConstExprIntegerNode('0'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new ConstExprIntegerNode('1'),
+						true,
+						new IdentifierTypeNode('DateTime')
+					),
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('hello'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'array{\'a\': int, \'b\': array{\'c\': callable(): int}}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'a\''),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('\'b\''),
+						false,
+						new ArrayShapeNode([
+							new ArrayShapeItemNode(
+								new ConstExprStringNode('\'c\''),
+								false,
+								new CallableTypeNode(
+									new IdentifierTypeNode('callable'),
+									[],
+									new IdentifierTypeNode('int')
+								)
+							),
+						])
+					),
+				]),
+			],
+			[
+				'?array{\'a\': int}',
+				new NullableTypeNode(
+					new ArrayShapeNode([
+						new ArrayShapeItemNode(
+							new ConstExprStringNode('\'a\''),
+							false,
+							new IdentifierTypeNode('int')
+						),
+					])
+				),
+			],
+			[
 				'callable(): Foo',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
@@ -336,6 +476,20 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					new IntersectionTypeNode([
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
+					])
+				),
+			],
+			[
+				'callable(): array{\'a\': int}',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new ArrayShapeNode([
+						new ArrayShapeItemNode(
+							new ConstExprStringNode('\'a\''),
+							false,
+							new IdentifierTypeNode('int')
+						),
 					])
 				),
 			],
