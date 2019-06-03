@@ -18,6 +18,8 @@ class Lexer
 	public const TOKEN_CLOSE_ANGLE_BRACKET = 7;
 	public const TOKEN_OPEN_SQUARE_BRACKET = 8;
 	public const TOKEN_CLOSE_SQUARE_BRACKET = 9;
+	public const TOKEN_OPEN_CURLY_BRACKET = 30;
+	public const TOKEN_CLOSE_CURLY_BRACKET = 31;
 	public const TOKEN_COMMA = 10;
 	public const TOKEN_COLON = 29;
 	public const TOKEN_VARIADIC = 11;
@@ -50,6 +52,8 @@ class Lexer
 		self::TOKEN_CLOSE_ANGLE_BRACKET => '\'>\'',
 		self::TOKEN_OPEN_SQUARE_BRACKET => '\'[\'',
 		self::TOKEN_CLOSE_SQUARE_BRACKET => '\']\'',
+		self::TOKEN_OPEN_CURLY_BRACKET => '\'{\'',
+		self::TOKEN_CLOSE_CURLY_BRACKET => '\'}\'',
 		self::TOKEN_COMMA => '\',\'',
 		self::TOKEN_COLON => '\':\'',
 		self::TOKEN_VARIADIC => '\'...\'',
@@ -123,6 +127,8 @@ class Lexer
 			self::TOKEN_CLOSE_ANGLE_BRACKET => '>',
 			self::TOKEN_OPEN_SQUARE_BRACKET => '\\[',
 			self::TOKEN_CLOSE_SQUARE_BRACKET => '\\]',
+			self::TOKEN_OPEN_CURLY_BRACKET => '\\{',
+			self::TOKEN_CLOSE_CURLY_BRACKET => '\\}',
 
 			self::TOKEN_COMMA => ',',
 			self::TOKEN_VARIADIC => '\\.\\.\\.',
