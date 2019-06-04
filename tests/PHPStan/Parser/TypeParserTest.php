@@ -448,6 +448,24 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				),
 			],
 			[
+				'array{"a": int}',
+				new \PHPStan\PhpDocParser\Parser\ParserException(
+					'"a"',
+					Lexer::TOKEN_DOUBLE_QUOTED_STRING,
+					6,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'array{\'a\': int}',
+				new \PHPStan\PhpDocParser\Parser\ParserException(
+					'\'a\'',
+					Lexer::TOKEN_SINGLE_QUOTED_STRING,
+					6,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
 				'callable(): Foo',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
