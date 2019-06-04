@@ -269,6 +269,12 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				),
 			],
 			[
+				'array {\'a\': int}',
+				new IdentifierTypeNode('array'),
+				Lexer::TOKEN_OPEN_CURLY_BRACKET,
+			],
+
+			[
 				'array{\'a\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(

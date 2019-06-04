@@ -64,6 +64,12 @@ class TokenIterator
 	}
 
 
+	public function isPrecededByHorizontalWhitespace(): bool
+	{
+		return ($this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
+	}
+
+
 	/**
 	 * @param  int $tokenType
 	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
