@@ -3,7 +3,6 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
-use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -280,20 +279,20 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 
 			[
-				'array{\'a\': int}',
+				'array{a: int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'a\''),
+						new IdentifierTypeNode('a'),
 						false,
 						new IdentifierTypeNode('int')
 					),
 				]),
 			],
 			[
-				'array{\'a\': ?int}',
+				'array{a: ?int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'a\''),
+						new IdentifierTypeNode('a'),
 						false,
 						new NullableTypeNode(
 							new IdentifierTypeNode('int')
@@ -302,10 +301,10 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
-				'array{\'a\'?: ?int}',
+				'array{a?: ?int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'a\''),
+						new IdentifierTypeNode('a'),
 						true,
 						new NullableTypeNode(
 							new IdentifierTypeNode('int')
@@ -314,22 +313,27 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
-				'array{\'a\': int, \'b\': string}',
+				'array{0: int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'a\''),
+						new ConstExprIntegerNode('0'),
 						false,
 						new IdentifierTypeNode('int')
-					),
-					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'b\''),
-						false,
-						new IdentifierTypeNode('string')
 					),
 				]),
 			],
 			[
-				'array{int, string, "a": string}',
+				'array{0?: int}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprIntegerNode('0'),
+						true,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'array{int, int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
 						null,
@@ -339,25 +343,35 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					new ArrayShapeItemNode(
 						null,
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'array{a: int, b: string}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
 					),
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('"a"'),
+						new IdentifierTypeNode('b'),
 						false,
 						new IdentifierTypeNode('string')
 					),
 				]),
 			],
 			[
-				'array{"a"?: int, \'b\': string, 0: int, 1?: DateTime, hello: string}',
+				'array{a?: int, b: string, 0: int, 1?: DateTime, hello: string}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('"a"'),
+						new IdentifierTypeNode('a'),
 						true,
 						new IdentifierTypeNode('int')
 					),
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'b\''),
+						new IdentifierTypeNode('b'),
 						false,
 						new IdentifierTypeNode('string')
 					),
@@ -379,19 +393,19 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
-				'array{\'a\': int, \'b\': array{\'c\': callable(): int}}',
+				'array{a: int, b: array{c: callable(): int}}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'a\''),
+						new IdentifierTypeNode('a'),
 						false,
 						new IdentifierTypeNode('int')
 					),
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('\'b\''),
+						new IdentifierTypeNode('b'),
 						false,
 						new ArrayShapeNode([
 							new ArrayShapeItemNode(
-								new ConstExprStringNode('\'c\''),
+								new IdentifierTypeNode('c'),
 								false,
 								new CallableTypeNode(
 									new IdentifierTypeNode('callable'),
@@ -404,11 +418,11 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
-				'?array{\'a\': int}',
+				'?array{a: int}',
 				new NullableTypeNode(
 					new ArrayShapeNode([
 						new ArrayShapeItemNode(
-							new ConstExprStringNode('\'a\''),
+							new IdentifierTypeNode('a'),
 							false,
 							new IdentifierTypeNode('int')
 						),
@@ -509,13 +523,13 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				),
 			],
 			[
-				'callable(): array{\'a\': int}',
+				'callable(): array{a: int}',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
 					[],
 					new ArrayShapeNode([
 						new ArrayShapeItemNode(
-							new ConstExprStringNode('\'a\''),
+							new IdentifierTypeNode('a'),
 							false,
 							new IdentifierTypeNode('int')
 						),
