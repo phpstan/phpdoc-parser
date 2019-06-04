@@ -37,17 +37,22 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * @dataProvider provideParseData
-	 * @param string   $input
-	 * @param TypeNode $expectedType
-	 * @param int      $nextTokenType
+	 * @param string              $input
+	 * @param TypeNode|\Exception $expectedResult
+	 * @param int                 $nextTokenType
 	 */
-	public function testParse(string $input, TypeNode $expectedType, int $nextTokenType = Lexer::TOKEN_END): void
+	public function testParse(string $input, $expectedResult, int $nextTokenType = Lexer::TOKEN_END): void
 	{
+		if ($expectedResult instanceof \Exception) {
+			$this->expectException(get_class($expectedResult));
+			$this->expectExceptionMessage($expectedResult->getMessage());
+		}
+
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$typeNode = $this->typeParser->parse($tokens);
 
-		$this->assertSame((string) $expectedType, (string) $typeNode);
-		$this->assertEquals($expectedType, $typeNode);
+		$this->assertSame((string) $expectedResult, (string) $typeNode);
+		$this->assertEquals($expectedResult, $typeNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
 
@@ -408,6 +413,24 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 							new IdentifierTypeNode('int')
 						),
 					])
+				),
+			],
+			[
+				'array{',
+				new \PHPStan\PhpDocParser\Parser\ParserException(
+					'',
+					Lexer::TOKEN_END,
+					6,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'array{a => int}',
+				new \PHPStan\PhpDocParser\Parser\ParserException(
+					'=>',
+					Lexer::TOKEN_OTHER,
+					8,
+					Lexer::TOKEN_CLOSE_CURLY_BRACKET
 				),
 			],
 			[
