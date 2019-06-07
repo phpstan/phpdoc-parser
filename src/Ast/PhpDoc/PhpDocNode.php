@@ -85,6 +85,48 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return ExtendsTagValueNode[]
+	 */
+	public function getExtendsTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@extends'), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof ExtendsTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return ImplementsTagValueNode[]
+	 */
+	public function getImplementsTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@implements'), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof ImplementsTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
+	 * @return UsesTagValueNode[]
+	 */
+	public function getUsesTagValues(): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName('@uses'), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof UsesTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
 	 * @return ReturnTagValueNode[]
 	 */
 	public function getReturnTagValues(): array

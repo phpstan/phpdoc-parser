@@ -5,7 +5,9 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
@@ -17,8 +19,10 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -51,6 +55,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideSingleLinePhpDocData
 	 * @dataProvider provideMultiLinePhpDocData
 	 * @dataProvider provideTemplateTagsData
+	 * @dataProvider provideExtendsTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @param string     $label
 	 * @param string     $input
@@ -2361,6 +2366,143 @@ some text in the middle'
 							Lexer::TOKEN_OTHER,
 							14,
 							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideExtendsTagsData(): \Iterator
+	{
+		yield [
+			'OK with one argument',
+			'/** @extends Foo<A> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@extends',
+					new ExtendsTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('A'),
+							]
+						),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with two arguments',
+			'/** @extends Foo<A,B> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@extends',
+					new ExtendsTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('A'),
+								new IdentifierTypeNode('B'),
+							]
+						),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK @implements',
+			'/** @implements Foo<A,B> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@implements',
+					new ImplementsTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('A'),
+								new IdentifierTypeNode('B'),
+							]
+						),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK @uses',
+			'/** @uses Foo<A,B> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@uses',
+					new UsesTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('A'),
+								new IdentifierTypeNode('B'),
+							]
+						),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @extends Foo<A> extends foo*/',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@extends',
+					new ExtendsTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[new IdentifierTypeNode('A')]
+						),
+						'extends foo'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type',
+			'/** @extends */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@extends',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							13,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without arguments',
+			'/** @extends Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@extends',
+					new InvalidTagValueNode(
+						'Foo',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							17,
+							Lexer::TOKEN_OPEN_ANGLE_BRACKET
 						)
 					)
 				),
