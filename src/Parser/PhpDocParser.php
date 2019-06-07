@@ -145,6 +145,12 @@ class PhpDocParser
 					$tagValue = $this->parseTemplateTagValue($tokens);
 					break;
 
+				case '@extends':
+				case '@implements':
+				case '@uses':
+					$tagValue = $this->parseExtendsTagValue($tag, $tokens);
+					break;
+
 				default:
 					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
 					break;
@@ -290,6 +296,25 @@ class PhpDocParser
 		$description = $this->parseOptionalDescription($tokens);
 
 		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description);
+	}
+
+	private function parseExtendsTagValue(string $tagName, TokenIterator $tokens): Ast\PhpDoc\PhpDocTagValueNode
+	{
+		$baseType = new IdentifierTypeNode($tokens->currentTokenValue());
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		$type = $this->typeParser->parseGeneric($tokens, $baseType);
+
+		$description = $this->parseOptionalDescription($tokens);
+
+		switch ($tagName) {
+			case '@extends':
+				return new Ast\PhpDoc\ExtendsTagValueNode($type, $description);
+			case '@implements':
+				return new Ast\PhpDoc\ImplementsTagValueNode($type, $description);
+			case '@uses':
+				return new Ast\PhpDoc\UsesTagValueNode($type, $description);
+		}
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
