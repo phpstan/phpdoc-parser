@@ -315,6 +315,8 @@ class PhpDocParser
 			case '@uses':
 				return new Ast\PhpDoc\UsesTagValueNode($type, $description);
 		}
+
+		throw new \PHPStan\ShouldNotHappenException();
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
