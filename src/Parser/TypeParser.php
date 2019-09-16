@@ -108,7 +108,7 @@ class TypeParser
 	public function parseGeneric(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $baseType): Ast\Type\GenericTypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
-		$genericTypes[] = $this->parse($tokens);
+		$genericTypes = [$this->parse($tokens)];
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$genericTypes[] = $this->parse($tokens);

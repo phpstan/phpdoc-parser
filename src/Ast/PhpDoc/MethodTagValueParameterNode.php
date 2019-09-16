@@ -36,10 +36,10 @@ class MethodTagValueParameterNode implements Node
 
 	public function __toString(): string
 	{
-		$type = $this->type ? "{$this->type} " : '';
+		$type = $this->type !== null ? "{$this->type} " : '';
 		$isReference = $this->isReference ? '&' : '';
 		$isVariadic = $this->isVariadic ? '...' : '';
-		$default = $this->defaultValue ? " = {$this->defaultValue}" : '';
+		$default = $this->defaultValue !== null ? " = {$this->defaultValue}" : '';
 		return "{$type}{$isReference}{$isVariadic}{$this->parameterName}{$default}";
 	}
 

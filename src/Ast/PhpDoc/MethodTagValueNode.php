@@ -35,7 +35,7 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	public function __toString(): string
 	{
 		$static = $this->isStatic ? 'static ' : '';
-		$returnType = $this->returnType ? "{$this->returnType} " : '';
+		$returnType = $this->returnType !== null ? "{$this->returnType} " : '';
 		$parameters = implode(', ', $this->parameters);
 		$description = $this->description !== '' ? " {$this->description}" : '';
 		return "{$static}{$returnType}{$this->methodName}({$parameters}){$description}";
