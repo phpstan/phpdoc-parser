@@ -6,21 +6,13 @@ php:
   - 7.4snapshot
   - master
 
-env:
-  - dependencies=lowest
-  - dependencies=highest
-
 matrix:
   allow_failures:
     - php: master
-      env: dependencies=lowest
-    - php: master
-      env: dependencies=highest
 
 before_script:
   - composer self-update
-  - if [ "$dependencies" = "lowest" ]; then composer update --prefer-lowest --no-interaction; fi;
-  - if [ "$dependencies" = "highest" ]; then composer update --no-interaction; fi;
+  - composer update --no-interaction
 
 script:
   - vendor/bin/phing
