@@ -1,5 +1,2 @@
 parameters:
-	ignoreErrors:
-		-
-			message: '#Unreachable statement - code above always terminates\.#'
-			path: */src/Parser/PhpDocParser.php
+	ignoreErrors: []

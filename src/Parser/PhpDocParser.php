@@ -65,7 +65,8 @@ class PhpDocParser
 		while (true) {
 			// If we received a Lexer::TOKEN_PHPDOC_EOL, exit early to prevent
 			// them from being processed.
-			if ($tokens->currentTokenType() === Lexer::TOKEN_PHPDOC_EOL) {
+			$currentTokenType = $tokens->currentTokenType();
+			if ($currentTokenType === Lexer::TOKEN_PHPDOC_EOL) {
 				break;
 			}
 			$text .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
@@ -73,7 +74,8 @@ class PhpDocParser
 
 			// If we joined until TOKEN_PHPDOC_EOL, peak at the next tokens to see
 			// if we have a multiline string to join.
-			if ($tokens->currentTokenType() !== Lexer::TOKEN_PHPDOC_EOL) {
+			$currentTokenType = $tokens->currentTokenType();
+			if ($currentTokenType !== Lexer::TOKEN_PHPDOC_EOL) {
 				break;
 			}
 
@@ -81,7 +83,8 @@ class PhpDocParser
 			// to be combined.
 			$tokens->pushSavePoint();
 			$tokens->next();
-			if ($tokens->currentTokenType() !== Lexer::TOKEN_IDENTIFIER) {
+			$currentTokenType = $tokens->currentTokenType();
+			if ($currentTokenType !== Lexer::TOKEN_IDENTIFIER) {
 				$tokens->rollback();
 				break;
 			}
