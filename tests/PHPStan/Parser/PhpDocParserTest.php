@@ -2508,6 +2508,66 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'class-string in @return',
+			'/** @return class-string */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('class-string'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'class-string in @return with description',
+			'/** @return class-string some description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('class-string'),
+						'some description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'class-string in @param',
+			'/** @param class-string $test */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('class-string'),
+						false,
+						'$test',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'class-string in @param with description',
+			'/** @param class-string $test some description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('class-string'),
+						false,
+						'$test',
+						'some description'
+					)
+				),
+			]),
+		];
 	}
 
 	public function providerDebug(): \Iterator
