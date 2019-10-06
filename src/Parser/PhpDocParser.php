@@ -115,14 +115,20 @@ class PhpDocParser
 
 			switch ($tag) {
 				case '@param':
+				case '@phpstan-param':
+				case '@psalm-param':
 					$tagValue = $this->parseParamTagValue($tokens);
 					break;
 
 				case '@var':
+				case '@phpstan-var':
+				case '@psalm-var':
 					$tagValue = $this->parseVarTagValue($tokens);
 					break;
 
 				case '@return':
+				case '@phpstan-return':
+				case '@psalm-return':
 					$tagValue = $this->parseReturnTagValue($tokens);
 					break;
 
@@ -137,21 +143,43 @@ class PhpDocParser
 				case '@property':
 				case '@property-read':
 				case '@property-write':
+				case '@phpstan-property':
+				case '@phpstan-property-read':
+				case '@phpstan-property-write':
+				case '@psalm-property':
+				case '@psalm-property-read':
+				case '@psalm-property-write':
 					$tagValue = $this->parsePropertyTagValue($tokens);
 					break;
 
 				case '@method':
+				case '@phpstan-method':
+				case '@psalm-method':
 					$tagValue = $this->parseMethodTagValue($tokens);
 					break;
 
 				case '@template':
+				case '@phpstan-template':
+				case '@psalm-template':
 					$tagValue = $this->parseTemplateTagValue($tokens);
 					break;
 
 				case '@extends':
+				case '@phpstan-extends':
+				case '@template-extends':
+					$tagValue = $this->parseExtendsTagValue('@extends', $tokens);
+					break;
+
 				case '@implements':
+				case '@phpstan-implements':
+				case '@template-implements':
+					$tagValue = $this->parseExtendsTagValue('@implements', $tokens);
+					break;
+
 				case '@uses':
-					$tagValue = $this->parseExtendsTagValue($tag, $tokens);
+				case '@phpstan-uses':
+				case '@template-use':
+					$tagValue = $this->parseExtendsTagValue('@uses', $tokens);
 					break;
 
 				default:
