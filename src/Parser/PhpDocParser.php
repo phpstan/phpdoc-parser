@@ -293,7 +293,7 @@ class PhpDocParser
 			$bound = $this->typeParser->parse($tokens);
 
 		} else {
-			$bound = new IdentifierTypeNode('mixed');
+			$bound = null;
 		}
 
 		$description = $this->parseOptionalDescription($tokens);

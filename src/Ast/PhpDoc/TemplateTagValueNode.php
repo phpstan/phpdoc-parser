@@ -10,13 +10,13 @@ class TemplateTagValueNode implements PhpDocTagValueNode
 	/** @var string */
 	public $name;
 
-	/** @var TypeNode */
+	/** @var TypeNode|null */
 	public $bound;
 
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(string $name, TypeNode $bound, string $description)
+	public function __construct(string $name, ?TypeNode $bound, string $description)
 	{
 		$this->name = $name;
 		$this->bound = $bound;
@@ -26,7 +26,8 @@ class TemplateTagValueNode implements PhpDocTagValueNode
 
 	public function __toString(): string
 	{
-		return trim("{$this->name} of {$this->bound} {$this->description}");
+		$bound = $this->bound ? " of {$this->bound}" : '';
+		return trim("{$this->name}{$bound} {$this->description}");
 	}
 
 }

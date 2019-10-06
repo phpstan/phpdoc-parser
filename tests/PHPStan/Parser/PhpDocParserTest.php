@@ -2282,7 +2282,7 @@ some text in the middle'
 					'@template',
 					new TemplateTagValueNode(
 						'T',
-						new IdentifierTypeNode('mixed'),
+						null,
 						''
 					)
 				),
@@ -2297,7 +2297,7 @@ some text in the middle'
 					'@template',
 					new TemplateTagValueNode(
 						'T',
-						new IdentifierTypeNode('mixed'),
+						null,
 						'the value type'
 					)
 				),
