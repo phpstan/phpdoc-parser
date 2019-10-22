@@ -221,12 +221,15 @@ class TypeParser
 	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET);
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$items = [$this->parseArrayShapeItem($tokens)];
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			$items[] = $this->parseArrayShapeItem($tokens);
 		}
 
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
 		return new Ast\Type\ArrayShapeNode($items);
