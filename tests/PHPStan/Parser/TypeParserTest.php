@@ -478,6 +478,24 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
+				'array{
+				 	a: int,
+				 	b: string
+				 }',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
 				'callable(): Foo',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
