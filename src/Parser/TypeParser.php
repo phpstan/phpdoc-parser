@@ -226,6 +226,11 @@ class TypeParser
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			if($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
+				// trailing comma case
+				return new Ast\Type\ArrayShapeNode($items);
+			}
+
 			$items[] = $this->parseArrayShapeItem($tokens);
 		}
 
