@@ -393,7 +393,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
-                'array{a: int, b: array{c: callable(): int}}',
+				'array{a: int, b: array{c: callable(): int}}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
