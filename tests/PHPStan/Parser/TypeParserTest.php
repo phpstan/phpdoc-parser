@@ -393,12 +393,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				]),
 			],
 			[
-				'array{
-				    a: int, 
-				    b: array{
-				        c: callable(): int
-				    }
-				 }',
+                'array{a: int, b: array{c: callable(): int}}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
@@ -469,6 +464,18 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					6,
 					Lexer::TOKEN_IDENTIFIER
 				),
+			],
+			[
+				'array{
+				 *	a: int
+				 *}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
 			],
 			[
 				'callable(): Foo',
