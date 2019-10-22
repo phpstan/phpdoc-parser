@@ -224,6 +224,7 @@ class TypeParser
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$items = [$this->parseArrayShapeItem($tokens)];
 
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			if($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
@@ -232,6 +233,7 @@ class TypeParser
 			}
 
 			$items[] = $this->parseArrayShapeItem($tokens);
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		}
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
