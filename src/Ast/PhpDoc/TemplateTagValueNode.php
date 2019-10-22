@@ -26,7 +26,7 @@ class TemplateTagValueNode implements PhpDocTagValueNode
 
 	public function __toString(): string
 	{
-		$bound = $this->bound ? " of {$this->bound}" : '';
+		$bound = isset($this->bound) ? " of {$this->bound}" : '';
 		return trim("{$this->name}{$bound} {$this->description}");
 	}
 
