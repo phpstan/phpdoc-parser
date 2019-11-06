@@ -2371,6 +2371,21 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'OK with covariance',
+			'/** @template-covariant T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template-covariant',
+					new TemplateTagValueNode(
+						'T',
+						null,
+						''
+					)
+				),
+			]),
+		];
 	}
 
 	public function provideExtendsTagsData(): \Iterator
