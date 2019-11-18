@@ -320,7 +320,7 @@ class PhpDocParser
 		$name = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
-		if ($tokens->tryConsumeTokenValue('of')) {
+		if ($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as')) {
 			$bound = $this->typeParser->parse($tokens);
 
 		} else {

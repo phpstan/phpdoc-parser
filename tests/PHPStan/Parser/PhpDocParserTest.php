@@ -2320,8 +2320,38 @@ some text in the middle'
 		];
 
 		yield [
+			'OK without description',
+			'/** @template T as DateTime */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('DateTime'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
 			'OK with bound and description',
 			'/** @template T of DateTime the value type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('DateTime'),
+						'the value type'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with bound and description',
+			'/** @template T as DateTime the value type */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@template',
