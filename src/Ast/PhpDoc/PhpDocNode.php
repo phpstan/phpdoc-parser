@@ -115,7 +115,7 @@ class PhpDocNode implements Node
 	/**
 	 * @return UsesTagValueNode[]
 	 */
-	public function getUsesTagValues(string $tagName = '@uses'): array
+	public function getUsesTagValues(string $tagName = '@use'): array
 	{
 		return array_column(
 			array_filter($this->getTagsByName($tagName), static function (PhpDocTagNode $tag): bool {

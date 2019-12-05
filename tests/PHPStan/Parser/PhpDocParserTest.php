@@ -2480,11 +2480,11 @@ some text in the middle'
 		];
 
 		yield [
-			'OK @uses',
-			'/** @uses Foo<A,B> */',
+			'OK @use',
+			'/** @use Foo<A,B> */',
 			new PhpDocNode([
 				new PhpDocTagNode(
-					'@uses',
+					'@use',
 					new UsesTagValueNode(
 						new GenericTypeNode(
 							new IdentifierTypeNode('Foo'),

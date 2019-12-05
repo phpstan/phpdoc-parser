@@ -179,10 +179,10 @@ class PhpDocParser
 					$tagValue = $this->parseExtendsTagValue('@implements', $tokens);
 					break;
 
-				case '@uses':
-				case '@phpstan-uses':
+				case '@use':
+				case '@phpstan-use':
 				case '@template-use':
-					$tagValue = $this->parseExtendsTagValue('@uses', $tokens);
+					$tagValue = $this->parseExtendsTagValue('@use', $tokens);
 					break;
 
 				default:
@@ -346,7 +346,7 @@ class PhpDocParser
 				return new Ast\PhpDoc\ExtendsTagValueNode($type, $description);
 			case '@implements':
 				return new Ast\PhpDoc\ImplementsTagValueNode($type, $description);
-			case '@uses':
+			case '@use':
 				return new Ast\PhpDoc\UsesTagValueNode($type, $description);
 		}
 
