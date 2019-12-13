@@ -418,6 +418,66 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield [
+			'OK without description with variable $this',
+			'/** @var Foo $this */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$this',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without description and with no space between type and variable name with variable $this',
+			'/** @var Foo$this */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$this',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description with variable $this',
+			'/** @var Foo $this Testing */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$this',
+						'Testing'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description and with no space between type and variable name with variable $this',
+			'/** @var Foo$this Testing */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$this',
+						'Testing'
+					)
+				),
+			]),
+		];
+
+		yield [
 			'OK with variable name and description and without all optional spaces',
 			'/** @var(Foo)$foo#desc*/',
 			new PhpDocNode([

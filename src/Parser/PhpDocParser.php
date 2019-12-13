@@ -358,6 +358,9 @@ class PhpDocParser
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
 			$parameterName = $tokens->currentTokenValue();
 			$tokens->next();
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+			$parameterName = '$this';
+			$tokens->next();
 
 		} else {
 			$parameterName = '';
