@@ -14,7 +14,8 @@
 		"slevomat/coding-standard": "^4.7.2",
 		"symfony/process": "^4.0",
 		"phpstan/extension-installer": "^1.0",
-		"phpstan/phpstan-strict-rules": "^0.12"
+		"phpstan/phpstan-strict-rules": "^0.12",
+		"ergebnis/composer-normalize": "^2.0.2"
 	},
 	"autoload": {
 		"psr-4": {"PHPStan\\PhpDocParser\\": ["src/"]}
