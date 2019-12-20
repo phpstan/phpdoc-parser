@@ -7,25 +7,33 @@
 	},
 	"require-dev": {
 		"consistence/coding-standard": "^3.5",
+		"ergebnis/composer-normalize": "^2.0.2",
 		"jakub-onderka/php-parallel-lint": "^0.9.2",
 		"phing/phing": "^2.16.0",
+		"phpstan/extension-installer": "^1.0",
 		"phpstan/phpstan": "^0.12",
+		"phpstan/phpstan-strict-rules": "^0.12",
 		"phpunit/phpunit": "^6.3",
 		"slevomat/coding-standard": "^4.7.2",
-		"symfony/process": "^4.0",
-		"phpstan/extension-installer": "^1.0",
-		"phpstan/phpstan-strict-rules": "^0.12",
-		"ergebnis/composer-normalize": "^2.0.2"
-	},
-	"autoload": {
-		"psr-4": {"PHPStan\\PhpDocParser\\": ["src/"]}
-	},
-	"autoload-dev": {
-		"psr-4": {"PHPStan\\PhpDocParser\\": ["tests/PHPStan"]}
+		"symfony/process": "^4.0"
 	},
 	"extra": {
 		"branch-alias": {
 			"dev-master": "0.4-dev"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"PHPStan\\PhpDocParser\\": [
+				"src/"
+			]
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"PHPStan\\PhpDocParser\\": [
+				"tests/PHPStan"
+			]
 		}
 	},
 	"minimum-stability": "dev",
