@@ -37,10 +37,12 @@ class TypeParser
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$type = $this->tryParseArray($tokens, $type);
 			}
-
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
-			return new Ast\Type\ThisTypeNode();
+			$type = new Ast\Type\ThisTypeNode();
 
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+				$type = $this->tryParseArray($tokens, $type);
+			}
 		} else {
 			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
@@ -48,6 +50,9 @@ class TypeParser
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 				$type = $this->parseGeneric($tokens, $type);
 
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+					$type = $this->tryParseArray($tokens, $type);
+				}
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
 				$type = $this->tryParseCallable($tokens, $type);
 
@@ -56,6 +61,10 @@ class TypeParser
 
 			} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
 				$type = $this->parseArrayShape($tokens, $type);
+
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+					$type = $this->tryParseArray($tokens, $type);
+				}
 			}
 		}
 
@@ -99,6 +108,10 @@ class TypeParser
 
 		} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
 			$type = $this->parseArrayShape($tokens, $type);
+		}
+
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+			$type = $this->tryParseArray($tokens, $type);
 		}
 
 		return new Ast\Type\NullableTypeNode($type);
@@ -179,6 +192,10 @@ class TypeParser
 			}
 		}
 
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+			$type = $this->tryParseArray($tokens, $type);
+		}
+
 		return $type;
 	}
 
@@ -218,7 +235,7 @@ class TypeParser
 	}
 
 
-	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
+	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\ArrayShapeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);

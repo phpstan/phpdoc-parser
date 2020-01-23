@@ -711,6 +711,93 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					new IdentifierTypeNode("\xA009")
 				),
 			],
+			[
+				'Collection<array-key, int>[]',
+				new ArrayTypeNode(
+					new GenericTypeNode(
+						new IdentifierTypeNode('Collection'),
+						[
+							new IdentifierTypeNode('array-key'),
+							new IdentifierTypeNode('int'),
+						]
+					)
+				),
+			],
+			[
+				'int | Collection<array-key, int>[]',
+				new UnionTypeNode([
+					new IdentifierTypeNode('int'),
+					new ArrayTypeNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Collection'),
+							[
+								new IdentifierTypeNode('array-key'),
+								new IdentifierTypeNode('int'),
+							]
+						)
+					),
+				]),
+			],
+			[
+				'array{foo: int}[]',
+				new ArrayTypeNode(
+					new ArrayShapeNode([
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('foo'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+					])
+				),
+			],
+			[
+				'int | array{foo: int}[]',
+				new UnionTypeNode([
+					new IdentifierTypeNode('int'),
+					new ArrayTypeNode(
+						new ArrayShapeNode([
+							new ArrayShapeItemNode(
+								new IdentifierTypeNode('foo'),
+								false,
+								new IdentifierTypeNode('int')
+							),
+						])
+					),
+				]),
+			],
+			[
+				'$this[]',
+				new ArrayTypeNode(
+					new ThisTypeNode()
+				),
+			],
+			[
+				'int | $this[]',
+				new UnionTypeNode([
+					new IdentifierTypeNode('int'),
+					new ArrayTypeNode(
+						new ThisTypeNode()
+					),
+				]),
+			],
+			[
+				'callable(): int[]',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new ArrayTypeNode(
+						new IdentifierTypeNode('int')
+					)
+				),
+			],
+			[
+				'?int[]',
+				new NullableTypeNode(
+					new ArrayTypeNode(
+						new IdentifierTypeNode('int')
+					)
+				),
+			],
 		];
 	}
 
