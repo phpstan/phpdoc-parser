@@ -22,6 +22,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -1599,6 +1601,57 @@ Symfony\'s polyfill.')
 					'@varFoo',
 					new GenericTagValueNode(
 						'$foo'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'callable with space between keyword and parameters',
+			'/** @var callable (int): void */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false)
+							],
+							new IdentifierTypeNode('void')
+						),
+						'',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'callable with description in parentheses',
+			'/** @var callable (int) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('callable'),
+						'',
+						'(int)'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'callable with incomplete signature without return type',
+			'/** @var callable(int) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('callable'),
+						'',
+						'(int)'
 					)
 				),
 			]),
