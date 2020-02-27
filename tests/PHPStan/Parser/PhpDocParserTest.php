@@ -1616,7 +1616,7 @@ Symfony\'s polyfill.')
 						new CallableTypeNode(
 							new IdentifierTypeNode('callable'),
 							[
-								new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false)
+								new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false),
 							],
 							new IdentifierTypeNode('void')
 						),
