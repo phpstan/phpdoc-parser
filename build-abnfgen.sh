@@ -8,10 +8,7 @@ if [[ ! -d "$ROOT_DIR/tools/abnfgen" ]]; then
 	rm -rf "$ROOT_DIR/temp/abnfgen"
 	mkdir -p "$ROOT_DIR/temp/abnfgen"
 
-	wget http://www.quut.com/abnfgen/abnfgen-0.20.tar.gz \
-		--output-document "$ROOT_DIR/temp/abnfgen.tar.gz"
-
-	tar xf "$ROOT_DIR/temp/abnfgen.tar.gz" \
+	tar xf "$ROOT_DIR/tests/abnfgen-0.20.tar.gz" \
 		--directory "$ROOT_DIR/temp/abnfgen" \
 		--strip-components 1
 
