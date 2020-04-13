@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -51,6 +52,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 		$typeNode = $this->typeParser->parse($tokens);
 
 		$this->assertSame((string) $expectedResult, (string) $typeNode);
+		$this->assertInstanceOf(get_class($expectedResult), $typeNode);
 		$this->assertEquals($expectedResult, $typeNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
@@ -449,21 +451,43 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 			[
 				'array{"a": int}',
-				new \PHPStan\PhpDocParser\Parser\ParserException(
-					'"a"',
-					Lexer::TOKEN_DOUBLE_QUOTED_STRING,
-					6,
-					Lexer::TOKEN_IDENTIFIER
-				),
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
 			],
 			[
 				'array{\'a\': int}',
-				new \PHPStan\PhpDocParser\Parser\ParserException(
-					'\'a\'',
-					Lexer::TOKEN_SINGLE_QUOTED_STRING,
-					6,
-					Lexer::TOKEN_IDENTIFIER
-				),
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'array{\'$ref\': int}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('$ref'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'array{"$ref": int}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new ConstExprStringNode('$ref'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
 			],
 			[
 				'array{

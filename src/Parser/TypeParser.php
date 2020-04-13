@@ -280,12 +280,20 @@ class TypeParser
 	}
 
 	/**
-	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\Type\IdentifierTypeNode
+	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
 	 */
 	private function parseArrayShapeKey(TokenIterator $tokens)
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
 			$key = new Ast\ConstExpr\ConstExprIntegerNode($tokens->currentTokenValue());
+			$tokens->next();
+
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
+			$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), "'"));
+			$tokens->next();
+
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
+			$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), '"'));
 			$tokens->next();
 
 		} else {
