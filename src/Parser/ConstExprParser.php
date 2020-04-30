@@ -53,8 +53,18 @@ class ConstExprParser
 			}
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
-				$classConstantName = $tokens->currentTokenValue();
-				$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+				$classConstantName = '';
+				if ($tokens->currentTokenType() === Lexer::TOKEN_IDENTIFIER) {
+					$classConstantName .= $tokens->currentTokenValue();
+					$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+					if ($tokens->tryConsumeTokenValue('*')) {
+						$classConstantName .= '*';
+					}
+				} else {
+					$tokens->consumeTokenValue('*');
+					$classConstantName .= '*';
+				}
+
 				return new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName);
 
 			}

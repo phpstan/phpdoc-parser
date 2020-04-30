@@ -859,6 +859,20 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
 			],
 			[
+				'Foo::*',
+				new ConstTypeNode(new ConstFetchNode('Foo', '*')),
+			],
+			[
+				'Foo::**',
+				new \PHPStan\PhpDocParser\Parser\ParserException(
+					'**',
+					Lexer::TOKEN_END,
+					5,
+					null,
+					'*'
+				),
+			],
+			[
 				'( "foo" | Foo::FOO_* )',
 				new UnionTypeNode([
 					new ConstTypeNode(new ConstExprStringNode('foo')),
