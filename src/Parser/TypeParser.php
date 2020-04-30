@@ -11,9 +11,6 @@ class TypeParser
 	/** @var ConstExprParser|null */
 	private $constExprParser;
 
-	/**
-	 * @param ConstExprParser|null $constExprParser
-	 */
 	public function __construct(?ConstExprParser $constExprParser = null)
 	{
 		$this->constExprParser = $constExprParser;
