@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
@@ -24,6 +25,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -42,7 +44,8 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
-		$this->phpDocParser = new PhpDocParser(new TypeParser(), new ConstExprParser());
+		$constExprParser = new ConstExprParser();
+		$this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser), $constExprParser);
 	}
 
 
@@ -944,11 +947,33 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new InvalidTagValueNode(
 						'A | B < 123',
 						new \PHPStan\PhpDocParser\Parser\ParserException(
-							'123',
-							Lexer::TOKEN_INTEGER,
-							20,
-							Lexer::TOKEN_IDENTIFIER
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							24,
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
 						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with type and const expr as generic type variable',
+			'/** @return A | B < 123 > */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new UnionTypeNode([
+							new IdentifierTypeNode('A'),
+							new GenericTypeNode(
+								new IdentifierTypeNode('B'),
+								[
+									new ConstTypeNode(new ConstExprIntegerNode('123')),
+								]
+							),
+						]),
+						''
 					)
 				),
 			]),
@@ -2896,6 +2921,23 @@ chunk. Must be higher that in the previous request.'),
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('array'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'string literals in @return',
+			"/** @return 'foo'|'bar' */",
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new UnionTypeNode([
+							new ConstTypeNode(new ConstExprStringNode('foo')),
+							new ConstTypeNode(new ConstExprStringNode('bar')),
+						]),
 						''
 					)
 				),

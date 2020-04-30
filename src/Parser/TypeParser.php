@@ -8,6 +8,17 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 class TypeParser
 {
 
+	/** @var ConstExprParser|null */
+	private $constExprParser;
+
+	/**
+	 * @param ConstExprParser|null $constExprParser
+	 */
+	public function __construct(?ConstExprParser $constExprParser = null)
+	{
+		$this->constExprParser = $constExprParser;
+	}
+
 	public function parse(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
@@ -35,40 +46,75 @@ class TypeParser
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-				$type = $this->tryParseArray($tokens, $type);
+				return $this->tryParseArray($tokens, $type);
 			}
+
+			return $type;
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
 			$type = new Ast\Type\ThisTypeNode();
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-				$type = $this->tryParseArray($tokens, $type);
+				return $this->tryParseArray($tokens, $type);
 			}
-		} else {
-			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
-			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
-				$type = $this->parseGeneric($tokens, $type);
-
-				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-					$type = $this->tryParseArray($tokens, $type);
-				}
-			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-				$type = $this->tryParseCallable($tokens, $type);
-
-			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-				$type = $this->tryParseArray($tokens, $type);
-
-			} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
-				$type = $this->parseArrayShape($tokens, $type);
-
-				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-					$type = $this->tryParseArray($tokens, $type);
-				}
-			}
+			return $type;
 		}
 
-		return $type;
+		$currentTokenValue = $tokens->currentTokenValue();
+		$tokens->pushSavePoint(); // because of ConstFetchNode
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_IDENTIFIER)) {
+			$type = new Ast\Type\IdentifierTypeNode($currentTokenValue);
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+				$tokens->dropSavePoint(); // because of ConstFetchNode
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+					$type = $this->parseGeneric($tokens, $type);
+
+					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+						$type = $this->tryParseArray($tokens, $type);
+					}
+				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+					$type = $this->tryParseCallable($tokens, $type);
+
+				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+					$type = $this->tryParseArray($tokens, $type);
+
+				} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
+					$type = $this->parseArrayShape($tokens, $type);
+
+					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+						$type = $this->tryParseArray($tokens, $type);
+					}
+				}
+
+				return $type;
+			} else {
+				$tokens->rollback(); // because of ConstFetchNode
+			}
+		} else {
+			$tokens->dropSavePoint(); // because of ConstFetchNode
+		}
+
+		$exception = new \PHPStan\PhpDocParser\Parser\ParserException(
+			$tokens->currentTokenValue(),
+			$tokens->currentTokenType(),
+			$tokens->currentTokenOffset(),
+			Lexer::TOKEN_IDENTIFIER
+		);
+
+		if ($this->constExprParser === null) {
+			throw $exception;
+		}
+
+		try {
+			$constExpr = $this->constExprParser->parse($tokens, true);
+			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
+				throw $exception;
+			}
+			return new Ast\Type\ConstTypeNode($constExpr);
+		} catch (\LogicException $e) {
+			throw $exception;
+		}
 	}
 
 

@@ -2,13 +2,16 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
@@ -31,7 +34,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
-		$this->typeParser = new TypeParser();
+		$this->typeParser = new TypeParser(new ConstExprParser());
 	}
 
 
@@ -827,6 +830,29 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('mixed'), false, true, '', false),
 				], new IdentifierTypeNode('TReturn')),
+			],
+			[
+				"'foo'|'bar'",
+				new UnionTypeNode([
+					new ConstTypeNode(new ConstExprStringNode('foo')),
+					new ConstTypeNode(new ConstExprStringNode('bar')),
+				]),
+			],
+			[
+				'Foo::FOO_CONSTANT',
+				new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_CONSTANT')),
+			],
+			[
+				'123',
+				new ConstTypeNode(new ConstExprIntegerNode('123')),
+			],
+			[
+				'123.2',
+				new ConstTypeNode(new ConstExprFloatNode('123.2')),
+			],
+			[
+				'"bar"',
+				new ConstTypeNode(new ConstExprStringNode('bar')),
 			],
 		];
 	}

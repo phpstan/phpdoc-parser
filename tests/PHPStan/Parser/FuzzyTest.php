@@ -22,7 +22,7 @@ class FuzzyTest extends \PHPUnit\Framework\TestCase
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
-		$this->typeParser = new TypeParser();
+		$this->typeParser = new TypeParser(new ConstExprParser());
 		$this->constExprParser = new ConstExprParser();
 	}
 
