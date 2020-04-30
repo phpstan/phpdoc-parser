@@ -854,6 +854,17 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				'"bar"',
 				new ConstTypeNode(new ConstExprStringNode('bar')),
 			],
+			[
+				'Foo::FOO_*',
+				new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
+			],
+			[
+				'( "foo" | Foo::FOO_* )',
+				new UnionTypeNode([
+					new ConstTypeNode(new ConstExprStringNode('foo')),
+					new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
+				]),
+			],
 		];
 	}
 

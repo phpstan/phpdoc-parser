@@ -111,6 +111,12 @@ class TypeParser
 			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
 				throw $exception;
 			}
+			if ($constExpr instanceof Ast\ConstExpr\ConstFetchNode) {
+				if ($tokens->currentTokenValue() === '*') {
+					$tokens->consumeTokenType($tokens->currentTokenType());
+					$constExpr = new Ast\ConstExpr\ConstFetchNode($constExpr->className, $constExpr->name . '*');
+				}
+			}
 			return new Ast\Type\ConstTypeNode($constExpr);
 		} catch (\LogicException $e) {
 			throw $exception;
