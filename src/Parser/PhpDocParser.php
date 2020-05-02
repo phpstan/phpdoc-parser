@@ -136,6 +136,10 @@ class PhpDocParser
 					$tagValue = $this->parseThrowsTagValue($tokens);
 					break;
 
+				case '@mixin':
+					$tagValue = $this->parseMixinTagValue($tokens);
+					break;
+
 				case '@deprecated':
 					$tagValue = $this->parseDeprecatedTagValue($tokens);
 					break;
@@ -233,6 +237,13 @@ class PhpDocParser
 		$type = $this->typeParser->parse($tokens);
 		$description = $this->parseOptionalDescription($tokens, true);
 		return new Ast\PhpDoc\ThrowsTagValueNode($type, $description);
+	}
+
+	private function parseMixinTagValue(TokenIterator $tokens): Ast\PhpDoc\MixinTagValueNode
+	{
+		$type = $this->typeParser->parse($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
+		return new Ast\PhpDoc\MixinTagValueNode($type, $description);
 	}
 
 	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode

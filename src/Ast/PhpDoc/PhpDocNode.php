@@ -155,6 +155,20 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return MixinTagValueNode[]
+	 */
+	public function getMixinTagValues(string $tagName = '@mixin'): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName($tagName), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof MixinTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
+	/**
 	 * @return \PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode[]
 	 */
 	public function getDeprecatedTagValues(): array

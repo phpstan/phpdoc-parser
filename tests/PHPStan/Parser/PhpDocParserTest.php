@@ -12,6 +12,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
@@ -54,6 +55,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
+	 * @dataProvider provideMixinTagsData
 	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
@@ -1058,6 +1060,105 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							18,
 							Lexer::TOKEN_IDENTIFIER
 						)
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideMixinTagsData(): \Iterator
+	{
+		yield [
+			'OK without description',
+			'/** @mixin Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @mixin Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description that starts with TOKEN_OPEN_SQUARE_BRACKET',
+			'/** @mixin Foo [Bar] */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'[Bar]'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @mixin */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							11,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid with type and disallowed description start token',
+			'/** @mixin Foo | #desc */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new InvalidTagValueNode(
+						'Foo | #desc',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'#desc',
+							Lexer::TOKEN_OTHER,
+							17,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'generic @mixin',
+			'/** @mixin Foo<Bar> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new GenericTypeNode(new IdentifierTypeNode('Foo'), [
+							new IdentifierTypeNode('Bar'),
+						]),
+						''
 					)
 				),
 			]),
