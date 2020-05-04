@@ -3054,6 +3054,30 @@ chunk. Must be higher that in the previous request.'),
 				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new \PHPStan\PhpDocParser\Parser\ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
 			]),
 		];
+
+		yield [
+			'multiline generic types',
+			'/**' . PHP_EOL .
+			' * @implements Foo<' . PHP_EOL .
+			' *    A, B' . PHP_EOL .
+			' * >' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@implements',
+					new ImplementsTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('A'),
+								new IdentifierTypeNode('B'),
+							]
+						),
+						''
+					)
+				),
+			]),
+		];
 	}
 
 	public function dataParseTagValue(): array
