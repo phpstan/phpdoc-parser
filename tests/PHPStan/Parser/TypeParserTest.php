@@ -899,6 +899,62 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					new ConstTypeNode(new ConstFetchNode('QueueAttributeName', '*')),
 				]),
 			],
+            [
+                'array<' . PHP_EOL .
+                '  Foo' . PHP_EOL .
+                '>',
+                new GenericTypeNode(
+                    new IdentifierTypeNode('array'),
+                    [
+                        new IdentifierTypeNode('Foo')
+                    ]
+                )
+            ],
+            [
+                'array<' . PHP_EOL .
+                '  Foo,' . PHP_EOL .
+                '  Bar' . PHP_EOL .
+                '>',
+                new GenericTypeNode(
+                    new IdentifierTypeNode('array'),
+                    [
+                        new IdentifierTypeNode('Foo'),
+                        new IdentifierTypeNode('Bar'),
+                    ]
+                )
+            ],
+            [
+                'array<' . PHP_EOL .
+                '  Foo, Bar' . PHP_EOL .
+                '>',
+                new GenericTypeNode(
+                    new IdentifierTypeNode('array'),
+                    [
+                        new IdentifierTypeNode('Foo'),
+                        new IdentifierTypeNode('Bar'),
+                    ]
+                )
+            ],
+            [
+                'array<' . PHP_EOL .
+                '  Foo,' . PHP_EOL .
+                '  array<' . PHP_EOL .
+                '    Bar' . PHP_EOL .
+                '  >' . PHP_EOL .
+                '>',
+                new GenericTypeNode(
+                    new IdentifierTypeNode('array'),
+                    [
+                        new IdentifierTypeNode('Foo'),
+                        new GenericTypeNode(
+                            new IdentifierTypeNode('array'),
+                            [
+                                new IdentifierTypeNode('Bar')
+                            ]
+                        )
+                    ]
+                )
+            ],
 		];
 	}
 
