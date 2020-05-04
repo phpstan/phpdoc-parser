@@ -3051,7 +3051,7 @@ chunk. Must be higher that in the previous request.'),
 			'malformed const fetch',
 			'/** @param Foo::** $a */',
 			new PhpDocNode([
-				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
+				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new \PHPStan\PhpDocParser\Parser\ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
 			]),
 		];
 	}
