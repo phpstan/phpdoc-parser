@@ -77,7 +77,7 @@ class TokenIterator
 	public function consumeTokenType(int $tokenType): void
 	{
 		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType) {
-			$this->throwError($tokenType, null);
+			$this->throwError($tokenType);
 		}
 
 		$this->index++;
