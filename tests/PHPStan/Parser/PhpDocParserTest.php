@@ -5,6 +5,8 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
@@ -3044,6 +3046,39 @@ chunk. Must be higher that in the previous request.'),
 				),
 			]),
 		];
+	}
+
+	public function dataParseTagValue(): array
+	{
+		return [
+			[
+				'@param',
+				'DateTimeImmutable::ATOM $a',
+				new ParamTagValueNode(
+					new ConstTypeNode(new ConstFetchNode('DateTimeImmutable', 'ATOM')),
+					false,
+					'$a',
+					''
+				),
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataParseTagValue
+	 * @param string $tag
+	 * @param string $phpDoc
+	 * @param PhpDocNode $expectedPhpDocNode
+	 * @param int $nextTokenType
+	 */
+	public function testParseTagValue(string $tag, string $phpDoc, Node $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
+		$actualPhpDocNode = $this->phpDocParser->parseTagValue($tokens, $tag);
+
+		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode);
+		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
+		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
 
 }
