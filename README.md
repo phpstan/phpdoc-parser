@@ -7,7 +7,7 @@
 	<a href="https://phpstan.org/"><img src="https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat" alt="PHPStan Enabled"></a>
 </p>
 
-* [PHPStan](https://github.com/phpstan/phpstan)
+* [PHPStan](https://phpstan.org)
 
 ------
 
