@@ -864,19 +864,39 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 			[
 				'Foo::**',
-				new \PHPStan\PhpDocParser\Parser\ParserException(
-					'**',
-					Lexer::TOKEN_END,
-					5,
-					null,
-					'*'
-				),
+				new ConstTypeNode(new ConstFetchNode('Foo', '*')), // fails later in PhpDocParser
+				Lexer::TOKEN_WILDCARD,
+			],
+			[
+				'Foo::*a',
+				new ConstTypeNode(new ConstFetchNode('Foo', '*')), // fails later in PhpDocParser
+				Lexer::TOKEN_IDENTIFIER,
 			],
 			[
 				'( "foo" | Foo::FOO_* )',
 				new UnionTypeNode([
 					new ConstTypeNode(new ConstExprStringNode('foo')),
 					new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
+				]),
+			],
+			[
+				'DateTimeImmutable::*|DateTime::*',
+				new UnionTypeNode([
+					new ConstTypeNode(new ConstFetchNode('DateTimeImmutable', '*')),
+					new ConstTypeNode(new ConstFetchNode('DateTime', '*')),
+				]),
+			],
+			[
+				'ParameterTier::*|null',
+				new UnionTypeNode([
+					new ConstTypeNode(new ConstFetchNode('ParameterTier', '*')),
+					new IdentifierTypeNode('null'),
+				]),
+			],
+			[
+				'list<QueueAttributeName::*>',
+				new GenericTypeNode(new IdentifierTypeNode('list'), [
+					new ConstTypeNode(new ConstFetchNode('QueueAttributeName', '*')),
 				]),
 			],
 		];

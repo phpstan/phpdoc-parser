@@ -57,11 +57,11 @@ class ConstExprParser
 				if ($tokens->currentTokenType() === Lexer::TOKEN_IDENTIFIER) {
 					$classConstantName .= $tokens->currentTokenValue();
 					$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
-					if ($tokens->tryConsumeTokenValue('*')) {
+					if ($tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
 						$classConstantName .= '*';
 					}
 				} else {
-					$tokens->consumeTokenValue('*');
+					$tokens->consumeTokenType(Lexer::TOKEN_WILDCARD);
 					$classConstantName .= '*';
 				}
 
