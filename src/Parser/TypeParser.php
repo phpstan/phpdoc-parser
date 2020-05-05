@@ -167,6 +167,7 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$genericTypes = [$this->parse($tokens)];
+        $tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
