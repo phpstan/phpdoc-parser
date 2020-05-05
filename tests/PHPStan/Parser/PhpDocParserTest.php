@@ -3079,35 +3079,37 @@ chunk. Must be higher that in the previous request.'),
 			]),
 		];
 
-//		yield [
-//			'multiline generic types - trailing comma',
-//			'/**' . PHP_EOL .
-//			' * @implements Foo<' . PHP_EOL .
-//			' *    A,' . PHP_EOL .
-//			' * >' . PHP_EOL .
-//			' */',
-//			new PhpDocNode([
-//				new PhpDocTagNode(
-//					'@implements',
-//					new ImplementsTagValueNode(
-//						new GenericTypeNode(
-//							new IdentifierTypeNode('Foo'),
-//							[
-//								new IdentifierTypeNode('A'),
-//							]
-//						),
-//						''
-//					)
-//				),
-//			]),
-//		];
-
 		yield [
 			'multiline generic types - leading comma',
 			'/**' . PHP_EOL .
 			' * @implements Foo<' . PHP_EOL .
 			' *    A' . PHP_EOL .
 			' *    , B' . PHP_EOL .
+			' * >' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@implements',
+					new ImplementsTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('A'),
+								new IdentifierTypeNode('B'),
+							]
+						),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'multiline generic types - traling comma',
+			'/**' . PHP_EOL .
+			' * @implements Foo<' . PHP_EOL .
+			' *    A,' . PHP_EOL .
+			' *    B,' . PHP_EOL .
 			' * >' . PHP_EOL .
 			' */',
 			new PhpDocNode([
