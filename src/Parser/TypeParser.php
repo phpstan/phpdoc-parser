@@ -167,10 +167,15 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$genericTypes = [$this->parse($tokens)];
-        $tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
+				// trailing comma case
+				return new Ast\Type\GenericTypeNode($baseType, $genericTypes);
+			}
 			$genericTypes[] = $this->parse($tokens);
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		}

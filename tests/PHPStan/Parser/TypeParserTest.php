@@ -899,7 +899,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					new ConstTypeNode(new ConstFetchNode('QueueAttributeName', '*')),
 				]),
 			],
-            [
+			[
 				'array<' . PHP_EOL .
 				'  Foo' . PHP_EOL .
 				'>',
@@ -940,6 +940,26 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				'  Foo,' . PHP_EOL .
 				'  array<' . PHP_EOL .
 				'    Bar' . PHP_EOL .
+				'  >' . PHP_EOL .
+				'>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('array'),
+					[
+						new IdentifierTypeNode('Foo'),
+						new GenericTypeNode(
+							new IdentifierTypeNode('array'),
+							[
+								new IdentifierTypeNode('Bar'),
+							]
+						),
+					]
+				),
+			],
+			[
+				'array<' . PHP_EOL .
+				'  Foo,' . PHP_EOL .
+				'  array<' . PHP_EOL .
+				'    Bar,' . PHP_EOL .
 				'  >' . PHP_EOL .
 				'>',
 				new GenericTypeNode(
