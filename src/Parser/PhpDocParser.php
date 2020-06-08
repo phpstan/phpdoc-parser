@@ -12,7 +12,6 @@ class PhpDocParser
 	private const DISALLOWED_DESCRIPTION_START_TOKENS = [
 		Lexer::TOKEN_UNION,
 		Lexer::TOKEN_INTERSECTION,
-		Lexer::TOKEN_OPEN_ANGLE_BRACKET,
 	];
 
 	/** @var TypeParser */

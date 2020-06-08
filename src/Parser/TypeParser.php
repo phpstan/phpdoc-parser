@@ -65,6 +65,14 @@ class TypeParser
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
 				$tokens->dropSavePoint(); // because of ConstFetchNode
 				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+					$tokens->pushSavePoint();
+
+					$isHtml = $this->isHtml($tokens);
+					$tokens->rollback();
+					if ($isHtml) {
+						return $type;
+					}
+
 					$type = $this->parseGeneric($tokens, $type);
 
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
@@ -161,6 +169,35 @@ class TypeParser
 		return new Ast\Type\NullableTypeNode($type);
 	}
 
+	public function isHtml(TokenIterator $tokens): bool
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
+
+		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
+			return false;
+		}
+
+		$htmlTagName = $tokens->currentTokenValue();
+
+		$tokens->next();
+
+		if (!$tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
+			return false;
+		}
+
+		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_END)) {
+			if (
+				$tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)
+				&& strpos($tokens->currentTokenValue(), '/' . $htmlTagName . '>') !== false
+			) {
+				return true;
+			}
+
+			$tokens->next();
+		}
+
+		return false;
+	}
 
 	public function parseGeneric(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $baseType): Ast\Type\GenericTypeNode
 	{

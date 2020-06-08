@@ -66,6 +66,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideTemplateTagsData
 	 * @dataProvider provideExtendsTagsData
 	 * @dataProvider provideRealWorldExampleData
+	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 * @param string     $label
 	 * @param string     $input
 	 * @param PhpDocNode $expectedPhpDocNode
@@ -3124,6 +3125,78 @@ chunk. Must be higher that in the previous request.'),
 							]
 						),
 						''
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideDescriptionWithOrWithoutHtml(): \Iterator
+	{
+		yield [
+			'Description with HTML tags in @return tag (close tags together)',
+			'/**' . PHP_EOL .
+			' * @return Foo <strong>Important <i>description</i></strong>' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'<strong>Important <i>description</i></strong>'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'Description with HTML tags in @throws tag (closed tags with text between)',
+			'/**' . PHP_EOL .
+			' * @throws FooException <strong>Important <em>description</em> etc</strong>' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@throws',
+					new ThrowsTagValueNode(
+						new IdentifierTypeNode('FooException'),
+						'<strong>Important <em>description</em> etc</strong>'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'Description with HTML tags in @mixin tag',
+			'/**' . PHP_EOL .
+			' * @mixin Mixin <strong>Important description</strong>' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new IdentifierTypeNode('Mixin'),
+						'<strong>Important description</strong>'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'Description with unclosed HTML tags in @return tag - unclosed HTML tag is parsed as generics',
+			'/**' . PHP_EOL .
+			' * @return Foo <strong>Important description' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('strong'),
+							]
+						),
+						'Important description'
 					)
 				),
 			]),
