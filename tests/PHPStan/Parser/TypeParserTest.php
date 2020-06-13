@@ -278,6 +278,28 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				),
 			],
 			[
+				'array<*>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('array'),
+					[
+						new ConstTypeNode(new ConstExprStringNode('*')),
+					]
+				),
+			],
+			[
+				'Generator<*, *, *, *, *,>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Generator'),
+					[
+						new ConstTypeNode(new ConstExprStringNode('*')),
+						new ConstTypeNode(new ConstExprStringNode('*')),
+						new ConstTypeNode(new ConstExprStringNode('*')),
+						new ConstTypeNode(new ConstExprStringNode('*')),
+						new ConstTypeNode(new ConstExprStringNode('*')),
+					]
+				),
+			],
+			[
 				'array {\'a\': int}',
 				new IdentifierTypeNode('array'),
 				Lexer::TOKEN_OPEN_CURLY_BRACKET,

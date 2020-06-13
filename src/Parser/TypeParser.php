@@ -202,20 +202,24 @@ class TypeParser
 	public function parseGeneric(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $baseType): Ast\Type\GenericTypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-		$genericTypes = [$this->parse($tokens)];
+		$genericTypes = [];
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-
-		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+		do {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
+
+			if (count($genericTypes) > 0 && $tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
 				// trailing comma case
 				return new Ast\Type\GenericTypeNode($baseType, $genericTypes);
 			}
-			$genericTypes[] = $this->parse($tokens);
+
+			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
+				$genericTypes[] = new Ast\Type\ConstTypeNode(new Ast\ConstExpr\ConstExprStringNode('*'));
+			} else {
+				$genericTypes[] = $this->parse($tokens);
+			}
+
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-		}
+		} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
