@@ -188,6 +188,10 @@ class PhpDocParser
 					$tagValue = $this->parseExtendsTagValue('@use', $tokens);
 					break;
 
+				case '@friend':
+					$tagValue = $this->parseFriendTagValue($tokens);
+					break;
+
 				default:
 					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
 					break;
@@ -201,6 +205,18 @@ class PhpDocParser
 		}
 
 		return $tagValue;
+	}
+
+	private function parseFriendTagValue(TokenIterator $tokens): Ast\PhpDoc\FriendTagValueNode
+	{
+		$class = new IdentifierTypeNode($tokens->currentTokenValue());
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		$method = null;
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+			$method = $tokens->currentTokenValue();
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+		return new Ast\PhpDoc\FriendTagValueNode($class, $method);
 	}
 
 

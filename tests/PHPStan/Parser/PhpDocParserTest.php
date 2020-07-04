@@ -9,6 +9,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\FriendTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
@@ -67,6 +68,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideExtendsTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
+	 * @dataProvider provideFriendTagsData
 	 * @param string     $label
 	 * @param string     $input
 	 * @param PhpDocNode $expectedPhpDocNode
@@ -80,6 +82,38 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+	}
+
+
+	public function provideFriendTagsData(): \Iterator
+	{
+		yield [
+			'Class as friend',
+			'/** @friend Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@friend',
+					new FriendTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						null
+					)
+				),
+			]),
+		];
+
+		yield [
+			'Method as friend',
+			'/** @friend Foo::bar */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@friend',
+					new FriendTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'bar'
+					)
+				),
+			]),
+		];
 	}
 
 

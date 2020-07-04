@@ -237,6 +237,19 @@ class PhpDocNode implements Node
 		);
 	}
 
+	/**
+	 * @return FriendTagValueNode[]
+	 */
+	public function getFriendTagValues(string $tagName = '@friend'): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName($tagName), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof FriendTagValueNode;
+			}),
+			'value'
+		);
+	}
+
 
 	public function __toString(): string
 	{
