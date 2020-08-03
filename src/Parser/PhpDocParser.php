@@ -132,6 +132,7 @@ class PhpDocParser
 					break;
 
 				case '@throws':
+				case '@phpstan-throws':
 					$tagValue = $this->parseThrowsTagValue($tokens);
 					break;
 
