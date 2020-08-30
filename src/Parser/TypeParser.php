@@ -258,7 +258,7 @@ class TypeParser
 			$parameterName = '';
 		}
 
-		$isOptional = $tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
+		$isOptional = $tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL) || $isVariadic;
 		return new Ast\Type\CallableTypeParameterNode($type, $isReference, $isVariadic, $parameterName, $isOptional);
 	}
 
