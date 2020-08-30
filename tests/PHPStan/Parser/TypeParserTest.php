@@ -828,7 +828,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			[
 				'callable(mixed...): TReturn',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
-					new CallableTypeParameterNode(new IdentifierTypeNode('mixed'), false, true, '', false),
+					new CallableTypeParameterNode(new IdentifierTypeNode('mixed'), false, true, '', true),
 				], new IdentifierTypeNode('TReturn')),
 			],
 			[
