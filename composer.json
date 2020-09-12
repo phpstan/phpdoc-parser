@@ -8,8 +8,8 @@
 	"require-dev": {
 		"consistence/coding-standard": "^3.5",
 		"ergebnis/composer-normalize": "^2.0.2",
-		"php-parallel-lint/php-parallel-lint": "^1.2",
 		"phing/phing": "^2.16.0",
+		"php-parallel-lint/php-parallel-lint": "^1.2",
 		"phpstan/extension-installer": "^1.0",
 		"phpstan/phpstan": "^0.12.26",
 		"phpstan/phpstan-strict-rules": "^0.12",
