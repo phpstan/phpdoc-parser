@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="PHPStan PHPDoc Parser">
-	<rule ref="vendor/consistence/coding-standard/Consistence/ruleset.xml">
+	<rule ref="build-cs/vendor/consistence/coding-standard/Consistence/ruleset.xml">
 		<exclude name="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.InvalidFormat"/>
 		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameAfterKeyword"/>
 		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation"/>

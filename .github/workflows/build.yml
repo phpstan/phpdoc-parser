@@ -1,0 +1,160 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Build"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Validate Composer"
+        run: "composer validate"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress --no-suggest"
+
+      - name: "Update PHPUnit"
+        if: matrix.php-version == '7.4' || matrix.php-version == '8.0'
+        run: "composer require --dev phpunit/phpunit:'^9.5' --update-with-dependencies"
+
+
+      - name: "Lint"
+        run: "vendor/bin/phing lint"
+
+  coding-standards:
+    name: "Coding Standard"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "7.3"
+
+      - name: "Validate Composer"
+        run: "composer validate"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress --no-suggest"
+
+      - name: "Lint"
+        run: "vendor/bin/phing lint"
+
+      - name: "Coding Standard"
+        run: "vendor/bin/phing cs"
+
+  tests:
+    name: "Tests"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+        dependencies:
+          - "lowest"
+          - "highest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Install lowest dependencies"
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: "composer update --prefer-lowest --no-interaction --no-progress --no-suggest"
+
+      - name: "Install highest dependencies"
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: "composer update --no-interaction --no-progress --no-suggest"
+
+      - name: "Update PHPUnit"
+        if: matrix.php-version == '7.4' || matrix.php-version == '8.0'
+        run: "composer require --dev phpunit/phpunit:'^9.5' --update-with-dependencies"
+
+      - name: "Tests"
+        run: "vendor/bin/phing tests"
+
+  static-analysis:
+    name: "PHPStan"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+        dependencies:
+          - "lowest"
+          - "highest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+          extensions: mbstring
+          tools: composer:v2
+
+      - name: "Install lowest dependencies"
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: "composer update --prefer-lowest --no-interaction --no-progress --no-suggest"
+
+      - name: "Install highest dependencies"
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: "composer update --no-interaction --no-progress --no-suggest"
+
+      - name: "Update PHPUnit"
+        if: matrix.php-version == '7.4' || matrix.php-version == '8.0'
+        run: "composer require --dev phpunit/phpunit:'^9.5' --update-with-dependencies"
+
+      - name: "PHPStan"
+        run: "vendor/bin/phing phpstan"

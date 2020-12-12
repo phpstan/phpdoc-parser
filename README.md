@@ -1,7 +1,7 @@
 <h1 align="center">PHPDoc-Parser for PHPStan</h1>
 
 <p align="center">
-	<a href="https://travis-ci.com/phpstan/phpdoc-parser"><img src="https://api.travis-ci.com/phpstan/phpdoc-parser.svg?branch=master" alt="Build Status"></a>
+	<a href="https://github.com/phpstan/phpdoc-parser/actions"><img src="https://github.com/phpstan/phpdoc-parser/workflows/Build/badge.svg" alt="Build Status"></a>
 	<a href="https://packagist.org/packages/phpstan/phpdoc-parser"><img src="https://poser.pugx.org/phpstan/phpdoc-parser/v/stable" alt="Latest Stable Version"></a>
 	<a href="https://choosealicense.com/licenses/mit/"><img src="https://poser.pugx.org/phpstan/phpstan/license" alt="License"></a>
 	<a href="https://phpstan.org/"><img src="https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat" alt="PHPStan Enabled"></a>

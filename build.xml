@@ -6,7 +6,6 @@
 		composer-install,
 		lint,
 		cs,
-		composer-normalize-check,
 		tests,
 		phpstan
 	"/>
@@ -33,31 +32,6 @@
 		</exec>
 	</target>
 
-	<target name="composer-normalize-check">
-		<exec
-				executable="composer"
-				logoutput="true"
-				passthru="true"
-				checkreturn="true"
-		>
-			<arg value="normalize"/>
-			<arg value="--ansi"/>
-			<arg value="--dry-run"/>
-		</exec>
-	</target>
-
-	<target name="composer-normalize-fix">
-		<exec
-				executable="composer"
-				logoutput="true"
-				passthru="true"
-				checkreturn="true"
-		>
-			<arg value="normalize"/>
-			<arg value="--ansi"/>
-		</exec>
-	</target>
-
 	<target name="lint">
 		<exec
 				executable="vendor/bin/parallel-lint"
@@ -77,31 +51,36 @@
 	</target>
 
 	<target name="cs">
-		<php expression="PHP_VERSION_ID &gt;= 70400 ?'true':'false'" returnProperty="isPHP74" level="verbose" />
-		<if>
-			<equals arg1="${isPHP74}" arg2="false" />
-			<then>
-				<exec
-						executable="vendor/bin/phpcs"
-						logoutput="true"
-						passthru="true"
-						checkreturn="true"
-				>
-					<arg value="--extensions=php"/>
-					<arg value="--encoding=utf-8"/>
-					<arg value="--tab-width=4"/>
-					<arg value="--ignore=tests/*/data,tests/*/traits"/>
-					<arg value="-sp"/>
-					<arg path="src"/>
-					<arg path="tests"/>
-				</exec>
-			</then>
-		</if>
+		<exec
+				executable="composer"
+				logoutput="true"
+				passthru="true"
+				checkreturn="true"
+		>
+			<arg value="install"/>
+			<arg value="--working-dir"/>
+			<arg path="build-cs"/>
+			<arg value="--ansi"/>
+		</exec>
+		<exec
+				executable="build-cs/vendor/bin/phpcs"
+				logoutput="true"
+				passthru="true"
+				checkreturn="true"
+		>
+			<arg value="--extensions=php"/>
+			<arg value="--encoding=utf-8"/>
+			<arg value="--tab-width=4"/>
+			<arg value="--ignore=tests/*/data,tests/*/traits"/>
+			<arg value="-sp"/>
+			<arg path="src"/>
+			<arg path="tests"/>
+		</exec>
 	</target>
 
 	<target name="cs-fix">
 		<exec
-				executable="vendor/bin/phpcbf"
+				executable="build-cs/vendor/bin/phpcbf"
 				logoutput="true"
 				passthru="true"
 				checkreturn="true"
