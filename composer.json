@@ -12,7 +12,7 @@
 		"phpstan/phpstan": "^0.12.60",
 		"phpstan/phpstan-strict-rules": "^0.12.5",
 		"phpunit/phpunit": "^7.5.20",
-		"symfony/process": "^4.0"
+		"symfony/process": "^5.2"
 	},
 	"config": {
 		"platform": {
