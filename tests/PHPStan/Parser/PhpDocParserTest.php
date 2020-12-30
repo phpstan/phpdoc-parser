@@ -23,6 +23,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -66,6 +67,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideMultiLinePhpDocData
 	 * @dataProvider provideTemplateTagsData
 	 * @dataProvider provideExtendsTagsData
+	 * @dataProvider provideTypeAliasTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 * @param string     $label
@@ -2852,6 +2854,81 @@ some text in the middle'
 						false,
 						'$test',
 						'some description'
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideTypeAliasTagsData(): \Iterator
+	{
+		yield [
+			'OK',
+			'/** @phpstan-type TypeAlias string|int */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new UnionTypeNode([
+							new IdentifierTypeNode('string'),
+							new IdentifierTypeNode('int'),
+						])
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with psalm syntax',
+			'/** @psalm-type TypeAlias=string|int */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new UnionTypeNode([
+							new IdentifierTypeNode('string'),
+							new IdentifierTypeNode('int'),
+						])
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type',
+			'/** @phpstan-type TypeAlias */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new InvalidTagValueNode(
+						'TypeAlias',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							28,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid empty',
+			'/** @phpstan-type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new InvalidTagValueNode(
+						'',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							18,
+							Lexer::TOKEN_IDENTIFIER
+						)
 					)
 				),
 			]),
