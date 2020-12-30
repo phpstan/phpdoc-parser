@@ -238,6 +238,20 @@ class PhpDocNode implements Node
 	}
 
 
+	/**
+	 * @return TypeAliasTagValueNode[]
+	 */
+	public function getTypeAliasTagValues(string $tagName = '@phpstan-type'): array
+	{
+		return array_column(
+			array_filter($this->getTagsByName($tagName), static function (PhpDocTagNode $tag): bool {
+				return $tag->value instanceof TypeAliasTagValueNode;
+			}),
+			'value'
+		);
+	}
+
+
 	public function __toString(): string
 	{
 		return "/**\n * " . implode("\n * ", $this->children) . '*/';

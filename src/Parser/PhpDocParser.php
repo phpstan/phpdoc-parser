@@ -189,6 +189,11 @@ class PhpDocParser
 					$tagValue = $this->parseExtendsTagValue('@use', $tokens);
 					break;
 
+				case '@phpstan-type':
+				case '@psalm-type':
+					$tagValue = $this->parseTypeAliasTagValue($tokens);
+					break;
+
 				default:
 					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
 					break;
@@ -362,6 +367,19 @@ class PhpDocParser
 		}
 
 		throw new \PHPStan\ShouldNotHappenException();
+	}
+
+	private function parseTypeAliasTagValue(TokenIterator $tokens): Ast\PhpDoc\TypeAliasTagValueNode
+	{
+		$alias = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		// support psalm-type syntax
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
+
+		$type = $this->typeParser->parse($tokens);
+
+		return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
