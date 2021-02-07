@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class ArrayTypeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class ArrayTypeNode extends BaseNode implements TypeNode
 {
 
 	/** @var TypeNode */

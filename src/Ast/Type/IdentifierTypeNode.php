@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class IdentifierTypeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class IdentifierTypeNode extends BaseNode implements TypeNode
 {
 
 	/** @var string */

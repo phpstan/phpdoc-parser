@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-class DeprecatedTagValueNode implements PhpDocTagValueNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class DeprecatedTagValueNode extends BaseNode implements PhpDocTagValueNode
 {
 
 	/** @var string (may be empty) */

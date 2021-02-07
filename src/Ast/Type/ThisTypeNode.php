@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class ThisTypeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class ThisTypeNode extends BaseNode implements TypeNode
 {
 
 	public function __toString(): string

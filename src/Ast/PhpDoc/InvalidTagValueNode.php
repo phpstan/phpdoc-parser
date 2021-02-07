@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-class InvalidTagValueNode implements PhpDocTagValueNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class InvalidTagValueNode extends BaseNode implements PhpDocTagValueNode
 {
 
 	/** @var string (may be empty) */

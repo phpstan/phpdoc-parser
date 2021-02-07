@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class ArrayShapeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class ArrayShapeNode extends BaseNode implements TypeNode
 {
 
 	/** @var ArrayShapeItemNode[] */

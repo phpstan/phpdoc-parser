@@ -2,9 +2,10 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
+use PHPStan\PhpDocParser\Ast\BaseNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
-class PropertyTagValueNode implements PhpDocTagValueNode
+class PropertyTagValueNode extends BaseNode implements PhpDocTagValueNode
 {
 
 	/** @var TypeNode */

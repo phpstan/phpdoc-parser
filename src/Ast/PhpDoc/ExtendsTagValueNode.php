@@ -2,9 +2,10 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
+use PHPStan\PhpDocParser\Ast\BaseNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 
-class ExtendsTagValueNode implements PhpDocTagValueNode
+class ExtendsTagValueNode extends BaseNode implements PhpDocTagValueNode
 {
 
 	/** @var GenericTypeNode */

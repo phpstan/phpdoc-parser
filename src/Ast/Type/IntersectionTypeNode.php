@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class IntersectionTypeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class IntersectionTypeNode extends BaseNode implements TypeNode
 {
 
 	/** @var TypeNode[] */

@@ -2,9 +2,10 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
+use PHPStan\PhpDocParser\Ast\BaseNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
 
-class ConstTypeNode implements TypeNode
+class ConstTypeNode extends BaseNode implements TypeNode
 {
 
 	/** @var ConstExprNode */

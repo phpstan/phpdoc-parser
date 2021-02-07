@@ -2,11 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
+use PHPStan\PhpDocParser\Ast\BaseNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
-class MethodTagValueParameterNode implements Node
+class MethodTagValueParameterNode extends BaseNode implements Node
 {
 
 	/** @var TypeNode|null */

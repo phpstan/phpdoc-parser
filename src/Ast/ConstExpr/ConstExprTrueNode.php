@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-class ConstExprTrueNode implements ConstExprNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class ConstExprTrueNode extends BaseNode implements ConstExprNode
 {
 
 	public function __toString(): string

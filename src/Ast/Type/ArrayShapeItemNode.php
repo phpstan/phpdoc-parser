@@ -2,10 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
+use PHPStan\PhpDocParser\Ast\BaseNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 
-class ArrayShapeItemNode implements TypeNode
+class ArrayShapeItemNode extends BaseNode implements TypeNode
 {
 
 	/** @var ConstExprIntegerNode|ConstExprStringNode|IdentifierTypeNode|null */

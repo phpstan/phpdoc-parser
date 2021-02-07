@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-class ConstExprIntegerNode implements ConstExprNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class ConstExprIntegerNode extends BaseNode implements ConstExprNode
 {
 
 	/** @var string */

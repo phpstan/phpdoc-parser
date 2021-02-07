@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class UnionTypeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class UnionTypeNode extends BaseNode implements TypeNode
 {
 
 	/** @var TypeNode[] */

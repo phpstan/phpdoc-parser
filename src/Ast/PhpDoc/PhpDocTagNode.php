@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
-class PhpDocTagNode implements PhpDocChildNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class PhpDocTagNode extends BaseNode implements PhpDocChildNode
 {
 
 	/** @var string */

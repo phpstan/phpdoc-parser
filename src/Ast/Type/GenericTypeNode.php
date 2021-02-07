@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class GenericTypeNode implements TypeNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class GenericTypeNode extends BaseNode implements TypeNode
 {
 
 	/** @var IdentifierTypeNode */

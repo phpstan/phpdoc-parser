@@ -2,7 +2,9 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
-class ConstFetchNode implements ConstExprNode
+use PHPStan\PhpDocParser\Ast\BaseNode;
+
+class ConstFetchNode extends BaseNode implements ConstExprNode
 {
 
 	/** @var string class name for class constants or empty string for non-class constants */
