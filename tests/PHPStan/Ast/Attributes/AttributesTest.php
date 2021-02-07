@@ -2,31 +2,47 @@
 
 namespace PHPStan\PhpDocParser\Ast\Attributes;
 
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPUnit\Framework\TestCase;
 
 final class AttributesTest extends TestCase
 {
 
-	/**
-	 * @var Lexer
-	 */
-	private $lexer;
-
-	/**
-	 * @var PhpDocParser
-	 */
-	private $phpDocParser;
+	/** @var PhpDocNode */
+	private $phpDocNode;
 
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer();
+		$lexer = new Lexer();
 		$constExprParser = new ConstExprParser();
-		$this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser), $constExprParser);
+		$phpDocParser = new PhpDocParser(new TypeParser($constExprParser), $constExprParser);
+
+		$input = '/** @var string */';
+		$tokens = new TokenIterator($lexer->tokenize($input));
+		$this->phpDocNode = $phpDocParser->parse($tokens);
+	}
+
+	public function testGetAttribute(): void
+	{
+		$defaultValue = $this->phpDocNode->getAttribute('unknown_with_default', 100);
+		$this->assertSame(100, $defaultValue);
+
+		$unKnownValue = $this->phpDocNode->getAttribute('unknown');
+		$this->assertNull($unKnownValue);
+	}
+
+	public function testSetAttribute(): void
+	{
+		$this->phpDocNode->setAttribute('key', 'value');
+
+		$attributeValue = $this->phpDocNode->getAttribute('key');
+		$this->assertSame('value', $attributeValue);
 	}
 
 }

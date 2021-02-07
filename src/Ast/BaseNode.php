@@ -8,9 +8,10 @@ abstract class BaseNode implements Node
 	/** @var array<string, mixed> */
 	private $attributes = [];
 
-    /**
-     * @param mixed $value
-     */
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 */
 	public function setAttribute(string $key, $value): void
 	{
 		$this->attributes[$key] = $value;
