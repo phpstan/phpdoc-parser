@@ -2,8 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
+use PHPStan\PhpDocParser\Ast\NodeAttributes;
+
 class PhpDocTextNode implements PhpDocChildNode
 {
+
+	use NodeAttributes;
 
 	/** @var string */
 	public $text;

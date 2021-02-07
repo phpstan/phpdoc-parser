@@ -2,8 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
+use PHPStan\PhpDocParser\Ast\NodeAttributes;
+
 class ConstExprArrayNode implements ConstExprNode
 {
+
+	use NodeAttributes;
 
 	/** @var ConstExprArrayItemNode[] */
 	public $items;

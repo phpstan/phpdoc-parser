@@ -2,8 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
+use PHPStan\PhpDocParser\Ast\NodeAttributes;
+
 class ConstExprStringNode implements ConstExprNode
 {
+
+	use NodeAttributes;
 
 	/** @var string */
 	public $value;

@@ -2,8 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
+use PHPStan\PhpDocParser\Ast\NodeAttributes;
+
 class ArrayShapeNode implements TypeNode
 {
+
+	use NodeAttributes;
 
 	/** @var ArrayShapeItemNode[] */
 	public $items;

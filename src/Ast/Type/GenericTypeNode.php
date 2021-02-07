@@ -2,8 +2,12 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
+use PHPStan\PhpDocParser\Ast\NodeAttributes;
+
 class GenericTypeNode implements TypeNode
 {
+
+	use NodeAttributes;
 
 	/** @var IdentifierTypeNode */
 	public $type;
