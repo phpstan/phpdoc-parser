@@ -47,7 +47,9 @@ class TypeParser
 			}
 
 			return $type;
-		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+		}
+
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
 			$type = new Ast\Type\ThisTypeNode();
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {

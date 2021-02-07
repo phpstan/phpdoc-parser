@@ -14,13 +14,15 @@ class ConstExprParser
 			$value = $tokens->currentTokenValue();
 			$tokens->next();
 			return new Ast\ConstExpr\ConstExprFloatNode($value);
+		}
 
-		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
 			$value = $tokens->currentTokenValue();
 			$tokens->next();
 			return new Ast\ConstExpr\ConstExprIntegerNode($value);
+		}
 
-		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
 			$value = $tokens->currentTokenValue();
 			if ($trimStrings) {
 				$value = trim($tokens->currentTokenValue(), "'");
