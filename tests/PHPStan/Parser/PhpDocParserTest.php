@@ -53,6 +53,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 
 
 	/**
+	 * @dataProvider provideTagsWithNumbers
 	 * @dataProvider provideParamTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
@@ -3216,6 +3217,20 @@ chunk. Must be higher that in the previous request.'),
 					''
 				),
 			],
+		];
+	}
+
+	public function provideTagsWithNumbers(): \Iterator
+	{
+		yield [
+			'OK without description and tag with number in it',
+			'/** @special3 Foo  */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@special3',
+					new GenericTagValueNode('Foo')
+				),
+			]),
 		];
 	}
 
