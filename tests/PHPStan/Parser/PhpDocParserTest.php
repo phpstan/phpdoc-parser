@@ -23,6 +23,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
@@ -68,6 +69,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideTemplateTagsData
 	 * @dataProvider provideExtendsTagsData
 	 * @dataProvider provideTypeAliasTagsData
+	 * @dataProvider provideTypeAliasImportTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 * @param string     $label
@@ -2904,7 +2906,7 @@ some text in the middle'
 					'@phpstan-type',
 					new InvalidTagValueNode(
 						'TypeAlias',
-						new ParserException(
+						new \PHPStan\PhpDocParser\Parser\ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							28,
@@ -2923,10 +2925,100 @@ some text in the middle'
 					'@phpstan-type',
 					new InvalidTagValueNode(
 						'',
-						new ParserException(
+						new \PHPStan\PhpDocParser\Parser\ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							18,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideTypeAliasImportTagsData(): \Iterator
+	{
+		yield [
+			'OK',
+			'/** @phpstan-import-type TypeAlias from AnotherClass */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new TypeAliasImportTagValueNode(
+						'TypeAlias',
+						new IdentifierTypeNode('AnotherClass'),
+						null
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with alias',
+			'/** @phpstan-import-type TypeAlias from AnotherClass as DifferentAlias */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new TypeAliasImportTagValueNode(
+						'TypeAlias',
+						new IdentifierTypeNode('AnotherClass'),
+						'DifferentAlias'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid missing from',
+			'/** @phpstan-import-type TypeAlias */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new InvalidTagValueNode(
+						'TypeAlias',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							35,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid missing from with alias',
+			'/** @phpstan-import-type TypeAlias as DifferentAlias */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new InvalidTagValueNode(
+						'TypeAlias as DifferentAlias',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'as',
+							Lexer::TOKEN_IDENTIFIER,
+							35,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid empty',
+			'/** @phpstan-import-type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new InvalidTagValueNode(
+						'',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							25,
 							Lexer::TOKEN_IDENTIFIER
 						)
 					)

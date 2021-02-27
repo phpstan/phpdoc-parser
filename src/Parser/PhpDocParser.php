@@ -194,6 +194,11 @@ class PhpDocParser
 					$tagValue = $this->parseTypeAliasTagValue($tokens);
 					break;
 
+				case '@phpstan-import-type':
+				case '@psalm-import-type':
+					$tagValue = $this->parseTypeAliasImportTagValue($tokens);
+					break;
+
 				default:
 					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
 					break;
@@ -380,6 +385,32 @@ class PhpDocParser
 		$type = $this->typeParser->parse($tokens);
 
 		return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
+	}
+
+	private function parseTypeAliasImportTagValue(TokenIterator $tokens): Ast\PhpDoc\TypeAliasImportTagValueNode
+	{
+		$importedAlias = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		if (!$tokens->tryConsumeTokenValue('from')) {
+			throw new \PHPStan\PhpDocParser\Parser\ParserException(
+				$tokens->currentTokenValue(),
+				$tokens->currentTokenType(),
+				$tokens->currentTokenOffset(),
+				Lexer::TOKEN_IDENTIFIER
+			);
+		}
+
+		$importedFrom = $this->typeParser->parse($tokens);
+		assert($importedFrom instanceof IdentifierTypeNode);
+
+		$importedAs = null;
+		if ($tokens->tryConsumeTokenValue('as')) {
+			$importedAs = $tokens->currentTokenValue();
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		return new Ast\PhpDoc\TypeAliasImportTagValueNode($importedAlias, $importedFrom, $importedAs);
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
