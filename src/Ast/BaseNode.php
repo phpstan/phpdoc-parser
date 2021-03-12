@@ -23,16 +23,15 @@ abstract class BaseNode implements Node
 	}
 
 	/**
-	 * @param mixed|null $default
 	 * @return mixed|null
 	 */
-	public function getAttribute(string $key, $default = null)
+	public function getAttribute(string $key)
 	{
 		if ($this->hasAttribute($key)) {
 			return $this->attributes[$key];
 		}
 
-		return $default;
+		return null;
 	}
 
 }

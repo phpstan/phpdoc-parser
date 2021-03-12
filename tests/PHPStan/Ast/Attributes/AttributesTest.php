@@ -30,9 +30,6 @@ final class AttributesTest extends TestCase
 
 	public function testGetAttribute(): void
 	{
-		$defaultValue = $this->phpDocNode->getAttribute('unknown_with_default', 100);
-		$this->assertSame(100, $defaultValue);
-
 		$unKnownValue = $this->phpDocNode->getAttribute('unknown');
 		$this->assertNull($unKnownValue);
 	}
