@@ -60,7 +60,6 @@
 			<arg value="install"/>
 			<arg value="--working-dir"/>
 			<arg path="build-cs"/>
-			<arg value="--ignore-platform-reqs"/>
 			<arg value="--ansi"/>
 		</exec>
 		<exec
