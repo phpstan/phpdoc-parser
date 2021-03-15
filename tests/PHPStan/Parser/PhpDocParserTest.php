@@ -1242,9 +1242,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 				new PhpDocTagNode(
 					'@deprecated',
 					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
-Drupal 9 there will be no way to set the status and in Drupal 8 this
-ability has been removed because mb_*() functions are supplied using
-Symfony\'s polyfill.')
+  Drupal 9 there will be no way to set the status and in Drupal 8 this
+  ability has been removed because mb_*() functions are supplied using
+  Symfony\'s polyfill.')
 				),
 			]),
 		];
@@ -1271,9 +1271,9 @@ Symfony\'s polyfill.')
 				new PhpDocTagNode(
 					'@deprecated',
 					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
-Drupal 9 there will be no way to set the status and in Drupal 8 this
-ability has been removed because mb_*() functions are supplied using
-Symfony\'s polyfill.')
+  Drupal 9 there will be no way to set the status and in Drupal 8 this
+  ability has been removed because mb_*() functions are supplied using
+  Symfony\'s polyfill.')
 				),
 			]),
 		];
@@ -3122,29 +3122,29 @@ time are not reliable as field settings might be missing.'),
 						''
 					)
 				),
-				new PhpDocTextNode('An empty array if there is no schema, or an associative array with the
-following key/value pairs:'),
-				new PhpDocTextNode('- columns: An array of Schema API column specifications, keyed by column
-name. The columns need to be a subset of the properties defined in
-propertyDefinitions(). The \'not null\' property is ignored if present,
-as it is determined automatically by the storage controller depending
-on the table layout and the property definitions. It is recommended to
-avoid having the column definitions depend on field settings when
-possible. No assumptions should be made on how storage engines
-internally use the original column name to structure their storage.'),
-				new PhpDocTextNode('- unique keys: (optional) An array of Schema API unique key definitions.
-Only columns that appear in the \'columns\' array are allowed.'),
-				new PhpDocTextNode('- indexes: (optional) An array of Schema API index definitions. Only
-columns that appear in the \'columns\' array are allowed. Those indexes
-will be used as default indexes. Field definitions can specify
-additional indexes or, at their own risk, modify the default indexes
-specified by the field-type module. Some storage engines might not
-support indexes.'),
-				new PhpDocTextNode('- foreign keys: (optional) An array of Schema API foreign key
-definitions. Note, however, that the field data is not necessarily
-stored in SQL. Also, the possible usage is limited, as you cannot
-specify another field as related, only existing SQL tables,
-such as {taxonomy_term_data}.'),
+				new PhpDocTextNode("An empty array if there is no schema, or an associative array with the
+  following key/value pairs:
+  - columns: An array of Schema API column specifications, keyed by column
+    name. The columns need to be a subset of the properties defined in
+    propertyDefinitions(). The 'not null' property is ignored if present,
+    as it is determined automatically by the storage controller depending
+    on the table layout and the property definitions. It is recommended to
+    avoid having the column definitions depend on field settings when
+    possible. No assumptions should be made on how storage engines
+    internally use the original column name to structure their storage.
+  - unique keys: (optional) An array of Schema API unique key definitions.
+    Only columns that appear in the 'columns' array are allowed.
+  - indexes: (optional) An array of Schema API index definitions. Only
+    columns that appear in the 'columns' array are allowed. Those indexes
+    will be used as default indexes. Field definitions can specify
+    additional indexes or, at their own risk, modify the default indexes
+    specified by the field-type module. Some storage engines might not
+    support indexes.
+  - foreign keys: (optional) An array of Schema API foreign key
+    definitions. Note, however, that the field data is not necessarily
+    stored in SQL. Also, the possible usage is limited, as you cannot
+    specify another field as related, only existing SQL tables,
+    such as {taxonomy_term_data}."),
 			]),
 		];
 
@@ -3172,14 +3172,14 @@ such as {taxonomy_term_data}.'),
 				new PhpDocTextNode('Parses a chunked request and return relevant information.'),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode('This function must return an array containing the following
-keys and their corresponding values:'),
-				new PhpDocTextNode('- last: Wheter this is the last chunk of the uploaded file'),
-				new PhpDocTextNode('- uuid: A unique id which distinguishes two uploaded files
-This uuid must stay the same among the task of
-uploading a chunked file.'),
-				new PhpDocTextNode('- index: A numerical representation of the currently uploaded
-chunk. Must be higher that in the previous request.'),
-				new PhpDocTextNode('- orig: The original file name.'),
+ keys and their corresponding values:
+   - last: Wheter this is the last chunk of the uploaded file
+   - uuid: A unique id which distinguishes two uploaded files
+           This uuid must stay the same among the task of
+           uploading a chunked file.
+   - index: A numerical representation of the currently uploaded
+           chunk. Must be higher that in the previous request.
+   - orig: The original file name.'),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@param',
@@ -3198,6 +3198,30 @@ chunk. Must be higher that in the previous request.'),
 						''
 					)
 				),
+			]),
+		];
+
+		yield [
+			'Description with indented <code>',
+			"/**
+			  * Finder allows searching through directory trees using iterator.
+			  *
+			  * <code>
+			  * Finder::findFiles('*.php')
+			  *     ->size('> 10kB')
+			  *     ->from('.')
+			  *     ->exclude('temp');
+			  * </code>
+			  */",
+			new PhpDocNode([
+				new PhpDocTextNode('Finder allows searching through directory trees using iterator.'),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode("<code>
+Finder::findFiles('*.php')
+    ->size('> 10kB')
+    ->from('.')
+    ->exclude('temp');
+</code>"),
 			]),
 		];
 

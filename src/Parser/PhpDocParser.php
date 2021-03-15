@@ -61,39 +61,27 @@ class PhpDocParser
 	private function parseText(TokenIterator $tokens): Ast\PhpDoc\PhpDocTextNode
 	{
 		$text = '';
-		while (true) {
-			// If we received a Lexer::TOKEN_PHPDOC_EOL, exit early to prevent
-			// them from being processed.
-			$currentTokenType = $tokens->currentTokenType();
-			if ($currentTokenType === Lexer::TOKEN_PHPDOC_EOL) {
-				break;
-			}
-			$text .= $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
-			$text = rtrim($text, " \t");
 
-			// If we joined until TOKEN_PHPDOC_EOL, peak at the next tokens to see
-			// if we have a multiline string to join.
-			$currentTokenType = $tokens->currentTokenType();
-			if ($currentTokenType !== Lexer::TOKEN_PHPDOC_EOL) {
+		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
 				break;
 			}
 
-			// Peek at the next token to determine if it is more text that needs
-			// to be combined.
 			$tokens->pushSavePoint();
 			$tokens->next();
-			$currentTokenType = $tokens->currentTokenType();
-			if ($currentTokenType !== Lexer::TOKEN_IDENTIFIER) {
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG) || $tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL) || $tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC) || $tokens->isCurrentTokenType(Lexer::TOKEN_END)) {
 				$tokens->rollback();
 				break;
 			}
 
-			// There's more text on a new line, ensure spacing.
+			$tokens->dropSavePoint();
 			$text .= "\n";
 		}
-		$text = trim($text, " \t");
 
-		return new Ast\PhpDoc\PhpDocTextNode($text);
+		return new Ast\PhpDoc\PhpDocTextNode(trim($text, " \t"));
 	}
 
 
