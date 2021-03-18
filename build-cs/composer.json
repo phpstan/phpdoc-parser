@@ -1,9 +1,9 @@
 {
 	"require": {
-		"php": "^7.1 || ^8.0"
+		"php": "^7.4 || ^8.0"
 	},
 	"require-dev": {
-		"consistence/coding-standard": "^3.10",
+		"consistence-community/coding-standard": "^3.11",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
 		"slevomat/coding-standard": "^6.4.1"
 	}
