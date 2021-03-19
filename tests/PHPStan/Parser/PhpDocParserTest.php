@@ -3410,6 +3410,19 @@ Finder::findFiles('*.php')
 					''
 				),
 			],
+			[
+				'@var',
+				'$foo string[]',
+				new InvalidTagValueNode(
+					'$foo string[]',
+					new \PHPStan\PhpDocParser\Parser\ParserException(
+						'$foo',
+						Lexer::TOKEN_VARIABLE,
+						0,
+						Lexer::TOKEN_IDENTIFIER
+					)
+				),
+			],
 		];
 	}
 
