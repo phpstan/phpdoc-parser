@@ -124,7 +124,7 @@ class TokenIterator
 
 	public function getSkippedHorizontalWhiteSpaceIfAny(): string
 	{
-		if ($this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
+		if ($this->index > 0 && $this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
 			return $this->tokens[$this->index - 1][Lexer::VALUE_OFFSET];
 		}
 
