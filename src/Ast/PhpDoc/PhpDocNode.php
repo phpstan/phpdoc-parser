@@ -271,7 +271,7 @@ class PhpDocNode implements Node
 
 	public function __toString(): string
 	{
-		return "/**\n * " . implode("\n * ", $this->children) . '*/';
+		return "/**\n * " . implode("\n * ", $this->children) . "\n */";
 	}
 
 }
