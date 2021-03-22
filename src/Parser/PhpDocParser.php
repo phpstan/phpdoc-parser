@@ -41,7 +41,21 @@ class PhpDocParser
 			}
 		}
 
-		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC);
+		try {
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC);
+		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+			$name = '';
+			if (count($children) > 0) {
+				$lastChild = $children[count($children) - 1];
+				if ($lastChild instanceof Ast\PhpDoc\PhpDocTagNode) {
+					$name = $lastChild->name;
+				}
+			}
+			$tokens->forwardToTheEnd();
+			return new Ast\PhpDoc\PhpDocNode([
+				new Ast\PhpDoc\PhpDocTagNode($name, new Ast\PhpDoc\InvalidTagValueNode($e->getMessage(), $e)),
+			]);
+		}
 
 		return new Ast\PhpDoc\PhpDocNode(array_values($children));
 	}

@@ -153,6 +153,12 @@ class TokenIterator
 		$this->index++;
 	}
 
+	public function forwardToTheEnd(): void
+	{
+		$lastToken = count($this->tokens) - 1;
+		$this->index = $lastToken;
+	}
+
 
 	public function pushSavePoint(): void
 	{
