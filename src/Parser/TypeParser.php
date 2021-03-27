@@ -16,6 +16,7 @@ class TypeParser
 		$this->constExprParser = $constExprParser;
 	}
 
+	/** @phpstan-impure */
 	public function parse(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
@@ -36,6 +37,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseAtomic(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
@@ -126,6 +128,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseUnion(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		$types = [$type];
@@ -138,6 +141,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseIntersection(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		$types = [$type];
@@ -150,6 +154,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseNullable(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
@@ -171,6 +176,7 @@ class TypeParser
 		return new Ast\Type\NullableTypeNode($type);
 	}
 
+	/** @phpstan-impure */
 	public function isHtml(TokenIterator $tokens): bool
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
@@ -201,6 +207,7 @@ class TypeParser
 		return false;
 	}
 
+	/** @phpstan-impure */
 	public function parseGeneric(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $baseType): Ast\Type\GenericTypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
@@ -226,6 +233,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
@@ -246,6 +254,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseCallableParameter(TokenIterator $tokens): Ast\Type\CallableTypeParameterNode
 	{
 		$type = $this->parse($tokens);
@@ -265,6 +274,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseCallableReturnType(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
@@ -294,6 +304,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function tryParseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
 	{
 		try {
@@ -310,6 +321,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function tryParseArray(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
 		try {
@@ -329,6 +341,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\ArrayShapeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET);
@@ -354,6 +367,7 @@ class TypeParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseArrayShapeItem(TokenIterator $tokens): Ast\Type\ArrayShapeItemNode
 	{
 		try {
@@ -374,6 +388,7 @@ class TypeParser
 	}
 
 	/**
+	 * @phpstan-impure
 	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
 	 */
 	private function parseArrayShapeKey(TokenIterator $tokens)
