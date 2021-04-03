@@ -2989,6 +2989,44 @@ some text in the middle'
 		];
 
 		yield [
+			'invalid non-identifier from',
+			'/** @phpstan-import-type TypeAlias from 42 */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new InvalidTagValueNode(
+						'TypeAlias from 42',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'42',
+							Lexer::TOKEN_INTEGER,
+							40,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid non-simple-identifier from',
+			'/** @phpstan-import-type TypeAlias from AnotherClass[] */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-import-type',
+					new InvalidTagValueNode(
+						'Unexpected token "[", expected \'*/\' at offset 52',
+						new \PHPStan\PhpDocParser\Parser\ParserException(
+							'[',
+							Lexer::TOKEN_OPEN_SQUARE_BRACKET,
+							52,
+							Lexer::TOKEN_CLOSE_PHPDOC
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
 			'invalid missing from',
 			'/** @phpstan-import-type TypeAlias */',
 			new PhpDocNode([

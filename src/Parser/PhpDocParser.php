@@ -403,8 +403,8 @@ class PhpDocParser
 			);
 		}
 
-		$importedFrom = $this->typeParser->parse($tokens);
-		assert($importedFrom instanceof IdentifierTypeNode);
+		$importedFrom = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
 		$importedAs = null;
 		if ($tokens->tryConsumeTokenValue('as')) {
@@ -412,7 +412,7 @@ class PhpDocParser
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 		}
 
-		return new Ast\PhpDoc\TypeAliasImportTagValueNode($importedAlias, $importedFrom, $importedAs);
+		return new Ast\PhpDoc\TypeAliasImportTagValueNode($importedAlias, new IdentifierTypeNode($importedFrom), $importedAs);
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
