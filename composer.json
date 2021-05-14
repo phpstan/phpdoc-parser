@@ -6,7 +6,6 @@
 		"php": "^7.1 || ^8.0"
 	},
 	"require-dev": {
-		"phing/phing": "^2.16.3",
 		"php-parallel-lint/php-parallel-lint": "^1.2",
 		"phpstan/extension-installer": "^1.0",
 		"phpstan/phpstan": "^0.12.60",
