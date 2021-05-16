@@ -1,8 +1,8 @@
 .PHONY: check
-check: build-abnfgen lint cs tests phpstan
+check: lint cs tests phpstan
 
 .PHONY: tests
-tests:
+tests: build-abnfgen
 	php vendor/bin/phpunit
 
 .PHONY: lint

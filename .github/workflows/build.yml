@@ -44,7 +44,7 @@ jobs:
 
 
       - name: "Lint"
-        run: "vendor/bin/phing lint"
+        run: "make lint"
 
   coding-standards:
     name: "Coding Standard"
@@ -68,10 +68,10 @@ jobs:
         run: "composer install --no-interaction --no-progress --no-suggest"
 
       - name: "Lint"
-        run: "vendor/bin/phing lint"
+        run: "make lint"
 
       - name: "Coding Standard"
-        run: "vendor/bin/phing cs"
+        run: "make cs"
 
   tests:
     name: "Tests"
@@ -113,7 +113,7 @@ jobs:
         run: "composer require --dev phpunit/phpunit:'^9.5' --update-with-dependencies"
 
       - name: "Tests"
-        run: "vendor/bin/phing tests"
+        run: "make tests"
 
   static-analysis:
     name: "PHPStan"
@@ -149,4 +149,4 @@ jobs:
         run: "composer require --dev phpunit/phpunit:'^9.5' --update-with-dependencies"
 
       - name: "PHPStan"
-        run: "vendor/bin/phing phpstan"
+        run: "make phpstan"
