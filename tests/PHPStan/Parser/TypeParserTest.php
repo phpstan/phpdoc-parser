@@ -975,6 +975,18 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 					]
 				),
 			],
+			[
+				'array{}',
+				new ArrayShapeNode([]),
+			],
+			[
+				'array{}|int',
+				new UnionTypeNode([new ArrayShapeNode([]), new IdentifierTypeNode('int')]),
+			],
+			[
+				'int|array{}',
+				new UnionTypeNode([new IdentifierTypeNode('int'), new ArrayShapeNode([])]),
+			],
 		];
 	}
 
