@@ -23,7 +23,7 @@ cs-fix:
 
 .PHONY: phpstan
 phpstan:
-	php vendor/bin/phpstan analyse -l 5 -c phpstan.neon src tests
+	php vendor/bin/phpstan
 
 .PHONY: build-abnfgen
 build-abnfgen:
