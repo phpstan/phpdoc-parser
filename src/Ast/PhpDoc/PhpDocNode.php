@@ -272,8 +272,9 @@ class PhpDocNode implements Node
 	public function __toString(): string
 	{
 		$children = array_map(
-			static function ($child): string {
-				return (string) $child === '' ? '' : ' ' . $child;
+			static function (PhpDocChildNode $child): string {
+				$s = (string) $child;
+				return $s === '' ? '' : ' ' . $s;
 			},
 			$this->children
 		);
