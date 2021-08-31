@@ -271,7 +271,14 @@ class PhpDocNode implements Node
 
 	public function __toString(): string
 	{
-		return "/**\n * " . implode("\n * ", $this->children) . "\n */";
+		$children = array_map(
+			static function (PhpDocChildNode $child): string {
+				$s = (string) $child;
+				return $s === '' ? '' : ' ' . $s;
+			},
+			$this->children
+		);
+		return "/**\n *" . implode("\n *", $children) . "\n */";
 	}
 
 }

@@ -27,6 +27,19 @@ final class NodePrintTest extends TestCase
  * It works
  */',
 		];
+
+		yield [
+			new PhpDocNode([
+				new PhpDocTextNode('It works'),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('with empty lines'),
+			]),
+			'/**
+ * It works
+ *
+ * with empty lines
+ */',
+		];
 	}
 
 }
