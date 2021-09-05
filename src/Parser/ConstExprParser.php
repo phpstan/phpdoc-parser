@@ -56,15 +56,29 @@ class ConstExprParser
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
 				$classConstantName = '';
-				if ($tokens->currentTokenType() === Lexer::TOKEN_IDENTIFIER) {
-					$classConstantName .= $tokens->currentTokenValue();
-					$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
-					if ($tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
-						$classConstantName .= '*';
+				$lastType = null;
+				while (true) {
+					if ($lastType !== Lexer::TOKEN_IDENTIFIER && $tokens->currentTokenType() === Lexer::TOKEN_IDENTIFIER) {
+						$classConstantName .= $tokens->currentTokenValue();
+						$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+						$lastType = Lexer::TOKEN_IDENTIFIER;
+
+						continue;
 					}
-				} else {
-					$tokens->consumeTokenType(Lexer::TOKEN_WILDCARD);
-					$classConstantName .= '*';
+
+					if ($lastType !== Lexer::TOKEN_WILDCARD && $tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
+						$classConstantName .= '*';
+						$lastType = Lexer::TOKEN_WILDCARD;
+
+						continue;
+					}
+
+					if ($lastType === null) {
+						// trigger parse error if nothing valid was consumed
+						$tokens->consumeTokenType(Lexer::TOKEN_WILDCARD);
+					}
+
+					break;
 				}
 
 				return new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName);
