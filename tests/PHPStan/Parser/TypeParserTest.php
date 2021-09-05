@@ -859,6 +859,22 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
 			],
 			[
+				'Foo::FOO_*BAR',
+				new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*BAR')),
+			],
+			[
+				'Foo::*FOO*',
+				new ConstTypeNode(new ConstFetchNode('Foo', '*FOO*')),
+			],
+			[
+				'Foo::A*B*C',
+				new ConstTypeNode(new ConstFetchNode('Foo', 'A*B*C')),
+			],
+			[
+				'self::*BAR',
+				new ConstTypeNode(new ConstFetchNode('self', '*BAR')),
+			],
+			[
 				'Foo::*',
 				new ConstTypeNode(new ConstFetchNode('Foo', '*')),
 			],
@@ -869,8 +885,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 			[
 				'Foo::*a',
-				new ConstTypeNode(new ConstFetchNode('Foo', '*')), // fails later in PhpDocParser
-				Lexer::TOKEN_IDENTIFIER,
+				new ConstTypeNode(new ConstFetchNode('Foo', '*a')),
 			],
 			[
 				'( "foo" | Foo::FOO_* )',
