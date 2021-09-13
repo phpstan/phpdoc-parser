@@ -227,6 +227,22 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield [
+			'OK const wildcard with description',
+			'/** @param self::* $foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new ConstTypeNode(new ConstFetchNode('self', '*')),
+						false,
+						'$foo',
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
 			'invalid without type, parameter name and description',
 			'/** @param */',
 			new PhpDocNode([
@@ -574,6 +590,21 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new IdentifierTypeNode('Foo'),
 						'$foo',
 						'#desc'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with variable name and description and const expression',
+			'/** @var self::* $foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new ConstTypeNode(new ConstFetchNode('self', '*')),
+						'$foo',
+						'optional description'
 					)
 				),
 			]),
@@ -1075,6 +1106,20 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 							),
 						]),
 						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with constant wildcard and description',
+			'/** @return self::* example description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new ConstTypeNode(new ConstFetchNode('self', '*')),
+						'example description'
 					)
 				),
 			]),
