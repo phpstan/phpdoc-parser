@@ -99,7 +99,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						false,
-						false,
 						'$foo',
 						''
 					)
@@ -116,7 +115,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						false,
-						false,
 						'$foo',
 						'optional description'
 					)
@@ -132,7 +130,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						false,
 						true,
 						'$foo',
 						''
@@ -149,7 +146,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						false,
 						true,
 						'$foo',
 						'optional description'
@@ -166,10 +162,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						true,
 						false,
 						'$foo',
-						''
+						'',
+						true
 					)
 				),
 			]),
@@ -183,10 +179,10 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						true,
 						false,
 						'$foo',
-						'optional description'
+						'optional description',
+						true
 					)
 				),
 			]),
@@ -201,9 +197,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						true,
-						true,
 						'$foo',
-						''
+						'',
+						true
 					)
 				),
 			]),
@@ -218,9 +214,9 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						true,
-						true,
 						'$foo',
-						'optional description'
+						'optional description',
+						true
 					)
 				),
 			]),
@@ -234,7 +230,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new ParamTagValueNode(
 						new ConstTypeNode(new ConstFetchNode('self', '*')),
-						false,
 						false,
 						'$foo',
 						'optional description'
@@ -1945,7 +1940,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
 							false,
-							false,
 							'$foo',
 							'1st multi world description'
 						)
@@ -1954,7 +1948,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Bar'),
-							false,
 							false,
 							'$bar',
 							'2nd multi world description'
@@ -1975,7 +1968,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
 							false,
-							false,
 							'$foo',
 							'1st multi world description
 some text in the middle'
@@ -1985,7 +1977,6 @@ some text in the middle'
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Bar'),
-							false,
 							false,
 							'$bar',
 							'2nd multi world description'
@@ -2017,7 +2008,6 @@ some text in the middle'
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Foo'),
 							false,
-							false,
 							'$foo',
 							'1st multi world description with empty lines'
 						)
@@ -2031,7 +2021,6 @@ some text in the middle'
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('Bar'),
-							false,
 							false,
 							'$bar',
 							'2nd multi world description with empty lines'
@@ -2065,7 +2054,6 @@ some text in the middle'
 						'@param',
 						new ParamTagValueNode(
 							new IdentifierTypeNode('int'),
-							false,
 							false,
 							'$foo',
 							'@param string $bar'
@@ -2982,7 +2970,6 @@ some text in the middle'
 					new ParamTagValueNode(
 						new IdentifierTypeNode('class-string'),
 						false,
-						false,
 						'$test',
 						''
 					)
@@ -2998,7 +2985,6 @@ some text in the middle'
 					'@param',
 					new ParamTagValueNode(
 						new IdentifierTypeNode('class-string'),
-						false,
 						false,
 						'$test',
 						'some description'
@@ -3293,7 +3279,6 @@ time are not reliable as field settings might be missing.'),
 					new ParamTagValueNode(
 						new IdentifierTypeNode('\Drupal\Core\Field\FieldStorageDefinitionInterface'),
 						false,
-						false,
 						'$field_definition',
 						''
 					)
@@ -3370,7 +3355,6 @@ time are not reliable as field settings might be missing.'),
 					'@param',
 					new ParamTagValueNode(
 						new IdentifierTypeNode('Request'),
-						false,
 						false,
 						'$request',
 						'- The request object'
@@ -3591,7 +3575,6 @@ Finder::findFiles('*.php')
 				'DateTimeImmutable::ATOM $a',
 				new ParamTagValueNode(
 					new ConstTypeNode(new ConstFetchNode('DateTimeImmutable', 'ATOM')),
-					false,
 					false,
 					'$a',
 					''

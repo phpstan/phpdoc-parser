@@ -224,7 +224,7 @@ class PhpDocParser
 		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
 		$parameterName = $this->parseRequiredVariableName($tokens);
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\ParamTagValueNode($type, $isReference, $isVariadic, $parameterName, $description);
+		return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description, $isReference);
 	}
 
 
