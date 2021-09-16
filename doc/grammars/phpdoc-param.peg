@@ -1,8 +1,11 @@
 PhpDocParam
-  = AnnotationName Type IsVariadic? ParameterName Description?
+  = AnnotationName Type IsReference? IsVariadic? ParameterName Description?
 
 AnnotationName
   = '@param'
+
+IsReference
+  = '&'
 
 IsVariaric
   = '...'
