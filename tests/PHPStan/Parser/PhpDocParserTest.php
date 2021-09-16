@@ -235,6 +235,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					new ParamTagValueNode(
 						new ConstTypeNode(new ConstFetchNode('self', '*')),
 						false,
+						false,
 						'$foo',
 						'optional description'
 					)
