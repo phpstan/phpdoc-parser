@@ -257,6 +257,15 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 				),
 			],
 			[
+				'?string|int',
+				new NullableTypeNode(
+					new UnionTypeNode([
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int'),
+					])
+				),
+			],
+			[
 				'?Foo<Bar>',
 				new NullableTypeNode(
 					new GenericTypeNode(

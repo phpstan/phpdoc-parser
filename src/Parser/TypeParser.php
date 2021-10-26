@@ -162,15 +162,20 @@ class TypeParser
 		$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
-		if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
-			$type = $this->parseGeneric($tokens, $type);
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+			$type = $this->parseUnion($tokens, $type);
 
-		} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
-			$type = $this->parseArrayShape($tokens, $type);
-		}
+		} else {
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+				$type = $this->parseGeneric($tokens, $type);
 
-		if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-			$type = $this->tryParseArray($tokens, $type);
+			} elseif ($type->name === 'array' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
+				$type = $this->parseArrayShape($tokens, $type);
+			}
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+				$type = $this->tryParseArray($tokens, $type);
+			}
 		}
 
 		return new Ast\Type\NullableTypeNode($type);
