@@ -36,7 +36,7 @@ jobs:
         run: "composer validate"
 
       - name: "Install dependencies"
-        run: "composer install --no-interaction --no-progress --no-suggest"
+        run: "composer install --no-interaction --no-progress"
 
       - name: "Downgrade PHPUnit"
         if: matrix.php-version == '7.1' || matrix.php-version == '7.2' || matrix.php-version == '7.3'
@@ -64,7 +64,7 @@ jobs:
         run: "composer validate"
 
       - name: "Install dependencies"
-        run: "composer install --no-interaction --no-progress --no-suggest"
+        run: "composer install --no-interaction --no-progress"
 
       - name: "Lint"
         run: "make lint"
@@ -101,11 +101,11 @@ jobs:
 
       - name: "Install lowest dependencies"
         if: ${{ matrix.dependencies == 'lowest' }}
-        run: "composer update --prefer-lowest --no-interaction --no-progress --no-suggest"
+        run: "composer update --prefer-lowest --no-interaction --no-progress"
 
       - name: "Install highest dependencies"
         if: ${{ matrix.dependencies == 'highest' }}
-        run: "composer update --no-interaction --no-progress --no-suggest"
+        run: "composer update --no-interaction --no-progress"
 
       - name: "Downgrade PHPUnit"
         if: matrix.php-version == '7.1' || matrix.php-version == '7.2' || matrix.php-version == '7.3'
@@ -141,7 +141,7 @@ jobs:
           tools: composer:v2
 
       - name: "Install dependencies"
-        run: "composer update --no-interaction --no-progress --no-suggest"
+        run: "composer update --no-interaction --no-progress"
 
       - name: "Downgrade PHPUnit"
         if: matrix.php-version == '7.1' || matrix.php-version == '7.2' || matrix.php-version == '7.3'
