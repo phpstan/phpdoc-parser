@@ -6,5 +6,10 @@
 		"consistence-community/coding-standard": "^3.11",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
 		"slevomat/coding-standard": "^6.4.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	}
 }
