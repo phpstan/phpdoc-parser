@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
+use function implode;
 
 class ConstExprArrayNode implements ConstExprNode
 {

@@ -5,6 +5,10 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\ShouldNotHappenException;
+use function array_values;
+use function count;
+use function trim;
 
 class PhpDocParser
 {
@@ -43,7 +47,7 @@ class PhpDocParser
 
 		try {
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC);
-		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+		} catch (ParserException $e) {
 			$name = '';
 			if (count($children) > 0) {
 				$lastChild = $children[count($children) - 1];
@@ -208,7 +212,7 @@ class PhpDocParser
 
 			$tokens->dropSavePoint();
 
-		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+		} catch (ParserException $e) {
 			$tokens->rollback();
 			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens), $e);
 		}
@@ -374,7 +378,7 @@ class PhpDocParser
 				return new Ast\PhpDoc\UsesTagValueNode($type, $description);
 		}
 
-		throw new \PHPStan\ShouldNotHappenException();
+		throw new ShouldNotHappenException();
 	}
 
 	private function parseTypeAliasTagValue(TokenIterator $tokens): Ast\PhpDoc\TypeAliasTagValueNode
@@ -396,7 +400,7 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
 		if (!$tokens->tryConsumeTokenValue('from')) {
-			throw new \PHPStan\PhpDocParser\Parser\ParserException(
+			throw new ParserException(
 				$tokens->currentTokenValue(),
 				$tokens->currentTokenType(),
 				$tokens->currentTokenOffset(),

@@ -4,9 +4,16 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use Iterator;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use function file_get_contents;
+use function glob;
+use function is_dir;
+use function mkdir;
+use function sprintf;
+use function unlink;
 
-class FuzzyTest extends \PHPUnit\Framework\TestCase
+class FuzzyTest extends TestCase
 {
 
 	/** @var Lexer */
@@ -28,7 +35,6 @@ class FuzzyTest extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * @dataProvider provideTypeParserData
-	 * @param string $input
 	 */
 	public function testTypeParser(string $input): void
 	{
@@ -49,7 +55,6 @@ class FuzzyTest extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * @dataProvider provideConstExprParserData
-	 * @param string $input
 	 */
 	public function testConstExprParser(string $input): void
 	{

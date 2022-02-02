@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use Iterator;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
@@ -35,8 +36,10 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPUnit\Framework\TestCase;
+use const PHP_EOL;
 
-class PhpDocParserTest extends \PHPUnit\Framework\TestCase
+class PhpDocParserTest extends TestCase
 {
 
 	/** @var Lexer */
@@ -72,10 +75,6 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideTypeAliasImportTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
-	 * @param string     $label
-	 * @param string     $input
-	 * @param PhpDocNode $expectedPhpDocNode
-	 * @param int        $nextTokenType
 	 */
 	public function testParse(string $label, string $input, PhpDocNode $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END): void
 	{
@@ -88,7 +87,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideParamTagsData(): \Iterator
+	public function provideParamTagsData(): Iterator
 	{
 		yield [
 			'OK without description',
@@ -246,7 +245,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							11,
@@ -265,7 +264,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'#desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							11,
@@ -284,7 +283,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'(Foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							16,
@@ -303,7 +302,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'(Foo $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							16,
@@ -322,7 +321,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'Foo<Bar $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							19,
@@ -341,7 +340,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'Foo| $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							16,
@@ -360,7 +359,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'Foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							15,
@@ -379,7 +378,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@param',
 					new InvalidTagValueNode(
 						'Foo optional description',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'optional',
 							Lexer::TOKEN_IDENTIFIER,
 							15,
@@ -392,7 +391,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideVarTagsData(): \Iterator
+	public function provideVarTagsData(): Iterator
 	{
 		yield [
 			'OK without description and variable name',
@@ -614,7 +613,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@var',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							9,
@@ -633,7 +632,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@var',
 					new InvalidTagValueNode(
 						'#desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							9,
@@ -652,7 +651,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@var',
 					new InvalidTagValueNode(
 						'(Foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							14,
@@ -671,7 +670,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@var',
 					new InvalidTagValueNode(
 						'(Foo $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							14,
@@ -690,7 +689,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@var',
 					new InvalidTagValueNode(
 						'Foo<Bar $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							17,
@@ -709,7 +708,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@var',
 					new InvalidTagValueNode(
 						'Foo| $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							14,
@@ -728,7 +727,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@psalm-type',
 					new InvalidTagValueNode(
 						'Unexpected token "{", expected \'*/\' at offset 44',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'{',
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
 							44,
@@ -741,7 +740,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function providePropertyTagsData(): \Iterator
+	public function providePropertyTagsData(): Iterator
 	{
 		yield [
 			'OK without description',
@@ -781,7 +780,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							14,
@@ -800,7 +799,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'#desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							14,
@@ -819,7 +818,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'(Foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							19,
@@ -838,7 +837,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'(Foo $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							19,
@@ -857,7 +856,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'Foo<Bar $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							22,
@@ -876,7 +875,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'Foo| $foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							19,
@@ -895,7 +894,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'Foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							18,
@@ -914,7 +913,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@property',
 					new InvalidTagValueNode(
 						'Foo optional description',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'optional',
 							Lexer::TOKEN_IDENTIFIER,
 							18,
@@ -927,7 +926,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideReturnTagsData(): \Iterator
+	public function provideReturnTagsData(): Iterator
 	{
 		yield [
 			'OK without description',
@@ -979,7 +978,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@return',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							12,
@@ -998,7 +997,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@return',
 					new InvalidTagValueNode(
 						'[int, string]',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'[',
 							Lexer::TOKEN_OPEN_SQUARE_BRACKET,
 							12,
@@ -1017,7 +1016,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@return',
 					new InvalidTagValueNode(
 						'Foo | #desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							18,
@@ -1036,7 +1035,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@return',
 					new InvalidTagValueNode(
 						'A & B | C',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'|',
 							Lexer::TOKEN_UNION,
 							18,
@@ -1055,7 +1054,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@return',
 					new InvalidTagValueNode(
 						'A | B & C',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'&',
 							Lexer::TOKEN_INTERSECTION,
 							18,
@@ -1074,7 +1073,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@return',
 					new InvalidTagValueNode(
 						'A | B < 123',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							24,
@@ -1123,7 +1122,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideThrowsTagsData(): \Iterator
+	public function provideThrowsTagsData(): Iterator
 	{
 		yield [
 			'OK without description',
@@ -1175,7 +1174,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@throws',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							12,
@@ -1194,7 +1193,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@throws',
 					new InvalidTagValueNode(
 						'Foo | #desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							18,
@@ -1206,7 +1205,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 	}
 
-	public function provideMixinTagsData(): \Iterator
+	public function provideMixinTagsData(): Iterator
 	{
 		yield [
 			'OK without description',
@@ -1258,7 +1257,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@mixin',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							11,
@@ -1277,7 +1276,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@mixin',
 					new InvalidTagValueNode(
 						'Foo | #desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							17,
@@ -1305,7 +1304,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 	}
 
-	public function provideDeprecatedTagsData(): \Iterator
+	public function provideDeprecatedTagsData(): Iterator
 	{
 		yield [
 			'OK with no description',
@@ -1411,7 +1410,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 		];
 	}
 
-	public function provideMethodTagsData(): \Iterator
+	public function provideMethodTagsData(): Iterator
 	{
 		yield [
 			'OK non-static, without return type',
@@ -1737,7 +1736,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@method',
 					new InvalidTagValueNode(
 						'a b',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							16,
@@ -1756,7 +1755,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@method',
 					new InvalidTagValueNode(
 						'static a b',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							23,
@@ -1775,7 +1774,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 					'@method',
 					new InvalidTagValueNode(
 						'a b(x)',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							')',
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							17,
@@ -1788,7 +1787,7 @@ class PhpDocParserTest extends \PHPUnit\Framework\TestCase
 	}
 
 
-	public function provideSingleLinePhpDocData(): \Iterator
+	public function provideSingleLinePhpDocData(): Iterator
 	{
 		yield [
 			'empty',
@@ -2651,7 +2650,7 @@ some text in the middle'
 		];
 	}
 
-	public function provideTemplateTagsData(): \Iterator
+	public function provideTemplateTagsData(): Iterator
 	{
 		yield [
 			'OK without bound and description',
@@ -2751,7 +2750,7 @@ some text in the middle'
 					'@template',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							14,
@@ -2770,7 +2769,7 @@ some text in the middle'
 					'@template',
 					new InvalidTagValueNode(
 						'#desc',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							14,
@@ -2797,7 +2796,7 @@ some text in the middle'
 		];
 	}
 
-	public function provideExtendsTagsData(): \Iterator
+	public function provideExtendsTagsData(): Iterator
 	{
 		yield [
 			'OK with one argument',
@@ -2903,7 +2902,7 @@ some text in the middle'
 					'@extends',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							13,
@@ -2922,7 +2921,7 @@ some text in the middle'
 					'@extends',
 					new InvalidTagValueNode(
 						'Foo',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							17,
@@ -2994,7 +2993,7 @@ some text in the middle'
 		];
 	}
 
-	public function provideTypeAliasTagsData(): \Iterator
+	public function provideTypeAliasTagsData(): Iterator
 	{
 		yield [
 			'OK',
@@ -3038,7 +3037,7 @@ some text in the middle'
 					'@phpstan-type',
 					new InvalidTagValueNode(
 						'TypeAlias',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							28,
@@ -3057,7 +3056,7 @@ some text in the middle'
 					'@phpstan-type',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							18,
@@ -3069,7 +3068,7 @@ some text in the middle'
 		];
 	}
 
-	public function provideTypeAliasImportTagsData(): \Iterator
+	public function provideTypeAliasImportTagsData(): Iterator
 	{
 		yield [
 			'OK',
@@ -3109,7 +3108,7 @@ some text in the middle'
 					'@phpstan-import-type',
 					new InvalidTagValueNode(
 						'TypeAlias from 42',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'42',
 							Lexer::TOKEN_INTEGER,
 							40,
@@ -3128,7 +3127,7 @@ some text in the middle'
 					'@phpstan-import-type',
 					new InvalidTagValueNode(
 						'Unexpected token "[", expected \'*/\' at offset 52',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'[',
 							Lexer::TOKEN_OPEN_SQUARE_BRACKET,
 							52,
@@ -3147,7 +3146,7 @@ some text in the middle'
 					'@phpstan-import-type',
 					new InvalidTagValueNode(
 						'TypeAlias',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							35,
@@ -3166,7 +3165,7 @@ some text in the middle'
 					'@phpstan-import-type',
 					new InvalidTagValueNode(
 						'TypeAlias as DifferentAlias',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'as',
 							Lexer::TOKEN_IDENTIFIER,
 							35,
@@ -3185,7 +3184,7 @@ some text in the middle'
 					'@phpstan-import-type',
 					new InvalidTagValueNode(
 						'',
-						new \PHPStan\PhpDocParser\Parser\ParserException(
+						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							25,
@@ -3197,7 +3196,7 @@ some text in the middle'
 		];
 	}
 
-	public function providerDebug(): \Iterator
+	public function providerDebug(): Iterator
 	{
 		$sample = '/**
 			 * Returns the schema for the field.
@@ -3223,7 +3222,7 @@ time are not reliable as field settings might be missing.'),
 		];
 	}
 
-	public function provideRealWorldExampleData(): \Iterator
+	public function provideRealWorldExampleData(): Iterator
 	{
 			$sample = "/**
 			 * Returns the schema for the field.
@@ -3416,7 +3415,7 @@ Finder::findFiles('*.php')
 			'malformed const fetch',
 			'/** @param Foo::** $a */',
 			new PhpDocNode([
-				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new \PHPStan\PhpDocParser\Parser\ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
+				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
 			]),
 		];
 
@@ -3495,7 +3494,7 @@ Finder::findFiles('*.php')
 		];
 	}
 
-	public function provideDescriptionWithOrWithoutHtml(): \Iterator
+	public function provideDescriptionWithOrWithoutHtml(): Iterator
 	{
 		yield [
 			'Description with HTML tags in @return tag (close tags together)',
@@ -3585,7 +3584,7 @@ Finder::findFiles('*.php')
 				'$foo string[]',
 				new InvalidTagValueNode(
 					'$foo string[]',
-					new \PHPStan\PhpDocParser\Parser\ParserException(
+					new ParserException(
 						'$foo',
 						Lexer::TOKEN_VARIABLE,
 						0,
@@ -3596,7 +3595,7 @@ Finder::findFiles('*.php')
 		];
 	}
 
-	public function provideTagsWithNumbers(): \Iterator
+	public function provideTagsWithNumbers(): Iterator
 	{
 		yield [
 			'OK without description and tag with number in it',
@@ -3612,10 +3611,7 @@ Finder::findFiles('*.php')
 
 	/**
 	 * @dataProvider dataParseTagValue
-	 * @param string $tag
-	 * @param string $phpDoc
 	 * @param PhpDocNode $expectedPhpDocNode
-	 * @param int $nextTokenType
 	 */
 	public function testParseTagValue(string $tag, string $phpDoc, Node $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END): void
 	{

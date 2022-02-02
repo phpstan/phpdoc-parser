@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
+use PHPStan\PhpDocParser\Parser\ParserException;
 
 class InvalidTagValueNode implements PhpDocTagValueNode
 {
@@ -12,10 +13,10 @@ class InvalidTagValueNode implements PhpDocTagValueNode
 	/** @var string (may be empty) */
 	public $value;
 
-	/** @var \PHPStan\PhpDocParser\Parser\ParserException */
+	/** @var ParserException */
 	public $exception;
 
-	public function __construct(string $value, \PHPStan\PhpDocParser\Parser\ParserException $exception)
+	public function __construct(string $value, ParserException $exception)
 	{
 		$this->value = $value;
 		$this->exception = $exception;
