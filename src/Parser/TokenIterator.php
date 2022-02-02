@@ -3,6 +3,11 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use function array_pop;
+use function assert;
+use function count;
+use function in_array;
+use function strlen;
 
 class TokenIterator
 {
@@ -71,8 +76,7 @@ class TokenIterator
 
 
 	/**
-	 * @param  int $tokenType
-	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
+	 * @throws ParserException
 	 */
 	public function consumeTokenType(int $tokenType): void
 	{
@@ -185,12 +189,11 @@ class TokenIterator
 
 
 	/**
-	 * @param  int $expectedTokenType
-	 * @throws \PHPStan\PhpDocParser\Parser\ParserException
+	 * @throws ParserException
 	 */
 	private function throwError(int $expectedTokenType): void
 	{
-		throw new \PHPStan\PhpDocParser\Parser\ParserException(
+		throw new ParserException(
 			$this->currentTokenValue(),
 			$this->currentTokenType(),
 			$this->currentTokenOffset(),

@@ -14,8 +14,9 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprTrueNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPUnit\Framework\TestCase;
 
-class ConstExprParserTest extends \PHPUnit\Framework\TestCase
+class ConstExprParserTest extends TestCase
 {
 
 	/** @var Lexer */
@@ -41,9 +42,6 @@ class ConstExprParserTest extends \PHPUnit\Framework\TestCase
 	 * @dataProvider provideStringNodeParseData
 	 * @dataProvider provideArrayNodeParseData
 	 * @dataProvider provideFetchNodeParseData
-	 * @param string        $input
-	 * @param ConstExprNode $expectedExpr
-	 * @param int           $nextTokenType
 	 */
 	public function testParse(string $input, ConstExprNode $expectedExpr, int $nextTokenType = Lexer::TOKEN_END): void
 	{

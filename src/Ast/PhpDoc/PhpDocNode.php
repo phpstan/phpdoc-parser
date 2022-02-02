@@ -4,6 +4,10 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
+use function array_column;
+use function array_filter;
+use function array_map;
+use function implode;
 
 class PhpDocNode implements Node
 {
@@ -34,7 +38,6 @@ class PhpDocNode implements Node
 
 
 	/**
-	 * @param  string $tagName
 	 * @return PhpDocTagNode[]
 	 */
 	public function getTagsByName(string $tagName): array

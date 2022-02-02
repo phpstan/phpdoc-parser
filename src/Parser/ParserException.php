@@ -2,9 +2,15 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use Exception;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use function assert;
+use function json_encode;
+use function sprintf;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 
-class ParserException extends \Exception
+class ParserException extends Exception
 {
 
 	/** @var string */

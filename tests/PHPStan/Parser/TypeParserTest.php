@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use Exception;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
@@ -20,8 +21,11 @@ use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPUnit\Framework\TestCase;
+use function get_class;
+use const PHP_EOL;
 
-class TypeParserTest extends \PHPUnit\Framework\TestCase
+class TypeParserTest extends TestCase
 {
 
 	/** @var Lexer */
@@ -40,13 +44,11 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * @dataProvider provideParseData
-	 * @param string              $input
-	 * @param TypeNode|\Exception $expectedResult
-	 * @param int                 $nextTokenType
+	 * @param TypeNode|Exception $expectedResult
 	 */
 	public function testParse(string $input, $expectedResult, int $nextTokenType = Lexer::TOKEN_END): void
 	{
-		if ($expectedResult instanceof \Exception) {
+		if ($expectedResult instanceof Exception) {
 			$this->expectException(get_class($expectedResult));
 			$this->expectExceptionMessage($expectedResult->getMessage());
 		}
@@ -436,7 +438,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 			[
 				'array{',
-				new \PHPStan\PhpDocParser\Parser\ParserException(
+				new ParserException(
 					'',
 					Lexer::TOKEN_END,
 					6,
@@ -445,7 +447,7 @@ class TypeParserTest extends \PHPUnit\Framework\TestCase
 			],
 			[
 				'array{a => int}',
-				new \PHPStan\PhpDocParser\Parser\ParserException(
+				new ParserException(
 					'=>',
 					Lexer::TOKEN_OTHER,
 					8,

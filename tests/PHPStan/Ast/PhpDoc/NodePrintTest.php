@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
+use Iterator;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ final class NodePrintTest extends TestCase
 	}
 
 
-	public function providePhpDocData(): \Iterator
+	public function providePhpDocData(): Iterator
 	{
 		yield [
 			new PhpDocNode([

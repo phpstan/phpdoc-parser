@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use function trim;
 
 class ThrowsTagValueNode implements PhpDocTagValueNode
 {

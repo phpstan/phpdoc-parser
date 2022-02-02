@@ -2,8 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use LogicException;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use function strpos;
+use function trim;
 
 class TypeParser
 {
@@ -104,7 +107,7 @@ class TypeParser
 			$tokens->dropSavePoint(); // because of ConstFetchNode
 		}
 
-		$exception = new \PHPStan\PhpDocParser\Parser\ParserException(
+		$exception = new ParserException(
 			$tokens->currentTokenValue(),
 			$tokens->currentTokenType(),
 			$tokens->currentTokenOffset(),
@@ -122,7 +125,7 @@ class TypeParser
 			}
 
 			return new Ast\Type\ConstTypeNode($constExpr);
-		} catch (\LogicException $e) {
+		} catch (LogicException $e) {
 			throw $exception;
 		}
 	}
@@ -312,7 +315,7 @@ class TypeParser
 			$type = $this->parseCallable($tokens, $identifier);
 			$tokens->dropSavePoint();
 
-		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+		} catch (ParserException $e) {
 			$tokens->rollback();
 			$type = $identifier;
 		}
@@ -333,7 +336,7 @@ class TypeParser
 				$type = new Ast\Type\ArrayTypeNode($type);
 			}
 
-		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+		} catch (ParserException $e) {
 			$tokens->rollback();
 		}
 
@@ -383,7 +386,7 @@ class TypeParser
 			$tokens->dropSavePoint();
 
 			return new Ast\Type\ArrayShapeItemNode($key, $optional, $value);
-		} catch (\PHPStan\PhpDocParser\Parser\ParserException $e) {
+		} catch (ParserException $e) {
 			$tokens->rollback();
 			$value = $this->parse($tokens);
 
