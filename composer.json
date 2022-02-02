@@ -11,7 +11,7 @@
 		"phpstan/phpstan": "^1.0",
 		"phpstan/phpstan-strict-rules": "^1.0",
 		"phpunit/phpunit": "^9.5",
-		"symfony/process": "^5.2"
+		"symfony/process": "^6.0"
 	},
 	"config": {
 		"platform": {
