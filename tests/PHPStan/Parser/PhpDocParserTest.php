@@ -86,6 +86,16 @@ class PhpDocParserTest extends TestCase
 		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+
+		if (strpos($label, 'OK') !== 0) {
+			return;
+		}
+		$tokens = new TokenIterator($this->lexer->tokenize((string) $actualPhpDocNode));
+		$actualPhpDocNode = $this->phpDocParser->parse($tokens);
+
+		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
+		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
+		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
 
 

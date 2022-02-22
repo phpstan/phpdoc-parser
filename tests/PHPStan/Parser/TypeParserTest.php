@@ -60,6 +60,18 @@ class TypeParserTest extends TestCase
 		$this->assertInstanceOf(get_class($expectedResult), $typeNode);
 		$this->assertEquals($expectedResult, $typeNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+
+		if ($nextTokenType !== Lexer::TOKEN_END) {
+			return;
+		}
+
+		$tokens = new TokenIterator($this->lexer->tokenize((string) $typeNode));
+		$typeNode = $this->typeParser->parse($tokens);
+
+		$this->assertSame((string) $expectedResult, (string) $typeNode);
+		$this->assertInstanceOf(get_class($expectedResult), $typeNode);
+		$this->assertEquals($expectedResult, $typeNode);
+		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
 
 
