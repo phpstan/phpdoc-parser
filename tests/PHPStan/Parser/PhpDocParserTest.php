@@ -28,6 +28,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -99,6 +101,28 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						false,
 						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK',
+			'/** @return array{name: "A B C"} */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new ArrayShapeNode([
+							new ArrayShapeItemNode(
+								new IdentifierTypeNode('name'),
+								false,
+								new ConstTypeNode(
+									new ConstExprStringNode('"A B C"')
+								)
+							),
+						]),
 						''
 					)
 				),
