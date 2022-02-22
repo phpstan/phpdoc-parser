@@ -836,8 +836,8 @@ class TypeParserTest extends TestCase
 			[
 				"'foo'|'bar'",
 				new UnionTypeNode([
-					new ConstTypeNode(new ConstExprStringNode('foo')),
-					new ConstTypeNode(new ConstExprStringNode('bar')),
+					new ConstTypeNode(new ConstExprStringNode("'foo'")),
+					new ConstTypeNode(new ConstExprStringNode("'bar'")),
 				]),
 			],
 			[
@@ -854,7 +854,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'"bar"',
-				new ConstTypeNode(new ConstExprStringNode('bar')),
+				new ConstTypeNode(new ConstExprStringNode('"bar"')),
 			],
 			[
 				'Foo::FOO_*',
@@ -892,7 +892,7 @@ class TypeParserTest extends TestCase
 			[
 				'( "foo" | Foo::FOO_* )',
 				new UnionTypeNode([
-					new ConstTypeNode(new ConstExprStringNode('foo')),
+					new ConstTypeNode(new ConstExprStringNode('"foo"')),
 					new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
 				]),
 			],

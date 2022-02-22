@@ -3426,8 +3426,8 @@ Finder::findFiles('*.php')
 					'@return',
 					new ReturnTagValueNode(
 						new UnionTypeNode([
-							new ConstTypeNode(new ConstExprStringNode('foo')),
-							new ConstTypeNode(new ConstExprStringNode('bar')),
+							new ConstTypeNode(new ConstExprStringNode("'foo'")),
+							new ConstTypeNode(new ConstExprStringNode("'bar'")),
 						]),
 						''
 					)
