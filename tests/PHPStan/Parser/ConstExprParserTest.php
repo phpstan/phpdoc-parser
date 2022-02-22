@@ -229,6 +229,11 @@ class ConstExprParserTest extends TestCase
 		];
 
 		yield [
+			'"foo \' bar"',
+			new ConstExprStringNode('"foo \' bar"'),
+		];
+
+		yield [
 			'"Foo \\n\\"\\r Bar"',
 			new ConstExprStringNode('"Foo \\n\\"\\r Bar"'),
 		];

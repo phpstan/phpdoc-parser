@@ -3,6 +3,9 @@
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
+use function strlen;
+use function strpos;
+use function substr;
 
 class ConstExprStringNode implements ConstExprNode
 {
@@ -16,16 +19,16 @@ class ConstExprStringNode implements ConstExprNode
 	{
 		$len = strlen($value);
 		if ($len >= 2 && (
-			($value[0] === '"' && $value[$len-1] === '"')
-			|| ($value[0] === "'" && $value[$len-1] === "'")
+			($value[0] === '"' && $value[$len - 1] === '"')
+			|| ($value[0] === "'" && $value[$len - 1] === "'")
 		)) {
 			$value = substr($value, 1, -1);
 		}
 		// Don't go crazy with escaping
 		if (strpos($value, '"') !== false) {
-			$value = "'".$value."'";
+			$value = "'" . $value . "'";
 		} else {
-			$value = '"'.$value.'"';
+			$value = '"' . $value . '"';
 		}
 		$this->value = $value;
 	}
