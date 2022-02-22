@@ -51,6 +51,13 @@ class ConstExprParserTest extends TestCase
 		$this->assertSame((string) $expectedExpr, (string) $exprNode);
 		$this->assertEquals($expectedExpr, $exprNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+
+		$tokens = new TokenIterator($this->lexer->tokenize((string) $exprNode));
+		$exprNode = $this->constExprParser->parse($tokens);
+
+		$this->assertSame((string) $expectedExpr, (string) $exprNode);
+		$this->assertEquals($expectedExpr, $exprNode);
+		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
 
 
@@ -214,6 +221,11 @@ class ConstExprParserTest extends TestCase
 		yield [
 			'"foo"',
 			new ConstExprStringNode('"foo"'),
+		];
+
+		yield [
+			'"foo bar"',
+			new ConstExprStringNode('"foo bar"'),
 		];
 
 		yield [
