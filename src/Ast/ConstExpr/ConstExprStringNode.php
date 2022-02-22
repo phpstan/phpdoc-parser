@@ -20,7 +20,7 @@ class ConstExprStringNode implements ConstExprNode
 
 	public function __toString(): string
 	{
-		return $this->value;
+		return '"'.$this->value.'"';
 	}
 
 }
