@@ -405,11 +405,11 @@ class TypeParser
 			$tokens->next();
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
-			$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), "'"));
+			$key = new Ast\ConstExpr\ConstExprStringNode($tokens->currentTokenValue());
 			$tokens->next();
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
-			$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), '"'));
+			$key = new Ast\ConstExpr\ConstExprStringNode($tokens->currentTokenValue());
 			$tokens->next();
 
 		} else {

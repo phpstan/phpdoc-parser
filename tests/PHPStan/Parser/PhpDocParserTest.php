@@ -118,15 +118,15 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
-			'OK',
-			'/** @return array{name: "A B C"} */',
+			'OK spaces in shapes',
+			'/** @return array{"name 1 2 3": "A B C"} */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
 					new ReturnTagValueNode(
 						new ArrayShapeNode([
 							new ArrayShapeItemNode(
-								new IdentifierTypeNode('name'),
+								new ConstExprStringNode('"name 1 2 3"'),
 								false,
 								new ConstTypeNode(
 									new ConstExprStringNode('"A B C"')

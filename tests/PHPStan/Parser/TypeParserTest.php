@@ -470,7 +470,7 @@ class TypeParserTest extends TestCase
 				'array{"a": int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('a'),
+						new ConstExprStringNode('"a"'),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -480,7 +480,7 @@ class TypeParserTest extends TestCase
 				'array{\'a\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('a'),
+						new ConstExprStringNode("'a'"),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -490,7 +490,7 @@ class TypeParserTest extends TestCase
 				'array{\'$ref\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('$ref'),
+						new ConstExprStringNode("'\$ref'"),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -500,7 +500,7 @@ class TypeParserTest extends TestCase
 				'array{"$ref": int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('$ref'),
+						new ConstExprStringNode('"$ref"'),
 						false,
 						new IdentifierTypeNode('int')
 					),
