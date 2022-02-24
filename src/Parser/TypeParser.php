@@ -6,7 +6,6 @@ use LogicException;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function strpos;
-use function trim;
 
 class TypeParser
 {

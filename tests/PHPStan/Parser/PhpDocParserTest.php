@@ -39,6 +39,7 @@ use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
+use function strpos;
 use const PHP_EOL;
 
 class PhpDocParserTest extends TestCase

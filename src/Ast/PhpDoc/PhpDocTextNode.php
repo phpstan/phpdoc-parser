@@ -3,6 +3,8 @@
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
+use function explode;
+use function implode;
 
 class PhpDocTextNode implements PhpDocChildNode
 {
@@ -20,7 +22,7 @@ class PhpDocTextNode implements PhpDocChildNode
 
 	public function __toString(): string
 	{
-		return $this->text;
+		return implode("\n * ", explode("\n", $this->text));
 	}
 
 }

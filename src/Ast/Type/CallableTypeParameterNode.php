@@ -40,7 +40,7 @@ class CallableTypeParameterNode implements Node
 		$type = "{$this->type} ";
 		$isReference = $this->isReference ? '&' : '';
 		$isVariadic = $this->isVariadic ? '...' : '';
-		$default = $this->isOptional ? ' = default' : '';
+		$default = $this->isOptional ? ' = ' : '';
 		return "{$type}{$isReference}{$isVariadic}{$this->parameterName}{$default}";
 	}
 
