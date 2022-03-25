@@ -7,6 +7,7 @@ use function array_pop;
 use function assert;
 use function count;
 use function in_array;
+use function strcasecmp;
 use function strlen;
 
 class TokenIterator
@@ -59,7 +60,7 @@ class TokenIterator
 
 	public function isCurrentTokenValue(string $tokenValue): bool
 	{
-		return $this->tokens[$this->index][Lexer::VALUE_OFFSET] === $tokenValue;
+		return strcasecmp($this->tokens[$this->index][Lexer::VALUE_OFFSET], $tokenValue) === 0;
 	}
 
 

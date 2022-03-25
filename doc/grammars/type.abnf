@@ -3,7 +3,7 @@
 ; ---------------------------------------------------------------------------- ;
 
 Type
-	= Atomic [Union / Intersection]
+	= Atomic [Union / Intersection / Conditional]
 	/ Nullable
 
 Union
@@ -11,6 +11,9 @@ Union
 
 Intersection
 	= 1*(TokenIntersection Atomic)
+
+Conditional
+    = 1*ByteHorizontalWs "is" [1*ByteHorizontalWs "not"] 1*ByteHorizontalWs Atomic TokenNullable Atomic TokenColon Atomic
 
 Nullable
 	= TokenNullable TokenIdentifier [Generic]
