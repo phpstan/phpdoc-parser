@@ -33,6 +33,8 @@ class TypeParser
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
 				$type = $this->parseIntersection($tokens, $type);
+			} elseif ($tokens->isCurrentTokenValue('is')) {
+				$type = $this->parseConditional($tokens, $type);
 			}
 		}
 
@@ -44,7 +46,9 @@ class TypeParser
 	private function parseAtomic(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			$type = $this->parse($tokens);
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
@@ -154,6 +158,35 @@ class TypeParser
 		}
 
 		return new Ast\Type\IntersectionTypeNode($types);
+	}
+
+
+	/** @phpstan-impure */
+	private function parseConditional(TokenIterator $tokens, Ast\Type\TypeNode $subjectType): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		$negated = false;
+		if ($tokens->isCurrentTokenValue('not')) {
+			$negated = true;
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		$targetType = $this->parseAtomic($tokens);
+
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+		$trueType = $this->parseAtomic($tokens);
+
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+		$falseType = $this->parseAtomic($tokens);
+
+		return new Ast\Type\ConditionalTypeNode($subjectType, $targetType, $trueType, $falseType, $negated);
 	}
 
 
