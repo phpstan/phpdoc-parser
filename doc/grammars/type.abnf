@@ -13,7 +13,7 @@ Intersection
 	= 1*(TokenIntersection Atomic)
 
 Conditional
-    = 1*ByteHorizontalWs "is" [1*ByteHorizontalWs "not"] 1*ByteHorizontalWs Atomic TokenNullable Atomic TokenColon Atomic
+    = 1*ByteHorizontalWs TokenIs [TokenNot] Atomic TokenNullable Atomic TokenColon Atomic
 
 Nullable
 	= TokenNullable TokenIdentifier [Generic]
@@ -177,6 +177,12 @@ TokenDoubleColon
 
 TokenThisVariable
 	= %x24.74.68.69.73 *ByteHorizontalWs
+
+TokenIs
+    = %x69.73 1*ByteHorizontalWs
+
+TokenNot
+    = %x6E.6F.74 1*ByteHorizontalWs
 
 TokenIdentifier
 	= [ByteBackslash] ByteIdentifierFirst *ByteIdentifierSecond *(ByteBackslash ByteIdentifierFirst *ByteIdentifierSecond) *ByteHorizontalWs

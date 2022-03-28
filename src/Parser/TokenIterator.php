@@ -60,7 +60,7 @@ class TokenIterator
 
 	public function isCurrentTokenValue(string $tokenValue): bool
 	{
-		return strcasecmp($this->tokens[$this->index][Lexer::VALUE_OFFSET], $tokenValue) === 0;
+		return $this->tokens[$this->index][Lexer::VALUE_OFFSET] === $tokenValue;
 	}
 
 
