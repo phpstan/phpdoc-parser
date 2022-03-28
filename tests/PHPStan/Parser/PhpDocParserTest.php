@@ -1162,13 +1162,9 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
-			'OK with multiline conditional type',
+			'OK with nested conditional type',
 			'/**
-			  * @return (
-			  *     T is self::TYPE_STRING
-			  *     ? string
-			  *     : (T is self::TYPE_INT ? int : bool)
-			  * )
+			  * @return (T is self::TYPE_STRING ? string : (T is self::TYPE_INT ? int : bool))
 			  */',
 			new PhpDocNode([
 				new PhpDocTagNode(

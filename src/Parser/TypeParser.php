@@ -66,9 +66,7 @@ class TypeParser
 	private function parseAtomic(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			$type = $this->subParse($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
@@ -194,15 +192,11 @@ class TypeParser
 
 		$targetType = $this->parseAtomic($tokens);
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 		$ifType = $this->parseAtomic($tokens);
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 		$elseType = $this->parseAtomic($tokens);
 

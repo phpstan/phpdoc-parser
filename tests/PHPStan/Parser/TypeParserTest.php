@@ -1121,11 +1121,7 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
-				'(' . PHP_EOL .
-				'  T is self::TYPE_STRING' . PHP_EOL .
-				'    ? string' . PHP_EOL .
-				'    : (T is self::TYPE_INT ? int : bool)' . PHP_EOL .
-				')',
+				'(T is self::TYPE_STRING ? string : (T is self::TYPE_INT ? int : bool))',
 				new ConditionalTypeNode(
 					new IdentifierTypeNode('T'),
 					new ConstTypeNode(new ConstFetchNode('self', 'TYPE_STRING')),
