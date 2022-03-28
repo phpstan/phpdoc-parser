@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="PHPStan deprecation rules">
-	<config name="php_version" value="70100"/>
+	<config name="php_version" value="70200"/>
 	<arg name="colors"/>
 	<arg name="extensions" value="php"/>
 	<arg name="encoding" value="utf-8"/>
