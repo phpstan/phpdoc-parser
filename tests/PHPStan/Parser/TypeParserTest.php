@@ -1004,6 +1004,101 @@ class TypeParserTest extends TestCase
 				'int|array{}',
 				new UnionTypeNode([new IdentifierTypeNode('int'), new ArrayShapeNode([])]),
 			],
+			[
+				'callable(' . PHP_EOL .
+				'  Foo' . PHP_EOL .
+				'): void',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+					],
+					new IdentifierTypeNode('void')
+				),
+			],
+			[
+				'callable(' . PHP_EOL .
+				'  Foo,' . PHP_EOL .
+				'  Bar' . PHP_EOL .
+				'): void',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
+					],
+					new IdentifierTypeNode('void')
+				),
+			],
+			[
+				'callable(' . PHP_EOL .
+				'  Foo, Bar' . PHP_EOL .
+				'): void',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
+					],
+					new IdentifierTypeNode('void')
+				),
+			],
+			[
+				'callable(' . PHP_EOL .
+				'  Foo,' . PHP_EOL .
+				'  callable(' . PHP_EOL .
+				'    Bar' . PHP_EOL .
+				'  ): void' . PHP_EOL .
+				'): void',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+						new CallableTypeParameterNode(
+							new CallableTypeNode(
+								new IdentifierTypeNode('callable'),
+								[
+									new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
+								],
+								new IdentifierTypeNode('void')
+							),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new IdentifierTypeNode('void')
+				),
+			],
+			[
+				'callable(' . PHP_EOL .
+				'  Foo,' . PHP_EOL .
+				'  callable(' . PHP_EOL .
+				'    Bar,' . PHP_EOL .
+				'  ): void' . PHP_EOL .
+				'): void',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+						new CallableTypeParameterNode(
+							new CallableTypeNode(
+								new IdentifierTypeNode('callable'),
+								[
+									new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
+								],
+								new IdentifierTypeNode('void')
+							),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new IdentifierTypeNode('void')
+				),
+			],
 		];
 	}
 

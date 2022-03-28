@@ -3492,6 +3492,89 @@ Finder::findFiles('*.php')
 				),
 			]),
 		];
+
+		yield [
+			'multiline callable types',
+			'/**' . PHP_EOL .
+			' * @param callable(' . PHP_EOL .
+			' *    A, B' . PHP_EOL .
+			' * ): void $foo' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(new IdentifierTypeNode('A'), false, false, '', false),
+								new CallableTypeParameterNode(new IdentifierTypeNode('B'), false, false, '', false),
+							],
+							new IdentifierTypeNode('void')
+						),
+						false,
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'multiline callable types - leading comma',
+			'/**' . PHP_EOL .
+			' * @param callable(' . PHP_EOL .
+			' *    A' . PHP_EOL .
+			' *    , B' . PHP_EOL .
+			' * ): void $foo' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(new IdentifierTypeNode('A'), false, false, '', false),
+								new CallableTypeParameterNode(new IdentifierTypeNode('B'), false, false, '', false),
+							],
+							new IdentifierTypeNode('void')
+						),
+						false,
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'multiline callable types - traling comma',
+			'/**' . PHP_EOL .
+			' * @param callable(' . PHP_EOL .
+			' *    A,' . PHP_EOL .
+			' *    B,' . PHP_EOL .
+			' * ): void $foo' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(new IdentifierTypeNode('A'), false, false, '', false),
+								new CallableTypeParameterNode(new IdentifierTypeNode('B'), false, false, '', false),
+							],
+							new IdentifierTypeNode('void')
+						),
+						false,
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
 	}
 
 	public function provideDescriptionWithOrWithoutHtml(): Iterator
