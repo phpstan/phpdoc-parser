@@ -1101,7 +1101,7 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
-				'Foo is Bar ? never : int',
+				'(Foo is Bar ? never : int)',
 				new ConditionalTypeNode(
 					new IdentifierTypeNode('Foo'),
 					new IdentifierTypeNode('Bar'),
@@ -1111,13 +1111,13 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
-				'Foo is Bar ? never : int',
+				'(Foo is not Bar ? never : int)',
 				new ConditionalTypeNode(
 					new IdentifierTypeNode('Foo'),
 					new IdentifierTypeNode('Bar'),
 					new IdentifierTypeNode('never'),
 					new IdentifierTypeNode('int'),
-					false
+					true
 				),
 			],
 			[

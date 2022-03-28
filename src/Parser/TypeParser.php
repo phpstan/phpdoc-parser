@@ -33,6 +33,26 @@ class TypeParser
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
 				$type = $this->parseIntersection($tokens, $type);
+			}
+		}
+
+		return $type;
+	}
+
+	/** @phpstan-impure */
+	private function subParse(TokenIterator $tokens): Ast\Type\TypeNode
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
+			$type = $this->parseNullable($tokens);
+
+		} else {
+			$type = $this->parseAtomic($tokens);
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+				$type = $this->parseUnion($tokens, $type);
+
+			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+				$type = $this->parseIntersection($tokens, $type);
 			} elseif ($tokens->isCurrentTokenValue('is')) {
 				$type = $this->parseConditional($tokens, $type);
 			}
@@ -47,7 +67,7 @@ class TypeParser
 	{
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-			$type = $this->parse($tokens);
+			$type = $this->subParse($tokens);
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 

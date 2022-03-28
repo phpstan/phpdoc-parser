@@ -1123,7 +1123,7 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'OK with conditional type',
-			'/** @return Foo is Bar ? never : int */',
+			'/** @return (Foo is Bar ? never : int) */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
@@ -1143,7 +1143,7 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'OK with negated conditional type',
-			'/** @return Foo is not Bar ? never : int */',
+			'/** @return (Foo is not Bar ? never : int) */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
@@ -1188,6 +1188,20 @@ class PhpDocParserTest extends TestCase
 							false
 						),
 						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid non-parenthesized conditional type',
+			'/** @return Foo is not Bar ? never : int */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'is not Bar ? never : int'
 					)
 				),
 			]),

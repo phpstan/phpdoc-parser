@@ -3,6 +3,10 @@
 ; ---------------------------------------------------------------------------- ;
 
 Type
+	= Atomic [Union / Intersection]
+	/ Nullable
+
+ParenthesizedType
 	= Atomic [Union / Intersection / Conditional]
 	/ Nullable
 
@@ -21,7 +25,7 @@ Nullable
 Atomic
 	= TokenIdentifier [Generic / Callable / Array]
 	/ TokenThisVariable
-	/ TokenParenthesesOpen Type TokenParenthesesClose [Array]
+	/ TokenParenthesesOpen ParenthesizedType TokenParenthesesClose [Array]
 
 Generic
 	= TokenAngleBracketOpen Type *(TokenComma Type) TokenAngleBracketClose
