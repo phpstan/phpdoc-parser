@@ -39,12 +39,37 @@ class TypeParser
 		return $type;
 	}
 
+	/** @phpstan-impure */
+	private function subParse(TokenIterator $tokens): Ast\Type\TypeNode
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
+			$type = $this->parseNullable($tokens);
+
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
+			$type = $this->parseConditionalForParameter($tokens, $tokens->currentTokenValue());
+
+		} else {
+			$type = $this->parseAtomic($tokens);
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+				$type = $this->parseUnion($tokens, $type);
+
+			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+				$type = $this->parseIntersection($tokens, $type);
+			} elseif ($tokens->isCurrentTokenValue('is')) {
+				$type = $this->parseConditional($tokens, $type);
+			}
+		}
+
+		return $type;
+	}
+
 
 	/** @phpstan-impure */
 	private function parseAtomic(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-			$type = $this->parse($tokens);
+			$type = $this->subParse($tokens);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
@@ -154,6 +179,56 @@ class TypeParser
 		}
 
 		return new Ast\Type\IntersectionTypeNode($types);
+	}
+
+
+	/** @phpstan-impure */
+	private function parseConditional(TokenIterator $tokens, Ast\Type\TypeNode $subjectType): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		$negated = false;
+		if ($tokens->isCurrentTokenValue('not')) {
+			$negated = true;
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		$targetType = $this->parseAtomic($tokens);
+
+		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
+
+		$ifType = $this->parseAtomic($tokens);
+
+		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+
+		$elseType = $this->parseAtomic($tokens);
+
+		return new Ast\Type\ConditionalTypeNode($subjectType, $targetType, $ifType, $elseType, $negated);
+	}
+
+	/** @phpstan-impure */
+	private function parseConditionalForParameter(TokenIterator $tokens, string $parameterName): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
+		$tokens->consumeTokenValue(Lexer::TOKEN_IDENTIFIER, 'is');
+
+		$negated = false;
+		if ($tokens->isCurrentTokenValue('not')) {
+			$negated = true;
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		$targetType = $this->parseAtomic($tokens);
+
+		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
+
+		$ifType = $this->parseAtomic($tokens);
+
+		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+
+		$elseType = $this->parseAtomic($tokens);
+
+		return new Ast\Type\ConditionalTypeForParameterNode($parameterName, $targetType, $ifType, $elseType, $negated);
 	}
 
 

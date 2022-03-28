@@ -12,6 +12,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
@@ -1097,6 +1098,42 @@ class TypeParserTest extends TestCase
 						),
 					],
 					new IdentifierTypeNode('void')
+				),
+			],
+			[
+				'(Foo is Bar ? never : int)',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+					new IdentifierTypeNode('never'),
+					new IdentifierTypeNode('int'),
+					false
+				),
+			],
+			[
+				'(Foo is not Bar ? never : int)',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+					new IdentifierTypeNode('never'),
+					new IdentifierTypeNode('int'),
+					true
+				),
+			],
+			[
+				'(T is self::TYPE_STRING ? string : (T is self::TYPE_INT ? int : bool))',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('T'),
+					new ConstTypeNode(new ConstFetchNode('self', 'TYPE_STRING')),
+					new IdentifierTypeNode('string'),
+					new ConditionalTypeNode(
+						new IdentifierTypeNode('T'),
+						new ConstTypeNode(new ConstFetchNode('self', 'TYPE_INT')),
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('bool'),
+						false
+					),
+					false
 				),
 			],
 		];

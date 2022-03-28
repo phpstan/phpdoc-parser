@@ -6,11 +6,18 @@ Type
 	= Atomic [Union / Intersection]
 	/ Nullable
 
+ParenthesizedType
+	= Atomic [Union / Intersection / Conditional]
+	/ Nullable
+
 Union
 	= 1*(TokenUnion Atomic)
 
 Intersection
 	= 1*(TokenIntersection Atomic)
+
+Conditional
+    = 1*ByteHorizontalWs TokenIs [TokenNot] Atomic TokenNullable Atomic TokenColon Atomic
 
 Nullable
 	= TokenNullable TokenIdentifier [Generic]
@@ -18,7 +25,7 @@ Nullable
 Atomic
 	= TokenIdentifier [Generic / Callable / Array]
 	/ TokenThisVariable
-	/ TokenParenthesesOpen Type TokenParenthesesClose [Array]
+	/ TokenParenthesesOpen ParenthesizedType TokenParenthesesClose [Array]
 
 Generic
 	= TokenAngleBracketOpen Type *(TokenComma Type) TokenAngleBracketClose
@@ -174,6 +181,12 @@ TokenDoubleColon
 
 TokenThisVariable
 	= %x24.74.68.69.73 *ByteHorizontalWs
+
+TokenIs
+    = %x69.73 1*ByteHorizontalWs
+
+TokenNot
+    = %x6E.6F.74 1*ByteHorizontalWs
 
 TokenIdentifier
 	= [ByteBackslash] ByteIdentifierFirst *ByteIdentifierSecond *(ByteBackslash ByteIdentifierFirst *ByteIdentifierSecond) *ByteHorizontalWs
