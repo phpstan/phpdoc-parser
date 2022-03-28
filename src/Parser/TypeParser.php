@@ -45,6 +45,9 @@ class TypeParser
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
 			$type = $this->parseNullable($tokens);
 
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
+			$type = $this->parseConditionalForParameter($tokens, $tokens->currentTokenValue());
+
 		} else {
 			$type = $this->parseAtomic($tokens);
 
@@ -201,6 +204,31 @@ class TypeParser
 		$elseType = $this->parseAtomic($tokens);
 
 		return new Ast\Type\ConditionalTypeNode($subjectType, $targetType, $ifType, $elseType, $negated);
+	}
+
+	/** @phpstan-impure */
+	private function parseConditionalForParameter(TokenIterator $tokens, string $parameterName): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
+		$tokens->consumeTokenValue(Lexer::TOKEN_IDENTIFIER, 'is');
+
+		$negated = false;
+		if ($tokens->isCurrentTokenValue('not')) {
+			$negated = true;
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		$targetType = $this->parseAtomic($tokens);
+
+		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
+
+		$ifType = $this->parseAtomic($tokens);
+
+		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+
+		$elseType = $this->parseAtomic($tokens);
+
+		return new Ast\Type\ConditionalTypeForParameterNode($parameterName, $targetType, $ifType, $elseType, $negated);
 	}
 
 

@@ -94,6 +94,25 @@ class TokenIterator
 	}
 
 
+	/**
+	 * @throws ParserException
+	 */
+	public function consumeTokenValue(int $tokenType, string $tokenValue): void
+	{
+		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType || $this->tokens[$this->index][Lexer::VALUE_OFFSET] !== $tokenValue) {
+			$this->throwError($tokenType, $tokenValue);
+		}
+
+		$this->index++;
+
+		if (($this->tokens[$this->index][Lexer::TYPE_OFFSET] ?? -1) !== Lexer::TOKEN_HORIZONTAL_WS) {
+			return;
+		}
+
+		$this->index++;
+	}
+
+
 	/** @phpstan-impure */
 	public function tryConsumeTokenValue(string $tokenValue): bool
 	{
@@ -191,13 +210,14 @@ class TokenIterator
 	/**
 	 * @throws ParserException
 	 */
-	private function throwError(int $expectedTokenType): void
+	private function throwError(int $expectedTokenType, ?string $expectedTokenValue = null): void
 	{
 		throw new ParserException(
 			$this->currentTokenValue(),
 			$this->currentTokenType(),
 			$this->currentTokenOffset(),
-			$expectedTokenType
+			$expectedTokenType,
+			$expectedTokenValue
 		);
 	}
 
