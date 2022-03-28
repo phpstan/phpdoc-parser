@@ -240,12 +240,19 @@ class TypeParser
 	private function parseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 		$parameters = [];
 		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
 			$parameters[] = $this->parseCallableParameter($tokens);
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
+					break;
+				}
 				$parameters[] = $this->parseCallableParameter($tokens);
+				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			}
 		}
 
