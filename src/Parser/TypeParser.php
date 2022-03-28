@@ -178,15 +178,15 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
-		$trueType = $this->parseAtomic($tokens);
+		$ifType = $this->parseAtomic($tokens);
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
-		$falseType = $this->parseAtomic($tokens);
+		$elseType = $this->parseAtomic($tokens);
 
-		return new Ast\Type\ConditionalTypeNode($subjectType, $targetType, $trueType, $falseType, $negated);
+		return new Ast\Type\ConditionalTypeNode($subjectType, $targetType, $ifType, $elseType, $negated);
 	}
 
 

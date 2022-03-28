@@ -17,20 +17,20 @@ class ConditionalTypeNode implements TypeNode
 	public $targetType;
 
 	/** @var TypeNode */
-	public $trueType;
+	public $if;
 
 	/** @var TypeNode */
-	public $falseType;
+	public $else;
 
 	/** @var bool */
 	public $negated;
 
-	public function __construct(TypeNode $subjectType, TypeNode $targetType, TypeNode $trueType, TypeNode $falseType, bool $negated)
+	public function __construct(TypeNode $subjectType, TypeNode $targetType, TypeNode $if, TypeNode $false, bool $negated)
 	{
 		$this->subjectType = $subjectType;
 		$this->targetType = $targetType;
-		$this->trueType = $trueType;
-		$this->falseType = $falseType;
+		$this->if = $if;
+		$this->else = $false;
 		$this->negated = $negated;
 	}
 
@@ -41,8 +41,8 @@ class ConditionalTypeNode implements TypeNode
 			$this->subjectType,
 			$this->negated ? 'is not' : 'is',
 			$this->targetType,
-			$this->trueType,
-			$this->falseType
+			$this->if,
+			$this->else
 		);
 	}
 
