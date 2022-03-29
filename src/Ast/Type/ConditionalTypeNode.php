@@ -25,12 +25,12 @@ class ConditionalTypeNode implements TypeNode
 	/** @var bool */
 	public $negated;
 
-	public function __construct(TypeNode $subjectType, TypeNode $targetType, TypeNode $if, TypeNode $false, bool $negated)
+	public function __construct(TypeNode $subjectType, TypeNode $targetType, TypeNode $if, TypeNode $else, bool $negated)
 	{
 		$this->subjectType = $subjectType;
 		$this->targetType = $targetType;
 		$this->if = $if;
-		$this->else = $false;
+		$this->else = $else;
 		$this->negated = $negated;
 	}
 
