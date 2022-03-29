@@ -37,7 +37,7 @@ class ConditionalTypeForParameterNode implements TypeNode
 	public function __toString(): string
 	{
 		return sprintf(
-			'%s %s %s ? %s : %s',
+			'(%s %s %s ? %s : %s)',
 			$this->parameterName,
 			$this->negated ? 'is not' : 'is',
 			$this->targetType,
