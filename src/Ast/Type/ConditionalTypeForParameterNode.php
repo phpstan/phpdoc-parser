@@ -25,12 +25,12 @@ class ConditionalTypeForParameterNode implements TypeNode
 	/** @var bool */
 	public $negated;
 
-	public function __construct(string $parameterName, TypeNode $targetType, TypeNode $if, TypeNode $false, bool $negated)
+	public function __construct(string $parameterName, TypeNode $targetType, TypeNode $if, TypeNode $else, bool $negated)
 	{
 		$this->parameterName = $parameterName;
 		$this->targetType = $targetType;
 		$this->if = $if;
-		$this->else = $false;
+		$this->else = $else;
 		$this->negated = $negated;
 	}
 
