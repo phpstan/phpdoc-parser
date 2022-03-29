@@ -37,7 +37,7 @@ class ConditionalTypeNode implements TypeNode
 	public function __toString(): string
 	{
 		return sprintf(
-			'%s %s %s ? %s : %s',
+			'(%s %s %s ? %s : %s)',
 			$this->subjectType,
 			$this->negated ? 'is not' : 'is',
 			$this->targetType,
