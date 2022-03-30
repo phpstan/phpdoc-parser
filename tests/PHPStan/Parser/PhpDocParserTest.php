@@ -2818,6 +2818,119 @@ some text in the middle'
 					),
 				]),
 			],
+			[
+				'OK with multiline conditional return type',
+				'/**
+				  * @template TRandKey as array-key
+				  * @template TRandVal
+				  * @template TRandList as array<TRandKey, TRandVal>|XIterator<TRandKey, TRandVal>|Traversable<TRandKey, TRandVal>
+				  *
+				  * @param TRandList $list
+				  *
+				  * @return (
+				  *        TRandList is array ? array<TRandKey, TRandVal> : (
+				  *        TRandList is XIterator ?    XIterator<TRandKey, TRandVal> :
+				  *        IteratorIterator<TRandKey, TRandVal>|LimitIterator<TRandKey, TRandVal>
+				  * ))
+				  */',
+				new PhpDocNode([
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode('TRandKey', new IdentifierTypeNode('array-key'), '')
+					),
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode('TRandVal', null, '')
+					),
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode(
+							'TRandList',
+							new UnionTypeNode([
+								new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('TRandKey'),
+										new IdentifierTypeNode('TRandVal'),
+									]
+								),
+								new GenericTypeNode(
+									new IdentifierTypeNode('XIterator'),
+									[
+										new IdentifierTypeNode('TRandKey'),
+										new IdentifierTypeNode('TRandVal'),
+									]
+								),
+								new GenericTypeNode(
+									new IdentifierTypeNode('Traversable'),
+									[
+										new IdentifierTypeNode('TRandKey'),
+										new IdentifierTypeNode('TRandVal'),
+									]
+								),
+							]),
+							''
+						)
+					),
+					new PhpDocTextNode(''),
+					new PhpDocTagNode(
+						'@param',
+						new ParamTagValueNode(
+							new IdentifierTypeNode('TRandList'),
+							false,
+							'$list',
+							''
+						)
+					),
+					new PhpDocTextNode(''),
+					new PhpDocTagNode(
+						'@return',
+						new ReturnTagValueNode(
+							new ConditionalTypeNode(
+								new IdentifierTypeNode('TRandList'),
+								new IdentifierTypeNode('array'),
+								new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('TRandKey'),
+										new IdentifierTypeNode('TRandVal'),
+									]
+								),
+								new ConditionalTypeNode(
+									new IdentifierTypeNode('TRandList'),
+									new IdentifierTypeNode('XIterator'),
+									new GenericTypeNode(
+										new IdentifierTypeNode('XIterator'),
+										[
+											new IdentifierTypeNode('TRandKey'),
+											new IdentifierTypeNode('TRandVal'),
+										]
+									),
+									new UnionTypeNode([
+										new GenericTypeNode(
+											new IdentifierTypeNode('IteratorIterator'),
+											[
+												new IdentifierTypeNode('TRandKey'),
+												new IdentifierTypeNode('TRandVal'),
+											]
+										),
+										new GenericTypeNode(
+											new IdentifierTypeNode('LimitIterator'),
+											[
+												new IdentifierTypeNode('TRandKey'),
+												new IdentifierTypeNode('TRandVal'),
+											]
+										),
+									]),
+									false
+								),
+								false
+							),
+							''
+						)
+					),
+				]),
+			],
 		];
 	}
 
