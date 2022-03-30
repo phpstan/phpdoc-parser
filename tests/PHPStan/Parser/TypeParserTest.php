@@ -150,6 +150,17 @@ class TypeParserTest extends TestCase
 				]),
 			],
 			[
+				'(' . PHP_EOL .
+				'  string' . PHP_EOL .
+				'  &' . PHP_EOL .
+				'  int' . PHP_EOL .
+				')',
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('string'),
+					new IdentifierTypeNode('int'),
+				]),
+			],
+			[
 				'string & int & float',
 				new IntersectionTypeNode([
 					new IdentifierTypeNode('string'),
@@ -1131,6 +1142,69 @@ class TypeParserTest extends TestCase
 						new ConstTypeNode(new ConstFetchNode('self', 'TYPE_INT')),
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('bool'),
+						false
+					),
+					false
+				),
+			],
+			[
+				'(Foo is Bar|Baz ? never : int|string)',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('Foo'),
+					new UnionTypeNode([
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('Baz'),
+					]),
+					new IdentifierTypeNode('never'),
+					new UnionTypeNode([
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('string'),
+					]),
+					false
+				),
+			],
+			[
+				'(' . PHP_EOL .
+				'  TRandList is array ? array<TRandKey, TRandVal> : (' . PHP_EOL .
+				'  TRandList is XIterator ? XIterator<TRandKey, TRandVal> :' . PHP_EOL .
+				'  IteratorIterator<TRandKey, TRandVal>|LimitIterator<TRandKey, TRandVal>' . PHP_EOL .
+				'))',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('TRandList'),
+					new IdentifierTypeNode('array'),
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('TRandKey'),
+							new IdentifierTypeNode('TRandVal'),
+						]
+					),
+					new ConditionalTypeNode(
+						new IdentifierTypeNode('TRandList'),
+						new IdentifierTypeNode('XIterator'),
+						new GenericTypeNode(
+							new IdentifierTypeNode('XIterator'),
+							[
+								new IdentifierTypeNode('TRandKey'),
+								new IdentifierTypeNode('TRandVal'),
+							]
+						),
+						new UnionTypeNode([
+							new GenericTypeNode(
+								new IdentifierTypeNode('IteratorIterator'),
+								[
+									new IdentifierTypeNode('TRandKey'),
+									new IdentifierTypeNode('TRandVal'),
+								]
+							),
+							new GenericTypeNode(
+								new IdentifierTypeNode('LimitIterator'),
+								[
+									new IdentifierTypeNode('TRandKey'),
+									new IdentifierTypeNode('TRandVal'),
+								]
+							),
+						]),
 						false
 					),
 					false
