@@ -1231,7 +1231,7 @@ class TypeParserTest extends TestCase
 				'(' . PHP_EOL .
 				'  $foo is Bar|Baz' . PHP_EOL .
 				'    ? never' . PHP_EOL .
-		        '    : int|string' . PHP_EOL .
+				'    : int|string' . PHP_EOL .
 				')',
 				new ConditionalTypeForParameterNode(
 					'$foo',
