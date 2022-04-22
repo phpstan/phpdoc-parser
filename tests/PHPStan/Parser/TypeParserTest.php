@@ -12,6 +12,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
@@ -1207,6 +1208,42 @@ class TypeParserTest extends TestCase
 						]),
 						false
 					),
+					false
+				),
+			],
+			[
+				'($foo is Bar|Baz ? never : int|string)',
+				new ConditionalTypeForParameterNode(
+					'$foo',
+					new UnionTypeNode([
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('Baz'),
+					]),
+					new IdentifierTypeNode('never'),
+					new UnionTypeNode([
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('string'),
+					]),
+					false
+				),
+			],
+			[
+				'(' . PHP_EOL .
+				'  $foo is Bar|Baz' . PHP_EOL .
+				'    ? never' . PHP_EOL .
+				'    : int|string' . PHP_EOL .
+				')',
+				new ConditionalTypeForParameterNode(
+					'$foo',
+					new UnionTypeNode([
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('Baz'),
+					]),
+					new IdentifierTypeNode('never'),
+					new UnionTypeNode([
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('string'),
+					]),
 					false
 				),
 			],
