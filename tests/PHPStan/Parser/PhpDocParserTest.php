@@ -37,6 +37,7 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
@@ -969,6 +970,23 @@ class PhpDocParserTest extends TestCase
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'[Bar]'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with offset access type',
+			'/** @return Foo[Bar] */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new OffsetAccessTypeNode(
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar')
+						),
+						''
 					)
 				),
 			]),

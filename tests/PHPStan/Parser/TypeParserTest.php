@@ -19,6 +19,7 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -746,6 +747,13 @@ class TypeParserTest extends TestCase
 				'array [ int ]',
 				new IdentifierTypeNode('array'),
 				Lexer::TOKEN_OPEN_SQUARE_BRACKET,
+			],
+			[
+				'array[ int ]',
+				new OffsetAccessTypeNode(
+					new IdentifierTypeNode('array'),
+					new IdentifierTypeNode('int')
+				),
 			],
 			[
 				"?\t\xA009", // edge-case with \h
