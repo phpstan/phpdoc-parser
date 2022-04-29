@@ -205,6 +205,11 @@ class PhpDocParser
 					$tagValue = $this->parseTypeAliasImportTagValue($tokens);
 					break;
 
+				case '@phpstan-assert':
+				case '@psalm-assert':
+					$tagValue = $this->parseAssertTagValue($tokens);
+					break;
+
 				default:
 					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
 					break;
@@ -418,6 +423,14 @@ class PhpDocParser
 		}
 
 		return new Ast\PhpDoc\TypeAliasImportTagValueNode($importedAlias, new IdentifierTypeNode($importedFrom), $importedAs);
+	}
+
+	private function parseAssertTagValue(TokenIterator $tokens): Ast\PhpDoc\AssertTagValueNode
+	{
+		$type = $this->typeParser->parse($tokens);
+		$parameter = $this->parseRequiredVariableName($tokens);
+		$description = $this->parseOptionalDescription($tokens);
+		return new Ast\PhpDoc\AssertTagValueNode($type, $parameter, $description);
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
