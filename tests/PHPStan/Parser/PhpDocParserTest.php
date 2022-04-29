@@ -8,6 +8,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
@@ -75,6 +76,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideExtendsTagsData
 	 * @dataProvider provideTypeAliasTagsData
 	 * @dataProvider provideTypeAliasImportTagsData
+	 * @dataProvider provideAssertTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 */
@@ -3473,6 +3475,91 @@ some text in the middle'
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							25,
 							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideAssertTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @phpstan-assert Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with psalm syntax',
+			'/** @psalm-assert Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-assert Type $var assert Type to $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						'assert Type to $var'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with union type',
+			'/** @phpstan-assert Type|Other $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new UnionTypeNode([
+							new IdentifierTypeNode('Type'),
+							new IdentifierTypeNode('Other'),
+						]),
+						'$var',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid $this->method()',
+			'/** @phpstan-assert Type $this->method() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new InvalidTagValueNode(
+						'Type $this->method()',
+						new ParserException(
+							'$this',
+							Lexer::TOKEN_THIS_VARIABLE,
+							25,
+							Lexer::TOKEN_VARIABLE
 						)
 					)
 				),
