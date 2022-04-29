@@ -272,6 +272,20 @@ class PhpDocNode implements Node
 	}
 
 
+	/**
+	 * @return AssertTagValueNode[]
+	 */
+	public function getAssertTagValues(string $tagName = '@phpstan-assert'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof AssertTagValueNode;
+			}
+		);
+	}
+
+
 	public function __toString(): string
 	{
 		$children = array_map(
