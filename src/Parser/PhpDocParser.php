@@ -206,7 +206,11 @@ class PhpDocParser
 					break;
 
 				case '@phpstan-assert':
+				case '@phpstan-assert-if-true':
+				case '@phpstan-assert-if-false':
 				case '@psalm-assert':
+				case '@psalm-assert-if-true':
+				case '@psalm-assert-if-false':
 					$tagValue = $this->parseAssertTagValue($tokens);
 					break;
 

@@ -3565,6 +3565,35 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'OK assert-if-true',
+			'/** @phpstan-assert-if-true Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert-if-true',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						''
+					)
+				),
+			]),
+		];
+		yield [
+			'OK assert-if-false',
+			'/** @phpstan-assert-if-false Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert-if-false',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						''
+					)
+				),
+			]),
+		];
 	}
 
 	public function providerDebug(): Iterator
