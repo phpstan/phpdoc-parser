@@ -431,10 +431,11 @@ class PhpDocParser
 
 	private function parseAssertTagValue(TokenIterator $tokens): Ast\PhpDoc\AssertTagValueNode
 	{
+		$isNegated = $tokens->tryConsumeTokenType(Lexer::TOKEN_NEGATED);
 		$type = $this->typeParser->parse($tokens);
 		$parameter = $this->parseRequiredVariableName($tokens);
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\AssertTagValueNode($type, $parameter, $description);
+		return new Ast\PhpDoc\AssertTagValueNode($type, $parameter, $isNegated, $description);
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string

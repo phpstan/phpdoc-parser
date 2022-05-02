@@ -3493,6 +3493,7 @@ some text in the middle'
 					new AssertTagValueNode(
 						new IdentifierTypeNode('Type'),
 						'$var',
+						false,
 						''
 					)
 				),
@@ -3508,6 +3509,7 @@ some text in the middle'
 					new AssertTagValueNode(
 						new IdentifierTypeNode('Type'),
 						'$var',
+						false,
 						''
 					)
 				),
@@ -3523,6 +3525,7 @@ some text in the middle'
 					new AssertTagValueNode(
 						new IdentifierTypeNode('Type'),
 						'$var',
+						false,
 						'assert Type to $var'
 					)
 				),
@@ -3541,6 +3544,7 @@ some text in the middle'
 							new IdentifierTypeNode('Other'),
 						]),
 						'$var',
+						false,
 						''
 					)
 				),
@@ -3575,11 +3579,13 @@ some text in the middle'
 					new AssertTagValueNode(
 						new IdentifierTypeNode('Type'),
 						'$var',
+						false,
 						''
 					)
 				),
 			]),
 		];
+
 		yield [
 			'OK assert-if-false',
 			'/** @phpstan-assert-if-false Type $var */',
@@ -3589,6 +3595,23 @@ some text in the middle'
 					new AssertTagValueNode(
 						new IdentifierTypeNode('Type'),
 						'$var',
+						false,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK negated',
+			'/** @phpstan-assert !Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						true,
 						''
 					)
 				),
