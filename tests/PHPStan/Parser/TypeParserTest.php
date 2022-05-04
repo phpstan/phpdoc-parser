@@ -20,8 +20,10 @@ use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\StarProjectionNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeProjectionNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
@@ -1314,6 +1316,51 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_VARIABLE,
 					15,
 					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'Foo<covariant Bar, Baz>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new TypeProjectionNode(
+							new IdentifierTypeNode('Bar'),
+							'covariant'
+						),
+						new IdentifierTypeNode('Baz'),
+					]
+				),
+			],
+			[
+				'Foo<Bar, contravariant Baz>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new IdentifierTypeNode('Bar'),
+						new TypeProjectionNode(
+							new IdentifierTypeNode('Baz'),
+							'contravariant'
+						),
+					]
+				),
+			],
+			[
+				'Foo<covariant>',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					13,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'Foo<Bar, *>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new IdentifierTypeNode('Bar'),
+						new StarProjectionNode(),
+					]
 				),
 			],
 		];

@@ -323,7 +323,7 @@ class TypeParser
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-		$genericTypes = [$this->parse($tokens)];
+		$genericTypes = [$this->parseGenericTypeArgument($tokens)];
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
@@ -333,7 +333,7 @@ class TypeParser
 				// trailing comma case
 				return new Ast\Type\GenericTypeNode($baseType, $genericTypes);
 			}
-			$genericTypes[] = $this->parse($tokens);
+			$genericTypes[] = $this->parseGenericTypeArgument($tokens);
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		}
 
@@ -341,6 +341,27 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 
 		return new Ast\Type\GenericTypeNode($baseType, $genericTypes);
+	}
+
+
+	/** @phpstan-impure */
+	public function parseGenericTypeArgument(TokenIterator $tokens): Ast\Type\TypeNode
+	{
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
+			return new Ast\Type\StarProjectionNode();
+		}
+
+		if ($tokens->tryConsumeTokenValue('contravariant')) {
+			$variance = 'contravariant';
+		} elseif ($tokens->tryConsumeTokenValue('covariant')) {
+			$variance = 'covariant';
+		} else {
+			return $this->parse($tokens);
+		}
+
+		$type = $this->parse($tokens);
+
+		return new Ast\Type\TypeProjectionNode($type, $variance);
 	}
 
 
