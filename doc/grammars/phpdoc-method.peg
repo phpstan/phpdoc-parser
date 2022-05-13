@@ -20,7 +20,7 @@ MethodParametersInner
   = MethodParameter (',' MethodParameter)*
 
 MethodParameter
-  = MethodParameterType? IsReference? IsVariaric? MethodParameterName MethodParameterDefaultValue?
+  = MethodParameterType? IsReference? IsVariadic? MethodParameterName MethodParameterDefaultValue?
 
 MethodParameterType
   = Type
@@ -28,7 +28,7 @@ MethodParameterType
 IsReference
   = '&'
 
-IsVariaric
+IsVariadic
   = '...'
 
 MethodParameterName

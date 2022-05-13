@@ -7,7 +7,7 @@ AnnotationName
 IsReference
   = '&'
 
-IsVariaric
+IsVariadic
   = '...'
 
 ParameterName
