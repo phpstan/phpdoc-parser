@@ -3679,7 +3679,8 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							35,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							'from'
 						)
 					)
 				),
@@ -3698,7 +3699,8 @@ some text in the middle'
 							'as',
 							Lexer::TOKEN_IDENTIFIER,
 							35,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							'from'
 						)
 					)
 				),

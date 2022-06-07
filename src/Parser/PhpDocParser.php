@@ -429,14 +429,7 @@ class PhpDocParser
 		$importedAlias = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
-		if (!$tokens->tryConsumeTokenValue('from')) {
-			throw new ParserException(
-				$tokens->currentTokenValue(),
-				$tokens->currentTokenType(),
-				$tokens->currentTokenOffset(),
-				Lexer::TOKEN_IDENTIFIER
-			);
-		}
+		$tokens->consumeTokenValue(Lexer::TOKEN_IDENTIFIER, 'from');
 
 		$importedFrom = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
