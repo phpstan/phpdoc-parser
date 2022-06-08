@@ -27,6 +27,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TypelessParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -64,6 +65,7 @@ class PhpDocParserTest extends TestCase
 	/**
 	 * @dataProvider provideTagsWithNumbers
 	 * @dataProvider provideParamTagsData
+	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
@@ -395,6 +397,86 @@ class PhpDocParserTest extends TestCase
 		];
 	}
 
+	public function provideTypelessParamTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @param $foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new TypelessParamTagValueNode(
+						false,
+						'$foo',
+						'description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK reference',
+			'/** @param &$foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new TypelessParamTagValueNode(
+						false,
+						'$foo',
+						'description',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK variadic',
+			'/** @param ...$foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new TypelessParamTagValueNode(
+						true,
+						'$foo',
+						'description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK reference variadic',
+			'/** @param &...$foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new TypelessParamTagValueNode(
+						true,
+						'$foo',
+						'description',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without type and description',
+			'/** @param $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new TypelessParamTagValueNode(
+						false,
+						'$foo',
+						'',
+						false
+					)
+				),
+			]),
+		];
+	}
 
 	public function provideVarTagsData(): Iterator
 	{
