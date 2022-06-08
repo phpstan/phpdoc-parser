@@ -20,7 +20,7 @@ Conditional
     = 1*ByteHorizontalWs TokenIs [TokenNot] Atomic TokenNullable Atomic TokenColon Atomic
 
 Nullable
-	= TokenNullable TokenIdentifier [Generic]
+	= TokenNullable Atomic
 
 Atomic
 	= TokenIdentifier [Generic / Callable / Array]
