@@ -1255,6 +1255,17 @@ class TypeParserTest extends TestCase
 					false
 				),
 			],
+			[
+				'?Currency::CURRENCY_*',
+				new NullableTypeNode(
+					new ConstTypeNode(
+						new ConstFetchNode(
+							'Currency',
+							'CURRENCY_*'
+						)
+					)
+				),
+			],
 		];
 	}
 
