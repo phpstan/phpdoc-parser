@@ -243,6 +243,72 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
+			'OK without type',
+			'/** @param $foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						null,
+						false,
+						'$foo',
+						'description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK reference without type',
+			'/** @param &$foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						null,
+						false,
+						'$foo',
+						'description',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK variadic without type',
+			'/** @param ...$foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						null,
+						true,
+						'$foo',
+						'description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK reference variadic without type',
+			'/** @param &...$foo description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						null,
+						true,
+						'$foo',
+						'description',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
 			'invalid without type, parameter name and description',
 			'/** @param */',
 			new PhpDocNode([
@@ -388,6 +454,25 @@ class PhpDocParserTest extends TestCase
 							Lexer::TOKEN_IDENTIFIER,
 							15,
 							Lexer::TOKEN_VARIABLE
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @param $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'$foo',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							16,
+							Lexer::TOKEN_OTHER
 						)
 					)
 				),

@@ -8,6 +8,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\ShouldNotHappenException;
 use function array_values;
 use function count;
+use function strlen;
 use function trim;
 
 class PhpDocParser
@@ -232,11 +233,20 @@ class PhpDocParser
 
 	private function parseParamTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamTagValueNode
 	{
-		$type = $this->typeParser->parse($tokens);
+		if (
+			$tokens->isCurrentTokenType(Lexer::TOKEN_REFERENCE)
+			|| $tokens->isCurrentTokenType(Lexer::TOKEN_VARIADIC)
+			|| $tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)
+		) {
+			$type = null;
+		} else {
+			$type = $this->typeParser->parse($tokens);
+		}
+
 		$isReference = $tokens->tryConsumeTokenType(Lexer::TOKEN_REFERENCE);
 		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $type === null ? $this->parseRequiredDescription($tokens) : $this->parseOptionalDescription($tokens);
 		return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description, $isReference);
 	}
 
@@ -463,6 +473,22 @@ class PhpDocParser
 		return $parameterName;
 	}
 
+	private function parseRequiredDescription(TokenIterator $tokens): string
+	{
+		$tokens->pushSavePoint();
+
+		$description = $this->parseOptionalDescription($tokens);
+
+		if (strlen($description) === 0) {
+			$tokens->rollback();
+
+			$tokens->consumeTokenType(Lexer::TOKEN_OTHER);
+		}
+
+		$tokens->dropSavePoint();
+
+		return $description;
+	}
 
 	private function parseOptionalDescription(TokenIterator $tokens, bool $limitStartToken = false): string
 	{
