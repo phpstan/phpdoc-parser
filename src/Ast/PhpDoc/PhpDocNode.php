@@ -77,7 +77,7 @@ class PhpDocNode implements Node
 
 
 	/**
-	 * @return ParamTagValueNode[]
+	 * @return TypelessParamTagValueNode[]
 	 */
 	public function getTypelessParamTagValues(string $tagName = '@param'): array
 	{
