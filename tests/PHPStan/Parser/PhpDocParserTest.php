@@ -1310,6 +1310,58 @@ class PhpDocParserTest extends TestCase
 				),
 			]),
 		];
+
+		yield [
+			'OK variadic callable',
+			'/** @return \Closure(int ...$u, string): string */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new CallableTypeNode(
+							new IdentifierTypeNode('\Closure'),
+							[
+								new CallableTypeParameterNode(
+									new IdentifierTypeNode('int'),
+									false,
+									true,
+									'$u',
+									false
+								),
+								new CallableTypeParameterNode(
+									new IdentifierTypeNode('string'),
+									false,
+									false,
+									'',
+									false
+								),
+							],
+							new IdentifierTypeNode('string')
+						),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid variadic callable',
+			'/** @return \Closure(...int, string): string */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode(
+						'\Closure(...int, string): string',
+						new ParserException(
+							'(',
+							Lexer::TOKEN_OPEN_PARENTHESES,
+							20,
+							Lexer::TOKEN_HORIZONTAL_WS
+						)
+					)
+				),
+			]),
+		];
 	}
 
 
@@ -2104,10 +2156,14 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@var',
-					new VarTagValueNode(
-						new IdentifierTypeNode('callable'),
-						'',
-						'(int)'
+					new InvalidTagValueNode(
+						'callable(int)',
+						new ParserException(
+							'(',
+							Lexer::TOKEN_OPEN_PARENTHESES,
+							17,
+							Lexer::TOKEN_HORIZONTAL_WS
+						)
 					)
 				),
 			]),
@@ -4076,14 +4132,14 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
-					new ReturnTagValueNode(
-						new GenericTypeNode(
-							new IdentifierTypeNode('Foo'),
-							[
-								new IdentifierTypeNode('strong'),
-							]
-						),
-						'Important description'
+					new InvalidTagValueNode(
+						'Foo <strong>Important description',
+						new ParserException(
+							'Important',
+							Lexer::TOKEN_IDENTIFIER,
+							27,
+							Lexer::TOKEN_HORIZONTAL_WS
+						)
 					)
 				),
 			]),
