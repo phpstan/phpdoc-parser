@@ -611,6 +611,36 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
+			'OK with no description and no trailing whitespace',
+			'/** @var Foo $var*/',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$var',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with no variable name and description and no trailing whitespace',
+			'/** @var Foo*/',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
 			'invalid without type, variable name and description',
 			'/** @var */',
 			new PhpDocNode([

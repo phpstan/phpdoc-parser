@@ -90,7 +90,7 @@ class PhpDocParser
 			$tokens->pushSavePoint();
 			$tokens->next();
 
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG) || $tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL) || $tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC) || $tokens->isCurrentTokenType(Lexer::TOKEN_END)) {
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)) {
 				$tokens->rollback();
 				break;
 			}
@@ -475,7 +475,10 @@ class PhpDocParser
 				$tokens->consumeTokenType(Lexer::TOKEN_OTHER); // will throw exception
 			}
 
-			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL) && !$tokens->isPrecededByHorizontalWhitespace()) {
+			if (
+				!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)
+				&& !$tokens->isPrecededByHorizontalWhitespace()
+			) {
 				$tokens->consumeTokenType(Lexer::TOKEN_HORIZONTAL_WS); // will throw exception
 			}
 		}
