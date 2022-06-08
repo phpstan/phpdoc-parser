@@ -8,7 +8,6 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\ShouldNotHappenException;
 use function array_values;
 use function count;
-use function strlen;
 use function trim;
 
 class PhpDocParser
