@@ -474,6 +474,10 @@ class PhpDocParser
 
 				$tokens->consumeTokenType(Lexer::TOKEN_OTHER); // will throw exception
 			}
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL) && !$tokens->isPrecededByHorizontalWhitespace()) {
+				$tokens->consumeTokenType(Lexer::TOKEN_HORIZONTAL_WS); // will throw exception
+			}
 		}
 
 		return $this->parseText($tokens)->text;
