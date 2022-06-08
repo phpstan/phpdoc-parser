@@ -1265,7 +1265,7 @@ class TypeParserTest extends TestCase
 						)
 					)
 				),
-			]
+			],
 		];
 	}
 
