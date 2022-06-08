@@ -462,19 +462,16 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
-			'invalid without type and description',
+			'OK without type and description',
 			'/** @param $foo */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@param',
-					new InvalidTagValueNode(
+					new TypelessParamTagValueNode(
+						false,
 						'$foo',
-						new ParserException(
-							'*/',
-							Lexer::TOKEN_CLOSE_PHPDOC,
-							16,
-							Lexer::TOKEN_OTHER
-						)
+						'',
+						false
 					)
 				),
 			]),

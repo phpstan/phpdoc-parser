@@ -249,13 +249,12 @@ class PhpDocParser
 		$isReference = $tokens->tryConsumeTokenType(Lexer::TOKEN_REFERENCE);
 		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
 		$parameterName = $this->parseRequiredVariableName($tokens);
+		$description = $this->parseOptionalDescription($tokens);
 
 		if ($type !== null) {
-			$description = $this->parseOptionalDescription($tokens);
 			return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description, $isReference);
 		}
 
-		$description = $this->parseRequiredDescription($tokens);
 		return new Ast\PhpDoc\TypelessParamTagValueNode($isVariadic, $parameterName, $description, $isReference);
 	}
 
@@ -480,23 +479,6 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
 
 		return $parameterName;
-	}
-
-	private function parseRequiredDescription(TokenIterator $tokens): string
-	{
-		$tokens->pushSavePoint();
-
-		$description = $this->parseOptionalDescription($tokens);
-
-		if (strlen($description) === 0) {
-			$tokens->rollback();
-
-			$tokens->consumeTokenType(Lexer::TOKEN_OTHER);
-		}
-
-		$tokens->dropSavePoint();
-
-		return $description;
 	}
 
 	private function parseOptionalDescription(TokenIterator $tokens, bool $limitStartToken = false): string
