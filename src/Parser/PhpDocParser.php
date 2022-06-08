@@ -231,7 +231,10 @@ class PhpDocParser
 	}
 
 
-	private function parseParamTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamTagValueNode
+	/**
+	 * @return Ast\PhpDoc\ParamTagValueNode|Ast\PhpDoc\TypelessParamTagValueNode
+	 */
+	private function parseParamTagValue(TokenIterator $tokens): Ast\PhpDoc\PhpDocTagValueNode
 	{
 		if (
 			$tokens->isCurrentTokenType(Lexer::TOKEN_REFERENCE)
@@ -246,8 +249,14 @@ class PhpDocParser
 		$isReference = $tokens->tryConsumeTokenType(Lexer::TOKEN_REFERENCE);
 		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $type === null ? $this->parseRequiredDescription($tokens) : $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description, $isReference);
+
+		if ($type !== null) {
+			$description = $this->parseOptionalDescription($tokens);
+			return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description, $isReference);
+		}
+
+		$description = $this->parseRequiredDescription($tokens);
+		return new Ast\PhpDoc\TypelessParamTagValueNode($isVariadic, $parameterName, $description, $isReference);
 	}
 
 

@@ -3,16 +3,12 @@
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
-use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use function trim;
 
-class ParamTagValueNode implements PhpDocTagValueNode
+class TypelessParamTagValueNode implements PhpDocTagValueNode
 {
 
 	use NodeAttributes;
-
-	/** @var TypeNode */
-	public $type;
 
 	/** @var bool */
 	public $isReference;
@@ -23,12 +19,11 @@ class ParamTagValueNode implements PhpDocTagValueNode
 	/** @var string */
 	public $parameterName;
 
-	/** @var string (may be empty) */
+	/** @var string */
 	public $description;
 
-	public function __construct(TypeNode $type, bool $isVariadic, string $parameterName, string $description, bool $isReference = false)
+	public function __construct(bool $isVariadic, string $parameterName, string $description, bool $isReference = false)
 	{
-		$this->type = $type;
 		$this->isReference = $isReference;
 		$this->isVariadic = $isVariadic;
 		$this->parameterName = $parameterName;
@@ -40,7 +35,7 @@ class ParamTagValueNode implements PhpDocTagValueNode
 	{
 		$reference = $this->isReference ? '&' : '';
 		$variadic = $this->isVariadic ? '...' : '';
-		return trim("{$this->type} {$reference}{$variadic}{$this->parameterName} {$this->description}");
+		return trim("{$reference}{$variadic}{$this->parameterName} {$this->description}");
 	}
 
 }
