@@ -53,12 +53,17 @@ class PhpDocParserTest extends TestCase
 	/** @var PhpDocParser */
 	private $phpDocParser;
 
+	/** @var PhpDocParser */
+	private $phpDocParserWithRequiredWhitespaceBeforeDescription;
+
 	protected function setUp(): void
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
 		$constExprParser = new ConstExprParser();
-		$this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser), $constExprParser);
+		$typeParser = new TypeParser($constExprParser);
+		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true);
 	}
 
 
@@ -83,14 +88,37 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 */
-	public function testParse(string $label, string $input, PhpDocNode $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END): void
+	public function testParse(
+		string $label,
+		string $input,
+		PhpDocNode $expectedPhpDocNode,
+		?PhpDocNode $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode = null
+	): void
+	{
+		$this->executeTestParse(
+			$this->phpDocParser,
+			$label,
+			$input,
+			$expectedPhpDocNode
+		);
+
+		$this->executeTestParse(
+			$this->phpDocParserWithRequiredWhitespaceBeforeDescription,
+			$label,
+			$input,
+			$withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode ?? $expectedPhpDocNode
+		);
+	}
+
+
+	private function executeTestParse(PhpDocParser $phpDocParser, string $label, string $input, PhpDocNode $expectedPhpDocNode): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
-		$actualPhpDocNode = $this->phpDocParser->parse($tokens);
+		$actualPhpDocNode = $phpDocParser->parse($tokens);
 
 		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
-		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
 	}
 
 
@@ -665,6 +693,16 @@ class PhpDocParserTest extends TestCase
 		yield [
 			'OK with variable name and description and without all optional spaces',
 			'/** @var(Foo)$foo#desc*/',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$foo',
+						'#desc'
+					)
+				),
+			]),
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@var',
@@ -1459,6 +1497,15 @@ class PhpDocParserTest extends TestCase
 		yield [
 			'invalid variadic callable',
 			'/** @return \Closure(...int, string): string */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('\Closure'),
+						'(...int, string): string'
+					)
+				),
+			]),
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
@@ -2265,6 +2312,16 @@ class PhpDocParserTest extends TestCase
 		yield [
 			'callable with incomplete signature without return type',
 			'/** @var callable(int) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new IdentifierTypeNode('callable'),
+						'',
+						'(int)'
+					)
+				),
+			]),
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@var',
@@ -4244,6 +4301,20 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
+					new ReturnTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('Foo'),
+							[
+								new IdentifierTypeNode('strong'),
+							]
+						),
+						'Important description'
+					)
+				),
+			]),
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
 					new InvalidTagValueNode(
 						'Foo <strong>Important description',
 						new ParserException(
@@ -4305,14 +4376,20 @@ Finder::findFiles('*.php')
 	 * @dataProvider dataParseTagValue
 	 * @param PhpDocNode $expectedPhpDocNode
 	 */
-	public function testParseTagValue(string $tag, string $phpDoc, Node $expectedPhpDocNode, int $nextTokenType = Lexer::TOKEN_END): void
+	public function testParseTagValue(string $tag, string $phpDoc, Node $expectedPhpDocNode): void
+	{
+		$this->executeTestParseTagValue($this->phpDocParser, $tag, $phpDoc, $expectedPhpDocNode);
+		$this->executeTestParseTagValue($this->phpDocParserWithRequiredWhitespaceBeforeDescription, $tag, $phpDoc, $expectedPhpDocNode);
+	}
+
+	private function executeTestParseTagValue(PhpDocParser $phpDocParser, string $tag, string $phpDoc, Node $expectedPhpDocNode): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
-		$actualPhpDocNode = $this->phpDocParser->parseTagValue($tokens, $tag);
+		$actualPhpDocNode = $phpDocParser->parseTagValue($tokens, $tag);
 
 		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode);
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
-		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
 	}
 
 }
