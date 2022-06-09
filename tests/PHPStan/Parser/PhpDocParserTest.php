@@ -4392,4 +4392,22 @@ Finder::findFiles('*.php')
 		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
 	}
 
+	public function testBug132(): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize('/**
+ * @see \Symplify\SymfonyStaticDumper\Tests\Application\SymfonyStaticDumperApplicationTest
+ */'));
+		$phpDocNode = $this->phpDocParser->parse($tokens);
+		$this->assertSame('/**
+ * @see \Symplify\SymfonyStaticDumper\Tests\Application\SymfonyStaticDumperApplicationTest
+ */', $phpDocNode->__toString());
+
+		$seeNode = $phpDocNode->children[0];
+		$this->assertInstanceOf(PhpDocTagNode::class, $seeNode);
+		$this->assertInstanceOf(GenericTagValueNode::class, $seeNode->value);
+
+		$this->assertSame('@see \Symplify\SymfonyStaticDumper\Tests\Application\SymfonyStaticDumperApplicationTest', $seeNode->__toString());
+		$this->assertSame('\Symplify\SymfonyStaticDumper\Tests\Application\SymfonyStaticDumperApplicationTest', $seeNode->value->__toString());
+	}
+
 }
