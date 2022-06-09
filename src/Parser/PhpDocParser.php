@@ -24,10 +24,14 @@ class PhpDocParser
 	/** @var ConstExprParser */
 	private $constantExprParser;
 
-	public function __construct(TypeParser $typeParser, ConstExprParser $constantExprParser)
+	/** @var bool */
+	private $requireWhitespaceBeforeDescription;
+
+	public function __construct(TypeParser $typeParser, ConstExprParser $constantExprParser, bool $requireWhitespaceBeforeDescription = false)
 	{
 		$this->typeParser = $typeParser;
 		$this->constantExprParser = $constantExprParser;
+		$this->requireWhitespaceBeforeDescription = $requireWhitespaceBeforeDescription;
 	}
 
 
@@ -492,7 +496,8 @@ class PhpDocParser
 			}
 
 			if (
-				!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)
+				$this->requireWhitespaceBeforeDescription
+				&& !$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)
 				&& !$tokens->isPrecededByHorizontalWhitespace()
 			) {
 				$tokens->consumeTokenType(Lexer::TOKEN_HORIZONTAL_WS); // will throw exception
