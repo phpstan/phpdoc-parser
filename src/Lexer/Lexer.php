@@ -105,16 +105,11 @@ class Lexer
 		assert($this->regexp !== null);
 		assert($this->types !== null);
 
-		preg_match_all($this->regexp, $s, $tokens, PREG_SET_ORDER);
+		preg_match_all($this->regexp, $s, $matches, PREG_SET_ORDER);
 
-		$count = count($this->types);
-		foreach ($tokens as &$match) {
-			for ($i = 1; $i <= $count; $i++) {
-				if ($match[$i] !== null && $match[$i] !== '') {
-					$match = [$match[0], $this->types[$i - 1]];
-					break;
-				}
-			}
+		$tokens = [];
+		foreach ($matches as $match) {
+			$tokens[] = [$match[0], $this->types[count($match) - 2]];
 		}
 
 		$tokens[] = ['', self::TOKEN_END];
