@@ -2,9 +2,6 @@
 
 namespace PHPStan\PhpDocParser\Lexer;
 
-use function array_keys;
-use function assert;
-use function count;
 use function implode;
 use function preg_match_all;
 use const PREG_SET_ORDER;
@@ -93,23 +90,17 @@ class Lexer
 	/** @var string|null */
 	private $regexp;
 
-	/** @var int[]|null */
-	private $types;
-
 	public function tokenize(string $s): array
 	{
-		if ($this->regexp === null || $this->types === null) {
-			$this->initialize();
+		if ($this->regexp === null) {
+			$this->regexp = $this->generateRegexp();
 		}
-
-		assert($this->regexp !== null);
-		assert($this->types !== null);
 
 		preg_match_all($this->regexp, $s, $matches, PREG_SET_ORDER);
 
 		$tokens = [];
 		foreach ($matches as $match) {
-			$tokens[] = [$match[0], $this->types[count($match) - 2]];
+			$tokens[] = [$match[0], (int) $match['MARK']];
 		}
 
 		$tokens[] = ['', self::TOKEN_END];
@@ -118,7 +109,7 @@ class Lexer
 	}
 
 
-	private function initialize(): void
+	private function generateRegexp(): string
 	{
 		$patterns = [
 			self::TOKEN_HORIZONTAL_WS => '[\\x09\\x20]++',
@@ -166,8 +157,11 @@ class Lexer
 			self::TOKEN_OTHER => '(?:(?!\\*/)[^\\s])++',
 		];
 
-		$this->regexp = '~(' . implode(')|(', $patterns) . ')~Asi';
-		$this->types = array_keys($patterns);
+		foreach ($patterns as $type => &$pattern) {
+			$pattern = '(?:' . $pattern . ')(*MARK:' . $type . ')';
+		}
+
+		return '~' . implode('|', $patterns) . '~Asi';
 	}
 
 }
