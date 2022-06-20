@@ -3812,19 +3812,83 @@ some text in the middle'
 		];
 
 		yield [
-			'invalid $this->method()',
-			'/** @phpstan-assert Type $this->method() */',
+			'OK $var->method()',
+			'/** @phpstan-assert Type $var->method() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var->method()',
+						false,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK $var->property',
+			'/** @phpstan-assert Type $var->property */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var->property',
+						false,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid $this',
+			'/** @phpstan-assert Type $this */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-assert',
 					new InvalidTagValueNode(
-						'Type $this->method()',
+						'Type $this',
 						new ParserException(
-							'$this',
-							Lexer::TOKEN_THIS_VARIABLE,
-							25,
-							Lexer::TOKEN_VARIABLE
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							31,
+							Lexer::TOKEN_ARROW
 						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK $this->method()',
+			'/** @phpstan-assert Type $this->method() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$this->method()',
+						false,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK $this->property',
+			'/** @phpstan-assert Type $this->property */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$this->property',
+						false,
+						''
 					)
 				),
 			]),

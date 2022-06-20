@@ -450,9 +450,37 @@ class PhpDocParser
 	{
 		$isNegated = $tokens->tryConsumeTokenType(Lexer::TOKEN_NEGATED);
 		$type = $this->typeParser->parse($tokens);
-		$parameter = $this->parseRequiredVariableName($tokens);
+		$parameter = $this->parseAssertParameter($tokens);
 		$description = $this->parseOptionalDescription($tokens);
 		return new Ast\PhpDoc\AssertTagValueNode($type, $parameter, $isNegated, $description);
+	}
+
+	private function parseAssertParameter(TokenIterator $tokens): string
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+			$parameter = '$this';
+			$requirePropertyOrMethod = true;
+			$tokens->next();
+		} else {
+			$parameter = $tokens->currentTokenValue();
+			$requirePropertyOrMethod = false;
+			$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
+		}
+
+		if ($requirePropertyOrMethod || $tokens->isCurrentTokenType(Lexer::TOKEN_ARROW)) {
+			$tokens->consumeTokenType(Lexer::TOKEN_ARROW);
+
+			$parameter .= '->' . $tokens->currentTokenValue();
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+				$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
+
+				$parameter .= '()';
+			}
+		}
+
+		return $parameter;
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string
