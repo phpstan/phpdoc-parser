@@ -8,6 +8,8 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagPropertyValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
@@ -3817,9 +3819,10 @@ some text in the middle'
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-assert',
-					new AssertTagValueNode(
+					new AssertTagMethodValueNode(
 						new IdentifierTypeNode('Type'),
-						'$var->method()',
+						'$var',
+						'method',
 						false,
 						''
 					)
@@ -3833,9 +3836,10 @@ some text in the middle'
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-assert',
-					new AssertTagValueNode(
+					new AssertTagPropertyValueNode(
 						new IdentifierTypeNode('Type'),
-						'$var->property',
+						'$var',
+						'property',
 						false,
 						''
 					)
@@ -3868,9 +3872,10 @@ some text in the middle'
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-assert',
-					new AssertTagValueNode(
+					new AssertTagMethodValueNode(
 						new IdentifierTypeNode('Type'),
-						'$this->method()',
+						'$this',
+						'method',
 						false,
 						''
 					)
@@ -3884,9 +3889,10 @@ some text in the middle'
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-assert',
-					new AssertTagValueNode(
+					new AssertTagPropertyValueNode(
 						new IdentifierTypeNode('Type'),
-						'$this->property',
+						'$this',
+						'property',
 						false,
 						''
 					)
