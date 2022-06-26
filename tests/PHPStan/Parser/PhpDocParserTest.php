@@ -3323,6 +3323,21 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'OK with contravariance',
+			'/** @template-contravariant T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template-contravariant',
+					new TemplateTagValueNode(
+						'T',
+						null,
+						''
+					)
+				),
+			]),
+		];
 	}
 
 	public function provideExtendsTagsData(): Iterator
