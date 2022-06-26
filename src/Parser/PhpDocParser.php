@@ -178,6 +178,9 @@ class PhpDocParser
 				case '@template-covariant':
 				case '@phpstan-template-covariant':
 				case '@psalm-template-covariant':
+				case '@template-contravariant':
+				case '@phpstan-template-contravariant':
+				case '@psalm-template-contravariant':
 					$tagValue = $this->parseTemplateTagValue($tokens);
 					break;
 
