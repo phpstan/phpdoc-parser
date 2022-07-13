@@ -1,0 +1,53 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Create tag"
+
+on:
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Next version'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+
+jobs:
+  create-tag:
+    name: "Create tag"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: 'Get next versions'
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+
+      - name: "Create new minor tag"
+        uses: rickstaa/action-create-tag@v1
+        if: inputs.version == 'minor'
+        with:
+          tag: ${{ steps.semvers.outputs.minor }}
+          message: ${{ steps.semvers.outputs.minor }}
+
+      - name: "Create new patch tag"
+        uses: rickstaa/action-create-tag@v1
+        if: inputs.version == 'patch'
+        with:
+          tag: ${{ steps.semvers.outputs.patch }}
+          message: ${{ steps.semvers.outputs.patch }}
