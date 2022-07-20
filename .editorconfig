@@ -25,3 +25,7 @@ indent_size = 2
 [composer.json]
 indent_style = tab
 indent_size = 4
+
+[*.abnf]
+indent_style = space
+indent_size = 4

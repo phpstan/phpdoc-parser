@@ -73,7 +73,7 @@ ShapeItem
     / Type
 
 ObjectShape
-	= Shape
+    = Shape
 
 ObjectShapeItem
     = ShapeItem
