@@ -2,7 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-class ArrayShapeItemNode extends ShapeItemNode implements TypeNode
+class ObjectShapeItemNode extends ShapeItemNode implements TypeNode
 {
 
 }

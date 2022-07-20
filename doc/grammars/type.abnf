@@ -60,11 +60,23 @@ Array
 	= 1*(TokenSquareBracketOpen TokenSquareBracketClose)
 
 ArrayShape
-    = TokenCurlyBracketOpen ArrayShapeItem *(TokenComma ArrayShapeItem) TokenCurlyBracketClose
+	= Shape
 
 ArrayShapeItem
+    = ShapeItem
+
+Shape
+    = TokenCurlyBracketOpen ShapeItem *(TokenComma ShapeItem) TokenCurlyBracketClose
+
+ShapeItem
     = (ConstantString / ConstantInt / TokenIdentifier) TokenNullable TokenColon Type
     / Type
+
+ObjectShape
+	= Shape
+
+ObjectShapeItem
+    = ShapeItem
 
 ; ---------------------------------------------------------------------------- ;
 ;  ConstantExpr                                                                ;

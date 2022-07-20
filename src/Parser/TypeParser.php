@@ -129,6 +129,8 @@ class TypeParser
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 						$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
 					}
+				} elseif ($type->name === 'object' && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
+					$type = $this->parseObjectShape($tokens, $type);
 				}
 
 				return $type;
@@ -468,52 +470,75 @@ class TypeParser
 		return $type;
 	}
 
-
 	/** @phpstan-impure */
-	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\ArrayShapeNode
+	private function parseShape(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $type): array
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET);
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
-			return new Ast\Type\ArrayShapeNode([]);
+			return [];
 		}
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-		$items = [$this->parseArrayShapeItem($tokens)];
+		$items = [$this->parseShapeItem($tokens, $type)];
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
 				// trailing comma case
-				return new Ast\Type\ArrayShapeNode($items);
+				return $items;
 			}
 
-			$items[] = $this->parseArrayShapeItem($tokens);
+			$items[] = $this->parseShapeItem($tokens, $type);
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		}
 
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
+		return $items;
+	}
+
+	/** @phpstan-impure */
+	private function parseArrayShape(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $type): Ast\Type\ArrayShapeNode
+	{
+		$items = $this->parseShape($tokens, $type);
+
 		return new Ast\Type\ArrayShapeNode($items);
+	}
+
+	/** @phpstan-impure */
+	private function parseObjectShape(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $type): Ast\Type\ObjectShapeNode
+	{
+		$items = $this->parseShape($tokens, $type);
+
+		return new Ast\Type\ObjectShapeNode($type, $items);
 	}
 
 
 	/** @phpstan-impure */
-	private function parseArrayShapeItem(TokenIterator $tokens): Ast\Type\ArrayShapeItemNode
+	private function parseShapeItem(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $type): Ast\Type\ShapeItemNode
 	{
 		try {
 			$tokens->pushSavePoint();
-			$key = $this->parseArrayShapeKey($tokens);
+			$key = $this->parseShapeKey($tokens);
 			$optional = $tokens->tryConsumeTokenType(Lexer::TOKEN_NULLABLE);
 			$tokens->consumeTokenType(Lexer::TOKEN_COLON);
 			$value = $this->parse($tokens);
 			$tokens->dropSavePoint();
 
+			if ($type->name === 'object') {
+				return new Ast\Type\ObjectShapeItemNode($key, $optional, $value);
+			}
+
 			return new Ast\Type\ArrayShapeItemNode($key, $optional, $value);
 		} catch (ParserException $e) {
 			$tokens->rollback();
 			$value = $this->parse($tokens);
+
+			if ($type->name === 'object') {
+				return new Ast\Type\ObjectShapeItemNode(null, false, $value);
+			}
 
 			return new Ast\Type\ArrayShapeItemNode(null, false, $value);
 		}
@@ -523,7 +548,7 @@ class TypeParser
 	 * @phpstan-impure
 	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
 	 */
-	private function parseArrayShapeKey(TokenIterator $tokens)
+	private function parseShapeKey(TokenIterator $tokens)
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
 			$key = new Ast\ConstExpr\ConstExprIntegerNode($tokens->currentTokenValue());

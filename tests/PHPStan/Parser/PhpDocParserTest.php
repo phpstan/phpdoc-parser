@@ -38,6 +38,8 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -880,13 +882,22 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@psalm-type',
-					new InvalidTagValueNode(
-						'Unexpected token "{", expected \'*/\' at offset 44',
-						new ParserException(
-							'{',
-							Lexer::TOKEN_OPEN_CURLY_BRACKET,
-							44,
-							Lexer::TOKEN_CLOSE_PHPDOC
+					new TypeAliasTagValueNode(
+						'PARTSTRUCTURE_PARAM',
+						new ObjectShapeNode(
+							new IdentifierTypeNode('object'),
+							[
+								new ObjectShapeItemNode(
+									new IdentifierTypeNode('attribute'),
+									false,
+									new IdentifierTypeNode('string')
+								),
+								new ObjectShapeItemNode(
+									new IdentifierTypeNode('value'),
+									true,
+									new IdentifierTypeNode('string')
+								),
+							]
 						)
 					)
 				),
