@@ -63,20 +63,20 @@ ArrayShape
 	= Shape
 
 ArrayShapeItem
-    = ShapeItem
+	= ShapeItem
 
 Shape
-    = TokenCurlyBracketOpen ShapeItem *(TokenComma ShapeItem) TokenCurlyBracketClose
+	= TokenCurlyBracketOpen ShapeItem *(TokenComma ShapeItem) TokenCurlyBracketClose
 
 ShapeItem
-    = (ConstantString / ConstantInt / TokenIdentifier) TokenNullable TokenColon Type
-    / Type
+	= (ConstantString / ConstantInt / TokenIdentifier) TokenNullable TokenColon Type
+	/ Type
 
 ObjectShape
-    = Shape
+	= Shape
 
 ObjectShapeItem
-    = ShapeItem
+	= ShapeItem
 
 ; ---------------------------------------------------------------------------- ;
 ;  ConstantExpr                                                                ;
