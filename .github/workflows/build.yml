@@ -6,7 +6,7 @@ on:
   pull_request:
   push:
     branches:
-      - "1.5.x"
+      - "1.6.x"
 
 jobs:
   lint:
