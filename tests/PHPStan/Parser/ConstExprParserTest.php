@@ -358,4 +358,50 @@ class ConstExprParserTest extends TestCase
 		];
 	}
 
+	/**
+	 * @dataProvider provideWithTrimStringsStringNodeParseData
+	 */
+	public function testParseWithTrimStrings(string $input, ConstExprNode $expectedExpr, int $nextTokenType = Lexer::TOKEN_END): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+		$exprNode = $this->constExprParser->parse($tokens, true);
+
+		$this->assertSame((string) $expectedExpr, (string) $exprNode);
+		$this->assertEquals($expectedExpr, $exprNode);
+		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+	}
+
+	public function provideWithTrimStringsStringNodeParseData(): Iterator
+	{
+		yield [
+			'"foo"',
+			new ConstExprStringNode('foo'),
+		];
+
+		yield [
+			'"Foo \\n\\"\\r Bar"',
+			new ConstExprStringNode("Foo \n\"\r Bar"),
+		];
+
+		yield [
+			'\'bar\'',
+			new ConstExprStringNode('bar'),
+		];
+
+		yield [
+			'\'Foo \\\' Bar\'',
+			new ConstExprStringNode('Foo \' Bar'),
+		];
+
+		yield [
+			'"\u{1f601}"',
+			new ConstExprStringNode("\u{1f601}"),
+		];
+
+		yield [
+			'"\u{ffffffff}"',
+			new ConstExprStringNode("\u{fffd}"),
+		];
+	}
+
 }
