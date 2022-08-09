@@ -30,6 +30,9 @@ jobs:
       - name: "Install dependencies"
         run: "composer install --no-dev --no-interaction --no-progress --no-suggest"
 
+      - name: "allow composer plugins"
+        run: "composer config --no-plugins allow-plugins.ocramius/package-versions true"
+
       - name: "Install BackwardCompatibilityCheck"
         run: "composer global require --dev roave/backward-compatibility-check"
 
