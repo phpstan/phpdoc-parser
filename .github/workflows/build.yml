@@ -6,7 +6,7 @@ on:
   pull_request:
   push:
     branches:
-      - "1.6.x"
+      - "1.7.x"
 
 jobs:
   lint:
@@ -22,7 +22,6 @@ jobs:
           - "8.0"
           - "8.1"
           - "8.2"
-          
 
     steps:
       - name: "Checkout"

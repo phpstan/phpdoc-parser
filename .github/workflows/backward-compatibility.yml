@@ -6,7 +6,7 @@ on:
   pull_request:
   push:
     branches:
-      - "1.6.x"
+      - "1.7.x"
 
 jobs:
   backward-compatibility:
