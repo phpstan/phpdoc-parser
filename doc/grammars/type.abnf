@@ -180,13 +180,13 @@ TokenDoubleColon
 	= "::" *ByteHorizontalWs
 
 TokenThisVariable
-	= %x24.74.68.69.73 *ByteHorizontalWs
+	= %s"$this" *ByteHorizontalWs
 
 TokenIs
-    = %x69.73 1*ByteHorizontalWs
+	= %s"is" 1*ByteHorizontalWs
 
 TokenNot
-    = %x6E.6F.74 1*ByteHorizontalWs
+	= %s"not" 1*ByteHorizontalWs
 
 TokenIdentifier
 	= [ByteBackslash] ByteIdentifierFirst *ByteIdentifierSecond *(ByteBackslash ByteIdentifierFirst *ByteIdentifierSecond) *ByteHorizontalWs
