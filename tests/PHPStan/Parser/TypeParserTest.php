@@ -19,6 +19,8 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
@@ -590,6 +592,18 @@ class TypeParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('string')
 					),
+				]),
+			],
+			[
+				'object{
+				 	a: int
+				 }',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					)
 				]),
 			],
 			[

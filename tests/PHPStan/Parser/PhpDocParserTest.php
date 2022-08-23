@@ -44,6 +44,8 @@ use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use const PHP_EOL;
 
 class PhpDocParserTest extends TestCase
@@ -890,6 +892,69 @@ class PhpDocParserTest extends TestCase
 							44,
 							Lexer::TOKEN_CLOSE_PHPDOC
 						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK without variable and description object shape',
+			'/** @var object{a: int} */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(
+								new IdentifierTypeNode('a'),
+								false,
+								new IdentifierTypeNode('int')
+							)
+							]),
+							'',
+							''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with variable object shape',
+			'/** @var object{a: int} $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(
+								new IdentifierTypeNode('a'),
+								false,
+								new IdentifierTypeNode('int')
+							)
+							]),
+							'$foo',
+							''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with variable and description object shape',
+			'/** @var object{a: int} $foo some description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@var',
+					new VarTagValueNode(
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(
+								new IdentifierTypeNode('a'),
+								false,
+								new IdentifierTypeNode('int')
+							)
+							]),
+							'$foo',
+							'some description'
 					)
 				),
 			]),
