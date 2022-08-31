@@ -1279,6 +1279,9 @@ class PhpDocParserTest extends TestCase
 								new IdentifierTypeNode('B'),
 								[
 									new ConstTypeNode(new ConstExprIntegerNode('123')),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 						]),
@@ -1708,6 +1711,8 @@ class PhpDocParserTest extends TestCase
 					new MixinTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('Foo'), [
 							new IdentifierTypeNode('Bar'),
+						], [
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]),
 						''
 					)
@@ -3107,6 +3112,10 @@ some text in the middle'
 									[
 										new IdentifierTypeNode('TRandKey'),
 										new IdentifierTypeNode('TRandVal'),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
 									]
 								),
 								new GenericTypeNode(
@@ -3114,6 +3123,10 @@ some text in the middle'
 									[
 										new IdentifierTypeNode('TRandKey'),
 										new IdentifierTypeNode('TRandVal'),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
 									]
 								),
 								new GenericTypeNode(
@@ -3121,6 +3134,10 @@ some text in the middle'
 									[
 										new IdentifierTypeNode('TRandKey'),
 										new IdentifierTypeNode('TRandVal'),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
 									]
 								),
 							]),
@@ -3149,6 +3166,10 @@ some text in the middle'
 									[
 										new IdentifierTypeNode('TRandKey'),
 										new IdentifierTypeNode('TRandVal'),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
 									]
 								),
 								new ConditionalTypeNode(
@@ -3159,6 +3180,10 @@ some text in the middle'
 										[
 											new IdentifierTypeNode('TRandKey'),
 											new IdentifierTypeNode('TRandVal'),
+										],
+										[
+											GenericTypeNode::VARIANCE_INVARIANT,
+											GenericTypeNode::VARIANCE_INVARIANT,
 										]
 									),
 									new UnionTypeNode([
@@ -3167,6 +3192,10 @@ some text in the middle'
 											[
 												new IdentifierTypeNode('TRandKey'),
 												new IdentifierTypeNode('TRandVal'),
+											],
+											[
+												GenericTypeNode::VARIANCE_INVARIANT,
+												GenericTypeNode::VARIANCE_INVARIANT,
 											]
 										),
 										new GenericTypeNode(
@@ -3174,6 +3203,10 @@ some text in the middle'
 											[
 												new IdentifierTypeNode('TRandKey'),
 												new IdentifierTypeNode('TRandVal'),
+											],
+											[
+												GenericTypeNode::VARIANCE_INVARIANT,
+												GenericTypeNode::VARIANCE_INVARIANT,
 											]
 										),
 									]),
@@ -3411,6 +3444,9 @@ some text in the middle'
 							new IdentifierTypeNode('Foo'),
 							[
 								new IdentifierTypeNode('A'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -3431,6 +3467,10 @@ some text in the middle'
 							[
 								new IdentifierTypeNode('A'),
 								new IdentifierTypeNode('B'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -3451,6 +3491,10 @@ some text in the middle'
 							[
 								new IdentifierTypeNode('A'),
 								new IdentifierTypeNode('B'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -3471,6 +3515,10 @@ some text in the middle'
 							[
 								new IdentifierTypeNode('A'),
 								new IdentifierTypeNode('B'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -3488,7 +3536,8 @@ some text in the middle'
 					new ExtendsTagValueNode(
 						new GenericTypeNode(
 							new IdentifierTypeNode('Foo'),
-							[new IdentifierTypeNode('A')]
+							[new IdentifierTypeNode('A')],
+							[GenericTypeNode::VARIANCE_INVARIANT]
 						),
 						'extends foo'
 					)
@@ -4278,6 +4327,10 @@ Finder::findFiles('*.php')
 							[
 								new IdentifierTypeNode('A'),
 								new IdentifierTypeNode('B'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -4303,6 +4356,10 @@ Finder::findFiles('*.php')
 							[
 								new IdentifierTypeNode('A'),
 								new IdentifierTypeNode('B'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -4328,6 +4385,10 @@ Finder::findFiles('*.php')
 							[
 								new IdentifierTypeNode('A'),
 								new IdentifierTypeNode('B'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -4449,6 +4510,11 @@ Finder::findFiles('*.php')
 								new ConstTypeNode(new ConstExprIntegerNode('0')),
 								new ConstTypeNode(new ConstExprIntegerNode('256')),
 								new ConstTypeNode(new ConstExprIntegerNode('512')),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						''
@@ -4518,6 +4584,10 @@ Finder::findFiles('*.php')
 											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
 										]),
 									]),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 							new ConditionalTypeNode(
@@ -4531,6 +4601,10 @@ Finder::findFiles('*.php')
 											new IdentifierTypeNode('string'),
 											new IdentifierTypeNode('null'),
 										]),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
 									]
 								),
 								new ConditionalTypeNode(
@@ -4557,6 +4631,10 @@ Finder::findFiles('*.php')
 													new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
 												]),
 											]),
+										],
+										[
+											GenericTypeNode::VARIANCE_INVARIANT,
+											GenericTypeNode::VARIANCE_INVARIANT,
 										]
 									),
 									new GenericTypeNode(
@@ -4564,6 +4642,10 @@ Finder::findFiles('*.php')
 										[
 											new IdentifierTypeNode('array-key'),
 											new IdentifierTypeNode('string'),
+										],
+										[
+											GenericTypeNode::VARIANCE_INVARIANT,
+											GenericTypeNode::VARIANCE_INVARIANT,
 										]
 									),
 									false
@@ -4655,6 +4737,9 @@ Finder::findFiles('*.php')
 							new IdentifierTypeNode('Foo'),
 							[
 								new IdentifierTypeNode('strong'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						'Important description'
@@ -4755,7 +4840,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@phpstan-self-out',
 					new SelfOutTagValueNode(
-						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
 						''
 					)
 				),
@@ -4769,7 +4854,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@phpstan-this-out',
 					new SelfOutTagValueNode(
-						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
 						''
 					)
 				),
@@ -4783,7 +4868,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@psalm-self-out',
 					new SelfOutTagValueNode(
-						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
 						''
 					)
 				),
@@ -4797,7 +4882,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@psalm-this-out',
 					new SelfOutTagValueNode(
-						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
 						''
 					)
 				),
@@ -4811,7 +4896,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@phpstan-self-out',
 					new SelfOutTagValueNode(
-						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
 						'description'
 					)
 				),

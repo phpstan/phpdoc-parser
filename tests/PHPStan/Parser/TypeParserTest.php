@@ -20,10 +20,8 @@ use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\StarProjectionNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
-use PHPStan\PhpDocParser\Ast\Type\TypeProjectionNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
@@ -281,6 +279,9 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						[
 							new IdentifierTypeNode('Bar'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					)
 				),
@@ -292,6 +293,10 @@ class TypeParserTest extends TestCase
 					[
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('Foo\\Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -621,6 +626,9 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						[
 							new IdentifierTypeNode('Bar'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					)
 				),
@@ -724,6 +732,10 @@ class TypeParserTest extends TestCase
 								[
 									new IdentifierTypeNode('mixed'),
 									new IdentifierTypeNode('string'),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 							new UnionTypeNode([
@@ -734,12 +746,19 @@ class TypeParserTest extends TestCase
 											new IdentifierTypeNode('string'),
 											[
 												new IdentifierTypeNode('foo'),
+											],
+											[
+												GenericTypeNode::VARIANCE_INVARIANT,
 											]
 										),
 										new IdentifierTypeNode('bar'),
 									])
 								),
 							]),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					),
 					new IdentifierTypeNode('Lorem'),
@@ -771,6 +790,10 @@ class TypeParserTest extends TestCase
 						[
 							new IdentifierTypeNode('array-key'),
 							new IdentifierTypeNode('int'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					)
 				),
@@ -785,6 +808,10 @@ class TypeParserTest extends TestCase
 							[
 								new IdentifierTypeNode('array-key'),
 								new IdentifierTypeNode('int'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						)
 					),
@@ -937,6 +964,8 @@ class TypeParserTest extends TestCase
 				'list<QueueAttributeName::*>',
 				new GenericTypeNode(new IdentifierTypeNode('list'), [
 					new ConstTypeNode(new ConstFetchNode('QueueAttributeName', '*')),
+				], [
+					GenericTypeNode::VARIANCE_INVARIANT,
 				]),
 			],
 			[
@@ -947,6 +976,9 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('array'),
 					[
 						new IdentifierTypeNode('Foo'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -960,6 +992,10 @@ class TypeParserTest extends TestCase
 					[
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -972,6 +1008,10 @@ class TypeParserTest extends TestCase
 					[
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -990,8 +1030,15 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('array'),
 							[
 								new IdentifierTypeNode('Bar'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -1010,8 +1057,15 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('array'),
 							[
 								new IdentifierTypeNode('Bar'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -1188,6 +1242,10 @@ class TypeParserTest extends TestCase
 						[
 							new IdentifierTypeNode('TRandKey'),
 							new IdentifierTypeNode('TRandVal'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					),
 					new ConditionalTypeNode(
@@ -1198,6 +1256,10 @@ class TypeParserTest extends TestCase
 							[
 								new IdentifierTypeNode('TRandKey'),
 								new IdentifierTypeNode('TRandVal'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						new UnionTypeNode([
@@ -1206,6 +1268,10 @@ class TypeParserTest extends TestCase
 								[
 									new IdentifierTypeNode('TRandKey'),
 									new IdentifierTypeNode('TRandVal'),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 							new GenericTypeNode(
@@ -1213,6 +1279,10 @@ class TypeParserTest extends TestCase
 								[
 									new IdentifierTypeNode('TRandKey'),
 									new IdentifierTypeNode('TRandVal'),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 						]),
@@ -1323,11 +1393,12 @@ class TypeParserTest extends TestCase
 				new GenericTypeNode(
 					new IdentifierTypeNode('Foo'),
 					[
-						new TypeProjectionNode(
-							new IdentifierTypeNode('Bar'),
-							'covariant'
-						),
+						new IdentifierTypeNode('Bar'),
 						new IdentifierTypeNode('Baz'),
+					],
+					[
+						GenericTypeNode::VARIANCE_COVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -1337,10 +1408,11 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('Foo'),
 					[
 						new IdentifierTypeNode('Bar'),
-						new TypeProjectionNode(
-							new IdentifierTypeNode('Baz'),
-							'contravariant'
-						),
+						new IdentifierTypeNode('Baz'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_CONTRAVARIANT,
 					]
 				),
 			],
@@ -1359,7 +1431,11 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('Foo'),
 					[
 						new IdentifierTypeNode('Bar'),
-						new StarProjectionNode(),
+						new IdentifierTypeNode('mixed'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_COVARIANT,
 					]
 				),
 			],
