@@ -89,6 +89,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideAssertTagsData
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
+	 * @dataProvider provideTagsWithBackslash
 	 */
 	public function testParse(
 		string $label,
@@ -4454,6 +4455,20 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@special3',
 					new GenericTagValueNode('Foo')
+				),
+			]),
+		];
+	}
+
+	public function provideTagsWithBackslash(): Iterator
+	{
+		yield [
+			'OK without description and tag with backslash in it',
+			'/** @ORM\Mapping\Entity User */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@ORM\Mapping\Entity',
+					new GenericTagValueNode('User')
 				),
 			]),
 		];
