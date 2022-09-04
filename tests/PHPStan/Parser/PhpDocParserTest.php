@@ -4463,12 +4463,23 @@ Finder::findFiles('*.php')
 	public function provideTagsWithBackslash(): Iterator
 	{
 		yield [
-			'OK without description and tag with backslash in it',
+			'OK without description and tag with backslashes in it',
 			'/** @ORM\Mapping\Entity User */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@ORM\Mapping\Entity',
 					new GenericTagValueNode('User')
+				),
+			]),
+		];
+
+		yield [
+			'OK without description and tag with backslashes in it and parenthesis',
+			'/** @ORM\Mapping\JoinColumn(name="column_id", referencedColumnName="id") */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@ORM\Mapping\JoinColumn',
+					new GenericTagValueNode('(name="column_id", referencedColumnName="id")')
 				),
 			]),
 		];
