@@ -3345,6 +3345,22 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'OK with default',
+			'/** @template T = string */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						null,
+						'',
+						new IdentifierTypeNode('string')
+					)
+				),
+			]),
+		];
 	}
 
 	public function provideExtendsTagsData(): Iterator
