@@ -3361,6 +3361,38 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'OK with default and description',
+			'/** @template T = string the value type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						null,
+						'the value type',
+						new IdentifierTypeNode('string')
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with bound and default and description',
+			'/** @template T of string = \'\' the value type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('string'),
+						'the value type',
+						new ConstTypeNode(new ConstExprStringNode(''))
+					)
+				),
+			]),
+		];
 	}
 
 	public function provideExtendsTagsData(): Iterator
