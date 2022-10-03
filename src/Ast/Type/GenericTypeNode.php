@@ -12,6 +12,7 @@ class GenericTypeNode implements TypeNode
 	public const VARIANCE_INVARIANT = 'invariant';
 	public const VARIANCE_COVARIANT = 'covariant';
 	public const VARIANCE_CONTRAVARIANT = 'contravariant';
+	public const VARIANCE_BIVARIANT = 'bivariant';
 
 	use NodeAttributes;
 
@@ -40,6 +41,8 @@ class GenericTypeNode implements TypeNode
 			$variance = $this->variances[$index];
 			if ($variance === self::VARIANCE_INVARIANT) {
 				$genericTypes[] = (string) $type;
+			} elseif ($variance === self::VARIANCE_BIVARIANT) {
+				$genericTypes[] = '*';
 			} else {
 				$genericTypes[] = sprintf('%s %s', $variance, $type);
 			}

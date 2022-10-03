@@ -1435,7 +1435,7 @@ class TypeParserTest extends TestCase
 					],
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
-						GenericTypeNode::VARIANCE_COVARIANT,
+						GenericTypeNode::VARIANCE_BIVARIANT,
 					]
 				),
 			],

@@ -357,7 +357,7 @@ class TypeParser
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
 			return [
 				new Ast\Type\IdentifierTypeNode('mixed'),
-				Ast\Type\GenericTypeNode::VARIANCE_COVARIANT,
+				Ast\Type\GenericTypeNode::VARIANCE_BIVARIANT,
 			];
 		}
 
