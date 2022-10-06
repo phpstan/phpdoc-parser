@@ -25,6 +25,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
@@ -90,6 +91,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideRealWorldExampleData
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 * @dataProvider provideTagsWithBackslash
+	 * @dataProvider provideSelfOutTagsData
 	 */
 	public function testParse(
 		string $label,
@@ -4480,6 +4482,79 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@ORM\Mapping\JoinColumn',
 					new GenericTagValueNode('(name="column_id", referencedColumnName="id")')
+				),
+			]),
+		];
+	}
+
+	public function provideSelfOutTagsData(): Iterator
+	{
+		yield [
+			'OK phpstan-self-out',
+			'/** @phpstan-self-out self<T> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-self-out',
+					new SelfOutTagValueNode(
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK phpstan-this-out',
+			'/** @phpstan-this-out self<T> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-this-out',
+					new SelfOutTagValueNode(
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK psalm-self-out',
+			'/** @psalm-self-out self<T> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-self-out',
+					new SelfOutTagValueNode(
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK psalm-this-out',
+			'/** @psalm-this-out self<T> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-this-out',
+					new SelfOutTagValueNode(
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-self-out self<T> description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-self-out',
+					new SelfOutTagValueNode(
+						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
+						'description'
+					)
 				),
 			]),
 		];
