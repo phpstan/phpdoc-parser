@@ -19,6 +19,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
@@ -92,6 +93,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideDescriptionWithOrWithoutHtml
 	 * @dataProvider provideTagsWithBackslash
 	 * @dataProvider provideSelfOutTagsData
+	 * @dataProvider provideParamOutTagsData
 	 */
 	public function testParse(
 		string $label,
@@ -4554,6 +4556,23 @@ Finder::findFiles('*.php')
 					new SelfOutTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')]),
 						'description'
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideParamOutTagsData(): Iterator
+	{
+		yield [
+			'OK param-out',
+			'/** @param-out string $s */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-out',
+					new ParamOutTagValueNode(
+						new IdentifierTypeNode('string'),
+						'$s'
 					)
 				),
 			]),
