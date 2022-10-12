@@ -524,8 +524,9 @@ class PhpDocParser
 	{
 		$type = $this->typeParser->parse($tokens);
 		$parameterName = $this->parseRequiredVariableName($tokens);
+		$description = $this->parseOptionalDescription($tokens);
 
-		return new Ast\PhpDoc\ParamOutTagValueNode($type, $parameterName);
+		return new Ast\PhpDoc\ParamOutTagValueNode($type, $parameterName, $description);
 	}
 
 	private function parseOptionalVariableName(TokenIterator $tokens): string

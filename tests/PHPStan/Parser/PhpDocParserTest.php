@@ -4572,7 +4572,23 @@ Finder::findFiles('*.php')
 					'@param-out',
 					new ParamOutTagValueNode(
 						new IdentifierTypeNode('string'),
-						'$s'
+						'$s',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK param-out description',
+			'/** @param-out string $s description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-out',
+					new ParamOutTagValueNode(
+						new IdentifierTypeNode('string'),
+						'$s',
+						'description'
 					)
 				),
 			]),

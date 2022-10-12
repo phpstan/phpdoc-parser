@@ -17,15 +17,19 @@ class ParamOutTagValueNode implements PhpDocTagValueNode
 	/** @var string */
 	public $parameterName;
 
-	public function __construct(TypeNode $type, string $parameterName)
+	/** @var string (may be empty) */
+	public $description;
+
+	public function __construct(TypeNode $type, string $parameterName, string $description)
 	{
 		$this->type = $type;
 		$this->parameterName = $parameterName;
+		$this->description = $description;
 	}
 
 	public function __toString(): string
 	{
-		return trim("{$this->type} {$this->parameterName}");
+		return trim("{$this->type} {$this->parameterName} {$this->description}");
 	}
 
 }
