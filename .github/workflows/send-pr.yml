@@ -30,7 +30,7 @@ jobs:
 
       - name: "Change composer.json"
         working-directory: ./phpstan-src
-        run: "composer require phpstan/phpdoc-parser:${{ github.ref }}"
+        run: "composer require phpstan/phpdoc-parser:${{ github.ref_name }}"
 
       - name: "Create Pull Request"
         id: create-pr
@@ -41,6 +41,6 @@ jobs:
           branch-suffix: random
           delete-branch: true
           title: "Update phpdoc-parser"
-          body: "Update phpstan/phpdoc-parser to ${{ github.ref }}"
+          body: "Update phpstan/phpdoc-parser to ${{ github.ref_name }}"
           committer: "phpstan-bot <ondrej+phpstanbot@mirtes.cz>"
           commit-message: "Update phpdoc-parser"
