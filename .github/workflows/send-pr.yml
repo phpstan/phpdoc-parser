@@ -1,0 +1,46 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Send pull request"
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  send-pr:
+    name: "Send pull request"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.1"
+
+      - name: "Checkout phpstan-src"
+        uses: actions/checkout@v3
+        with:
+          repository: phpstan/phpstan-src
+          path: phpstan-src
+          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+
+      - name: "Install dependencies"
+        working-directory: ./phpstan-src
+        run: "composer install --no-interaction --no-progress --no-suggest"
+
+      - name: "Change composer.json"
+        working-directory: ./phpstan-src
+        run: "composer require phpstan/phpdoc-parser:${{ github.ref }}"
+
+      - name: "Create Pull Request"
+        id: create-pr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+          path: ./phpstan-src
+          branch-suffix: random
+          delete-branch: true
+          title: "Update phpdoc-parser"
+          body: "Update phpstan/phpdoc-parser to ${{ github.ref }}"
+          committer: "phpstan-bot <ondrej+phpstanbot@mirtes.cz>"
+          commit-message: "Update phpdoc-parser"
