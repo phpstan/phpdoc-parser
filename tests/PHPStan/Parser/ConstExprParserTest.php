@@ -29,7 +29,7 @@ class ConstExprParserTest extends TestCase
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
-		$this->constExprParser = new ConstExprParser();
+		$this->constExprParser = new ConstExprParser(true);
 	}
 
 
