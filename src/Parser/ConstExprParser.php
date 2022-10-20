@@ -171,6 +171,9 @@ class ConstExprParser
 		return self::parseEscapeSequences(substr($string, 1, -1), '"');
 	}
 
+	/**
+	 * Implementation based on https://github.com/nikic/PHP-Parser/blob/b0edd4c41111042d43bb45c6c657b2e0db367d9e/lib/PhpParser/Node/Scalar/String_.php#L90-L130
+	 */
 	private static function parseEscapeSequences(string $str, string $quote): string
 	{
 		$str = str_replace('\\' . $quote, $quote, $str);
@@ -196,6 +199,9 @@ class ConstExprParser
 		);
 	}
 
+	/**
+	 * Implementation based on https://github.com/nikic/PHP-Parser/blob/b0edd4c41111042d43bb45c6c657b2e0db367d9e/lib/PhpParser/Node/Scalar/String_.php#L132-L154
+	 */
 	private static function codePointToUtf8(int $num): string
 	{
 		if ($num <= 0x7F) {
