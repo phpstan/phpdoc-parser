@@ -34,6 +34,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypelessParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -4379,6 +4381,178 @@ Finder::findFiles('*.php')
 						''
 					)
 				),
+			]),
+		];
+
+		yield [
+			'complex stub from Psalm',
+			'/**' . PHP_EOL .
+			' * @psalm-pure' . PHP_EOL .
+			' * @template TFlags as int-mask<0, 256, 512>' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @param string $pattern' . PHP_EOL .
+			' * @param string $subject' . PHP_EOL .
+			' * @param mixed $matches' . PHP_EOL .
+			' * @param TFlags $flags' . PHP_EOL .
+			" * @param-out (TFlags is 256 ? array<array-key, array{string, 0|positive-int}|array{'', -1}> :" . PHP_EOL .
+			' *             TFlags is 512 ? array<array-key, string|null> :' . PHP_EOL .
+			' *             TFlags is 768 ? array<array-key, array{string, 0|positive-int}|array{null, -1}> :' . PHP_EOL .
+			' *                             array<array-key, string>' . PHP_EOL .
+			' *            ) $matches' . PHP_EOL .
+			' * @return 1|0|false' . PHP_EOL .
+			' * @psalm-ignore-falsable-return' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@psalm-pure', new GenericTagValueNode('')),
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'TFlags',
+						new GenericTypeNode(
+							new IdentifierTypeNode('int-mask'),
+							[
+								new ConstTypeNode(new ConstExprIntegerNode('0')),
+								new ConstTypeNode(new ConstExprIntegerNode('256')),
+								new ConstTypeNode(new ConstExprIntegerNode('512')),
+							]
+						),
+						''
+					)
+				),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('string'),
+						false,
+						'$pattern',
+						''
+					)
+				),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('string'),
+						false,
+						'$subject',
+						''
+					)
+				),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('mixed'),
+						false,
+						'$matches',
+						''
+					)
+				),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('TFlags'),
+						false,
+						'$flags',
+						''
+					)
+				),
+				new PhpDocTagNode(
+					'@param-out',
+					new ParamOutTagValueNode(
+						new ConditionalTypeNode(
+							new IdentifierTypeNode('TFlags'),
+							new ConstTypeNode(new ConstExprIntegerNode('256')),
+							new GenericTypeNode(
+								new IdentifierTypeNode('array'),
+								[
+									new IdentifierTypeNode('array-key'),
+									new UnionTypeNode([
+										new ArrayShapeNode([
+											new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
+											new ArrayShapeItemNode(
+												null,
+												false,
+												new UnionTypeNode([
+													new ConstTypeNode(new ConstExprIntegerNode('0')),
+													new IdentifierTypeNode('positive-int'),
+												])
+											),
+										]),
+										new ArrayShapeNode([
+											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprStringNode(''))),
+											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
+										]),
+									]),
+								]
+							),
+							new ConditionalTypeNode(
+								new IdentifierTypeNode('TFlags'),
+								new ConstTypeNode(new ConstExprIntegerNode('512')),
+								new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('array-key'),
+										new UnionTypeNode([
+											new IdentifierTypeNode('string'),
+											new IdentifierTypeNode('null'),
+										]),
+									]
+								),
+								new ConditionalTypeNode(
+									new IdentifierTypeNode('TFlags'),
+									new ConstTypeNode(new ConstExprIntegerNode('768')),
+									new GenericTypeNode(
+										new IdentifierTypeNode('array'),
+										[
+											new IdentifierTypeNode('array-key'),
+											new UnionTypeNode([
+												new ArrayShapeNode([
+													new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
+													new ArrayShapeItemNode(
+														null,
+														false,
+														new UnionTypeNode([
+															new ConstTypeNode(new ConstExprIntegerNode('0')),
+															new IdentifierTypeNode('positive-int'),
+														])
+													),
+												]),
+												new ArrayShapeNode([
+													new ArrayShapeItemNode(null, false, new IdentifierTypeNode('null')),
+													new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
+												]),
+											]),
+										]
+									),
+									new GenericTypeNode(
+										new IdentifierTypeNode('array'),
+										[
+											new IdentifierTypeNode('array-key'),
+											new IdentifierTypeNode('string'),
+										]
+									),
+									false
+								),
+								false
+							),
+							false
+						),
+						'$matches',
+						''
+					)
+				),
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new UnionTypeNode([
+							new ConstTypeNode(new ConstExprIntegerNode('1')),
+							new ConstTypeNode(new ConstExprIntegerNode('0')),
+							new IdentifierTypeNode('false'),
+						]),
+						''
+					)
+				),
+				new PhpDocTagNode('@psalm-ignore-falsable-return', new GenericTagValueNode('')),
 			]),
 		];
 	}

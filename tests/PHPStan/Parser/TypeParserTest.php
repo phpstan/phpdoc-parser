@@ -1266,6 +1266,56 @@ class TypeParserTest extends TestCase
 					)
 				),
 			],
+			[
+				'(T is Foo ? true : T is Bar ? false : null)',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('T'),
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('true'),
+					new ConditionalTypeNode(
+						new IdentifierTypeNode('T'),
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('false'),
+						new IdentifierTypeNode('null'),
+						false
+					),
+					false
+				),
+			],
+			[
+				'(T is Foo ? T is Bar ? true : false : null)',
+				new ParserException(
+					'is',
+					Lexer::TOKEN_IDENTIFIER,
+					14,
+					Lexer::TOKEN_COLON
+				),
+			],
+			[
+				'($foo is Foo ? true : $foo is Bar ? false : null)',
+				new ConditionalTypeForParameterNode(
+					'$foo',
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('true'),
+					new ConditionalTypeForParameterNode(
+						'$foo',
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('false'),
+						new IdentifierTypeNode('null'),
+						false
+					),
+					false
+				),
+			],
+			[
+				'($foo is Foo ? $foo is Bar ? true : false : null)',
+				new ParserException(
+					'$foo',
+					Lexer::TOKEN_VARIABLE,
+					15,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
 		];
 	}
 

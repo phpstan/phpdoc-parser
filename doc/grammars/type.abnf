@@ -17,7 +17,7 @@ Intersection
 	= 1*(TokenIntersection Atomic)
 
 Conditional
-    = 1*ByteHorizontalWs TokenIs [TokenNot] Atomic TokenNullable Atomic TokenColon Atomic
+    = 1*ByteHorizontalWs TokenIs [TokenNot] Atomic TokenNullable Type TokenColon ParenthesizedType
 
 Nullable
 	= TokenNullable Atomic
