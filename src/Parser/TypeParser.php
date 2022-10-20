@@ -242,7 +242,7 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
-		$elseType = $this->parse($tokens);
+		$elseType = $this->subParse($tokens);
 
 		return new Ast\Type\ConditionalTypeNode($subjectType, $targetType, $ifType, $elseType, $negated);
 	}
@@ -271,7 +271,7 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
-		$elseType = $this->parse($tokens);
+		$elseType = $this->subParse($tokens);
 
 		return new Ast\Type\ConditionalTypeForParameterNode($parameterName, $targetType, $ifType, $elseType, $negated);
 	}
