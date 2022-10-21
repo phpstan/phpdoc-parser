@@ -35,7 +35,7 @@ class AssertTagValueNode implements PhpDocTagValueNode
 	public function __toString(): string
 	{
 		$isNegated = $this->isNegated ? '!' : '';
-		return trim("{$this->type} {$isNegated}{$this->parameter} {$this->description}");
+		return trim("{$isNegated}{$this->type} {$this->parameter} {$this->description}");
 	}
 
 }
