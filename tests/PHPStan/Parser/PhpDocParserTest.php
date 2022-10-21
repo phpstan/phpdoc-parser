@@ -4002,6 +4002,40 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'OK equality',
+			'/** @phpstan-assert =Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						false,
+						'',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK negated equality',
+			'/** @phpstan-assert !=Type $var */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$var',
+						true,
+						'',
+						true
+					)
+				),
+			]),
+		];
 	}
 
 	public function providerDebug(): Iterator

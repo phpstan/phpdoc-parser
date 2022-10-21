@@ -23,15 +23,19 @@ class AssertTagMethodValueNode implements PhpDocTagValueNode
 	/** @var bool */
 	public $isNegated;
 
+	/** @var bool */
+	public $isEquality;
+
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(TypeNode $type, string $parameter, string $method, bool $isNegated, string $description)
+	public function __construct(TypeNode $type, string $parameter, string $method, bool $isNegated, string $description, bool $isEquality = false)
 	{
 		$this->type = $type;
 		$this->parameter = $parameter;
 		$this->method = $method;
 		$this->isNegated = $isNegated;
+		$this->isEquality = $isEquality;
 		$this->description = $description;
 	}
 
@@ -39,7 +43,8 @@ class AssertTagMethodValueNode implements PhpDocTagValueNode
 	public function __toString(): string
 	{
 		$isNegated = $this->isNegated ? '!' : '';
-		return trim("{$isNegated}{$this->type} {$this->parameter}->{$this->method}() {$this->description}");
+		$isEquality = $this->isEquality ? '=' : '';
+		return trim("{$isNegated}{$isEquality}{$this->type} {$this->parameter}->{$this->method}() {$this->description}");
 	}
 
 }
