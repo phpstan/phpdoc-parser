@@ -4855,4 +4855,16 @@ Finder::findFiles('*.php')
 		$this->assertSame('\Symplify\SymfonyStaticDumper\Tests\Application\SymfonyStaticDumperApplicationTest', $seeNode->value->__toString());
 	}
 
+	public function testNegatedAssertionToString(): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize('/** @phpstan-assert !Type $param */'));
+		$phpDocNode = $this->phpDocParser->parse($tokens);
+
+		$assertNode = $phpDocNode->children[0];
+		$this->assertInstanceOf(PhpDocTagNode::class, $assertNode);
+		$this->assertInstanceOf(AssertTagValueNode::class, $assertNode->value);
+
+		$this->assertSame('@phpstan-assert !Type $param', $assertNode->__toString());
+	}
+
 }
