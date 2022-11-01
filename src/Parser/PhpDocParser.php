@@ -346,10 +346,10 @@ class PhpDocParser
 			exit;
 		}
 
-		$generics = [];
+		$templateTypes = [];
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 			do {
-				$generics[] = $this->parseMethodTagValueGeneric($tokens);
+				$templateTypes[] = $this->parseMethodTagValueTemplateType($tokens);
 			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 		}
@@ -365,10 +365,10 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $generics, $parameters, $description);
+		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description, $templateTypes);
 	}
 
-	private function parseMethodTagValueGeneric(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueGenericNode
+	private function parseMethodTagValueTemplateType(TokenIterator $tokens): Ast\PhpDoc\TemplateTagValueNode
 	{
 		$name = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
@@ -379,7 +379,13 @@ class PhpDocParser
 			$bound = null;
 		}
 
-		return new Ast\PhpDoc\MethodTagValueGenericNode($name, $bound);
+		if ($tokens->tryConsumeTokenValue('=')) {
+			$default = $this->typeParser->parse($tokens);
+		} else {
+			$default = null;
+		}
+
+		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, '', $default);
 	}
 
 	private function parseMethodTagValueParameter(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueParameterNode

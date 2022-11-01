@@ -20,8 +20,8 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var string */
 	public $methodName;
 
-	/** @var MethodTagValueGenericNode[] */
-	public $generics;
+	/** @var TemplateTagValueNode[] */
+	public $templateTypes;
 
 	/** @var MethodTagValueParameterNode[] */
 	public $parameters;
@@ -29,14 +29,14 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $generics, array $parameters, string $description)
+	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description, array $templateTypes = [])
 	{
 		$this->isStatic = $isStatic;
 		$this->returnType = $returnType;
 		$this->methodName = $methodName;
-		$this->generics = $generics;
 		$this->parameters = $parameters;
 		$this->description = $description;
+		$this->templateTypes = $templateTypes;
 	}
 
 
@@ -44,10 +44,10 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	{
 		$static = $this->isStatic ? 'static ' : '';
 		$returnType = $this->returnType !== null ? "{$this->returnType} " : '';
-		$generics = count($this->generics) > 0 ? '<' . implode(', ', $this->generics) . '>' : '';
 		$parameters = implode(', ', $this->parameters);
 		$description = $this->description !== '' ? " {$this->description}" : '';
-		return "{$static}{$returnType}{$this->methodName}{$generics}({$parameters}){$description}";
+		$templateTypes = count($this->templateTypes) > 0 ? '<' . implode(', ', $this->templateTypes) . '>' : '';
+		return "{$static}{$returnType}{$this->methodName}{$templateTypes}({$parameters}){$description}";
 	}
 
 }
