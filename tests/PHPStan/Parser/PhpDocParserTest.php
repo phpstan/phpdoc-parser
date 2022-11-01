@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use Iterator;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
@@ -16,6 +17,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueGenericNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
@@ -44,6 +46,7 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -1834,6 +1837,7 @@ class PhpDocParserTest extends TestCase
 						null,
 						'foo',
 						[],
+						[],
 						''
 					)
 				),
@@ -1850,6 +1854,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[],
 						''
 					)
@@ -1868,6 +1873,7 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('static'),
 						'foo',
 						[],
+						[],
 						''
 					)
 				),
@@ -1884,6 +1890,7 @@ class PhpDocParserTest extends TestCase
 						true,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[],
 						''
 					)
@@ -1902,6 +1909,7 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('static'),
 						'foo',
 						[],
+						[],
 						''
 					)
 				),
@@ -1919,6 +1927,7 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						'foo',
 						[],
+						[],
 						'optional description'
 					)
 				),
@@ -1935,6 +1944,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								null,
@@ -1960,6 +1970,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('A'),
@@ -1985,6 +1996,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('A'),
@@ -2010,6 +2022,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('A'),
@@ -2035,6 +2048,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('A'),
@@ -2060,6 +2074,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								null,
@@ -2085,6 +2100,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('A'),
@@ -2110,6 +2126,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('Foo'),
 						'foo',
+						[],
 						[
 							new MethodTagValueParameterNode(
 								null,
@@ -2194,6 +2211,93 @@ class PhpDocParserTest extends TestCase
 					)
 				),
 			]),
+		];
+
+		yield [
+			'OK non-static, with return type and parameter with generic type',
+			'/** @method ?T randomElement<T>(array<array-key, T> $array = [\'a\', \'b\']) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new NullableTypeNode(new IdentifierTypeNode('T')),
+						'randomElement',
+						[
+							new MethodTagValueGenericNode('T', null),
+						],
+						[
+							new MethodTagValueParameterNode(
+								new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('array-key'),
+										new IdentifierTypeNode('T'),
+									]
+								),
+								false,
+								false,
+								'$array',
+								new ConstExprArrayNode([
+									new ConstExprArrayItemNode(
+										null,
+										new ConstExprStringNode('\'a\'')
+									),
+									new ConstExprArrayItemNode(
+										null,
+										new ConstExprStringNode('\'b\'')
+									),
+								]),
+							),
+						],
+						''
+					)
+				)
+			])
+		];
+
+		yield [
+			'OK static, with return type and multiple parameters with generic type',
+			'/** @method static bool compare<T1, T2 of Bar, T3 as Baz>(T1 $t1, T2 $t2, T3 $t3) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						true,
+						new IdentifierTypeNode('bool'),
+						'compare',
+						[
+							new MethodTagValueGenericNode('T1', null),
+							new MethodTagValueGenericNode('T2', new IdentifierTypeNode('Bar')),
+							new MethodTagValueGenericNode('T3', new IdentifierTypeNode('Baz')),
+						],
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('T1'),
+								false,
+								false,
+								'$t1',
+								null
+							),
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('T2'),
+								false,
+								false,
+								'$t2',
+								null
+							),
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('T3'),
+								false,
+								false,
+								'$t3',
+								null
+							),
+						],
+						''
+					)
+				)
+			])
 		];
 	}
 
@@ -2533,6 +2637,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('int'),
 							'getInteger',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2558,6 +2663,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('void'),
 							'doSomething',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2587,6 +2693,7 @@ some text in the middle'
 							]),
 							'getFooOrBar',
 							[],
+							[],
 							''
 						)
 					),
@@ -2597,6 +2704,7 @@ some text in the middle'
 							null,
 							'methodWithNoReturnType',
 							[],
+							[],
 							''
 						)
 					),
@@ -2606,6 +2714,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('int'),
 							'getIntegerStatically',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2631,6 +2740,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('void'),
 							'doSomethingStatically',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2660,6 +2770,7 @@ some text in the middle'
 							]),
 							'getFooOrBarStatically',
 							[],
+							[],
 							''
 						)
 					),
@@ -2670,6 +2781,7 @@ some text in the middle'
 							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStatically',
 							[],
+							[],
 							''
 						)
 					),
@@ -2679,6 +2791,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('int'),
 							'getIntegerWithDescription',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2704,6 +2817,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('void'),
 							'doSomethingWithDescription',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2733,6 +2847,7 @@ some text in the middle'
 							]),
 							'getFooOrBarWithDescription',
 							[],
+							[],
 							'Get a Foo or a Bar with a description.'
 						)
 					),
@@ -2743,6 +2858,7 @@ some text in the middle'
 							null,
 							'methodWithNoReturnTypeWithDescription',
 							[],
+							[],
 							'Do something with a description but what, who knows!'
 						)
 					),
@@ -2752,6 +2868,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('int'),
 							'getIntegerStaticallyWithDescription',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2777,6 +2894,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('void'),
 							'doSomethingStaticallyWithDescription',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
@@ -2806,6 +2924,7 @@ some text in the middle'
 							]),
 							'getFooOrBarStaticallyWithDescription',
 							[],
+							[],
 							'Get a Foo or a Bar with a description statically.'
 						)
 					),
@@ -2815,6 +2934,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStaticallyWithDescription',
+							[],
 							[],
 							'Do something with a description statically, but what, who knows!'
 						)
@@ -2826,6 +2946,7 @@ some text in the middle'
 							new IdentifierTypeNode('bool'),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClass',
 							[],
+							[],
 							''
 						)
 					),
@@ -2835,6 +2956,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('string'),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescription',
+							[],
 							[],
 							'A Description.'
 						)
@@ -2846,6 +2968,7 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerNoParams',
 							[],
+							[],
 							''
 						)
 					),
@@ -2855,6 +2978,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('void'),
 							'doSomethingNoParams',
+							[],
 							[],
 							''
 						)
@@ -2869,6 +2993,7 @@ some text in the middle'
 							]),
 							'getFooOrBarNoParams',
 							[],
+							[],
 							''
 						)
 					),
@@ -2878,6 +3003,7 @@ some text in the middle'
 							false,
 							null,
 							'methodWithNoReturnTypeNoParams',
+							[],
 							[],
 							''
 						)
@@ -2889,6 +3015,7 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerStaticallyNoParams',
 							[],
+							[],
 							''
 						)
 					),
@@ -2898,6 +3025,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('void'),
 							'doSomethingStaticallyNoParams',
+							[],
 							[],
 							''
 						)
@@ -2912,6 +3040,7 @@ some text in the middle'
 							]),
 							'getFooOrBarStaticallyNoParams',
 							[],
+							[],
 							''
 						)
 					),
@@ -2921,6 +3050,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStaticallyNoParams',
+							[],
 							[],
 							''
 						)
@@ -2932,6 +3062,7 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerWithDescriptionNoParams',
 							[],
+							[],
 							'Get an integer with a description.'
 						)
 					),
@@ -2941,6 +3072,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('void'),
 							'doSomethingWithDescriptionNoParams',
+							[],
 							[],
 							'Do something with a description.'
 						)
@@ -2955,6 +3087,7 @@ some text in the middle'
 							]),
 							'getFooOrBarWithDescriptionNoParams',
 							[],
+							[],
 							'Get a Foo or a Bar with a description.'
 						)
 					),
@@ -2965,6 +3098,7 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerStaticallyWithDescriptionNoParams',
 							[],
+							[],
 							'Get an integer with a description statically.'
 						)
 					),
@@ -2974,6 +3108,7 @@ some text in the middle'
 							true,
 							new IdentifierTypeNode('void'),
 							'doSomethingStaticallyWithDescriptionNoParams',
+							[],
 							[],
 							'Do something with a description statically.'
 						)
@@ -2988,6 +3123,7 @@ some text in the middle'
 							]),
 							'getFooOrBarStaticallyWithDescriptionNoParams',
 							[],
+							[],
 							'Get a Foo or a Bar with a description statically.'
 						)
 					),
@@ -3000,6 +3136,7 @@ some text in the middle'
 								new IdentifierTypeNode('string'),
 							]),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams',
+							[],
 							[],
 							''
 						)
@@ -3014,6 +3151,7 @@ some text in the middle'
 							]),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams',
 							[],
+							[],
 							'A Description.'
 						)
 					),
@@ -3023,6 +3161,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('\\Aws\\Result'),
 							'publish',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('array'),
@@ -3041,6 +3180,7 @@ some text in the middle'
 							false,
 							new IdentifierTypeNode('Image'),
 							'rotate',
+							[],
 							[
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('float'),
@@ -3067,7 +3207,48 @@ some text in the middle'
 							new IdentifierTypeNode('Foo'),
 							'overridenMethod',
 							[],
+							[],
 							''
+						)
+					),
+				]),
+			],
+			[
+				'OK with template method',
+				'/**
+				  * @template TKey as array-key
+				  * @template TValue
+				  * @method TKey|null find(TValue $v) find index of $v
+				  */',
+				new PhpDocNode([
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode('TKey', new IdentifierTypeNode('array-key'), '')
+					),
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode('TValue', null, '')
+					),
+					new PhpDocTagNode(
+						'@method',
+						new MethodTagValueNode(
+							false,
+							new UnionTypeNode([
+								new IdentifierTypeNode('TKey'),
+								new IdentifierTypeNode('null'),
+							]),
+							'find',
+							[],
+							[
+								new MethodTagValueParameterNode(
+									new IdentifierTypeNode('TValue'),
+									false,
+									false,
+									'$v',
+									null
+								),
+							],
+							'find index of $v',
 						)
 					),
 				]),

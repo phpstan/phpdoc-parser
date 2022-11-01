@@ -346,6 +346,14 @@ class PhpDocParser
 			exit;
 		}
 
+		$generics = [];
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+			do {
+				$generics[] = $this->parseMethodTagValueGeneric($tokens);
+			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
+		}
+
 		$parameters = [];
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
 		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
@@ -357,9 +365,22 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description);
+		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $generics, $parameters, $description);
 	}
 
+	private function parseMethodTagValueGeneric(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueGenericNode
+	{
+		$name = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		if ($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as')) {
+			$bound = $this->typeParser->parse($tokens);
+		} else {
+			$bound = null;
+		}
+
+		return new Ast\PhpDoc\MethodTagValueGenericNode($name, $bound);
+	}
 
 	private function parseMethodTagValueParameter(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueParameterNode
 	{

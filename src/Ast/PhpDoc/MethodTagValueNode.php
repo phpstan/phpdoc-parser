@@ -20,17 +20,21 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var string */
 	public $methodName;
 
+	/** @var MethodTagValueGenericNode[] */
+	public $generics;
+
 	/** @var MethodTagValueParameterNode[] */
 	public $parameters;
 
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description)
+	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $generics, array $parameters, string $description)
 	{
 		$this->isStatic = $isStatic;
 		$this->returnType = $returnType;
 		$this->methodName = $methodName;
+		$this->generics = $generics;
 		$this->parameters = $parameters;
 		$this->description = $description;
 	}
@@ -40,9 +44,10 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	{
 		$static = $this->isStatic ? 'static ' : '';
 		$returnType = $this->returnType !== null ? "{$this->returnType} " : '';
+		$generics = count($this->generics) > 0 ? '<' . implode(', ', $this->generics) . '>' : '';
 		$parameters = implode(', ', $this->parameters);
 		$description = $this->description !== '' ? " {$this->description}" : '';
-		return "{$static}{$returnType}{$this->methodName}({$parameters}){$description}";
+		return "{$static}{$returnType}{$this->methodName}{$generics}({$parameters}){$description}";
 	}
 
 }
