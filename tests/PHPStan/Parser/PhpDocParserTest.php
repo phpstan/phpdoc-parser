@@ -2229,8 +2229,8 @@ class PhpDocParserTest extends TestCase
 										null,
 										new ConstExprStringNode('\'b\'')
 									),
-								]),
-							)
+								])
+							),
 						],
 						'',
 						[
@@ -2238,7 +2238,7 @@ class PhpDocParserTest extends TestCase
 								'T',
 								null,
 								'',
-								new IdentifierTypeNode('string'),
+								new IdentifierTypeNode('string')
 							),
 						],
 					)
@@ -2284,7 +2284,7 @@ class PhpDocParserTest extends TestCase
 							new TemplateTagValueNode('T1', null, ''),
 							new TemplateTagValueNode('T2', new IdentifierTypeNode('Bar'), ''),
 							new TemplateTagValueNode('T3', new IdentifierTypeNode('Baz'), ''),
-						],
+						]
 					)
 				)
 			])
