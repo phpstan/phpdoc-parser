@@ -2230,7 +2230,7 @@ class PhpDocParserTest extends TestCase
 										new ConstExprStringNode('\'b\'')
 									),
 								]),
-							),
+							)
 						],
 						'',
 						[
