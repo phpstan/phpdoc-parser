@@ -2240,7 +2240,7 @@ class PhpDocParserTest extends TestCase
 								'',
 								new IdentifierTypeNode('string')
 							),
-						],
+						]
 					)
 				)
 			])
@@ -3200,7 +3200,7 @@ some text in the middle'
 									null
 								),
 							],
-							'find index of $v',
+							'find index of $v'
 						)
 					),
 				]),
