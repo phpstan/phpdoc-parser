@@ -2242,8 +2242,8 @@ class PhpDocParserTest extends TestCase
 							),
 						]
 					)
-				)
-			])
+				),
+			]),
 		];
 
 		yield [
@@ -2286,8 +2286,8 @@ class PhpDocParserTest extends TestCase
 							new TemplateTagValueNode('T3', new IdentifierTypeNode('Baz'), ''),
 						]
 					)
-				)
-			])
+				),
+			]),
 		];
 	}
 
