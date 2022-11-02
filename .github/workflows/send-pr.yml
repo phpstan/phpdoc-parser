@@ -23,7 +23,7 @@ jobs:
           repository: phpstan/phpstan-src
           path: phpstan-src
           token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
-          ref: 1.8.x
+          ref: 1.9.x
 
       - name: "Install dependencies"
         working-directory: ./phpstan-src
