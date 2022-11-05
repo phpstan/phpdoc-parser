@@ -593,6 +593,60 @@ class TypeParserTest extends TestCase
 				]),
 			],
 			[
+				'strict-array{
+				 	a: int,
+				 	b: string
+				 }',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'strict-list{
+				 	int,
+				 	string
+				 }',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'list{
+				 	int,
+				 	string
+				 }',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
 				'callable(): Foo',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
