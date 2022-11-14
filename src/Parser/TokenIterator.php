@@ -210,6 +210,15 @@ class TokenIterator
 	}
 
 
+	/** @internal */
+	public function copy(): self
+	{
+		$copy = new self($this->tokens, $this->index);
+		$copy->savePoints = $this->savePoints;
+		return $copy;
+	}
+
+
 	/**
 	 * @throws ParserException
 	 */
