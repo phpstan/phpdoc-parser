@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use function array_flip;
 use function array_pop;
 use function assert;
 use function count;
@@ -160,8 +161,10 @@ class TokenIterator
 	/** @phpstan-impure */
 	public function joinUntil(int ...$tokenType): string
 	{
+		$tokenTypeMap = array_flip($tokenType);
+
 		$s = '';
-		while (!in_array($this->tokens[$this->index][Lexer::TYPE_OFFSET], $tokenType, true)) {
+		while (!isset($tokenTypeMap[$this->tokens[$this->index][Lexer::TYPE_OFFSET]])) {
 			$s .= $this->tokens[$this->index++][Lexer::VALUE_OFFSET];
 		}
 		return $s;
