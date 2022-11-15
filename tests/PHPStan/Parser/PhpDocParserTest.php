@@ -282,6 +282,40 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
+			'ok without parameter name and description',
+			'/** @param Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						false,
+						'',
+						'',
+						false
+					)
+				),
+			]),
+		];
+
+		yield [
+			'ok without parameter name and with description',
+			'/** @param Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						false,
+						'',
+						'optional description',
+						false
+					)
+				),
+			]),
+		];
+
+		yield [
 			'invalid without type, parameter name and description',
 			'/** @param */',
 			new PhpDocNode([
@@ -389,44 +423,6 @@ class PhpDocParserTest extends TestCase
 							Lexer::TOKEN_VARIABLE,
 							16,
 							Lexer::TOKEN_IDENTIFIER
-						)
-					)
-				),
-			]),
-		];
-
-		yield [
-			'invalid without parameter name and description',
-			'/** @param Foo */',
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@param',
-					new InvalidTagValueNode(
-						'Foo',
-						new ParserException(
-							'*/',
-							Lexer::TOKEN_CLOSE_PHPDOC,
-							15,
-							Lexer::TOKEN_VARIABLE
-						)
-					)
-				),
-			]),
-		];
-
-		yield [
-			'invalid without parameter name and with description',
-			'/** @param Foo optional description */',
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@param',
-					new InvalidTagValueNode(
-						'Foo optional description',
-						new ParserException(
-							'optional',
-							Lexer::TOKEN_IDENTIFIER,
-							15,
-							Lexer::TOKEN_VARIABLE
 						)
 					)
 				),
@@ -4257,7 +4253,7 @@ Finder::findFiles('*.php')
 			'malformed const fetch',
 			'/** @param Foo::** $a */',
 			new PhpDocNode([
-				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
+				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_HORIZONTAL_WS))),
 			]),
 		];
 

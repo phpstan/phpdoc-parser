@@ -266,9 +266,13 @@ class PhpDocParser
 			$type = $this->typeParser->parse($tokens);
 		}
 
+		if ($type !== null) {
+			$tokens->mustBePrecededByHorizontalWhitespace();
+		}
+
 		$isReference = $tokens->tryConsumeTokenType(Lexer::TOKEN_REFERENCE);
 		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
-		$parameterName = $this->parseRequiredVariableName($tokens);
+		$parameterName = $this->parseOptionalVariableName($tokens);
 		$description = $this->parseOptionalDescription($tokens);
 
 		if ($type !== null) {
