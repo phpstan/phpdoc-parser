@@ -179,6 +179,17 @@ class TokenIterator
 		$this->index++;
 	}
 
+	public function prev(): void
+	{
+		$this->index--;
+
+		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_HORIZONTAL_WS) {
+			return;
+		}
+
+		$this->index--;
+	}
+
 	/** @phpstan-impure */
 	public function forwardToTheEnd(): void
 	{

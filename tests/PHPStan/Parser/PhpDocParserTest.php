@@ -44,6 +44,7 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -2134,6 +2135,63 @@ class PhpDocParserTest extends TestCase
 							),
 						],
 						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with reference return type',
+			'/** @method Foo &foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[],
+						'',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with reference return type be in intersection type',
+			'/** @method Foo & Bar &foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IntersectionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
+						'foo',
+						[],
+						'',
+						true
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK non-static, with reference return type with extra whitespace',
+			'/** @method Foo & foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new IdentifierTypeNode('Foo'),
+						'foo',
+						[],
+						'',
+						true
 					)
 				),
 			]),

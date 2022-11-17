@@ -26,13 +26,17 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description)
+	/** @var bool */
+	public $isByReference;
+
+	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description, bool $isByReference = false)
 	{
 		$this->isStatic = $isStatic;
 		$this->returnType = $returnType;
 		$this->methodName = $methodName;
 		$this->parameters = $parameters;
 		$this->description = $description;
+		$this->isByReference = $isByReference;
 	}
 
 
@@ -42,7 +46,8 @@ class MethodTagValueNode implements PhpDocTagValueNode
 		$returnType = $this->returnType !== null ? "{$this->returnType} " : '';
 		$parameters = implode(', ', $this->parameters);
 		$description = $this->description !== '' ? " {$this->description}" : '';
-		return "{$static}{$returnType}{$this->methodName}({$parameters}){$description}";
+		$reference = $this->isByReference === true ? '&' : '';
+		return "{$static}{$returnType}{$reference}{$this->methodName}({$parameters}){$description}";
 	}
 
 }
