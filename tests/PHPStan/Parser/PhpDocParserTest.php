@@ -75,6 +75,7 @@ class PhpDocParserTest extends TestCase
 
 	/**
 	 * @dataProvider provideTagsWithNumbers
+	 * @dataProvider provideSpecializedTags
 	 * @dataProvider provideParamTagsData
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideVarTagsData
@@ -4845,6 +4846,22 @@ Finder::findFiles('*.php')
 						new IdentifierTypeNode('string'),
 						'$s',
 						'description'
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideSpecializedTags(): Iterator
+	{
+		yield [
+			'Ok specialized tag',
+			'/** @special:param this is special */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@special:param',
+					new GenericTagValueNode(
+						'this is special'
 					)
 				),
 			]),
