@@ -28,7 +28,11 @@ Atomic
 	/ TokenParenthesesOpen ParenthesizedType TokenParenthesesClose [Array]
 
 Generic
-	= TokenAngleBracketOpen Type *(TokenComma Type) TokenAngleBracketClose
+	= TokenAngleBracketOpen GenericTypeArgument *(TokenComma GenericTypeArgument) TokenAngleBracketClose
+
+GenericTypeArgument
+    = [TokenContravariant / TokenCovariant] Type
+    / TokenWildcard
 
 Callable
 	= TokenParenthesesOpen [CallableParameters] TokenParenthesesClose TokenColon CallableReturnType
@@ -187,6 +191,15 @@ TokenIs
 
 TokenNot
 	= %s"not" 1*ByteHorizontalWs
+
+TokenContravariant
+    = %s"contravariant" 1*ByteHorizontalWs
+
+TokenCovariant
+    = %s"covariant" 1*ByteHorizontalWs
+
+TokenWildcard
+	= "*" *ByteHorizontalWs
 
 TokenIdentifier
 	= [ByteBackslash] ByteIdentifierFirst *ByteIdentifierSecond *(ByteBackslash ByteIdentifierFirst *ByteIdentifierSecond) *ByteHorizontalWs

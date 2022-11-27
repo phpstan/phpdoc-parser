@@ -279,6 +279,9 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						[
 							new IdentifierTypeNode('Bar'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					)
 				),
@@ -290,6 +293,10 @@ class TypeParserTest extends TestCase
 					[
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('Foo\\Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -619,6 +626,9 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						[
 							new IdentifierTypeNode('Bar'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					)
 				),
@@ -722,6 +732,10 @@ class TypeParserTest extends TestCase
 								[
 									new IdentifierTypeNode('mixed'),
 									new IdentifierTypeNode('string'),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 							new UnionTypeNode([
@@ -732,12 +746,19 @@ class TypeParserTest extends TestCase
 											new IdentifierTypeNode('string'),
 											[
 												new IdentifierTypeNode('foo'),
+											],
+											[
+												GenericTypeNode::VARIANCE_INVARIANT,
 											]
 										),
 										new IdentifierTypeNode('bar'),
 									])
 								),
 							]),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					),
 					new IdentifierTypeNode('Lorem'),
@@ -769,6 +790,10 @@ class TypeParserTest extends TestCase
 						[
 							new IdentifierTypeNode('array-key'),
 							new IdentifierTypeNode('int'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					)
 				),
@@ -783,6 +808,10 @@ class TypeParserTest extends TestCase
 							[
 								new IdentifierTypeNode('array-key'),
 								new IdentifierTypeNode('int'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						)
 					),
@@ -935,6 +964,8 @@ class TypeParserTest extends TestCase
 				'list<QueueAttributeName::*>',
 				new GenericTypeNode(new IdentifierTypeNode('list'), [
 					new ConstTypeNode(new ConstFetchNode('QueueAttributeName', '*')),
+				], [
+					GenericTypeNode::VARIANCE_INVARIANT,
 				]),
 			],
 			[
@@ -945,6 +976,9 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('array'),
 					[
 						new IdentifierTypeNode('Foo'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -958,6 +992,10 @@ class TypeParserTest extends TestCase
 					[
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -970,6 +1008,10 @@ class TypeParserTest extends TestCase
 					[
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -988,8 +1030,15 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('array'),
 							[
 								new IdentifierTypeNode('Bar'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -1008,8 +1057,15 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('array'),
 							[
 								new IdentifierTypeNode('Bar'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
 					]
 				),
 			],
@@ -1186,6 +1242,10 @@ class TypeParserTest extends TestCase
 						[
 							new IdentifierTypeNode('TRandKey'),
 							new IdentifierTypeNode('TRandVal'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
 						]
 					),
 					new ConditionalTypeNode(
@@ -1196,6 +1256,10 @@ class TypeParserTest extends TestCase
 							[
 								new IdentifierTypeNode('TRandKey'),
 								new IdentifierTypeNode('TRandVal'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+								GenericTypeNode::VARIANCE_INVARIANT,
 							]
 						),
 						new UnionTypeNode([
@@ -1204,6 +1268,10 @@ class TypeParserTest extends TestCase
 								[
 									new IdentifierTypeNode('TRandKey'),
 									new IdentifierTypeNode('TRandVal'),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 							new GenericTypeNode(
@@ -1211,6 +1279,10 @@ class TypeParserTest extends TestCase
 								[
 									new IdentifierTypeNode('TRandKey'),
 									new IdentifierTypeNode('TRandVal'),
+								],
+								[
+									GenericTypeNode::VARIANCE_INVARIANT,
+									GenericTypeNode::VARIANCE_INVARIANT,
 								]
 							),
 						]),
@@ -1314,6 +1386,66 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_VARIABLE,
 					15,
 					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'Foo<covariant Bar, Baz>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('Baz'),
+					],
+					[
+						GenericTypeNode::VARIANCE_COVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					]
+				),
+			],
+			[
+				'Foo<Bar, contravariant Baz>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('Baz'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_CONTRAVARIANT,
+					]
+				),
+			],
+			[
+				'Foo<covariant>',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					13,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'Foo<typovariant Bar>',
+				new ParserException(
+					'Bar',
+					Lexer::TOKEN_IDENTIFIER,
+					16,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'Foo<Bar, *>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('mixed'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_BIVARIANT,
+					]
 				),
 			],
 		];
