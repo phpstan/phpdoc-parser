@@ -1426,6 +1426,15 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'Foo<typovariant Bar>',
+				new ParserException(
+					'Bar',
+					Lexer::TOKEN_IDENTIFIER,
+					16,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
 				'Foo<Bar, *>',
 				new GenericTypeNode(
 					new IdentifierTypeNode('Foo'),
