@@ -1,5 +1,5 @@
 PhpDocMethod
-  = AnnotationName IsStatic? MethodReturnType? MethodName MethodParameters? Description?
+  = AnnotationName IsStatic? MethodReturnType? IsReference?MethodName MethodParameters? Description?
 
 AnnotationName
   = '@method'

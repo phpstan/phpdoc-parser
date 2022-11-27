@@ -7,6 +7,7 @@ use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\ShouldNotHappenException;
 use function array_key_exists;
+use function array_slice;
 use function array_values;
 use function count;
 use function trim;
@@ -330,6 +331,7 @@ class PhpDocParser
 	{
 		$isStatic = $tokens->tryConsumeTokenValue('static');
 		$returnTypeOrMethodName = $this->typeParser->parse($tokens);
+		$returnsReference = false;
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
 			$returnType = $returnTypeOrMethodName;
@@ -340,6 +342,16 @@ class PhpDocParser
 			$returnType = $isStatic ? new Ast\Type\IdentifierTypeNode('static') : null;
 			$methodName = $returnTypeOrMethodName->name;
 			$isStatic = false;
+		} elseif (
+			$returnTypeOrMethodName instanceof Ast\Type\IntersectionTypeNode
+			&& $returnTypeOrMethodName->types[count($returnTypeOrMethodName->types) - 1] instanceof Ast\Type\IdentifierTypeNode
+			&& $this->isPrecededByReferenceReturn($tokens)
+		) {
+			$methodName = $returnTypeOrMethodName->types[count($returnTypeOrMethodName->types) - 1]->name;
+			$returnType = count($returnTypeOrMethodName->types) === 2
+				? $returnTypeOrMethodName->types[0]
+				: new Ast\Type\IntersectionTypeNode(array_slice($returnTypeOrMethodName->types, 0, -1));
+			$returnsReference = true;
 
 		} else {
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER); // will throw exception
@@ -357,9 +369,25 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description);
+		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description, $returnsReference);
 	}
 
+	private function isPrecededByReferenceReturn(TokenIterator $tokens): bool
+	{
+		//We need to step back as the orignal & was already consumed.
+		$tokens->pushSavePoint();
+		$tokens->prev();
+		$tokens->prev();
+
+		//Now step forward to check the preceding tokens.
+		$result = $tokens->isPrecededByHorizontalWhitespace()
+			&& $tokens->tryConsumeTokenType(Lexer::TOKEN_INTERSECTION)
+			&& $tokens->tryConsumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		$tokens->rollback();
+
+		return $result;
+	}
 
 	private function parseMethodTagValueParameter(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueParameterNode
 	{
