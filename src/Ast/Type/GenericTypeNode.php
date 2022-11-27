@@ -38,7 +38,7 @@ class GenericTypeNode implements TypeNode
 		$genericTypes = [];
 
 		foreach ($this->genericTypes as $index => $type) {
-			$variance = $this->variances[$index];
+			$variance = $this->variances[$index] ?? self::VARIANCE_INVARIANT;
 			if ($variance === self::VARIANCE_INVARIANT) {
 				$genericTypes[] = (string) $type;
 			} elseif ($variance === self::VARIANCE_BIVARIANT) {
