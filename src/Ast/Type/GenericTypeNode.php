@@ -25,7 +25,7 @@ class GenericTypeNode implements TypeNode
 	/** @var (self::VARIANCE_*)[] */
 	public $variances;
 
-	public function __construct(IdentifierTypeNode $type, array $genericTypes, array $variances)
+	public function __construct(IdentifierTypeNode $type, array $genericTypes, array $variances = [])
 	{
 		$this->type = $type;
 		$this->genericTypes = $genericTypes;
