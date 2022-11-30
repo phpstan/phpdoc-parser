@@ -600,6 +600,75 @@ class TypeParserTest extends TestCase
 				]),
 			],
 			[
+				'array{a: int, b: int, ...}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				], false),
+			],
+			[
+				'array{int, string, ...}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ArrayShapeItemNode(
+						null,
+						false,
+						new IdentifierTypeNode('string')
+					),
+				], false),
+			],
+			[
+				'array{...}',
+				new ArrayShapeNode([], false),
+			],
+			[
+				'array{
+				 *	a: int,
+				 *	...
+				 *}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				], false),
+			],
+			[
+				'array{
+					a: int,
+					...,
+				}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				], false),
+			],
+			[
+				'array{int, ..., string}',
+				new ParserException(
+					'string',
+					Lexer::TOKEN_IDENTIFIER,
+					16,
+					Lexer::TOKEN_CLOSE_CURLY_BRACKET
+				),
+			],
+			[
 				'callable(): Foo',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
