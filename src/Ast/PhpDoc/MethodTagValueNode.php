@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use function count;
 use function implode;
 
 class MethodTagValueNode implements PhpDocTagValueNode
@@ -20,19 +21,23 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var string */
 	public $methodName;
 
+	/** @var TemplateTagValueNode[] */
+	public $templateTypes;
+
 	/** @var MethodTagValueParameterNode[] */
 	public $parameters;
 
 	/** @var string (may be empty) */
 	public $description;
 
-	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description)
+	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description, array $templateTypes = [])
 	{
 		$this->isStatic = $isStatic;
 		$this->returnType = $returnType;
 		$this->methodName = $methodName;
 		$this->parameters = $parameters;
 		$this->description = $description;
+		$this->templateTypes = $templateTypes;
 	}
 
 
@@ -42,7 +47,8 @@ class MethodTagValueNode implements PhpDocTagValueNode
 		$returnType = $this->returnType !== null ? "{$this->returnType} " : '';
 		$parameters = implode(', ', $this->parameters);
 		$description = $this->description !== '' ? " {$this->description}" : '';
-		return "{$static}{$returnType}{$this->methodName}({$parameters}){$description}";
+		$templateTypes = count($this->templateTypes) > 0 ? '<' . implode(', ', $this->templateTypes) . '>' : '';
+		return "{$static}{$returnType}{$this->methodName}{$templateTypes}({$parameters}){$description}";
 	}
 
 }

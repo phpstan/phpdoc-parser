@@ -182,7 +182,7 @@ class PhpDocParser
 				case '@template-contravariant':
 				case '@phpstan-template-contravariant':
 				case '@psalm-template-contravariant':
-					$tagValue = $this->parseTemplateTagValue($tokens);
+					$tagValue = $this->parseTemplateTagValue($tokens, true);
 					break;
 
 				case '@extends':
@@ -346,6 +346,14 @@ class PhpDocParser
 			exit;
 		}
 
+		$templateTypes = [];
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+			do {
+				$templateTypes[] = $this->parseTemplateTagValue($tokens, false);
+			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
+		}
+
 		$parameters = [];
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
 		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
@@ -357,9 +365,8 @@ class PhpDocParser
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
 		$description = $this->parseOptionalDescription($tokens);
-		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description);
+		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description, $templateTypes);
 	}
-
 
 	private function parseMethodTagValueParameter(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueParameterNode
 	{
@@ -390,7 +397,7 @@ class PhpDocParser
 		return new Ast\PhpDoc\MethodTagValueParameterNode($parameterType, $isReference, $isVariadic, $parameterName, $defaultValue);
 	}
 
-	private function parseTemplateTagValue(TokenIterator $tokens): Ast\PhpDoc\TemplateTagValueNode
+	private function parseTemplateTagValue(TokenIterator $tokens, bool $parseDescription): Ast\PhpDoc\TemplateTagValueNode
 	{
 		$name = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
@@ -408,7 +415,11 @@ class PhpDocParser
 			$default = null;
 		}
 
-		$description = $this->parseOptionalDescription($tokens);
+		if ($parseDescription) {
+			$description = $this->parseOptionalDescription($tokens);
+		} else {
+			$description = '';
+		}
 
 		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description, $default);
 	}

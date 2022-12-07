@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use Iterator;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
@@ -44,6 +45,7 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -2201,6 +2203,98 @@ class PhpDocParserTest extends TestCase
 				),
 			]),
 		];
+
+		yield [
+			'OK non-static, with return type and parameter with generic type',
+			'/** @method ?T randomElement<T = string>(array<array-key, T> $array = [\'a\', \'b\']) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new NullableTypeNode(new IdentifierTypeNode('T')),
+						'randomElement',
+						[
+							new MethodTagValueParameterNode(
+								new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('array-key'),
+										new IdentifierTypeNode('T'),
+									]
+								),
+								false,
+								false,
+								'$array',
+								new ConstExprArrayNode([
+									new ConstExprArrayItemNode(
+										null,
+										new ConstExprStringNode('\'a\'')
+									),
+									new ConstExprArrayItemNode(
+										null,
+										new ConstExprStringNode('\'b\'')
+									),
+								])
+							),
+						],
+						'',
+						[
+							new TemplateTagValueNode(
+								'T',
+								null,
+								'',
+								new IdentifierTypeNode('string')
+							),
+						]
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK static, with return type and multiple parameters with generic type',
+			'/** @method static bool compare<T1, T2 of Bar, T3 as Baz>(T1 $t1, T2 $t2, T3 $t3) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						true,
+						new IdentifierTypeNode('bool'),
+						'compare',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('T1'),
+								false,
+								false,
+								'$t1',
+								null
+							),
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('T2'),
+								false,
+								false,
+								'$t2',
+								null
+							),
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('T3'),
+								false,
+								false,
+								'$t3',
+								null
+							),
+						],
+						'',
+						[
+							new TemplateTagValueNode('T1', null, ''),
+							new TemplateTagValueNode('T2', new IdentifierTypeNode('Bar'), ''),
+							new TemplateTagValueNode('T3', new IdentifierTypeNode('Baz'), ''),
+						]
+					)
+				),
+			]),
+		];
 	}
 
 
@@ -3074,6 +3168,45 @@ some text in the middle'
 							'overridenMethod',
 							[],
 							''
+						)
+					),
+				]),
+			],
+			[
+				'OK with template method',
+				'/**
+				  * @template TKey as array-key
+				  * @template TValue
+				  * @method TKey|null find(TValue $v) find index of $v
+				  */',
+				new PhpDocNode([
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode('TKey', new IdentifierTypeNode('array-key'), '')
+					),
+					new PhpDocTagNode(
+						'@template',
+						new TemplateTagValueNode('TValue', null, '')
+					),
+					new PhpDocTagNode(
+						'@method',
+						new MethodTagValueNode(
+							false,
+							new UnionTypeNode([
+								new IdentifierTypeNode('TKey'),
+								new IdentifierTypeNode('null'),
+							]),
+							'find',
+							[
+								new MethodTagValueParameterNode(
+									new IdentifierTypeNode('TValue'),
+									false,
+									false,
+									'$v',
+									null
+								),
+							],
+							'find index of $v'
 						)
 					),
 				]),
