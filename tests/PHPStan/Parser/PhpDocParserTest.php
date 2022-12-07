@@ -2221,6 +2221,10 @@ class PhpDocParserTest extends TestCase
 									[
 										new IdentifierTypeNode('array-key'),
 										new IdentifierTypeNode('T'),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
 									]
 								),
 								false,
