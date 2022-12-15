@@ -86,14 +86,14 @@ class TypeToStringTest extends TestCase
 				new CallableTypeNode(new IdentifierTypeNode('\Closure'), [], new IdentifierTypeNode('string')),
 			],
 			[
-				'callable(int , int $foo): void',
+				'callable(int, int $foo): void',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false),
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '$foo', false),
 				], new IdentifierTypeNode('void')),
 			],
 			[
-				'callable(int  = default, int $foo = default): void',
+				'callable(int = default, int $foo = default): void',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', true),
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '$foo', true),
