@@ -27,7 +27,7 @@ class ArrayShapeNode implements TypeNode
 	{
 		$items = $this->items;
 
-		if ($this->sealed) {
+		if (! $this->sealed) {
 			$items[] = '...';
 		}
 
