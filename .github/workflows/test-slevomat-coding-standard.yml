@@ -1,0 +1,67 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Test Slevomat Coding Standard"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "1.9.x"
+
+jobs:
+  tests:
+    name: "Tests"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "7.3"
+          - "7.4"
+          - "8.0"
+          - "8.1"
+          - "8.2"
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+
+      - name: "Checkout Slevomat Coding Standard"
+        uses: actions/checkout@v3
+        with:
+          repository: slevomat/coding-standard
+          path: slevomat-cs
+          ref: 8.7.1
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Install dependencies"
+        working-directory: slevomat-cs
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Remove stable phpdoc-parser"
+        working-directory: slevomat-cs
+        run: "rm -r vendor/phpstan/phpdoc-parser/src"
+
+      - name: "Remove top-level phpcs.xml"
+        run: "rm phpcs.xml"
+
+      - name: "Copy phpdoc-parser"
+        run: "cp -r src/ slevomat-cs/vendor/phpstan/phpdoc-parser/src"
+
+      - name: "Tests"
+        working-directory: slevomat-cs
+        run: "bin/phpunit"
+
+      - name: "PHPStan"
+        working-directory: slevomat-cs
+        run: "bin/phpstan analyse -c build/PHPStan/phpstan.neon"
+
+      - name: "PHPStan in tests"
+        working-directory: slevomat-cs
+        run: "bin/phpstan analyse -c build/PHPStan/phpstan.tests.neon"
