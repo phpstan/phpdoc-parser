@@ -4,7 +4,6 @@ namespace PHPStan\PhpDocParser\Ast\Type;
 
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
-use function trim;
 
 class CallableTypeParameterNode implements Node
 {
@@ -42,7 +41,7 @@ class CallableTypeParameterNode implements Node
 		$isReference = $this->isReference ? '&' : '';
 		$isVariadic = $this->isVariadic ? '...' : '';
 		$default = $this->isOptional ? ' = default' : '';
-		return trim("{$type}{$isReference}{$isVariadic}{$this->parameterName}") . $default;
+		return "{$type}{$isReference}{$isVariadic}{$this->parameterName}{$default}";
 	}
 
 }
