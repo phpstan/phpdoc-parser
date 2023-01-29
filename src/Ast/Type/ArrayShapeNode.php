@@ -8,6 +8,9 @@ use function implode;
 class ArrayShapeNode implements TypeNode
 {
 
+	public const KIND_ARRAY = 'array';
+	public const KIND_LIST = 'list';
+
 	use NodeAttributes;
 
 	/** @var ArrayShapeItemNode[] */
@@ -16,10 +19,17 @@ class ArrayShapeNode implements TypeNode
 	/** @var bool */
 	public $sealed;
 
-	public function __construct(array $items, bool $sealed = true)
+	/** @var self::KIND_* */
+	public $kind;
+
+	/**
+	 * @param self::KIND_* $kind
+	 */
+	public function __construct(array $items, bool $sealed = true, string $kind = self::KIND_ARRAY)
 	{
 		$this->items = $items;
 		$this->sealed = $sealed;
+		$this->kind = $kind;
 	}
 
 
@@ -31,7 +41,7 @@ class ArrayShapeNode implements TypeNode
 			$items[] = '...';
 		}
 
-		return 'array{' . implode(', ', $items) . '}';
+		return $this->kind . '{' . implode(', ', $items) . '}';
 	}
 
 }
