@@ -125,7 +125,7 @@ class TypeParser
 					$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
 
 				} elseif (in_array($type->name, ['array', 'list'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
-					$type = $this->parseArrayShape($tokens, $type);
+					$type = $this->parseArrayShape($tokens, $type, $type->name);
 
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 						$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
@@ -441,7 +441,7 @@ class TypeParser
 				$type = $this->parseGeneric($tokens, $type);
 
 			} elseif (in_array($type->name, ['array', 'list'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
-				$type = $this->parseArrayShape($tokens, $type);
+				$type = $this->parseArrayShape($tokens, $type, $type->name);
 			}
 		}
 
@@ -500,8 +500,11 @@ class TypeParser
 	}
 
 
-	/** @phpstan-impure */
-	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\ArrayShapeNode
+	/**
+	 * @phpstan-impure
+	 * @param Ast\Type\ArrayShapeNode::KIND_* $kind
+	 */
+	private function parseArrayShape(TokenIterator $tokens, Ast\Type\TypeNode $type, string $kind): Ast\Type\ArrayShapeNode
 	{
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET);
 
@@ -529,7 +532,7 @@ class TypeParser
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
-		return new Ast\Type\ArrayShapeNode($items, $sealed);
+		return new Ast\Type\ArrayShapeNode($items, $sealed, $kind);
 	}
 
 

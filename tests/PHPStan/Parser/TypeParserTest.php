@@ -673,18 +673,22 @@ class TypeParserTest extends TestCase
 				 	int,
 				 	string
 				 }',
-				new ArrayShapeNode([
-					new ArrayShapeItemNode(
-						null,
-						false,
-						new IdentifierTypeNode('int')
-					),
-					new ArrayShapeItemNode(
-						null,
-						false,
-						new IdentifierTypeNode('string')
-					),
-				]),
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('string')
+						),
+					],
+					true,
+					ArrayShapeNode::KIND_LIST
+				),
 			],
 			[
 				'callable(): Foo',
