@@ -515,7 +515,7 @@ class TypeParser
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
-				return new Ast\Type\ArrayShapeNode($items);
+				return new Ast\Type\ArrayShapeNode($items, true, $kind);
 			}
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC)) {
