@@ -75,6 +75,15 @@ class TypeToStringTest extends TestCase
 					new ArrayShapeItemNode(new ConstExprIntegerNode('1'), false, new IdentifierTypeNode('Baz')),
 				]),
 			],
+			['list{}', new ArrayShapeNode([], true, 'list')],
+			['list{...}', new ArrayShapeNode([], false, 'list')],
+			[
+				'list{string, int, ...}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
+					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('int')),
+				], false, 'list'),
+			],
 		];
 	}
 
