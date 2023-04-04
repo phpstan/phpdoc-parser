@@ -916,6 +916,24 @@ class PhpDocParserTest extends TestCase
 					)
 				),
 			]),
+			null,
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-type',
+					new TypeAliasTagValueNode(
+						'PARTSTRUCTURE_PARAM',
+						new InvalidTypeNode(
+							new ParserException(
+								'{',
+								Lexer::TOKEN_OPEN_CURLY_BRACKET,
+								44,
+								Lexer::TOKEN_PHPDOC_EOL,
+								null
+							)
+						)
+					)
+				),
+			]),
 		];
 	}
 
@@ -3949,6 +3967,106 @@ some text in the middle'
 					new MixinTagValueNode(
 						new IdentifierTypeNode('T'),
 						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid type that should be an error',
+			'/**
+ * @phpstan-type Foo array{}
+ * @phpstan-type InvalidFoo what{}
+ */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new InvalidTagValueNode(
+						"Unexpected token \"{\", expected '*/' at offset 65",
+						new ParserException(
+							'{',
+							Lexer::TOKEN_OPEN_CURLY_BRACKET,
+							65,
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							null
+						)
+					)
+				),
+			]),
+			null,
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Foo',
+						new ArrayShapeNode([])
+					)
+				),
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'InvalidFoo',
+						new InvalidTypeNode(new ParserException(
+							'{',
+							Lexer::TOKEN_OPEN_CURLY_BRACKET,
+							65,
+							Lexer::TOKEN_PHPDOC_EOL,
+							null
+						))
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid type that should be an error followed by valid again',
+			'/**
+ * @phpstan-type Foo array{}
+ * @phpstan-type InvalidFoo what{}
+ * @phpstan-type Bar array{}
+ */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new InvalidTagValueNode(
+						"Unexpected token \"{\", expected '*/' at offset 65",
+						new ParserException(
+							'{',
+							Lexer::TOKEN_OPEN_CURLY_BRACKET,
+							65,
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							null
+						)
+					)
+				),
+			]),
+			null,
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Foo',
+						new ArrayShapeNode([])
+					)
+				),
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'InvalidFoo',
+						new InvalidTypeNode(new ParserException(
+							'{',
+							Lexer::TOKEN_OPEN_CURLY_BRACKET,
+							65,
+							Lexer::TOKEN_PHPDOC_EOL,
+							null
+						))
+					)
+				),
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Bar',
+						new ArrayShapeNode([])
 					)
 				),
 			]),
