@@ -28,11 +28,15 @@ class PhpDocParser
 	/** @var bool */
 	private $requireWhitespaceBeforeDescription;
 
-	public function __construct(TypeParser $typeParser, ConstExprParser $constantExprParser, bool $requireWhitespaceBeforeDescription = false)
+	/** @var bool */
+	private $preserveTypeAliasesWithInvalidTypes;
+
+	public function __construct(TypeParser $typeParser, ConstExprParser $constantExprParser, bool $requireWhitespaceBeforeDescription = false, bool $preserveTypeAliasesWithInvalidTypes = false)
 	{
 		$this->typeParser = $typeParser;
 		$this->constantExprParser = $constantExprParser;
 		$this->requireWhitespaceBeforeDescription = $requireWhitespaceBeforeDescription;
+		$this->preserveTypeAliasesWithInvalidTypes = $preserveTypeAliasesWithInvalidTypes;
 	}
 
 
@@ -452,6 +456,16 @@ class PhpDocParser
 
 		// support psalm-type syntax
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
+
+		if ($this->preserveTypeAliasesWithInvalidTypes) {
+			try {
+				$type = $this->typeParser->parse($tokens);
+
+				return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
+			} catch (ParserException $e) {
+				return new Ast\PhpDoc\TypeAliasTagValueNode($alias, new Ast\Type\InvalidTypeNode($e));
+			}
+		}
 
 		$type = $this->typeParser->parse($tokens);
 

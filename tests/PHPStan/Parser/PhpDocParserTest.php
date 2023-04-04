@@ -45,6 +45,7 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\InvalidTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -64,6 +65,9 @@ class PhpDocParserTest extends TestCase
 	/** @var PhpDocParser */
 	private $phpDocParserWithRequiredWhitespaceBeforeDescription;
 
+	/** @var PhpDocParser */
+	private $phpDocParserWithPreserveTypeAliasesWithInvalidTypes;
+
 	protected function setUp(): void
 	{
 		parent::setUp();
@@ -72,6 +76,7 @@ class PhpDocParserTest extends TestCase
 		$typeParser = new TypeParser($constExprParser);
 		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
 		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true);
+		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, true);
 	}
 
 
@@ -104,7 +109,8 @@ class PhpDocParserTest extends TestCase
 		string $label,
 		string $input,
 		PhpDocNode $expectedPhpDocNode,
-		?PhpDocNode $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode = null
+		?PhpDocNode $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode = null,
+		?PhpDocNode $withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode = null
 	): void
 	{
 		$this->executeTestParse(
@@ -119,6 +125,13 @@ class PhpDocParserTest extends TestCase
 			$label,
 			$input,
 			$withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode ?? $expectedPhpDocNode
+		);
+
+		$this->executeTestParse(
+			$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes,
+			$label,
+			$input,
+			$withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode ?? $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode ?? $expectedPhpDocNode
 		);
 	}
 
@@ -3831,6 +3844,111 @@ some text in the middle'
 							28,
 							Lexer::TOKEN_IDENTIFIER
 						)
+					)
+				),
+			]),
+			null,
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new InvalidTypeNode(new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							28,
+							Lexer::TOKEN_IDENTIFIER,
+							null
+						))
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type with newline',
+			'/**
+			  * @phpstan-type TypeAlias
+			  */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new InvalidTagValueNode(
+						'TypeAlias',
+						new ParserException(
+							"\n\t\t\t  ",
+							Lexer::TOKEN_PHPDOC_EOL,
+							34,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+			]),
+			null,
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new InvalidTypeNode(new ParserException(
+							"\n\t\t\t  ",
+							Lexer::TOKEN_PHPDOC_EOL,
+							34,
+							Lexer::TOKEN_IDENTIFIER,
+							null
+						))
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type but valid tag below',
+			'/**
+			  * @phpstan-type TypeAlias
+			  * @mixin T
+			  */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new InvalidTagValueNode(
+						'TypeAlias',
+						new ParserException(
+							"\n\t\t\t  * ",
+							Lexer::TOKEN_PHPDOC_EOL,
+							34,
+							Lexer::TOKEN_IDENTIFIER
+						)
+					)
+				),
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new IdentifierTypeNode('T'),
+						''
+					)
+				),
+			]),
+			null,
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new InvalidTypeNode(new ParserException(
+							"\n\t\t\t  * ",
+							Lexer::TOKEN_PHPDOC_EOL,
+							34,
+							Lexer::TOKEN_IDENTIFIER,
+							null
+						))
+					)
+				),
+				new PhpDocTagNode(
+					'@mixin',
+					new MixinTagValueNode(
+						new IdentifierTypeNode('T'),
+						''
 					)
 				),
 			]),
