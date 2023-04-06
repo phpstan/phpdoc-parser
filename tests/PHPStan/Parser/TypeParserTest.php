@@ -1860,6 +1860,21 @@ class TypeParserTest extends TestCase
 				'int|object{}',
 				new UnionTypeNode([new IdentifierTypeNode('int'), new ObjectShapeNode([])]),
 			],
+			[
+				'object{attribute:string, value?:string}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('attribute'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('value'),
+						true,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
 		];
 	}
 
