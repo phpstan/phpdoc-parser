@@ -19,6 +19,8 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
@@ -1538,6 +1540,325 @@ class TypeParserTest extends TestCase
 						GenericTypeNode::VARIANCE_BIVARIANT,
 					]
 				),
+			],
+			[
+				'object{a: int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{a: ?int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new NullableTypeNode(
+							new IdentifierTypeNode('int')
+						)
+					),
+				]),
+			],
+			[
+				'object{a?: ?int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						true,
+						new NullableTypeNode(
+							new IdentifierTypeNode('int')
+						)
+					),
+				]),
+			],
+			[
+				'object{a: int, b: string}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'object{a: int, b: array{c: callable(): int}}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new ArrayShapeNode([
+							new ArrayShapeItemNode(
+								new IdentifierTypeNode('c'),
+								false,
+								new CallableTypeNode(
+									new IdentifierTypeNode('callable'),
+									[],
+									new IdentifierTypeNode('int')
+								)
+							),
+						])
+					),
+				]),
+			],
+			[
+				'object{a: int, b: object{c: callable(): int}}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(
+								new IdentifierTypeNode('c'),
+								false,
+								new CallableTypeNode(
+									new IdentifierTypeNode('callable'),
+									[],
+									new IdentifierTypeNode('int')
+								)
+							),
+						])
+					),
+				]),
+			],
+			[
+				'?object{a: int}',
+				new NullableTypeNode(
+					new ObjectShapeNode([
+						new ObjectShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+					])
+				),
+			],
+			[
+				'object{',
+				new ParserException(
+					'',
+					Lexer::TOKEN_END,
+					7,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'object{a => int}',
+				new ParserException(
+					'=>',
+					Lexer::TOKEN_OTHER,
+					9,
+					Lexer::TOKEN_COLON
+				),
+			],
+			[
+				'object{int}',
+				new ParserException(
+					'}',
+					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
+					10,
+					Lexer::TOKEN_COLON
+				),
+			],
+			[
+				'object{0: int}',
+				new ParserException(
+					'0',
+					Lexer::TOKEN_END,
+					7,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'object{0?: int}',
+				new ParserException(
+					'0',
+					Lexer::TOKEN_END,
+					7,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'object{"a": int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new ConstExprStringNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{\'a\': int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new ConstExprStringNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{\'$ref\': int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new ConstExprStringNode('$ref'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{"$ref": int}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new ConstExprStringNode('$ref'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{
+				 *	a: int
+				 *}',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{
+				 	a: int,
+				 }',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'object{
+				 	a: int,
+				 	b: string,
+				 }',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'object{
+				 	a: int
+				 	, b: string
+				 	, c: string
+				 }',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('c'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'object{
+				 	a: int,
+				 	b: string
+				 }',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+					new ObjectShapeItemNode(
+						new IdentifierTypeNode('b'),
+						false,
+						new IdentifierTypeNode('string')
+					),
+				]),
+			],
+			[
+				'object{foo: int}[]',
+				new ArrayTypeNode(
+					new ObjectShapeNode([
+						new ObjectShapeItemNode(
+							new IdentifierTypeNode('foo'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+					])
+				),
+			],
+			[
+				'int | object{foo: int}[]',
+				new UnionTypeNode([
+					new IdentifierTypeNode('int'),
+					new ArrayTypeNode(
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(
+								new IdentifierTypeNode('foo'),
+								false,
+								new IdentifierTypeNode('int')
+							),
+						])
+					),
+				]),
+			],
+			[
+				'object{}',
+				new ObjectShapeNode([]),
+			],
+			[
+				'object{}|int',
+				new UnionTypeNode([new ObjectShapeNode([]), new IdentifierTypeNode('int')]),
+			],
+			[
+				'int|object{}',
+				new UnionTypeNode([new IdentifierTypeNode('int'), new ObjectShapeNode([])]),
 			],
 		];
 	}

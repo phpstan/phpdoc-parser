@@ -901,16 +901,16 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'invalid object shape',
-			'/** @psalm-type PARTSTRUCTURE_PARAM = object{attribute:string, value?:string} */',
+			'/** @psalm-type PARTSTRUCTURE_PARAM = objecttt{attribute:string, value?:string} */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@psalm-type',
 					new InvalidTagValueNode(
-						'Unexpected token "{", expected \'*/\' at offset 44',
+						'Unexpected token "{", expected \'*/\' at offset 46',
 						new ParserException(
 							'{',
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
-							44,
+							46,
 							Lexer::TOKEN_CLOSE_PHPDOC
 						)
 					)
@@ -926,7 +926,7 @@ class PhpDocParserTest extends TestCase
 							new ParserException(
 								'{',
 								Lexer::TOKEN_OPEN_CURLY_BRACKET,
-								44,
+								46,
 								Lexer::TOKEN_PHPDOC_EOL,
 								null
 							)
