@@ -33,7 +33,7 @@ class ConstExprParser
 		$this->unescapeStrings = $unescapeStrings;
 	}
 
-	public function parse(TokenIterator $tokens, bool $trimStrings = false): Ast\ConstExpr\ConstExprNode
+	public function parse(TokenIterator $tokens): Ast\ConstExpr\ConstExprNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_FLOAT)) {
 			$value = $tokens->currentTokenValue();
@@ -49,12 +49,10 @@ class ConstExprParser
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING, Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
 			$value = $tokens->currentTokenValue();
-			if ($trimStrings) {
-				if ($this->unescapeStrings) {
-					$value = self::unescapeString($value);
-				} else {
-					$value = substr($value, 1, -1);
-				}
+			if ($this->unescapeStrings) {
+				$value = self::unescapeString($value);
+			} else {
+				$value = substr($value, 1, -1);
 			}
 			$tokens->next();
 			return new Ast\ConstExpr\ConstExprStringNode($value);
