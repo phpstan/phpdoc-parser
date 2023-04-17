@@ -148,26 +148,29 @@ class TypeParser
 			$tokens->dropSavePoint(); // because of ConstFetchNode
 		}
 
-		$exception = new ParserException(
-			$tokens->currentTokenValue(),
-			$tokens->currentTokenType(),
-			$tokens->currentTokenOffset(),
-			Lexer::TOKEN_IDENTIFIER
-		);
+		$tokensCopy = $tokens->copy();
+		$exception = static function () use ($tokensCopy): ParserException {
+			return new ParserException(
+				$tokensCopy->currentTokenValue(),
+				$tokensCopy->currentTokenType(),
+				$tokensCopy->currentTokenOffset(),
+				Lexer::TOKEN_IDENTIFIER
+			);
+		};
 
 		if ($this->constExprParser === null) {
-			throw $exception;
+			throw $exception();
 		}
 
 		try {
 			$constExpr = $this->constExprParser->parse($tokens, true);
 			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
-				throw $exception;
+				throw $exception();
 			}
 
 			return new Ast\Type\ConstTypeNode($constExpr);
 		} catch (LogicException $e) {
-			throw $exception;
+			throw $exception();
 		}
 	}
 
