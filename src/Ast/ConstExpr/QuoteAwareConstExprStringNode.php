@@ -13,16 +13,13 @@ use function str_pad;
 use function strlen;
 use const STR_PAD_LEFT;
 
-class QuoteAwareConstExprStringNode implements ConstExprNode
+class QuoteAwareConstExprStringNode extends ConstExprStringNode implements ConstExprNode
 {
 
 	public const SINGLE_QUOTED = 1;
 	public const DOUBLE_QUOTED = 2;
 
 	use NodeAttributes;
-
-	/** @var string */
-	public $value;
 
 	/** @var self::SINGLE_QUOTED|self::DOUBLE_QUOTED */
 	public $quoteType;
@@ -32,7 +29,7 @@ class QuoteAwareConstExprStringNode implements ConstExprNode
 	 */
 	public function __construct(string $value, int $quoteType)
 	{
-		$this->value = $value;
+		parent::__construct($value);
 		$this->quoteType = $quoteType;
 	}
 

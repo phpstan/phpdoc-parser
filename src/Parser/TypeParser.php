@@ -566,7 +566,7 @@ class TypeParser
 
 	/**
 	 * @phpstan-impure
-	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\ConstExpr\QuoteAwareConstExprStringNode|Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
+	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
 	 */
 	private function parseArrayShapeKey(TokenIterator $tokens)
 	{
@@ -639,7 +639,7 @@ class TypeParser
 
 	/**
 	 * @phpstan-impure
-	 * @return Ast\ConstExpr\QuoteAwareConstExprStringNode|Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
+	 * @return Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
 	 */
 	private function parseObjectShapeKey(TokenIterator $tokens)
 	{
