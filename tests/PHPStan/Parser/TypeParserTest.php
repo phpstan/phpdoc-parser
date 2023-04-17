@@ -28,6 +28,7 @@ use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
 use function get_class;
+use function strpos;
 use const PHP_EOL;
 
 class TypeParserTest extends TestCase
@@ -65,6 +66,15 @@ class TypeParserTest extends TestCase
 		$this->assertInstanceOf(get_class($expectedResult), $typeNode);
 		$this->assertEquals($expectedResult, $typeNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+
+		if (strpos((string) $expectedResult, '$ref') !== false) {
+			// weird case with $ref inside double-quoted string - not really possible in PHP
+			return;
+		}
+
+		$typeNodeTokens = new TokenIterator($this->lexer->tokenize((string) $typeNode));
+		$parsedAgainTypeNode = $this->typeParser->parse($typeNodeTokens);
+		$this->assertSame((string) $typeNode, (string) $parsedAgainTypeNode);
 	}
 
 
