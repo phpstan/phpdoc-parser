@@ -576,7 +576,7 @@ class TypeParser
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
 			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(trim($tokens->currentTokenValue(), "'"), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
+				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
 			} else {
 				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), "'"));
 			}
@@ -584,7 +584,7 @@ class TypeParser
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
 			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(trim($tokens->currentTokenValue(), '"'), Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED);
+				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED);
 			} else {
 				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), '"'));
 			}
@@ -645,7 +645,7 @@ class TypeParser
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
 			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(trim($tokens->currentTokenValue(), "'"), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
+				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
 			} else {
 				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), "'"));
 			}
@@ -653,7 +653,7 @@ class TypeParser
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
 			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(trim($tokens->currentTokenValue(), '"'), Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED);
+				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED);
 			} else {
 				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), '"'));
 			}
