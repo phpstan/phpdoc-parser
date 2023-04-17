@@ -5,8 +5,8 @@ namespace PHPStan\PhpDocParser\Parser;
 use Exception;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
-use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -43,7 +43,7 @@ class TypeParserTest extends TestCase
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
-		$this->typeParser = new TypeParser(new ConstExprParser());
+		$this->typeParser = new TypeParser(new ConstExprParser(true, true), true);
 	}
 
 
@@ -481,7 +481,7 @@ class TypeParserTest extends TestCase
 				'array{"a": int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('a'),
+						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -491,7 +491,7 @@ class TypeParserTest extends TestCase
 				'array{\'a\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('a'),
+						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -501,7 +501,7 @@ class TypeParserTest extends TestCase
 				'array{\'$ref\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('$ref'),
+						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -511,7 +511,7 @@ class TypeParserTest extends TestCase
 				'array{"$ref": int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new ConstExprStringNode('$ref'),
+						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -979,8 +979,8 @@ class TypeParserTest extends TestCase
 			[
 				"'foo'|'bar'",
 				new UnionTypeNode([
-					new ConstTypeNode(new ConstExprStringNode('foo')),
-					new ConstTypeNode(new ConstExprStringNode('bar')),
+					new ConstTypeNode(new QuoteAwareConstExprStringNode('foo', QuoteAwareConstExprStringNode::SINGLE_QUOTED)),
+					new ConstTypeNode(new QuoteAwareConstExprStringNode('bar', QuoteAwareConstExprStringNode::SINGLE_QUOTED)),
 				]),
 			],
 			[
@@ -997,7 +997,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'"bar"',
-				new ConstTypeNode(new ConstExprStringNode('bar')),
+				new ConstTypeNode(new QuoteAwareConstExprStringNode('bar', QuoteAwareConstExprStringNode::DOUBLE_QUOTED)),
 			],
 			[
 				'Foo::FOO_*',
@@ -1035,7 +1035,7 @@ class TypeParserTest extends TestCase
 			[
 				'( "foo" | Foo::FOO_* )',
 				new UnionTypeNode([
-					new ConstTypeNode(new ConstExprStringNode('foo')),
+					new ConstTypeNode(new QuoteAwareConstExprStringNode('foo', QuoteAwareConstExprStringNode::DOUBLE_QUOTED)),
 					new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
 				]),
 			],
@@ -1701,7 +1701,7 @@ class TypeParserTest extends TestCase
 				'object{"a": int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new ConstExprStringNode('a'),
+						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -1711,7 +1711,7 @@ class TypeParserTest extends TestCase
 				'object{\'a\': int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new ConstExprStringNode('a'),
+						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -1721,7 +1721,7 @@ class TypeParserTest extends TestCase
 				'object{\'$ref\': int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new ConstExprStringNode('$ref'),
+						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -1731,7 +1731,7 @@ class TypeParserTest extends TestCase
 				'object{"$ref": int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new ConstExprStringNode('$ref'),
+						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
