@@ -28,9 +28,13 @@ class ConstExprParser
 	/** @var bool */
 	private $unescapeStrings;
 
-	public function __construct(bool $unescapeStrings = false)
+	/** @var bool */
+	private $quoteAwareConstExprString;
+
+	public function __construct(bool $unescapeStrings = false, bool $quoteAwareConstExprString = false)
 	{
 		$this->unescapeStrings = $unescapeStrings;
+		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
 	}
 
 	public function parse(TokenIterator $tokens, bool $trimStrings = false): Ast\ConstExpr\ConstExprNode
@@ -49,6 +53,7 @@ class ConstExprParser
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING, Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
 			$value = $tokens->currentTokenValue();
+			$type = $tokens->currentTokenType();
 			if ($trimStrings) {
 				if ($this->unescapeStrings) {
 					$value = self::unescapeString($value);
@@ -57,6 +62,16 @@ class ConstExprParser
 				}
 			}
 			$tokens->next();
+
+			if ($this->quoteAwareConstExprString) {
+				return new Ast\ConstExpr\QuoteAwareConstExprStringNode(
+					$value,
+					$type === Lexer::TOKEN_SINGLE_QUOTED_STRING
+						? Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED
+						: Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED
+				);
+			}
+
 			return new Ast\ConstExpr\ConstExprStringNode($value);
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
