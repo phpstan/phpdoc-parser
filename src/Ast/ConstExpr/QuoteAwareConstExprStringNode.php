@@ -11,6 +11,7 @@ use function preg_replace_callback;
 use function sprintf;
 use function str_pad;
 use function strlen;
+use const STR_PAD_LEFT;
 
 class QuoteAwareConstExprStringNode implements ConstExprNode
 {
@@ -47,9 +48,10 @@ class QuoteAwareConstExprStringNode implements ConstExprNode
 		return sprintf('"%s"', $this->escapeDoubleQuotedString());
 	}
 
-	private function escapeDoubleQuotedString() {
+	private function escapeDoubleQuotedString()
+	{
 		$quote = '"';
-		$escaped = addcslashes($this->value, "\n\r\t\f\v$" . $quote . "\\");
+		$escaped = addcslashes($this->value, "\n\r\t\f\v$" . $quote . '\\');
 
 		// Escape control characters and non-UTF-8 characters.
 		// Regex based on https://stackoverflow.com/a/11709412/385378.
@@ -68,10 +70,11 @@ class QuoteAwareConstExprStringNode implements ConstExprNode
             | (?<=[\xF0-\xF4])[\x80-\xBF](?![\x80-\xBF]{2}) # Short 4 byte sequence
             | (?<=[\xF0-\xF4][\x80-\xBF])[\x80-\xBF](?![\x80-\xBF]) # Short 4 byte sequence (2)
         )/x';
-		return preg_replace_callback($regex, function ($matches) {
+		return preg_replace_callback($regex, static function ($matches) {
 			assert(strlen($matches[0]) === 1);
-			$hex = dechex(ord($matches[0]));;
-			return '\\x' . str_pad($hex, 2, '0', \STR_PAD_LEFT);
+			$hex = dechex(ord($matches[0]));
+
+			return '\\x' . str_pad($hex, 2, '0', STR_PAD_LEFT);
 		}, $escaped);
 	}
 
