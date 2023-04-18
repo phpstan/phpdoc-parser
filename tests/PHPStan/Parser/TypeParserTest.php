@@ -1885,6 +1885,22 @@ class TypeParserTest extends TestCase
 					),
 				]),
 			],
+			[
+				'Closure(Foo): (Closure(Foo): Bar)',
+				new CallableTypeNode(
+					new IdentifierTypeNode('Closure'),
+					[
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+					],
+					new CallableTypeNode(
+						new IdentifierTypeNode('Closure'),
+						[
+							new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
+						],
+						new IdentifierTypeNode('Bar')
+					)
+				),
+			],
 		];
 	}
 

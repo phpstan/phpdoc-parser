@@ -29,8 +29,12 @@ class CallableTypeNode implements TypeNode
 
 	public function __toString(): string
 	{
+		$returnType = $this->returnType;
+		if ($returnType instanceof self) {
+			$returnType = "({$returnType})";
+		}
 		$parameters = implode(', ', $this->parameters);
-		return "{$this->identifier}({$parameters}): {$this->returnType}";
+		return "{$this->identifier}({$parameters}): {$returnType}";
 	}
 
 }
