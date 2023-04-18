@@ -34,8 +34,11 @@ class PhpDocParser
 	/** @var bool */
 	private $useLinesAttributes;
 
+	/** @var bool */
+	private $useIndexAttributes;
+
 	/**
-	 * @param array{lines?: bool} $usedAttributes
+	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
 	 */
 	public function __construct(
 		TypeParser $typeParser,
@@ -50,6 +53,7 @@ class PhpDocParser
 		$this->requireWhitespaceBeforeDescription = $requireWhitespaceBeforeDescription;
 		$this->preserveTypeAliasesWithInvalidTypes = $preserveTypeAliasesWithInvalidTypes;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
+		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 	}
 
 
@@ -91,24 +95,38 @@ class PhpDocParser
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
 			$startLine = $tokens->currentTokenLine();
+			$startIndex = $tokens->currentTokenIndex();
 			$tag = $this->parseTag($tokens);
 			$endLine = $tokens->currentTokenLine();
+			$endIndex = $tokens->currentTokenIndex();
 
 			if ($this->useLinesAttributes) {
 				$tag->setAttribute(Ast\Attribute::START_LINE, $startLine);
 				$tag->setAttribute(Ast\Attribute::END_LINE, $endLine);
 			}
 
+			if ($this->useIndexAttributes) {
+				$tag->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
+				$tag->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
+			}
+
 			return $tag;
 		}
 
 		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
 		$text = $this->parseText($tokens);
 		$endLine = $tokens->currentTokenLine();
+		$endIndex = $tokens->currentTokenIndex();
 
 		if ($this->useLinesAttributes) {
 			$text->setAttribute(Ast\Attribute::START_LINE, $startLine);
 			$text->setAttribute(Ast\Attribute::END_LINE, $endLine);
+		}
+
+		if ($this->useIndexAttributes) {
+			$text->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
+			$text->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
 		}
 
 		return $text;
@@ -155,6 +173,7 @@ class PhpDocParser
 	public function parseTagValue(TokenIterator $tokens, string $tag): Ast\PhpDoc\PhpDocTagValueNode
 	{
 		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
 
 		try {
 			$tokens->pushSavePoint();
@@ -284,10 +303,16 @@ class PhpDocParser
 		}
 
 		$endLine = $tokens->currentTokenLine();
+		$endIndex = $tokens->currentTokenIndex();
 
 		if ($this->useLinesAttributes) {
 			$tagValue->setAttribute(Ast\Attribute::START_LINE, $startLine);
 			$tagValue->setAttribute(Ast\Attribute::END_LINE, $endLine);
+		}
+
+		if ($this->useIndexAttributes) {
+			$tagValue->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
+			$tagValue->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
 		}
 
 		return $tagValue;

@@ -21,8 +21,11 @@ class TypeParser
 	/** @var bool */
 	private $useLinesAttributes;
 
+	/** @var bool */
+	private $useIndexAttributes;
+
 	/**
-	 * @param array{lines?: bool} $usedAttributes
+	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
 	 */
 	public function __construct(
 		?ConstExprParser $constExprParser = null,
@@ -33,12 +36,14 @@ class TypeParser
 		$this->constExprParser = $constExprParser;
 		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
+		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 	}
 
 	/** @phpstan-impure */
 	public function parse(TokenIterator $tokens): Ast\Type\TypeNode
 	{
 		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
 			$type = $this->parseNullable($tokens);
 
@@ -53,10 +58,16 @@ class TypeParser
 			}
 		}
 		$endLine = $tokens->currentTokenLine();
+		$endIndex = $tokens->currentTokenIndex();
 
 		if ($this->useLinesAttributes) {
 			$type->setAttribute(Ast\Attribute::START_LINE, $startLine);
 			$type->setAttribute(Ast\Attribute::END_LINE, $endLine);
+		}
+
+		if ($this->useIndexAttributes) {
+			$type->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
+			$type->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
 		}
 
 		return $type;

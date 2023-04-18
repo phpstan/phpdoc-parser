@@ -5522,7 +5522,7 @@ Finder::findFiles('*.php')
 		yield [
 			'/** @param Foo $a */',
 			[
-				[1, 1],
+				[1, 1, 1, 7],
 			],
 		];
 
@@ -5532,8 +5532,8 @@ Finder::findFiles('*.php')
 			  * @param Bar $bar 2nd multi world description
 			  */',
 			[
-				[2, 2],
-				[3, 3],
+				[2, 2, 2, 16],
+				[3, 3, 17, 31],
 			],
 		];
 
@@ -5552,27 +5552,28 @@ Finder::findFiles('*.php')
 			  * ))
 			  */',
 			[
-				[2, 2],
-				[3, 3],
-				[4, 4],
-				[5, 5],
-				[6, 6],
-				[7, 7],
-				[8, 12],
+				[2, 2, 2, 9],
+				[3, 3, 10, 13],
+				[4, 4, 14, 43],
+				[5, 5, 44, 44],
+				[6, 6, 45, 50],
+				[7, 7, 51, 51],
+				[8, 12, 52, 115],
 			],
 		];
 	}
 
 	/**
 	 * @dataProvider dataLines
-	 * @param list<array{int, int}> $childrenLines
+	 * @param list<array{int, int, int, int}> $childrenLines
 	 */
-	public function testLines(string $phpDoc, array $childrenLines): void
+	public function testLinesAndIndexes(string $phpDoc, array $childrenLines): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
 		$constExprParser = new ConstExprParser(true, true);
 		$usedAttributes = [
 			'lines' => true,
+			'indexes' => true,
 		];
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
@@ -5582,6 +5583,8 @@ Finder::findFiles('*.php')
 		foreach ($children as $i => $child) {
 			$this->assertSame($childrenLines[$i][0], $child->getAttribute(Attribute::START_LINE));
 			$this->assertSame($childrenLines[$i][1], $child->getAttribute(Attribute::END_LINE));
+			$this->assertSame($childrenLines[$i][2], $child->getAttribute(Attribute::START_INDEX));
+			$this->assertSame($childrenLines[$i][3], $child->getAttribute(Attribute::END_INDEX));
 		}
 	}
 

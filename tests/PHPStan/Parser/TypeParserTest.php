@@ -1911,6 +1911,8 @@ class TypeParserTest extends TestCase
 			'int | object{foo: int}[]',
 			1,
 			1,
+			0,
+			13,
 		];
 
 		yield [
@@ -1920,21 +1922,26 @@ class TypeParserTest extends TestCase
 			 }',
 			1,
 			4,
+			0,
+			15,
 		];
 	}
 
 	/**
 	 * @dataProvider dataLines
 	 */
-	public function testLines(string $input, int $startLine, int $endLine): void
+	public function testLines(string $input, int $startLine, int $endLine, int $startIndex, int $endIndex): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$typeParser = new TypeParser(new ConstExprParser(true, true), true, [
 			'lines' => true,
+			'indexes' => true,
 		]);
 		$typeNode = $typeParser->parse($tokens);
 		$this->assertSame($startLine, $typeNode->getAttribute(Attribute::START_LINE));
 		$this->assertSame($endLine, $typeNode->getAttribute(Attribute::END_LINE));
+		$this->assertSame($startIndex, $typeNode->getAttribute(Attribute::START_INDEX));
+		$this->assertSame($endIndex, $typeNode->getAttribute(Attribute::END_INDEX));
 	}
 
 }

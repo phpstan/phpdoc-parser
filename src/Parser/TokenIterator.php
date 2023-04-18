@@ -66,6 +66,12 @@ class TokenIterator
 	}
 
 
+	public function currentTokenIndex(): int
+	{
+		return $this->index;
+	}
+
+
 	public function isCurrentTokenValue(string $tokenValue): bool
 	{
 		return $this->tokens[$this->index][Lexer::VALUE_OFFSET] === $tokenValue;
