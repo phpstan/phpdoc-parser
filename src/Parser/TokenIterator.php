@@ -12,7 +12,7 @@ use function strlen;
 class TokenIterator
 {
 
-	/** @var mixed[][] */
+	/** @var list<array{string, int}> */
 	private $tokens;
 
 	/** @var int */
@@ -21,6 +21,9 @@ class TokenIterator
 	/** @var int[] */
 	private $savePoints = [];
 
+	/**
+	 * @param list<array{string, int}> $tokens
+	 */
 	public function __construct(array $tokens, int $index = 0)
 	{
 		$this->tokens = $tokens;

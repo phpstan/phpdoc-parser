@@ -92,6 +92,9 @@ class Lexer
 	/** @var string|null */
 	private $regexp;
 
+	/**
+	 * @return list<array{string, int}>
+	 */
 	public function tokenize(string $s): array
 	{
 		if ($this->regexp === null) {
