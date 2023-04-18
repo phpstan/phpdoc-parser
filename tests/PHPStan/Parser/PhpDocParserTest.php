@@ -5517,7 +5517,7 @@ Finder::findFiles('*.php')
 		$this->assertSame('@phpstan-assert !Type $param', $assertNode->__toString());
 	}
 
-	public function dataLines(): iterable
+	public function dataLinesAndIndexes(): iterable
 	{
 		yield [
 			'/** @param Foo $a */',
@@ -5564,7 +5564,7 @@ Finder::findFiles('*.php')
 	}
 
 	/**
-	 * @dataProvider dataLines
+	 * @dataProvider dataLinesAndIndexes
 	 * @param list<array{int, int, int, int}> $childrenLines
 	 */
 	public function testLinesAndIndexes(string $phpDoc, array $childrenLines): void

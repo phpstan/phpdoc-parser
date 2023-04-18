@@ -1905,7 +1905,7 @@ class TypeParserTest extends TestCase
 		];
 	}
 
-	public function dataLines(): iterable
+	public function dataLinesAndIndexes(): iterable
 	{
 		yield [
 			'int | object{foo: int}[]',
@@ -1928,9 +1928,9 @@ class TypeParserTest extends TestCase
 	}
 
 	/**
-	 * @dataProvider dataLines
+	 * @dataProvider dataLinesAndIndexes
 	 */
-	public function testLines(string $input, int $startLine, int $endLine, int $startIndex, int $endIndex): void
+	public function testLinesAndIndexes(string $input, int $startLine, int $endLine, int $startIndex, int $endIndex): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$typeParser = new TypeParser(new ConstExprParser(true, true), true, [
