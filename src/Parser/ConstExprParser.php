@@ -120,7 +120,9 @@ class ConstExprParser
 			$tokens->currentTokenValue(),
 			$tokens->currentTokenType(),
 			$tokens->currentTokenOffset(),
-			Lexer::TOKEN_IDENTIFIER
+			Lexer::TOKEN_IDENTIFIER,
+			null,
+			$tokens->currentTokenLine()
 		);
 	}
 

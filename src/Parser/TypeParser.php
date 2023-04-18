@@ -18,15 +18,27 @@ class TypeParser
 	/** @var bool */
 	private $quoteAwareConstExprString;
 
-	public function __construct(?ConstExprParser $constExprParser = null, bool $quoteAwareConstExprString = false)
+	/** @var bool */
+	private $useLinesAttributes;
+
+	/**
+	 * @param array{lines?: bool} $usedAttributes
+	 */
+	public function __construct(
+		?ConstExprParser $constExprParser = null,
+		bool $quoteAwareConstExprString = false,
+		array $usedAttributes = []
+	)
 	{
 		$this->constExprParser = $constExprParser;
 		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
+		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 	}
 
 	/** @phpstan-impure */
 	public function parse(TokenIterator $tokens): Ast\Type\TypeNode
 	{
+		$startLine = $tokens->currentTokenLine();
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
 			$type = $this->parseNullable($tokens);
 
@@ -39,6 +51,12 @@ class TypeParser
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
 				$type = $this->parseIntersection($tokens, $type);
 			}
+		}
+		$endLine = $tokens->currentTokenLine();
+
+		if ($this->useLinesAttributes) {
+			$type->setAttribute(Ast\Attribute::START_LINE, $startLine);
+			$type->setAttribute(Ast\Attribute::END_LINE, $endLine);
 		}
 
 		return $type;
@@ -152,7 +170,9 @@ class TypeParser
 			$tokens->currentTokenValue(),
 			$tokens->currentTokenType(),
 			$tokens->currentTokenOffset(),
-			Lexer::TOKEN_IDENTIFIER
+			Lexer::TOKEN_IDENTIFIER,
+			null,
+			$tokens->currentTokenLine()
 		);
 
 		if ($this->constExprParser === null) {

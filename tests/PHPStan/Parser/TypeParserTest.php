@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use Exception;
+use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
@@ -1902,6 +1903,38 @@ class TypeParserTest extends TestCase
 				),
 			],
 		];
+	}
+
+	public function dataLines(): iterable
+	{
+		yield [
+			'int | object{foo: int}[]',
+			1,
+			1,
+		];
+
+		yield [
+			'array{
+				a: int,
+				b: string
+			 }',
+			1,
+			4,
+		];
+	}
+
+	/**
+	 * @dataProvider dataLines
+	 */
+	public function testLines(string $input, int $startLine, int $endLine): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+		$typeParser = new TypeParser(new ConstExprParser(true, true), true, [
+			'lines' => true,
+		]);
+		$typeNode = $typeParser->parse($tokens);
+		$this->assertSame($startLine, $typeNode->getAttribute(Attribute::START_LINE));
+		$this->assertSame($endLine, $typeNode->getAttribute(Attribute::END_LINE));
 	}
 
 }

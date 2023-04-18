@@ -88,12 +88,13 @@ class Lexer
 
 	public const VALUE_OFFSET = 0;
 	public const TYPE_OFFSET = 1;
+	public const LINE_OFFSET = 2;
 
 	/** @var string|null */
 	private $regexp;
 
 	/**
-	 * @return list<array{string, int}>
+	 * @return list<array{string, int, int}>
 	 */
 	public function tokenize(string $s): array
 	{
@@ -104,11 +105,18 @@ class Lexer
 		preg_match_all($this->regexp, $s, $matches, PREG_SET_ORDER);
 
 		$tokens = [];
+		$line = 1;
 		foreach ($matches as $match) {
-			$tokens[] = [$match[0], (int) $match['MARK']];
+			$type = (int) $match['MARK'];
+			$tokens[] = [$match[0], $type, $line];
+			if ($type !== self::TOKEN_PHPDOC_EOL) {
+				continue;
+			}
+
+			$line++;
 		}
 
-		$tokens[] = ['', self::TOKEN_END];
+		$tokens[] = ['', self::TOKEN_END, $line];
 
 		return $tokens;
 	}

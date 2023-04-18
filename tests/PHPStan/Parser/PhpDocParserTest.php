@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use Iterator;
+use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
@@ -51,6 +52,7 @@ use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
+use function count;
 use const PHP_EOL;
 
 class PhpDocParserTest extends TestCase
@@ -309,7 +311,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							11,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -328,7 +332,9 @@ class PhpDocParserTest extends TestCase
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							11,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -347,7 +353,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							16,
-							Lexer::TOKEN_CLOSE_PARENTHESES
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -366,7 +374,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							16,
-							Lexer::TOKEN_CLOSE_PARENTHESES
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -385,7 +395,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							19,
-							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+							null,
+							1
 						)
 					)
 				),
@@ -404,7 +416,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							16,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -423,7 +437,32 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							15,
-							Lexer::TOKEN_VARIABLE
+							Lexer::TOKEN_VARIABLE,
+							null,
+							1
+						)
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without parameter name and description - multiline',
+			'/**
+			  * @param Foo
+			  */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new InvalidTagValueNode(
+						'Foo',
+						new ParserException(
+							"\n\t\t\t  ",
+							Lexer::TOKEN_PHPDOC_EOL,
+							21,
+							Lexer::TOKEN_VARIABLE,
+							null,
+							2
 						)
 					)
 				),
@@ -442,7 +481,9 @@ class PhpDocParserTest extends TestCase
 							'optional',
 							Lexer::TOKEN_IDENTIFIER,
 							15,
-							Lexer::TOKEN_VARIABLE
+							Lexer::TOKEN_VARIABLE,
+							null,
+							1
 						)
 					)
 				),
@@ -797,7 +838,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							9,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -816,7 +859,9 @@ class PhpDocParserTest extends TestCase
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							9,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -835,7 +880,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							14,
-							Lexer::TOKEN_CLOSE_PARENTHESES
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -854,7 +901,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							14,
-							Lexer::TOKEN_CLOSE_PARENTHESES
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -873,7 +922,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							17,
-							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+							null,
+							1
 						)
 					)
 				),
@@ -892,7 +943,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							14,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -906,12 +959,14 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@psalm-type',
 					new InvalidTagValueNode(
-						'Unexpected token "{", expected \'*/\' at offset 46',
+						'Unexpected token "{", expected \'*/\' at offset 46 on line 1',
 						new ParserException(
 							'{',
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
 							46,
-							Lexer::TOKEN_CLOSE_PHPDOC
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							null,
+							1
 						)
 					)
 				),
@@ -928,7 +983,8 @@ class PhpDocParserTest extends TestCase
 								Lexer::TOKEN_OPEN_CURLY_BRACKET,
 								46,
 								Lexer::TOKEN_PHPDOC_EOL,
-								null
+								null,
+								1
 							)
 						)
 					)
@@ -982,7 +1038,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							14,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1001,7 +1059,9 @@ class PhpDocParserTest extends TestCase
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							14,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1020,7 +1080,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							19,
-							Lexer::TOKEN_CLOSE_PARENTHESES
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -1039,7 +1101,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							19,
-							Lexer::TOKEN_CLOSE_PARENTHESES
+							Lexer::TOKEN_CLOSE_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -1058,7 +1122,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							22,
-							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+							null,
+							1
 						)
 					)
 				),
@@ -1077,7 +1143,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							19,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1096,7 +1164,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							18,
-							Lexer::TOKEN_VARIABLE
+							Lexer::TOKEN_VARIABLE,
+							null,
+							1
 						)
 					)
 				),
@@ -1115,7 +1185,9 @@ class PhpDocParserTest extends TestCase
 							'optional',
 							Lexer::TOKEN_IDENTIFIER,
 							18,
-							Lexer::TOKEN_VARIABLE
+							Lexer::TOKEN_VARIABLE,
+							null,
+							1
 						)
 					)
 				),
@@ -1197,7 +1269,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							12,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1216,7 +1290,9 @@ class PhpDocParserTest extends TestCase
 							'[',
 							Lexer::TOKEN_OPEN_SQUARE_BRACKET,
 							12,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1235,7 +1311,9 @@ class PhpDocParserTest extends TestCase
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							18,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1254,7 +1332,9 @@ class PhpDocParserTest extends TestCase
 							'|',
 							Lexer::TOKEN_UNION,
 							18,
-							Lexer::TOKEN_OTHER
+							Lexer::TOKEN_OTHER,
+							null,
+							1
 						)
 					)
 				),
@@ -1273,7 +1353,9 @@ class PhpDocParserTest extends TestCase
 							'&',
 							Lexer::TOKEN_INTERSECTION,
 							18,
-							Lexer::TOKEN_OTHER
+							Lexer::TOKEN_OTHER,
+							null,
+							1
 						)
 					)
 				),
@@ -1292,7 +1374,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							24,
-							Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+							null,
+							1
 						)
 					)
 				),
@@ -1500,7 +1584,9 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							Lexer::TOKEN_VARIABLE,
 							12,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1561,7 +1647,9 @@ class PhpDocParserTest extends TestCase
 							'(',
 							Lexer::TOKEN_OPEN_PARENTHESES,
 							20,
-							Lexer::TOKEN_HORIZONTAL_WS
+							Lexer::TOKEN_HORIZONTAL_WS,
+							null,
+							1
 						)
 					)
 				),
@@ -1626,7 +1714,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							12,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1645,7 +1735,9 @@ class PhpDocParserTest extends TestCase
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							18,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1709,7 +1801,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							11,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -1728,7 +1822,9 @@ class PhpDocParserTest extends TestCase
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							17,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -2190,7 +2286,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							16,
-							Lexer::TOKEN_OPEN_PARENTHESES
+							Lexer::TOKEN_OPEN_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -2209,7 +2307,9 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							23,
-							Lexer::TOKEN_OPEN_PARENTHESES
+							Lexer::TOKEN_OPEN_PARENTHESES,
+							null,
+							1
 						)
 					)
 				),
@@ -2228,7 +2328,9 @@ class PhpDocParserTest extends TestCase
 							')',
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							17,
-							Lexer::TOKEN_VARIABLE
+							Lexer::TOKEN_VARIABLE,
+							null,
+							1
 						)
 					)
 				),
@@ -2475,7 +2577,9 @@ class PhpDocParserTest extends TestCase
 							'(',
 							Lexer::TOKEN_OPEN_PARENTHESES,
 							17,
-							Lexer::TOKEN_HORIZONTAL_WS
+							Lexer::TOKEN_HORIZONTAL_WS,
+							null,
+							1
 						)
 					)
 				),
@@ -3494,7 +3598,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							14,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -3513,7 +3619,9 @@ some text in the middle'
 							'#desc',
 							Lexer::TOKEN_OTHER,
 							14,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -3725,7 +3833,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							13,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -3744,7 +3854,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							17,
-							Lexer::TOKEN_OPEN_ANGLE_BRACKET
+							Lexer::TOKEN_OPEN_ANGLE_BRACKET,
+							null,
+							1
 						)
 					)
 				),
@@ -3860,7 +3972,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							28,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -3876,7 +3990,8 @@ some text in the middle'
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							28,
 							Lexer::TOKEN_IDENTIFIER,
-							null
+							null,
+							1
 						))
 					)
 				),
@@ -3897,7 +4012,9 @@ some text in the middle'
 							"\n\t\t\t  ",
 							Lexer::TOKEN_PHPDOC_EOL,
 							34,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							2
 						)
 					)
 				),
@@ -3913,7 +4030,8 @@ some text in the middle'
 							Lexer::TOKEN_PHPDOC_EOL,
 							34,
 							Lexer::TOKEN_IDENTIFIER,
-							null
+							null,
+							2
 						))
 					)
 				),
@@ -3935,7 +4053,9 @@ some text in the middle'
 							"\n\t\t\t  * ",
 							Lexer::TOKEN_PHPDOC_EOL,
 							34,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							2
 						)
 					)
 				),
@@ -3958,7 +4078,8 @@ some text in the middle'
 							Lexer::TOKEN_PHPDOC_EOL,
 							34,
 							Lexer::TOKEN_IDENTIFIER,
-							null
+							null,
+							2
 						))
 					)
 				),
@@ -3982,13 +4103,14 @@ some text in the middle'
 				new PhpDocTagNode(
 					'@phpstan-type',
 					new InvalidTagValueNode(
-						"Unexpected token \"{\", expected '*/' at offset 65",
+						"Unexpected token \"{\", expected '*/' at offset 65 on line 3",
 						new ParserException(
 							'{',
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
 							65,
 							Lexer::TOKEN_CLOSE_PHPDOC,
-							null
+							null,
+							3
 						)
 					)
 				),
@@ -4011,7 +4133,8 @@ some text in the middle'
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
 							65,
 							Lexer::TOKEN_PHPDOC_EOL,
-							null
+							null,
+							3
 						))
 					)
 				),
@@ -4029,13 +4152,14 @@ some text in the middle'
 				new PhpDocTagNode(
 					'@phpstan-type',
 					new InvalidTagValueNode(
-						"Unexpected token \"{\", expected '*/' at offset 65",
+						"Unexpected token \"{\", expected '*/' at offset 65 on line 3",
 						new ParserException(
 							'{',
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
 							65,
 							Lexer::TOKEN_CLOSE_PHPDOC,
-							null
+							null,
+							3
 						)
 					)
 				),
@@ -4058,7 +4182,8 @@ some text in the middle'
 							Lexer::TOKEN_OPEN_CURLY_BRACKET,
 							65,
 							Lexer::TOKEN_PHPDOC_EOL,
-							null
+							null,
+							3
 						))
 					)
 				),
@@ -4084,7 +4209,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							18,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -4136,7 +4263,9 @@ some text in the middle'
 							'42',
 							Lexer::TOKEN_INTEGER,
 							40,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -4150,12 +4279,14 @@ some text in the middle'
 				new PhpDocTagNode(
 					'@phpstan-import-type',
 					new InvalidTagValueNode(
-						'Unexpected token "[", expected \'*/\' at offset 52',
+						'Unexpected token "[", expected \'*/\' at offset 52 on line 1',
 						new ParserException(
 							'[',
 							Lexer::TOKEN_OPEN_SQUARE_BRACKET,
 							52,
-							Lexer::TOKEN_CLOSE_PHPDOC
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							null,
+							1
 						)
 					)
 				),
@@ -4175,7 +4306,8 @@ some text in the middle'
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							35,
 							Lexer::TOKEN_IDENTIFIER,
-							'from'
+							'from',
+							1
 						)
 					)
 				),
@@ -4195,7 +4327,8 @@ some text in the middle'
 							Lexer::TOKEN_IDENTIFIER,
 							35,
 							Lexer::TOKEN_IDENTIFIER,
-							'from'
+							'from',
+							1
 						)
 					)
 				),
@@ -4214,7 +4347,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							25,
-							Lexer::TOKEN_IDENTIFIER
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
 						)
 					)
 				),
@@ -4337,7 +4472,9 @@ some text in the middle'
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							31,
-							Lexer::TOKEN_ARROW
+							Lexer::TOKEN_ARROW,
+							null,
+							1
 						)
 					)
 				),
@@ -4680,7 +4817,7 @@ Finder::findFiles('*.php')
 			'malformed const fetch',
 			'/** @param Foo::** $a */',
 			new PhpDocNode([
-				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE))),
+				new PhpDocTagNode('@param', new InvalidTagValueNode('Foo::** $a', new ParserException('*', Lexer::TOKEN_WILDCARD, 17, Lexer::TOKEN_VARIABLE, null, 1))),
 			]),
 		];
 
@@ -5128,7 +5265,9 @@ Finder::findFiles('*.php')
 							'Important',
 							Lexer::TOKEN_IDENTIFIER,
 							27,
-							Lexer::TOKEN_HORIZONTAL_WS
+							Lexer::TOKEN_HORIZONTAL_WS,
+							null,
+							2
 						)
 					)
 				),
@@ -5158,7 +5297,9 @@ Finder::findFiles('*.php')
 						'$foo',
 						Lexer::TOKEN_VARIABLE,
 						0,
-						Lexer::TOKEN_IDENTIFIER
+						Lexer::TOKEN_IDENTIFIER,
+						null,
+						1
 					)
 				),
 			],
@@ -5374,6 +5515,74 @@ Finder::findFiles('*.php')
 		$this->assertInstanceOf(AssertTagValueNode::class, $assertNode->value);
 
 		$this->assertSame('@phpstan-assert !Type $param', $assertNode->__toString());
+	}
+
+	public function dataLines(): iterable
+	{
+		yield [
+			'/** @param Foo $a */',
+			[
+				[1, 1],
+			],
+		];
+
+		yield [
+			'/**
+			  * @param Foo $foo 1st multi world description
+			  * @param Bar $bar 2nd multi world description
+			  */',
+			[
+				[2, 2],
+				[3, 3],
+			],
+		];
+
+		yield [
+			'/**
+			  * @template TRandKey as array-key
+			  * @template TRandVal
+			  * @template TRandList as array<TRandKey, TRandVal>|XIterator<TRandKey, TRandVal>|Traversable<TRandKey, TRandVal>
+			  *
+			  * @param TRandList $list
+			  *
+			  * @return (
+			  *        TRandList is array ? array<TRandKey, TRandVal> : (
+			  *        TRandList is XIterator ?    XIterator<TRandKey, TRandVal> :
+			  *        IteratorIterator<TRandKey, TRandVal>|LimitIterator<TRandKey, TRandVal>
+			  * ))
+			  */',
+			[
+				[2, 2],
+				[3, 3],
+				[4, 4],
+				[5, 5],
+				[6, 6],
+				[7, 7],
+				[8, 12],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataLines
+	 * @param list<array{int, int}> $childrenLines
+	 */
+	public function testLines(string $phpDoc, array $childrenLines): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
+		$constExprParser = new ConstExprParser(true, true);
+		$usedAttributes = [
+			'lines' => true,
+		];
+		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$phpDocNode = $phpDocParser->parse($tokens);
+		$children = $phpDocNode->children;
+		$this->assertCount(count($childrenLines), $children);
+		foreach ($children as $i => $child) {
+			$this->assertSame($childrenLines[$i][0], $child->getAttribute(Attribute::START_LINE));
+			$this->assertSame($childrenLines[$i][1], $child->getAttribute(Attribute::END_LINE));
+		}
 	}
 
 }

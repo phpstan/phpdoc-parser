@@ -21,6 +21,7 @@ class InvalidTypeNode implements TypeNode
 			$exception->getCurrentOffset(),
 			$exception->getExpectedTokenType(),
 			$exception->getExpectedTokenValue(),
+			$exception->getCurrentTokenLine(),
 		];
 	}
 

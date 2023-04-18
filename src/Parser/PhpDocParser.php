@@ -31,12 +31,25 @@ class PhpDocParser
 	/** @var bool */
 	private $preserveTypeAliasesWithInvalidTypes;
 
-	public function __construct(TypeParser $typeParser, ConstExprParser $constantExprParser, bool $requireWhitespaceBeforeDescription = false, bool $preserveTypeAliasesWithInvalidTypes = false)
+	/** @var bool */
+	private $useLinesAttributes;
+
+	/**
+	 * @param array{lines?: bool} $usedAttributes
+	 */
+	public function __construct(
+		TypeParser $typeParser,
+		ConstExprParser $constantExprParser,
+		bool $requireWhitespaceBeforeDescription = false,
+		bool $preserveTypeAliasesWithInvalidTypes = false,
+		array $usedAttributes = []
+	)
 	{
 		$this->typeParser = $typeParser;
 		$this->constantExprParser = $constantExprParser;
 		$this->requireWhitespaceBeforeDescription = $requireWhitespaceBeforeDescription;
 		$this->preserveTypeAliasesWithInvalidTypes = $preserveTypeAliasesWithInvalidTypes;
+		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 	}
 
 
@@ -77,11 +90,28 @@ class PhpDocParser
 	private function parseChild(TokenIterator $tokens): Ast\PhpDoc\PhpDocChildNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
-			return $this->parseTag($tokens);
+			$startLine = $tokens->currentTokenLine();
+			$tag = $this->parseTag($tokens);
+			$endLine = $tokens->currentTokenLine();
 
+			if ($this->useLinesAttributes) {
+				$tag->setAttribute(Ast\Attribute::START_LINE, $startLine);
+				$tag->setAttribute(Ast\Attribute::END_LINE, $endLine);
+			}
+
+			return $tag;
 		}
 
-		return $this->parseText($tokens);
+		$startLine = $tokens->currentTokenLine();
+		$text = $this->parseText($tokens);
+		$endLine = $tokens->currentTokenLine();
+
+		if ($this->useLinesAttributes) {
+			$text->setAttribute(Ast\Attribute::START_LINE, $startLine);
+			$text->setAttribute(Ast\Attribute::END_LINE, $endLine);
+		}
+
+		return $text;
 	}
 
 
@@ -124,6 +154,8 @@ class PhpDocParser
 
 	public function parseTagValue(TokenIterator $tokens, string $tag): Ast\PhpDoc\PhpDocTagValueNode
 	{
+		$startLine = $tokens->currentTokenLine();
+
 		try {
 			$tokens->pushSavePoint();
 
@@ -249,6 +281,13 @@ class PhpDocParser
 		} catch (ParserException $e) {
 			$tokens->rollback();
 			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens), $e);
+		}
+
+		$endLine = $tokens->currentTokenLine();
+
+		if ($this->useLinesAttributes) {
+			$tagValue->setAttribute(Ast\Attribute::START_LINE, $startLine);
+			$tagValue->setAttribute(Ast\Attribute::END_LINE, $endLine);
 		}
 
 		return $tagValue;
@@ -466,7 +505,9 @@ class PhpDocParser
 							$tokens->currentTokenValue(),
 							$tokens->currentTokenType(),
 							$tokens->currentTokenOffset(),
-							Lexer::TOKEN_PHPDOC_EOL
+							Lexer::TOKEN_PHPDOC_EOL,
+							null,
+							$tokens->currentTokenLine()
 						);
 					}
 				}
