@@ -25,6 +25,10 @@ cs-fix:
 phpstan:
 	php vendor/bin/phpstan
 
+.PHONY: phpstan-generate-baseline
+phpstan-generate-baseline:
+	php vendor/bin/phpstan --generate-baseline
+
 .PHONY: build-abnfgen
 build-abnfgen:
 	./build-abnfgen.sh

@@ -1,0 +1,11 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method PHPStan\\\\PhpDocParser\\\\Ast\\\\ConstExpr\\\\QuoteAwareConstExprStringNode\\:\\:escapeDoubleQuotedString\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Ast/ConstExpr/QuoteAwareConstExprStringNode.php
+
+		-
+			message: "#^Method PHPStan\\\\PhpDocParser\\\\Parser\\\\StringUnescaper\\:\\:parseEscapeSequences\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Parser/StringUnescaper.php
