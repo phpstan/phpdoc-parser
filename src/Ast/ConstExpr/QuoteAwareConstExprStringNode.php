@@ -45,7 +45,7 @@ class QuoteAwareConstExprStringNode extends ConstExprStringNode implements Const
 		return sprintf('"%s"', $this->escapeDoubleQuotedString());
 	}
 
-	private function escapeDoubleQuotedString()
+	private function escapeDoubleQuotedString(): string
 	{
 		$quote = '"';
 		$escaped = addcslashes($this->value, "\n\r\t\f\v$" . $quote . '\\');

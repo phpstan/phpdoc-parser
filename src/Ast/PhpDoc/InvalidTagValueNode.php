@@ -35,7 +35,7 @@ class InvalidTagValueNode implements PhpDocTagValueNode
 		];
 	}
 
-	public function __get(string $name)
+	public function __get(string $name): ?ParserException
 	{
 		if ($name !== 'exception') {
 			trigger_error(sprintf('Undefined property: %s::$%s', self::class, $name), E_USER_WARNING);

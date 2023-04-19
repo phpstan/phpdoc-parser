@@ -2587,7 +2587,9 @@ class PhpDocParserTest extends TestCase
 		];
 	}
 
-
+	/**
+	 * @return array<mixed>
+	 */
 	public function provideMultiLinePhpDocData(): array
 	{
 		return [
@@ -5275,6 +5277,9 @@ Finder::findFiles('*.php')
 		];
 	}
 
+	/**
+	 * @return array<mixed>
+	 */
 	public function dataParseTagValue(): array
 	{
 		return [
@@ -5517,6 +5522,9 @@ Finder::findFiles('*.php')
 		$this->assertSame('@phpstan-assert !Type $param', $assertNode->__toString());
 	}
 
+	/**
+	 * @return array<mixed>
+	 */
 	public function dataLinesAndIndexes(): iterable
 	{
 		yield [

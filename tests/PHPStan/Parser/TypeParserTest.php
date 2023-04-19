@@ -79,6 +79,9 @@ class TypeParserTest extends TestCase
 	}
 
 
+	/**
+	 * @return array<mixed>
+	 */
 	public function provideParseData(): array
 	{
 		return [
@@ -1905,6 +1908,9 @@ class TypeParserTest extends TestCase
 		];
 	}
 
+	/**
+	 * @return array<mixed>
+	 */
 	public function dataLinesAndIndexes(): iterable
 	{
 		yield [

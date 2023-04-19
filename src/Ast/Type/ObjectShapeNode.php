@@ -13,6 +13,9 @@ class ObjectShapeNode implements TypeNode
 	/** @var ObjectShapeItemNode[] */
 	public $items;
 
+	/**
+	 * @param ObjectShapeItemNode[] $items
+	 */
 	public function __construct(array $items)
 	{
 		$this->items = $items;

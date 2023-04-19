@@ -19,6 +19,9 @@ class CallableTypeNode implements TypeNode
 	/** @var TypeNode */
 	public $returnType;
 
+	/**
+	 * @param CallableTypeParameterNode[] $parameters
+	 */
 	public function __construct(IdentifierTypeNode $identifier, array $parameters, TypeNode $returnType)
 	{
 		$this->identifier = $identifier;

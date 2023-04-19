@@ -13,6 +13,9 @@ class UnionTypeNode implements TypeNode
 	/** @var TypeNode[] */
 	public $types;
 
+	/**
+	 * @param TypeNode[] $types
+	 */
 	public function __construct(array $types)
 	{
 		$this->types = $types;

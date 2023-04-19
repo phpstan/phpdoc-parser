@@ -30,6 +30,10 @@ class MethodTagValueNode implements PhpDocTagValueNode
 	/** @var string (may be empty) */
 	public $description;
 
+	/**
+	 * @param MethodTagValueParameterNode[] $parameters
+	 * @param TemplateTagValueNode[] $templateTypes
+	 */
 	public function __construct(bool $isStatic, ?TypeNode $returnType, string $methodName, array $parameters, string $description, array $templateTypes = [])
 	{
 		$this->isStatic = $isStatic;
