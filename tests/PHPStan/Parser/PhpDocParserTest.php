@@ -5561,6 +5561,27 @@ Finder::findFiles('*.php')
 				[8, 12, 52, 115],
 			],
 		];
+
+		yield [
+			'/** @param Foo( */',
+			[
+				[1, 1, 1, 6],
+			],
+		];
+
+		yield [
+			'/** @phpstan-import-type TypeAlias from AnotherClass[] */',
+			[
+				[1, 1, 8, 12],
+			],
+		];
+
+		yield [
+			'/** @param Foo::** $a */',
+			[
+				[1, 1, 1, 10],
+			],
+		];
 	}
 
 	/**

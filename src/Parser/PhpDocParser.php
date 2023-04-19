@@ -75,16 +75,21 @@ class PhpDocParser
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PHPDOC);
 		} catch (ParserException $e) {
 			$name = '';
+			$startLine = $tokens->currentTokenLine();
+			$startIndex = $tokens->currentTokenIndex();
 			if (count($children) > 0) {
 				$lastChild = $children[count($children) - 1];
 				if ($lastChild instanceof Ast\PhpDoc\PhpDocTagNode) {
 					$name = $lastChild->name;
+					$startLine = $tokens->currentTokenLine();
+					$startIndex = $tokens->currentTokenIndex();
 				}
 			}
+
 			$tokens->forwardToTheEnd();
-			return new Ast\PhpDoc\PhpDocNode([
-				new Ast\PhpDoc\PhpDocTagNode($name, new Ast\PhpDoc\InvalidTagValueNode($e->getMessage(), $e)),
-			]);
+			$tag = new Ast\PhpDoc\PhpDocTagNode($name, new Ast\PhpDoc\InvalidTagValueNode($e->getMessage(), $e));
+
+			return new Ast\PhpDoc\PhpDocNode([$this->enrichWithAttributes($tokens, $tag, $startLine, $startIndex)]);
 		}
 
 		return new Ast\PhpDoc\PhpDocNode(array_values($children));
@@ -96,40 +101,37 @@ class PhpDocParser
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
 			$startLine = $tokens->currentTokenLine();
 			$startIndex = $tokens->currentTokenIndex();
-			$tag = $this->parseTag($tokens);
-			$endLine = $tokens->currentTokenLine();
-			$endIndex = $tokens->currentTokenIndex();
-
-			if ($this->useLinesAttributes) {
-				$tag->setAttribute(Ast\Attribute::START_LINE, $startLine);
-				$tag->setAttribute(Ast\Attribute::END_LINE, $endLine);
-			}
-
-			if ($this->useIndexAttributes) {
-				$tag->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
-				$tag->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
-			}
-
-			return $tag;
+			return $this->enrichWithAttributes($tokens, $this->parseTag($tokens), $startLine, $startIndex);
 		}
 
 		$startLine = $tokens->currentTokenLine();
 		$startIndex = $tokens->currentTokenIndex();
 		$text = $this->parseText($tokens);
+
+		return $this->enrichWithAttributes($tokens, $text, $startLine, $startIndex);
+	}
+
+	/**
+	 * @template T of Ast\Node
+	 * @param T $tag
+	 * @return T
+	 */
+	private function enrichWithAttributes(TokenIterator $tokens, Ast\Node $tag, int $startLine, int $startIndex): Ast\Node
+	{
 		$endLine = $tokens->currentTokenLine();
 		$endIndex = $tokens->currentTokenIndex();
 
 		if ($this->useLinesAttributes) {
-			$text->setAttribute(Ast\Attribute::START_LINE, $startLine);
-			$text->setAttribute(Ast\Attribute::END_LINE, $endLine);
+			$tag->setAttribute(Ast\Attribute::START_LINE, $startLine);
+			$tag->setAttribute(Ast\Attribute::END_LINE, $endLine);
 		}
 
 		if ($this->useIndexAttributes) {
-			$text->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
-			$text->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
+			$tag->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
+			$tag->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
 		}
 
-		return $text;
+		return $tag;
 	}
 
 
@@ -302,20 +304,7 @@ class PhpDocParser
 			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens), $e);
 		}
 
-		$endLine = $tokens->currentTokenLine();
-		$endIndex = $tokens->currentTokenIndex();
-
-		if ($this->useLinesAttributes) {
-			$tagValue->setAttribute(Ast\Attribute::START_LINE, $startLine);
-			$tagValue->setAttribute(Ast\Attribute::END_LINE, $endLine);
-		}
-
-		if ($this->useIndexAttributes) {
-			$tagValue->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
-			$tagValue->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
-		}
-
-		return $tagValue;
+		return $this->enrichWithAttributes($tokens, $tagValue, $startLine, $startIndex);
 	}
 
 
