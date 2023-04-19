@@ -1909,10 +1909,35 @@ class TypeParserTest extends TestCase
 	{
 		yield [
 			'int | object{foo: int}[]',
-			1,
-			1,
-			0,
-			13,
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					1,
+					1,
+					0,
+					13,
+				],
+				[
+					static function (UnionTypeNode $typeNode): TypeNode {
+						return $typeNode->types[0];
+					},
+					1,
+					1,
+					0,
+					2,
+				],
+				[
+					static function (UnionTypeNode $typeNode): TypeNode {
+						return $typeNode->types[1];
+					},
+					1,
+					1,
+					4,
+					13,
+				],
+			],
 		];
 
 		yield [
@@ -1920,17 +1945,25 @@ class TypeParserTest extends TestCase
 				a: int,
 				b: string
 			 }',
-			1,
-			4,
-			0,
-			15,
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					1,
+					4,
+					0,
+					15,
+				],
+			],
 		];
 	}
 
 	/**
 	 * @dataProvider dataLinesAndIndexes
+	 * @param list<array{callable(TypeNode): TypeNode, int, int, int, int}> $assertions
 	 */
-	public function testLinesAndIndexes(string $input, int $startLine, int $endLine, int $startIndex, int $endIndex): void
+	public function testLinesAndIndexes(string $input, array $assertions): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$typeParser = new TypeParser(new ConstExprParser(true, true), true, [
@@ -1938,10 +1971,14 @@ class TypeParserTest extends TestCase
 			'indexes' => true,
 		]);
 		$typeNode = $typeParser->parse($tokens);
-		$this->assertSame($startLine, $typeNode->getAttribute(Attribute::START_LINE));
-		$this->assertSame($endLine, $typeNode->getAttribute(Attribute::END_LINE));
-		$this->assertSame($startIndex, $typeNode->getAttribute(Attribute::START_INDEX));
-		$this->assertSame($endIndex, $typeNode->getAttribute(Attribute::END_INDEX));
+
+		foreach ($assertions as [$callable, $startLine, $endLine, $startIndex, $endIndex]) {
+			$typeToAssert = $callable($typeNode);
+			$this->assertSame($startLine, $typeToAssert->getAttribute(Attribute::START_LINE));
+			$this->assertSame($endLine, $typeToAssert->getAttribute(Attribute::END_LINE));
+			$this->assertSame($startIndex, $typeToAssert->getAttribute(Attribute::START_INDEX));
+			$this->assertSame($endIndex, $typeToAssert->getAttribute(Attribute::END_INDEX));
+		}
 	}
 
 }
