@@ -11,4 +11,6 @@ final class Attribute
 	public const START_INDEX = 'startIndex';
 	public const END_INDEX = 'endIndex';
 
+	public const ORIGINAL_NODE = 'originalNode';
+
 }
