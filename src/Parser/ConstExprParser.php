@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use function str_replace;
 use function strtolower;
 use function substr;
 
@@ -47,7 +48,7 @@ class ConstExprParser
 
 			return $this->enrichWithAttributes(
 				$tokens,
-				new Ast\ConstExpr\ConstExprFloatNode($value),
+				new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', $value)),
 				$startLine,
 				$startIndex
 			);
@@ -59,7 +60,7 @@ class ConstExprParser
 
 			return $this->enrichWithAttributes(
 				$tokens,
-				new Ast\ConstExpr\ConstExprIntegerNode($value),
+				new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $value)),
 				$startLine,
 				$startIndex
 			);

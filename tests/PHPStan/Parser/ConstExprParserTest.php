@@ -176,6 +176,21 @@ class ConstExprParserTest extends TestCase
 			'-0X7Fb4',
 			new ConstExprIntegerNode('-0X7Fb4'),
 		];
+
+		yield [
+			'123_456',
+			new ConstExprIntegerNode('123456'),
+		];
+
+		yield [
+			'0b01_01_01',
+			new ConstExprIntegerNode('0b010101'),
+		];
+
+		yield [
+			'-0X7_Fb_4',
+			new ConstExprIntegerNode('-0X7Fb4'),
+		];
 	}
 
 
@@ -239,6 +254,11 @@ class ConstExprParserTest extends TestCase
 		yield [
 			'-12.3e-4',
 			new ConstExprFloatNode('-12.3e-4'),
+		];
+
+		yield [
+			'-1_2.3_4e5_6',
+			new ConstExprFloatNode('-12.34e56'),
 		];
 	}
 

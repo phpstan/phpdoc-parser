@@ -1036,8 +1036,25 @@ class TypeParserTest extends TestCase
 				new ConstTypeNode(new ConstExprIntegerNode('123')),
 			],
 			[
+				'123_456',
+				new ConstTypeNode(new ConstExprIntegerNode('123456')),
+			],
+			[
+				'_123',
+				new IdentifierTypeNode('_123'),
+			],
+			[
+				'123_',
+				new ConstTypeNode(new ConstExprIntegerNode('123')),
+				Lexer::TOKEN_IDENTIFIER,
+			],
+			[
 				'123.2',
 				new ConstTypeNode(new ConstExprFloatNode('123.2')),
+			],
+			[
+				'123_456.789_012',
+				new ConstTypeNode(new ConstExprFloatNode('123456.789012')),
 			],
 			[
 				'"bar"',
