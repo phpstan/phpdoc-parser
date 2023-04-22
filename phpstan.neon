@@ -5,6 +5,8 @@ parameters:
 	paths:
 		- src
 		- tests
+	excludePaths:
+		- tests/PHPStan/*/data/*
 	level: 8
 	ignoreErrors:
 		- '#^Dynamic call to static method PHPUnit\\Framework\\Assert#'

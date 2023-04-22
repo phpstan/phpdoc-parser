@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use LogicException;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function array_pop;
 use function assert;
@@ -43,6 +44,27 @@ class TokenIterator
 	public function getTokens(): array
 	{
 		return $this->tokens;
+	}
+
+
+	public function getContentBetween(int $startPos, int $endPos): string
+	{
+		if ($startPos < 0 || $endPos > count($this->tokens)) {
+			throw new LogicException();
+		}
+
+		$content = '';
+		for ($i = $startPos; $i < $endPos; $i++) {
+			$content .= $this->tokens[$i][Lexer::VALUE_OFFSET];
+		}
+
+		return $content;
+	}
+
+
+	public function getTokenCount(): int
+	{
+		return count($this->tokens);
 	}
 
 
