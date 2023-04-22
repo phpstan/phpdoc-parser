@@ -1920,6 +1920,7 @@ class TypeParserTest extends TestCase
 					static function (TypeNode $typeNode): TypeNode {
 						return $typeNode;
 					},
+					'int | object{foo: int}[]',
 					1,
 					1,
 					0,
@@ -1929,6 +1930,7 @@ class TypeParserTest extends TestCase
 					static function (UnionTypeNode $typeNode): TypeNode {
 						return $typeNode->types[0];
 					},
+					'int',
 					1,
 					1,
 					0,
@@ -1938,6 +1940,7 @@ class TypeParserTest extends TestCase
 					static function (UnionTypeNode $typeNode): TypeNode {
 						return $typeNode->types[1];
 					},
+					'object{foo: int}[]',
 					1,
 					1,
 					4,
@@ -1953,6 +1956,7 @@ class TypeParserTest extends TestCase
 					static function (TypeNode $typeNode): TypeNode {
 						return $typeNode;
 					},
+					'int | object{foo: int}[]',
 					1,
 					1,
 					0,
@@ -1962,6 +1966,7 @@ class TypeParserTest extends TestCase
 					static function (UnionTypeNode $typeNode): TypeNode {
 						return $typeNode->types[0];
 					},
+					'int',
 					1,
 					1,
 					0,
@@ -1971,6 +1976,7 @@ class TypeParserTest extends TestCase
 					static function (UnionTypeNode $typeNode): TypeNode {
 						return $typeNode->types[1];
 					},
+					'object{foo: int}[]',
 					1,
 					1,
 					4,
@@ -1989,6 +1995,10 @@ class TypeParserTest extends TestCase
 					static function (TypeNode $typeNode): TypeNode {
 						return $typeNode;
 					},
+					'array{
+				a: int,
+				b: string
+			 }',
 					1,
 					4,
 					0,
@@ -2000,19 +2010,27 @@ class TypeParserTest extends TestCase
 
 	/**
 	 * @dataProvider dataLinesAndIndexes
-	 * @param list<array{callable(TypeNode): TypeNode, int, int, int, int}> $assertions
+	 * @param list<array{callable(TypeNode): TypeNode, string, int, int, int, int}> $assertions
 	 */
 	public function testLinesAndIndexes(string $input, array $assertions): void
 	{
-		$tokens = new TokenIterator($this->lexer->tokenize($input));
+		$tokensArray = $this->lexer->tokenize($input);
+		$tokens = new TokenIterator($tokensArray);
 		$typeParser = new TypeParser(new ConstExprParser(true, true), true, [
 			'lines' => true,
 			'indexes' => true,
 		]);
 		$typeNode = $typeParser->parse($tokens);
 
-		foreach ($assertions as [$callable, $startLine, $endLine, $startIndex, $endIndex]) {
+		foreach ($assertions as [$callable, $expectedContent, $startLine, $endLine, $startIndex, $endIndex]) {
 			$typeToAssert = $callable($typeNode);
+
+			$content = '';
+			for ($i = $startIndex; $i <= $endIndex; $i++) {
+				$content .= $tokensArray[$i][Lexer::VALUE_OFFSET];
+			}
+
+			$this->assertSame($expectedContent, $content);
 			$this->assertSame($startLine, $typeToAssert->getAttribute(Attribute::START_LINE));
 			$this->assertSame($endLine, $typeToAssert->getAttribute(Attribute::END_LINE));
 			$this->assertSame($startIndex, $typeToAssert->getAttribute(Attribute::START_INDEX));
