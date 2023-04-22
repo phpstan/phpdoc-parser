@@ -32,13 +32,17 @@ jobs:
         with:
           repository: slevomat/coding-standard
           path: slevomat-cs
-          ref: 8.7.1
+          ref: 710c256bf3f0f696ec8d4f9d2218321c3eb0f7d2
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
           php-version: "${{ matrix.php-version }}"
+
+      - name: "Unset platform"
+        working-directory: slevomat-cs
+        run: "composer config --unset platform"
 
       - name: "Install dependencies"
         working-directory: slevomat-cs
@@ -56,12 +60,14 @@ jobs:
 
       - name: "Tests"
         working-directory: slevomat-cs
-        run: "bin/phpunit"
+        run: "bin/phpunit --no-coverage"
 
       - name: "PHPStan"
+        if: matrix.php-version == '8.0' || matrix.php-version == '8.1' || matrix.php-version == '8.2'
         working-directory: slevomat-cs
         run: "bin/phpstan analyse -c build/PHPStan/phpstan.neon"
 
       - name: "PHPStan in tests"
+        if: matrix.php-version == '8.0' || matrix.php-version == '8.1' || matrix.php-version == '8.2'
         working-directory: slevomat-cs
         run: "bin/phpstan analyse -c build/PHPStan/phpstan.tests.neon"
