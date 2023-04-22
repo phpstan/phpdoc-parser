@@ -5530,7 +5530,7 @@ Finder::findFiles('*.php')
 		yield [
 			'/** @param Foo $a */',
 			[
-				[1, 1, 1, 7],
+				[1, 1, 1, 5],
 			],
 		];
 
@@ -5573,7 +5573,7 @@ Finder::findFiles('*.php')
 		yield [
 			'/** @param Foo( */',
 			[
-				[1, 1, 1, 6],
+				[1, 1, 1, 4],
 			],
 		];
 
@@ -5587,7 +5587,28 @@ Finder::findFiles('*.php')
 		yield [
 			'/** @param Foo::** $a */',
 			[
-				[1, 1, 1, 10],
+				[1, 1, 1, 8],
+			],
+		];
+
+		yield [
+			'/** @param Foo::** $a*/',
+			[
+				[1, 1, 1, 8],
+			],
+		];
+
+		yield [
+			'/** @return Foo */',
+			[
+				[1, 1, 1, 3],
+			],
+		];
+
+		yield [
+			'/** @return Foo*/',
+			[
+				[1, 1, 1, 3],
 			],
 		];
 	}
@@ -5615,6 +5636,49 @@ Finder::findFiles('*.php')
 			$this->assertSame($childrenLines[$i][2], $child->getAttribute(Attribute::START_INDEX));
 			$this->assertSame($childrenLines[$i][3], $child->getAttribute(Attribute::END_INDEX));
 		}
+	}
+
+	/**
+	 * @return array<mixed>
+	 */
+	public function dataTypeLinesAndIndexes(): iterable
+	{
+		yield [
+			'/** @return Foo */',
+			[1, 1, 3, 3],
+		];
+
+		yield [
+			'/** @return Foo*/',
+			[1, 1, 3, 3],
+		];
+	}
+
+	/**
+	 * @dataProvider dataTypeLinesAndIndexes
+	 * @param array{int, int, int, int} $lines
+	 */
+	public function testTypeLinesAndIndexes(string $phpDoc, array $lines): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
+		$constExprParser = new ConstExprParser(true, true);
+		$usedAttributes = [
+			'lines' => true,
+			'indexes' => true,
+		];
+		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$phpDocNode = $phpDocParser->parse($tokens);
+		$this->assertInstanceOf(PhpDocTagNode::class, $phpDocNode->children[0]);
+		$this->assertInstanceOf(ReturnTagValueNode::class, $phpDocNode->children[0]->value);
+
+		$type = $phpDocNode->children[0]->value->type;
+		$this->assertInstanceOf(IdentifierTypeNode::class, $type);
+
+		$this->assertSame($lines[0], $type->getAttribute(Attribute::START_LINE));
+		$this->assertSame($lines[1], $type->getAttribute(Attribute::END_LINE));
+		$this->assertSame($lines[2], $type->getAttribute(Attribute::START_INDEX));
+		$this->assertSame($lines[3], $type->getAttribute(Attribute::END_INDEX));
 	}
 
 }
