@@ -1923,7 +1923,7 @@ class TypeParserTest extends TestCase
 					1,
 					1,
 					0,
-					13,
+					12,
 				],
 				[
 					static function (UnionTypeNode $typeNode): TypeNode {
@@ -1932,7 +1932,7 @@ class TypeParserTest extends TestCase
 					1,
 					1,
 					0,
-					2,
+					0,
 				],
 				[
 					static function (UnionTypeNode $typeNode): TypeNode {
@@ -1941,7 +1941,40 @@ class TypeParserTest extends TestCase
 					1,
 					1,
 					4,
-					13,
+					12,
+				],
+			],
+		];
+
+		yield [
+			'int | object{foo: int}[]    ',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					1,
+					1,
+					0,
+					12,
+				],
+				[
+					static function (UnionTypeNode $typeNode): TypeNode {
+						return $typeNode->types[0];
+					},
+					1,
+					1,
+					0,
+					0,
+				],
+				[
+					static function (UnionTypeNode $typeNode): TypeNode {
+						return $typeNode->types[1];
+					},
+					1,
+					1,
+					4,
+					12,
 				],
 			],
 		];
@@ -1959,7 +1992,7 @@ class TypeParserTest extends TestCase
 					1,
 					4,
 					0,
-					15,
+					14,
 				],
 			],
 		];

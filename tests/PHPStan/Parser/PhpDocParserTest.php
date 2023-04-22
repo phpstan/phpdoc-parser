@@ -5641,7 +5641,7 @@ Finder::findFiles('*.php')
 	/**
 	 * @return array<mixed>
 	 */
-	public function dataTypeLinesAndIndexes(): iterable
+	public function dataReturnTypeLinesAndIndexes(): iterable
 	{
 		yield [
 			'/** @return Foo */',
@@ -5652,13 +5652,43 @@ Finder::findFiles('*.php')
 			'/** @return Foo*/',
 			[1, 1, 3, 3],
 		];
+
+		yield [
+			'/**
+			  * @param Foo $foo
+			  * @return Foo
+			  */',
+			[3, 3, 10, 10],
+		];
+
+		yield [
+			'/**
+			  * @return Foo
+			  * @param Foo $foo
+			  */',
+			[2, 2, 4, 4],
+		];
+
+		yield [
+			'/**
+			  * @param Foo $foo
+			  * @return Foo */',
+			[3, 3, 10, 10],
+		];
+
+		yield [
+			'/**
+			  * @param Foo $foo
+			  * @return Foo*/',
+			[3, 3, 10, 10],
+		];
 	}
 
 	/**
-	 * @dataProvider dataTypeLinesAndIndexes
+	 * @dataProvider dataReturnTypeLinesAndIndexes
 	 * @param array{int, int, int, int} $lines
 	 */
-	public function testTypeLinesAndIndexes(string $phpDoc, array $lines): void
+	public function testReturnTypeLinesAndIndexes(string $phpDoc, array $lines): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
 		$constExprParser = new ConstExprParser(true, true);
@@ -5669,10 +5699,8 @@ Finder::findFiles('*.php')
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);
-		$this->assertInstanceOf(PhpDocTagNode::class, $phpDocNode->children[0]);
-		$this->assertInstanceOf(ReturnTagValueNode::class, $phpDocNode->children[0]->value);
-
-		$type = $phpDocNode->children[0]->value->type;
+		$returnTag = $phpDocNode->getReturnTagValues()[0];
+		$type = $returnTag->type;
 		$this->assertInstanceOf(IdentifierTypeNode::class, $type);
 
 		$this->assertSame($lines[0], $type->getAttribute(Attribute::START_LINE));
