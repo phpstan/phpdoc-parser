@@ -16,24 +16,53 @@ class ConstExprParser
 	/** @var bool */
 	private $quoteAwareConstExprString;
 
-	public function __construct(bool $unescapeStrings = false, bool $quoteAwareConstExprString = false)
+	/** @var bool */
+	private $useLinesAttributes;
+
+	/** @var bool */
+	private $useIndexAttributes;
+
+	/**
+	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
+	 */
+	public function __construct(
+		bool $unescapeStrings = false,
+		bool $quoteAwareConstExprString = false,
+		array $usedAttributes = []
+	)
 	{
 		$this->unescapeStrings = $unescapeStrings;
 		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
+		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
+		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 	}
 
 	public function parse(TokenIterator $tokens, bool $trimStrings = false): Ast\ConstExpr\ConstExprNode
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_FLOAT)) {
 			$value = $tokens->currentTokenValue();
 			$tokens->next();
-			return new Ast\ConstExpr\ConstExprFloatNode($value);
+
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\ConstExpr\ConstExprFloatNode($value),
+				$startLine,
+				$startIndex
+			);
 		}
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
 			$value = $tokens->currentTokenValue();
 			$tokens->next();
-			return new Ast\ConstExpr\ConstExprIntegerNode($value);
+
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\ConstExpr\ConstExprIntegerNode($value),
+				$startLine,
+				$startIndex
+			);
 		}
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING, Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
@@ -49,15 +78,25 @@ class ConstExprParser
 			$tokens->next();
 
 			if ($this->quoteAwareConstExprString) {
-				return new Ast\ConstExpr\QuoteAwareConstExprStringNode(
-					$value,
-					$type === Lexer::TOKEN_SINGLE_QUOTED_STRING
-						? Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED
-						: Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED
+				return $this->enrichWithAttributes(
+					$tokens,
+					new Ast\ConstExpr\QuoteAwareConstExprStringNode(
+						$value,
+						$type === Lexer::TOKEN_SINGLE_QUOTED_STRING
+							? Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED
+							: Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED
+					),
+					$startLine,
+					$startIndex
 				);
 			}
 
-			return new Ast\ConstExpr\ConstExprStringNode($value);
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\ConstExpr\ConstExprStringNode($value),
+				$startLine,
+				$startIndex
+			);
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
 			$identifier = $tokens->currentTokenValue();
@@ -65,11 +104,26 @@ class ConstExprParser
 
 			switch (strtolower($identifier)) {
 				case 'true':
-					return new Ast\ConstExpr\ConstExprTrueNode();
+					return $this->enrichWithAttributes(
+						$tokens,
+						new Ast\ConstExpr\ConstExprTrueNode(),
+						$startLine,
+						$startIndex
+					);
 				case 'false':
-					return new Ast\ConstExpr\ConstExprFalseNode();
+					return $this->enrichWithAttributes(
+						$tokens,
+						new Ast\ConstExpr\ConstExprFalseNode(),
+						$startLine,
+						$startIndex
+					);
 				case 'null':
-					return new Ast\ConstExpr\ConstExprNullNode();
+					return $this->enrichWithAttributes(
+						$tokens,
+						new Ast\ConstExpr\ConstExprNullNode(),
+						$startLine,
+						$startIndex
+					);
 				case 'array':
 					$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
 					return $this->parseArray($tokens, Lexer::TOKEN_CLOSE_PARENTHESES);
@@ -106,11 +160,21 @@ class ConstExprParser
 					break;
 				}
 
-				return new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName);
+				return $this->enrichWithAttributes(
+					$tokens,
+					new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName),
+					$startLine,
+					$startIndex
+				);
 
 			}
 
-			return new Ast\ConstExpr\ConstFetchNode('', $identifier);
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\ConstExpr\ConstFetchNode('', $identifier),
+				$startLine,
+				$startIndex
+			);
 
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 			return $this->parseArray($tokens, Lexer::TOKEN_CLOSE_SQUARE_BRACKET);
@@ -131,6 +195,9 @@ class ConstExprParser
 	{
 		$items = [];
 
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+
 		if (!$tokens->tryConsumeTokenType($endToken)) {
 			do {
 				$items[] = $this->parseArrayItem($tokens);
@@ -138,12 +205,20 @@ class ConstExprParser
 			$tokens->consumeTokenType($endToken);
 		}
 
-		return new Ast\ConstExpr\ConstExprArrayNode($items);
+		return $this->enrichWithAttributes(
+			$tokens,
+			new Ast\ConstExpr\ConstExprArrayNode($items),
+			$startLine,
+			$startIndex
+		);
 	}
 
 
 	private function parseArrayItem(TokenIterator $tokens): Ast\ConstExpr\ConstExprArrayItemNode
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+
 		$expr = $this->parse($tokens);
 
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_ARROW)) {
@@ -155,7 +230,40 @@ class ConstExprParser
 			$value = $expr;
 		}
 
-		return new Ast\ConstExpr\ConstExprArrayItemNode($key, $value);
+		return $this->enrichWithAttributes(
+			$tokens,
+			new Ast\ConstExpr\ConstExprArrayItemNode($key, $value),
+			$startLine,
+			$startIndex
+		);
+	}
+
+	/**
+	 * @template T of Ast\ConstExpr\ConstExprNode
+	 * @param T $node
+	 * @return T
+	 */
+	private function enrichWithAttributes(TokenIterator $tokens, Ast\ConstExpr\ConstExprNode $node, int $startLine, int $startIndex): Ast\ConstExpr\ConstExprNode
+	{
+		$endLine = $tokens->currentTokenLine();
+		$endIndex = $tokens->currentTokenIndex();
+		if ($this->useLinesAttributes) {
+			$node->setAttribute(Ast\Attribute::START_LINE, $startLine);
+			$node->setAttribute(Ast\Attribute::END_LINE, $endLine);
+		}
+
+		if ($this->useIndexAttributes) {
+			$tokensArray = $tokens->getTokens();
+			$endIndex--;
+			if ($tokensArray[$endIndex][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
+				$endIndex--;
+			}
+
+			$node->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
+			$node->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
+		}
+
+		return $node;
 	}
 
 }

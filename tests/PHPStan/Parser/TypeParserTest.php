@@ -2179,10 +2179,11 @@ class TypeParserTest extends TestCase
 	{
 		$tokensArray = $this->lexer->tokenize($input);
 		$tokens = new TokenIterator($tokensArray);
-		$typeParser = new TypeParser(new ConstExprParser(true, true), true, [
+		$usedAttributes = [
 			'lines' => true,
 			'indexes' => true,
-		]);
+		];
+		$typeParser = new TypeParser(new ConstExprParser(true, true), true, $usedAttributes);
 		$typeNode = $typeParser->parse($tokens);
 
 		foreach ($assertions as [$callable, $expectedContent, $startLine, $endLine, $startIndex, $endIndex]) {

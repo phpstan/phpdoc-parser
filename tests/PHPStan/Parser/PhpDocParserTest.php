@@ -5620,11 +5620,11 @@ Finder::findFiles('*.php')
 	public function testLinesAndIndexes(string $phpDoc, array $childrenLines): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
-		$constExprParser = new ConstExprParser(true, true);
 		$usedAttributes = [
 			'lines' => true,
 			'indexes' => true,
 		];
+		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);
@@ -5691,11 +5691,11 @@ Finder::findFiles('*.php')
 	public function testReturnTypeLinesAndIndexes(string $phpDoc, array $lines): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
-		$constExprParser = new ConstExprParser(true, true);
 		$usedAttributes = [
 			'lines' => true,
 			'indexes' => true,
 		];
+		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);

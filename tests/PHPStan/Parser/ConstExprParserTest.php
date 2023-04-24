@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use Iterator;
+use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFalseNode;
@@ -13,6 +14,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNullNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprTrueNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
 
@@ -51,6 +53,38 @@ class ConstExprParserTest extends TestCase
 		$this->assertSame((string) $expectedExpr, (string) $exprNode);
 		$this->assertEquals($expectedExpr, $exprNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+	}
+
+
+	/**
+	 * @dataProvider provideTrueNodeParseData
+	 * @dataProvider provideFalseNodeParseData
+	 * @dataProvider provideNullNodeParseData
+	 * @dataProvider provideIntegerNodeParseData
+	 * @dataProvider provideFloatNodeParseData
+	 * @dataProvider provideStringNodeParseData
+	 * @dataProvider provideArrayNodeParseData
+	 * @dataProvider provideFetchNodeParseData
+	 *
+	 * @dataProvider provideWithTrimStringsStringNodeParseData
+	 */
+	public function testVerifyAttributes(string $input): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+		$constExprParser = new ConstExprParser(true, true, [
+			'lines' => true,
+			'indexes' => true,
+		]);
+		$visitor = new NodeCollectingVisitor();
+		$traverser = new NodeTraverser([$visitor]);
+		$traverser->traverse([$constExprParser->parse($tokens)]);
+
+		foreach ($visitor->nodes as $node) {
+			$this->assertNotNull($node->getAttribute(Attribute::START_LINE), (string) $node);
+			$this->assertNotNull($node->getAttribute(Attribute::END_LINE), (string) $node);
+			$this->assertNotNull($node->getAttribute(Attribute::START_INDEX), (string) $node);
+			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), (string) $node);
+		}
 	}
 
 
