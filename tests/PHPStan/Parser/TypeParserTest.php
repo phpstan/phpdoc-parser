@@ -2069,6 +2069,48 @@ class TypeParserTest extends TestCase
 				],
 			],
 		];
+
+		yield [
+			'array{foo: int}',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					'array{foo: int}',
+					1,
+					1,
+					0,
+					6,
+				],
+				[
+					static function (ArrayShapeNode $typeNode): TypeNode {
+						return $typeNode->items[0];
+					},
+					'foo: int',
+					1,
+					1,
+					2,
+					5,
+				],
+			],
+		];
+
+		yield [
+			'array{}',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					'array{}',
+					1,
+					1,
+					0,
+					2,
+				],
+			],
+		];
 	}
 
 	/**

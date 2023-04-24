@@ -611,6 +611,8 @@ class TypeParser
 	/** @phpstan-impure */
 	private function parseArrayShapeItem(TokenIterator $tokens): Ast\Type\ArrayShapeItemNode
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
 		try {
 			$tokens->pushSavePoint();
 			$key = $this->parseArrayShapeKey($tokens);
@@ -619,12 +621,22 @@ class TypeParser
 			$value = $this->parse($tokens);
 			$tokens->dropSavePoint();
 
-			return new Ast\Type\ArrayShapeItemNode($key, $optional, $value);
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\Type\ArrayShapeItemNode($key, $optional, $value),
+				$startLine,
+				$startIndex
+			);
 		} catch (ParserException $e) {
 			$tokens->rollback();
 			$value = $this->parse($tokens);
 
-			return new Ast\Type\ArrayShapeItemNode(null, false, $value);
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\Type\ArrayShapeItemNode(null, false, $value),
+				$startLine,
+				$startIndex
+			);
 		}
 	}
 
@@ -634,6 +646,9 @@ class TypeParser
 	 */
 	private function parseArrayShapeKey(TokenIterator $tokens)
 	{
+		$startIndex = $tokens->currentTokenIndex();
+		$startLine = $tokens->currentTokenLine();
+
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
 			$key = new Ast\ConstExpr\ConstExprIntegerNode($tokens->currentTokenValue());
 			$tokens->next();
@@ -660,7 +675,12 @@ class TypeParser
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 		}
 
-		return $key;
+		return $this->enrichWithAttributes(
+			$tokens,
+			$key,
+			$startLine,
+			$startIndex
+		);
 	}
 
 	/**
