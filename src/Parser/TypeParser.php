@@ -713,12 +713,15 @@ class TypeParser
 	/** @phpstan-impure */
 	private function parseObjectShapeItem(TokenIterator $tokens): Ast\Type\ObjectShapeItemNode
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+
 		$key = $this->parseObjectShapeKey($tokens);
 		$optional = $tokens->tryConsumeTokenType(Lexer::TOKEN_NULLABLE);
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
 		$value = $this->parse($tokens);
 
-		return new Ast\Type\ObjectShapeItemNode($key, $optional, $value);
+		return $this->enrichWithAttributes($tokens, new Ast\Type\ObjectShapeItemNode($key, $optional, $value), $startLine, $startIndex);
 	}
 
 	/**
@@ -727,6 +730,9 @@ class TypeParser
 	 */
 	private function parseObjectShapeKey(TokenIterator $tokens)
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
 			if ($this->quoteAwareConstExprString) {
 				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
@@ -748,7 +754,7 @@ class TypeParser
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 		}
 
-		return $key;
+		return $this->enrichWithAttributes($tokens, $key, $startLine, $startIndex);
 	}
 
 }
