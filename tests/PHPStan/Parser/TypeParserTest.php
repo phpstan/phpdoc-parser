@@ -8,6 +8,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -2006,11 +2007,73 @@ class TypeParserTest extends TestCase
 				],
 			],
 		];
+
+		yield [
+			'callable(Foo, Bar): void',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					'callable(Foo, Bar): void',
+					1,
+					1,
+					0,
+					9,
+				],
+				[
+					static function (CallableTypeNode $typeNode): TypeNode {
+						return $typeNode->identifier;
+					},
+					'callable',
+					1,
+					1,
+					0,
+					0,
+				],
+				[
+					static function (CallableTypeNode $typeNode): Node {
+						return $typeNode->parameters[0];
+					},
+					'Foo',
+					1,
+					1,
+					2,
+					2,
+				],
+				[
+					static function (CallableTypeNode $typeNode): TypeNode {
+						return $typeNode->returnType;
+					},
+					'void',
+					1,
+					1,
+					9,
+					9,
+				],
+			],
+		];
+
+		yield [
+			'$this',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					'$this',
+					1,
+					1,
+					0,
+					0,
+				],
+			],
+		];
 	}
 
 	/**
 	 * @dataProvider dataLinesAndIndexes
-	 * @param list<array{callable(TypeNode): TypeNode, string, int, int, int, int}> $assertions
+	 * @param list<array{callable(Node): Node, string, int, int, int, int}> $assertions
 	 */
 	public function testLinesAndIndexes(string $input, array $assertions): void
 	{
@@ -2025,16 +2088,16 @@ class TypeParserTest extends TestCase
 		foreach ($assertions as [$callable, $expectedContent, $startLine, $endLine, $startIndex, $endIndex]) {
 			$typeToAssert = $callable($typeNode);
 
-			$content = '';
-			for ($i = $startIndex; $i <= $endIndex; $i++) {
-				$content .= $tokensArray[$i][Lexer::VALUE_OFFSET];
-			}
-
-			$this->assertSame($expectedContent, $content);
 			$this->assertSame($startLine, $typeToAssert->getAttribute(Attribute::START_LINE));
 			$this->assertSame($endLine, $typeToAssert->getAttribute(Attribute::END_LINE));
 			$this->assertSame($startIndex, $typeToAssert->getAttribute(Attribute::START_INDEX));
 			$this->assertSame($endIndex, $typeToAssert->getAttribute(Attribute::END_INDEX));
+
+			$content = '';
+			for ($i = $startIndex; $i <= $endIndex; $i++) {
+				$content .= $tokensArray[$i][Lexer::VALUE_OFFSET];
+			}
+			$this->assertSame($expectedContent, $content);
 		}
 	}
 
