@@ -493,10 +493,15 @@ class PhpDocParser
 
 	private function parseExtendsTagValue(string $tagName, TokenIterator $tokens): Ast\PhpDoc\PhpDocTagValueNode
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
 		$baseType = new IdentifierTypeNode($tokens->currentTokenValue());
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
-		$type = $this->typeParser->parseGeneric($tokens, $baseType);
+		$type = $this->typeParser->parseGeneric(
+			$tokens,
+			$this->typeParser->enrichWithAttributes($tokens, $baseType, $startLine, $startIndex)
+		);
 
 		$description = $this->parseOptionalDescription($tokens);
 

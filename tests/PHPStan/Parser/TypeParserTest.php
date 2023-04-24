@@ -1935,6 +1935,10 @@ class TypeParserTest extends TestCase
 					)
 				),
 			],
+			[
+				'callable(): ?int',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('int'))),
+			],
 		];
 	}
 
