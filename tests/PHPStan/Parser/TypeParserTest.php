@@ -9,6 +9,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -77,6 +78,34 @@ class TypeParserTest extends TestCase
 		$typeNodeTokens = new TokenIterator($this->lexer->tokenize((string) $typeNode));
 		$parsedAgainTypeNode = $this->typeParser->parse($typeNodeTokens);
 		$this->assertSame((string) $typeNode, (string) $parsedAgainTypeNode);
+	}
+
+
+	/**
+	 * @dataProvider provideParseData
+	 * @param TypeNode|Exception $expectedResult
+	 */
+	public function testVerifyAttributes(string $input, $expectedResult): void
+	{
+		if ($expectedResult instanceof Exception) {
+			$this->expectException(get_class($expectedResult));
+			$this->expectExceptionMessage($expectedResult->getMessage());
+		}
+
+		$usedAttributes = ['lines' => true, 'indexes' => true];
+		$typeParser = new TypeParser(new ConstExprParser(true, true, $usedAttributes), true, $usedAttributes);
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+
+		$visitor = new NodeCollectingVisitor();
+		$traverser = new NodeTraverser([$visitor]);
+		$traverser->traverse([$typeParser->parse($tokens)]);
+
+		foreach ($visitor->nodes as $node) {
+			$this->assertNotNull($node->getAttribute(Attribute::START_LINE), (string) $node);
+			$this->assertNotNull($node->getAttribute(Attribute::END_LINE), (string) $node);
+			$this->assertNotNull($node->getAttribute(Attribute::START_INDEX), (string) $node);
+			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), (string) $node);
+		}
 	}
 
 
