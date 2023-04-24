@@ -133,6 +133,8 @@ class PhpDocParser
 				if ($tokensArray[$endIndex][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
 					$endIndex--;
 				}
+			} elseif ($tokensArray[$endIndex][Lexer::TYPE_OFFSET] === Lexer::TOKEN_PHPDOC_EOL) {
+				$endIndex--;
 			}
 
 			$tag->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
