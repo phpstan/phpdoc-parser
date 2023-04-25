@@ -2202,6 +2202,161 @@ class TypeParserTest extends TestCase
 				],
 			],
 		];
+
+		yield [
+			'int[][][]',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					'int[][][]',
+					1,
+					1,
+					0,
+					6,
+				],
+				[
+					static function (ArrayTypeNode $typeNode): TypeNode {
+						return $typeNode->type;
+					},
+					'int[][]',
+					1,
+					1,
+					0,
+					4,
+				],
+				[
+					static function (ArrayTypeNode $typeNode): TypeNode {
+						if (!$typeNode->type instanceof ArrayTypeNode) {
+							throw new Exception();
+						}
+
+						return $typeNode->type->type;
+					},
+					'int[]',
+					1,
+					1,
+					0,
+					2,
+				],
+				[
+					static function (ArrayTypeNode $typeNode): TypeNode {
+						if (!$typeNode->type instanceof ArrayTypeNode) {
+							throw new Exception();
+						}
+						if (!$typeNode->type->type instanceof ArrayTypeNode) {
+							throw new Exception();
+						}
+
+						return $typeNode->type->type->type;
+					},
+					'int',
+					1,
+					1,
+					0,
+					0,
+				],
+			],
+		];
+
+		yield [
+			'int[foo][bar][baz]',
+			[
+				[
+					static function (TypeNode $typeNode): TypeNode {
+						return $typeNode;
+					},
+					'int[foo][bar][baz]',
+					1,
+					1,
+					0,
+					9,
+				],
+				[
+					static function (OffsetAccessTypeNode $typeNode): TypeNode {
+						return $typeNode->type;
+					},
+					'int[foo][bar]',
+					1,
+					1,
+					0,
+					6,
+				],
+				[
+					static function (OffsetAccessTypeNode $typeNode): TypeNode {
+						return $typeNode->offset;
+					},
+					'baz',
+					1,
+					1,
+					8,
+					8,
+				],
+				[
+					static function (OffsetAccessTypeNode $typeNode): TypeNode {
+						if (!$typeNode->type instanceof OffsetAccessTypeNode) {
+							throw new Exception();
+						}
+
+						return $typeNode->type->type;
+					},
+					'int[foo]',
+					1,
+					1,
+					0,
+					3,
+				],
+				[
+					static function (OffsetAccessTypeNode $typeNode): TypeNode {
+						if (!$typeNode->type instanceof OffsetAccessTypeNode) {
+							throw new Exception();
+						}
+
+						return $typeNode->type->offset;
+					},
+					'bar',
+					1,
+					1,
+					5,
+					5,
+				],
+				[
+					static function (OffsetAccessTypeNode $typeNode): TypeNode {
+						if (!$typeNode->type instanceof OffsetAccessTypeNode) {
+							throw new Exception();
+						}
+						if (!$typeNode->type->type instanceof OffsetAccessTypeNode) {
+							throw new Exception();
+						}
+
+						return $typeNode->type->type->type;
+					},
+					'int',
+					1,
+					1,
+					0,
+					0,
+				],
+				[
+					static function (OffsetAccessTypeNode $typeNode): TypeNode {
+						if (!$typeNode->type instanceof OffsetAccessTypeNode) {
+							throw new Exception();
+						}
+						if (!$typeNode->type->type instanceof OffsetAccessTypeNode) {
+							throw new Exception();
+						}
+
+						return $typeNode->type->type->offset;
+					},
+					'foo',
+					1,
+					1,
+					2,
+					2,
+				],
+			],
+		];
 	}
 
 	/**

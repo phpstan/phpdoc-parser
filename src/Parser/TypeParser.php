@@ -585,8 +585,8 @@ class TypeParser
 	/** @phpstan-impure */
 	private function tryParseArrayOrOffsetAccess(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
 	{
-		$startLine = $tokens->currentTokenLine();
-		$startIndex = $tokens->currentTokenIndex();
+		$startLine = $type->getAttribute(Ast\Attribute::START_LINE);
+		$startIndex = $type->getAttribute(Ast\Attribute::START_INDEX);
 		try {
 			while ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$tokens->pushSavePoint();
@@ -598,21 +598,29 @@ class TypeParser
 					$offset = $this->parse($tokens);
 					$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_SQUARE_BRACKET);
 					$tokens->dropSavePoint();
-					$type = $this->enrichWithAttributes(
-						$tokens,
-						new Ast\Type\OffsetAccessTypeNode($type, $offset),
-						$startLine,
-						$startIndex
-					);
+					$type = new Ast\Type\OffsetAccessTypeNode($type, $offset);
+
+					if ($startLine !== null && $startIndex !== null) {
+						$type = $this->enrichWithAttributes(
+							$tokens,
+							$type,
+							$startLine,
+							$startIndex
+						);
+					}
 				} else {
 					$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_SQUARE_BRACKET);
 					$tokens->dropSavePoint();
-					$type = $this->enrichWithAttributes(
-						$tokens,
-						new Ast\Type\ArrayTypeNode($type),
-						$startLine,
-						$startIndex
-					);
+					$type = new Ast\Type\ArrayTypeNode($type);
+
+					if ($startLine !== null && $startIndex !== null) {
+						$type = $this->enrichWithAttributes(
+							$tokens,
+							$type,
+							$startLine,
+							$startIndex
+						);
+					}
 				}
 			}
 
