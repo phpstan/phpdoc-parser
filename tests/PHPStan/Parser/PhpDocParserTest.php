@@ -10,6 +10,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagPropertyValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
@@ -53,6 +54,7 @@ use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPUnit\Framework\TestCase;
 use function count;
+use function sprintf;
 use const PHP_EOL;
 
 class PhpDocParserTest extends TestCase
@@ -5707,6 +5709,51 @@ Finder::findFiles('*.php')
 		$this->assertSame($lines[1], $type->getAttribute(Attribute::END_LINE));
 		$this->assertSame($lines[2], $type->getAttribute(Attribute::START_INDEX));
 		$this->assertSame($lines[3], $type->getAttribute(Attribute::END_INDEX));
+	}
+
+	/**
+	 * @dataProvider provideTagsWithNumbers
+	 * @dataProvider provideSpecializedTags
+	 * @dataProvider provideParamTagsData
+	 * @dataProvider provideTypelessParamTagsData
+	 * @dataProvider provideVarTagsData
+	 * @dataProvider provideReturnTagsData
+	 * @dataProvider provideThrowsTagsData
+	 * @dataProvider provideMixinTagsData
+	 * @dataProvider provideDeprecatedTagsData
+	 * @dataProvider providePropertyTagsData
+	 * @dataProvider provideMethodTagsData
+	 * @dataProvider provideSingleLinePhpDocData
+	 * @dataProvider provideMultiLinePhpDocData
+	 * @dataProvider provideTemplateTagsData
+	 * @dataProvider provideExtendsTagsData
+	 * @dataProvider provideTypeAliasTagsData
+	 * @dataProvider provideTypeAliasImportTagsData
+	 * @dataProvider provideAssertTagsData
+	 * @dataProvider provideRealWorldExampleData
+	 * @dataProvider provideDescriptionWithOrWithoutHtml
+	 * @dataProvider provideTagsWithBackslash
+	 * @dataProvider provideSelfOutTagsData
+	 * @dataProvider provideParamOutTagsData
+	 */
+	public function testVerifyAttributes(string $label, string $input): void
+	{
+		$usedAttributes = ['lines' => true, 'indexes' => true];
+		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
+		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+
+		$visitor = new NodeCollectingVisitor();
+		$traverser = new NodeTraverser([$visitor]);
+		$traverser->traverse([$phpDocParser->parse($tokens)]);
+
+		foreach ($visitor->nodes as $node) {
+			$this->assertNotNull($node->getAttribute(Attribute::START_LINE), sprintf('%s: %s', $label, $node));
+			$this->assertNotNull($node->getAttribute(Attribute::END_LINE), sprintf('%s: %s', $label, $node));
+			$this->assertNotNull($node->getAttribute(Attribute::START_INDEX), sprintf('%s: %s', $label, $node));
+			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), sprintf('%s: %s', $label, $node));
+		}
 	}
 
 }
