@@ -1177,10 +1177,9 @@ class PrinterTest extends TestCase
 		$newPhpDoc = $printer->printFormatPreserving($newNode, $phpDocNode, $tokens);
 		$this->assertSame($expectedResult, $newPhpDoc);
 
-		$newTokens = new TokenIterator($lexer->tokenize($newPhpDoc));
 		$this->assertEquals(
 			$this->unsetAttributes($newNode),
-			$this->unsetAttributes($phpDocParser->parse($newTokens))
+			$this->unsetAttributes($phpDocParser->parse(new TokenIterator($lexer->tokenize($newPhpDoc))))
 		);
 	}
 
