@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Printer;
 
 use PHPStan\PhpDocParser\Ast\AbstractNodeVisitor;
+use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
@@ -1173,7 +1174,37 @@ class PrinterTest extends TestCase
 		[$newNode] = $changingTraverser->traverse($newNodes);
 
 		$printer = new Printer();
-		$this->assertSame($expectedResult, $printer->printFormatPreserving($newNode, $phpDocNode, $tokens));
+		$newPhpDoc = $printer->printFormatPreserving($newNode, $phpDocNode, $tokens);
+		$this->assertSame($expectedResult, $newPhpDoc);
+
+		$newTokens = new TokenIterator($lexer->tokenize($newPhpDoc));
+		$this->assertEquals(
+			$this->unsetAttributes($newNode),
+			$this->unsetAttributes($phpDocParser->parse($newTokens))
+		);
+	}
+
+	private function unsetAttributes(PhpDocNode $node): PhpDocNode
+	{
+		$visitor = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				$node->setAttribute(Attribute::START_LINE, null);
+				$node->setAttribute(Attribute::END_LINE, null);
+				$node->setAttribute(Attribute::START_INDEX, null);
+				$node->setAttribute(Attribute::END_INDEX, null);
+				$node->setAttribute(Attribute::ORIGINAL_NODE, null);
+
+				return $node;
+			}
+
+		};
+
+		$traverser = new NodeTraverser([$visitor]);
+
+		/** @var PhpDocNode */
+		return $traverser->traverse([$node])[0];
 	}
 
 }
