@@ -29,6 +29,7 @@ use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\Printer\Printer;
 use PHPUnit\Framework\TestCase;
 use function get_class;
 use function strpos;
@@ -68,16 +69,38 @@ class TypeParserTest extends TestCase
 		$this->assertSame((string) $expectedResult, (string) $typeNode);
 		$this->assertInstanceOf(get_class($expectedResult), $typeNode);
 		$this->assertEquals($expectedResult, $typeNode);
-		$this->assertSame($nextTokenType, $tokens->currentTokenType());
+		$this->assertSame($nextTokenType, $tokens->currentTokenType(), Lexer::TOKEN_LABELS[$nextTokenType]);
 
 		if (strpos((string) $expectedResult, '$ref') !== false) {
 			// weird case with $ref inside double-quoted string - not really possible in PHP
 			return;
 		}
 
-		$typeNodeTokens = new TokenIterator($this->lexer->tokenize((string) $typeNode));
+		$this->assertPrintedNodeViaToString($typeNode);
+		$this->assertPrintedNodeViaPrinter($typeNode);
+	}
+
+
+	private function assertPrintedNodeViaToString(TypeNode $typeNode): void
+	{
+		$this->assertPrintedNode($typeNode, (string) $typeNode);
+	}
+
+
+	private function assertPrintedNodeViaPrinter(TypeNode $typeNode): void
+	{
+		$printer = new Printer();
+		$this->assertPrintedNode($typeNode, $printer->print($typeNode));
+	}
+
+
+	private function assertPrintedNode(TypeNode $typeNode, string $typeNodeString): void
+	{
+		$typeNodeTokens = new TokenIterator($this->lexer->tokenize($typeNodeString));
 		$parsedAgainTypeNode = $this->typeParser->parse($typeNodeTokens);
 		$this->assertSame((string) $typeNode, (string) $parsedAgainTypeNode);
+		$this->assertInstanceOf(get_class($typeNode), $parsedAgainTypeNode);
+		$this->assertEquals($typeNode, $parsedAgainTypeNode);
 	}
 
 
@@ -1991,6 +2014,22 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'callable(): int[][][]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int'))))),
+			],
+			[
+				'callable(): (int[][][])',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int'))))),
+			],
+			[
+				'(callable(): int[])[][]',
+				new ArrayTypeNode(
+					new ArrayTypeNode(
+						new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int')))
+					)
+				),
+			],
+			[
 				'callable(): $this',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ThisTypeNode()),
 			],
@@ -2042,6 +2081,63 @@ class TypeParserTest extends TestCase
 			[
 				'callable(): ?Foo[]',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo')))),
+			],
+			[
+				'?(Foo|Bar)',
+				new NullableTypeNode(new UnionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+				])),
+			],
+			[
+				'Foo | (Bar & Baz)',
+				new UnionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IntersectionTypeNode([
+						new IdentifierTypeNode('Bar'),
+						new IdentifierTypeNode('Baz'),
+					]),
+				]),
+			],
+			[
+				'(?Foo) | Bar',
+				new UnionTypeNode([
+					new NullableTypeNode(new IdentifierTypeNode('Foo')),
+					new IdentifierTypeNode('Bar'),
+				]),
+			],
+			[
+				'?(Foo|Bar)',
+				new NullableTypeNode(new UnionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+				])),
+			],
+			[
+				'?(Foo&Bar)',
+				new NullableTypeNode(new IntersectionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+				])),
+			],
+			[
+				'?Foo[]',
+				new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'(?Foo)[]',
+				new ArrayTypeNode(new NullableTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'Foo | Bar | (Baz | Lorem)',
+				new UnionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+					new UnionTypeNode([
+						new IdentifierTypeNode('Baz'),
+						new IdentifierTypeNode('Lorem'),
+					]),
+				]),
 			],
 		];
 	}

@@ -268,4 +268,64 @@ class TokenIterator
 		);
 	}
 
+	/**
+	 * Check whether the position is directly preceded by a certain token type.
+	 *
+	 * During this check TOKEN_HORIZONTAL_WS and TOKEN_PHPDOC_EOL are skipped
+	 */
+	public function hasTokenImmediatelyBefore(int $pos, int $expectedTokenType): bool
+	{
+		$tokens = $this->tokens;
+		$pos--;
+		for (; $pos >= 0; $pos--) {
+			$token = $tokens[$pos];
+			$type = $token[Lexer::TYPE_OFFSET];
+			if ($type === $expectedTokenType) {
+				return true;
+			}
+			if (!in_array($type, [
+				Lexer::TOKEN_HORIZONTAL_WS,
+				Lexer::TOKEN_PHPDOC_EOL,
+			], true)) {
+				break;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check whether the position is directly followed by a certain token type.
+	 *
+	 * During this check TOKEN_HORIZONTAL_WS and TOKEN_PHPDOC_EOL are skipped
+	 */
+	public function hasTokenImmediatelyAfter(int $pos, int $expectedTokenType): bool
+	{
+		$tokens = $this->tokens;
+		$pos++;
+		for ($c = count($tokens); $pos < $c; $pos++) {
+			$token = $tokens[$pos];
+			$type = $token[Lexer::TYPE_OFFSET];
+			if ($type === $expectedTokenType) {
+				return true;
+			}
+			if (!in_array($type, [
+				Lexer::TOKEN_HORIZONTAL_WS,
+				Lexer::TOKEN_PHPDOC_EOL,
+			], true)) {
+				break;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether the given position is immediately surrounded by parenthesis.
+	 */
+	public function hasParentheses(int $startPos, int $endPos): bool
+	{
+		return $this->hasTokenImmediatelyBefore($startPos, Lexer::TOKEN_OPEN_PARENTHESES)
+			&& $this->hasTokenImmediatelyAfter($endPos, Lexer::TOKEN_CLOSE_PARENTHESES);
+	}
+
 }

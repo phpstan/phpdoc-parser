@@ -23,6 +23,14 @@ class OffsetAccessTypeNode implements TypeNode
 
 	public function __toString(): string
 	{
+		if (
+			$this->type instanceof CallableTypeNode
+			|| $this->type instanceof ConstTypeNode
+			|| $this->type instanceof NullableTypeNode
+		) {
+			return '(' . $this->type . ')[' . $this->offset . ']';
+		}
+
 		return $this->type . '[' . $this->offset . ']';
 	}
 

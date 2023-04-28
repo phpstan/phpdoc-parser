@@ -13,6 +13,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprTrueNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Printer\Printer;
 use PHPUnit\Framework\TestCase;
 
 class ConstExprToStringTest extends TestCase
@@ -24,6 +25,15 @@ class ConstExprToStringTest extends TestCase
 	public function testToString(string $expected, Node $node): void
 	{
 		$this->assertSame($expected, (string) $node);
+	}
+
+	/**
+	 * @dataProvider provideConstExprCases
+	 */
+	public function testPrinter(string $expected, Node $node): void
+	{
+		$printer = new Printer();
+		$this->assertSame($expected, $printer->print($node));
 	}
 
 	public static function provideConstExprCases(): Generator

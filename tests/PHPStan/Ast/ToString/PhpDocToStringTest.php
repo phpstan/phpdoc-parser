@@ -35,6 +35,7 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ParserException;
+use PHPStan\PhpDocParser\Printer\Printer;
 use PHPUnit\Framework\TestCase;
 
 class PhpDocToStringTest extends TestCase
@@ -49,6 +50,15 @@ class PhpDocToStringTest extends TestCase
 	}
 
 	/**
+	 * @dataProvider provideFullPhpDocCases
+	 */
+	public function testFullPhpDocPrinter(string $expected, Node $node): void
+	{
+		$printer = new Printer();
+		$this->assertSame($expected, $printer->print($node));
+	}
+
+	/**
 	 * @dataProvider provideOtherCases
 	 * @dataProvider provideMethodCases
 	 * @dataProvider provideClassCases
@@ -57,6 +67,18 @@ class PhpDocToStringTest extends TestCase
 	public function testTagValueNodeToString(string $expected, Node $node): void
 	{
 		$this->assertSame($expected, (string) $node);
+	}
+
+	/**
+	 * @dataProvider provideOtherCases
+	 * @dataProvider provideMethodCases
+	 * @dataProvider provideClassCases
+	 * @dataProvider provideAssertionCases
+	 */
+	public function testTagValueNodePrinter(string $expected, Node $node): void
+	{
+		$printer = new Printer();
+		$this->assertSame($expected, $printer->print($node));
 	}
 
 	public static function provideFullPhpDocCases(): Generator

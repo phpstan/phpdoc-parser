@@ -20,9 +20,13 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
@@ -1167,6 +1171,203 @@ class PrinterTest extends TestCase
 			'/** @method int doFoo<U, T of int>() */',
 			$addMethodTemplateType,
 		];
+
+		$changeCallableReturnTypeFactory = function (TypeNode $type): NodeVisitor {
+			return new class ($type) extends AbstractNodeVisitor {
+
+				/** @var TypeNode */
+				private $type;
+
+				public function __construct(TypeNode $type)
+				{
+					$this->type = $type;
+				}
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof CallableTypeNode) {
+						$node->returnType = $this->type;
+					}
+
+					return $node;
+				}
+
+			};
+		};
+
+		yield [
+			'/** @param callable(): int $a */',
+			'/** @param callable(): string $a */',
+			$changeCallableReturnTypeFactory(new IdentifierTypeNode('string')),
+		];
+
+		yield [
+			'/** @param callable(): int $a */',
+			'/** @param callable(): (int|string) $a */',
+			$changeCallableReturnTypeFactory(new UnionTypeNode([
+				new IdentifierTypeNode('int'),
+				new IdentifierTypeNode('string'),
+			])),
+		];
+
+		yield [
+			'/** @param callable(): (int|string) $a */',
+			'/** @param callable(): string $a */',
+			$changeCallableReturnTypeFactory(new IdentifierTypeNode('string')),
+		];
+
+		yield [
+			'/** @param callable(): (int|string) $a */',
+			'/** @param callable(): (string|int) $a */',
+			$changeCallableReturnTypeFactory(new UnionTypeNode([
+				new IdentifierTypeNode('string'),
+				new IdentifierTypeNode('int'),
+			])),
+		];
+
+		$changeCallableReturnTypeCallbackFactory = function (callable $callback): NodeVisitor {
+			return new class ($callback) extends AbstractNodeVisitor {
+
+				/** @var callable(TypeNode): TypeNode */
+				private $callback;
+
+				public function __construct(callable $callback)
+				{
+					$this->callback = $callback;
+				}
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof CallableTypeNode) {
+						$cb = $this->callback;
+						$node->returnType = $cb($node->returnType);
+					}
+
+					return $node;
+				}
+
+			};
+		};
+
+		yield [
+			'/** @param callable(): int $a */',
+			'/** @param callable(): string $a */',
+			$changeCallableReturnTypeCallbackFactory(static function (TypeNode $typeNode): TypeNode {
+				return new IdentifierTypeNode('string');
+			}),
+		];
+
+		yield [
+			'/** @param callable(): (int) $a */',
+			'/** @param callable(): string $a */',
+			$changeCallableReturnTypeCallbackFactory(static function (TypeNode $typeNode): TypeNode {
+				return new IdentifierTypeNode('string');
+			}),
+		];
+
+		yield [
+			'/** @param callable(): int $a */',
+			'/** @param callable(): string $a */',
+			$changeCallableReturnTypeCallbackFactory(static function (IdentifierTypeNode $typeNode): TypeNode {
+				$typeNode->name = 'string';
+
+				return $typeNode;
+			}),
+		];
+
+		yield [
+			'/** @param callable(): (int) $a */',
+			'/** @param callable(): string $a */',
+			$changeCallableReturnTypeCallbackFactory(static function (IdentifierTypeNode $typeNode): TypeNode {
+				$typeNode->name = 'string';
+
+				return $typeNode;
+			}),
+		];
+
+		yield [
+			'/** @param Foo&Bar&Baz $a */',
+			'/** @param Foo&Bar&(Lorem|Ipsum) $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof IntersectionTypeNode) {
+						$node->types[2] = new UnionTypeNode([
+							new IdentifierTypeNode('Lorem'),
+							new IdentifierTypeNode('Ipsum'),
+						]);
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param Foo&Bar $a */',
+			'/** @param Foo&Bar&(Lorem|Ipsum) $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof IntersectionTypeNode) {
+						$node->types[] = new UnionTypeNode([
+							new IdentifierTypeNode('Lorem'),
+							new IdentifierTypeNode('Ipsum'),
+						]);
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param Foo&Bar $a */',
+			'/** @param (Lorem|Ipsum)&Foo&Bar $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof IntersectionTypeNode) {
+						array_unshift($node->types, new UnionTypeNode([
+							new IdentifierTypeNode('Lorem'),
+							new IdentifierTypeNode('Ipsum'),
+						]));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param Foo&Bar $a */',
+			'/** @param (Lorem|Ipsum)&Baz&Dolor $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof IntersectionTypeNode) {
+						$node->types = [
+							new UnionTypeNode([
+								new IdentifierTypeNode('Lorem'),
+								new IdentifierTypeNode('Ipsum'),
+							]),
+							new IdentifierTypeNode('Baz'),
+							new IdentifierTypeNode('Dolor'),
+						];
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
@@ -1226,6 +1427,85 @@ class PrinterTest extends TestCase
 		yield [
 			new IdentifierTypeNode('int'),
 			'int',
+		];
+		yield [
+			new UnionTypeNode([
+				new IdentifierTypeNode('int'),
+				new IdentifierTypeNode('string'),
+			]),
+			'int|string',
+		];
+		yield [
+			new GenericTypeNode(
+				new IdentifierTypeNode('array'),
+				[
+					new IdentifierTypeNode('int'),
+					new UnionTypeNode([
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('string'),
+					]),
+				],
+				[
+					GenericTypeNode::VARIANCE_INVARIANT,
+					GenericTypeNode::VARIANCE_INVARIANT,
+				]
+			),
+			'array<int, int|string>',
+		];
+		yield [
+			new CallableTypeNode(new IdentifierTypeNode('callable'), [], new UnionTypeNode([
+				new IdentifierTypeNode('int'),
+				new IdentifierTypeNode('string'),
+			])),
+			'callable(): (int|string)',
+		];
+		yield [
+			new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int'))))),
+			'callable(): int[][][]',
+		];
+		yield [
+			new ArrayTypeNode(
+				new ArrayTypeNode(
+					new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int')))
+				)
+			),
+			'(callable(): int[])[][]',
+		];
+		yield [
+			new NullableTypeNode(new UnionTypeNode([
+				new IdentifierTypeNode('Foo'),
+				new IdentifierTypeNode('Bar'),
+			])),
+			'?(Foo|Bar)',
+		];
+		yield [
+			new UnionTypeNode([
+				new IdentifierTypeNode('Foo'),
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('Bar'),
+					new IdentifierTypeNode('Baz'),
+				]),
+			]),
+			'Foo|(Bar&Baz)',
+		];
+		yield [
+			new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo'))),
+			'?Foo[]',
+		];
+		yield [
+			new ArrayTypeNode(new NullableTypeNode(new IdentifierTypeNode('Foo'))),
+			'(?Foo)[]',
+		];
+		yield [
+			new UnionTypeNode([
+				new IdentifierTypeNode('Foo'),
+				new IdentifierTypeNode('Bar'),
+				new UnionTypeNode([
+					new IdentifierTypeNode('Baz'),
+					new IdentifierTypeNode('Lorem'),
+				]),
+			]),
+			'Foo|Bar|(Baz|Lorem)',
 		];
 	}
 
