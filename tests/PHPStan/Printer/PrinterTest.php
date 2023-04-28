@@ -42,6 +42,22 @@ use function count;
 class PrinterTest extends TestCase
 {
 
+	/** @var PhpDocParser */
+	private $phpDocParser;
+
+	protected function setUp(): void
+	{
+		$usedAttributes = ['lines' => true, 'indexes' => true];
+		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
+		$this->phpDocParser = new PhpDocParser(
+			new TypeParser($constExprParser, true, $usedAttributes),
+			$constExprParser,
+			true,
+			true,
+			$usedAttributes
+		);
+	}
+
 	/**
 	 * @return iterable<array{string, string, NodeVisitor}>
 	 */
@@ -1153,18 +1169,9 @@ class PrinterTest extends TestCase
 	 */
 	public function testPrintFormatPreserving(string $phpDoc, string $expectedResult, NodeVisitor $visitor): void
 	{
-		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser(
-			new TypeParser($constExprParser, true, $usedAttributes),
-			$constExprParser,
-			true,
-			true,
-			$usedAttributes
-		);
 		$lexer = new Lexer();
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
-		$phpDocNode = $phpDocParser->parse($tokens);
+		$phpDocNode = $this->phpDocParser->parse($tokens);
 		$cloningTraverser = new NodeTraverser([new NodeVisitor\CloningVisitor()]);
 		$newNodes = $cloningTraverser->traverse([$phpDocNode]);
 
@@ -1179,7 +1186,7 @@ class PrinterTest extends TestCase
 
 		$this->assertEquals(
 			$this->unsetAttributes($newNode),
-			$this->unsetAttributes($phpDocParser->parse(new TokenIterator($lexer->tokenize($newPhpDoc))))
+			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($newPhpDoc))))
 		);
 	}
 
