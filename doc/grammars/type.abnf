@@ -214,8 +214,8 @@ ByteHorizontalWs
 	/ %x20 ; space
 
 ByteNumberSign
-	= %x2B ; +
-	/ %x2D ; -
+	= "+"
+	/ "-"
 
 ByteBinDigit
 	= %x30-31 ; 0-1
@@ -233,14 +233,14 @@ ByteHexDigit
 
 ByteIdentifierFirst
 	= %x41-5A ; A-Z
-	/ %x5F    ; _
+	/ "_"
 	/ %x61-7A ; a-z
 	/ %x80-FF
 
 ByteIdentifierSecond
 	= %x30-39 ; 0-9
 	/ %x41-5A ; A-Z
-	/ %x5F    ; _
+	/ "_"
 	/ %x61-7A ; a-z
 	/ %x80-FF
 
