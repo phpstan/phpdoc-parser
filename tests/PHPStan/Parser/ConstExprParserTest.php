@@ -290,6 +290,11 @@ class ConstExprParserTest extends TestCase
 			'8.2023437675747321', // greater precision than 64-bit double
 			new ConstExprFloatNode('8.2023437675747321'),
 		];
+
+		yield [
+			'-0.0',
+			new ConstExprFloatNode('-0.0'),
+		];
 	}
 
 
