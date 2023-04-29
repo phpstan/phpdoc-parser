@@ -153,6 +153,16 @@ class ConstExprParserTest extends TestCase
 		];
 
 		yield [
+			'+123',
+			new ConstExprIntegerNode('+123'),
+		];
+
+		yield [
+			'-123',
+			new ConstExprIntegerNode('-123'),
+		];
+
+		yield [
 			'0b0110101',
 			new ConstExprIntegerNode('0b0110101'),
 		];
@@ -191,6 +201,11 @@ class ConstExprParserTest extends TestCase
 			'-0X7_Fb_4',
 			new ConstExprIntegerNode('-0X7Fb4'),
 		];
+
+		yield [
+			'18_446_744_073_709_551_616', // 64-bit unsigned long + 1, larger than PHP_INT_MAX
+			new ConstExprIntegerNode('18446744073709551616'),
+		];
 	}
 
 
@@ -227,8 +242,13 @@ class ConstExprParserTest extends TestCase
 		];
 
 		yield [
-			'-123',
-			new ConstExprIntegerNode('-123'),
+			'+123.5',
+			new ConstExprFloatNode('+123.5'),
+		];
+
+		yield [
+			'-123.',
+			new ConstExprFloatNode('-123.'),
 		];
 
 		yield [
@@ -259,6 +279,16 @@ class ConstExprParserTest extends TestCase
 		yield [
 			'-1_2.3_4e5_6',
 			new ConstExprFloatNode('-12.34e56'),
+		];
+
+		yield [
+			'123E+80',
+			new ConstExprFloatNode('123E+80'),
+		];
+
+		yield [
+			'8.2023437675747321', // greater precision than 64-bit double
+			new ConstExprFloatNode('8.2023437675747321'),
 		];
 	}
 
