@@ -86,8 +86,8 @@ ConstantExpr
 
 ConstantFloat
 	= ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit) "." [1*ByteDecDigit *("_" 1*ByteDecDigit)] [ConstantFloatExp]
-	/ ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit) ConstantFloatExp
 	/ ["-"] "." 1*ByteDecDigit *("_" 1*ByteDecDigit) [ConstantFloatExp]
+	/ ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit) ConstantFloatExp
 
 ConstantFloatExp
 	= "e" ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit)
