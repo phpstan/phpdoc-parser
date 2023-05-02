@@ -542,13 +542,17 @@ class TypeParser
 					)
 				);
 
-			} elseif (in_array($type->name, ['array', 'list'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
-				$type = $this->parseArrayShape($tokens, $this->enrichWithAttributes(
-					$tokens,
-					$type,
-					$startLine,
-					$startIndex
-				), $type->name);
+			} elseif (in_array($type->name, ['array', 'list', 'object'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
+				if ($type->name === 'object') {
+					$type = $this->parseObjectShape($tokens);
+				} else {
+					$type = $this->parseArrayShape($tokens, $this->enrichWithAttributes(
+						$tokens,
+						$type,
+						$startLine,
+						$startIndex
+					), $type->name);
+				}
 			}
 		}
 

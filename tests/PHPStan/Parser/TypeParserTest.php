@@ -1939,6 +1939,24 @@ class TypeParserTest extends TestCase
 				'callable(): ?int',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('int'))),
 			],
+			[
+				'callable(): object{foo: int}',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ObjectShapeNode([
+					new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+				])),
+			],
+			[
+				'callable(): object{foo: int}[]',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new ArrayTypeNode(
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+						])
+					)
+				),
+			],
 		];
 	}
 
