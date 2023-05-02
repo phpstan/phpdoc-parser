@@ -26,6 +26,7 @@ use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
@@ -1217,6 +1218,9 @@ class PrinterTest extends TestCase
 		return $traverser->traverse([$node])[0];
 	}
 
+	/**
+	 * @return iterable<list{TypeNode, string}>
+	 */
 	public function dataPrintType(): iterable
 	{
 		yield [
@@ -1241,6 +1245,9 @@ class PrinterTest extends TestCase
 		);
 	}
 
+	/**
+	 * @return iterable<list{PhpDocNode, string}>
+	 */
 	public function dataPrintPhpDocNode(): iterable
 	{
 		yield [
