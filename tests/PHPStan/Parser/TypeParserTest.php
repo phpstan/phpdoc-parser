@@ -1957,6 +1957,14 @@ class TypeParserTest extends TestCase
 					)
 				),
 			],
+			[
+				'callable(): $this',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ThisTypeNode()),
+			],
+			[
+				'callable(): $this[]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ThisTypeNode())),
+			],
 		];
 	}
 

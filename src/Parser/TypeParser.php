@@ -526,7 +526,8 @@ class TypeParser
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
 			$type = $this->parse($tokens);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
-
+		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+			$type = new Ast\Type\ThisTypeNode();
 		} else {
 			$type = new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue());
 			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
