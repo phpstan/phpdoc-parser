@@ -521,17 +521,7 @@ class TypeParser
 		$startLine = $tokens->currentTokenLine();
 		$startIndex = $tokens->currentTokenIndex();
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
-			$type = $this->parseNullable($tokens);
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-				$type = $this->tryParseArrayOrOffsetAccess($tokens, $this->enrichWithAttributes(
-					$tokens,
-					$type,
-					$startLine,
-					$startIndex
-				));
-			}
-
-			return $type;
+			return $this->parseNullable($tokens);
 
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
 			$type = $this->parse($tokens);

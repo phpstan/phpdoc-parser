@@ -2014,6 +2014,18 @@ class TypeParserTest extends TestCase
 				'callable(): Foo::*',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', '*'))),
 			],
+			[
+				'?Foo[]',
+				new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'callable(): ?Foo',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'callable(): ?Foo[]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo')))),
+			],
 		];
 	}
 
