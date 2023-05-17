@@ -62,11 +62,13 @@ final class Printer
 	 *
 	 * @var array<string, array{string|null, string, string}>
 	 */
-	protected $emptyListInsertionMap = [
+	private $emptyListInsertionMap = [
 		CallableTypeNode::class . '->parameters' => ['(', '', ''],
 		ArrayShapeNode::class . '->items' => ['{', '', ''],
 		ObjectShapeNode::class . '->items' => ['{', '', ''],
 	];
+
+
 
 	public function printFormatPreserving(PhpDocNode $node, PhpDocNode $originalNode, TokenIterator $originalTokens): string
 	{
