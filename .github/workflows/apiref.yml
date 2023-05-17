@@ -1,0 +1,64 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Deploy API Reference"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "1.21.x"
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: "Build API References Pages"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.1"
+          extensions: mbstring
+          tools: composer:v2
+
+      - name: "Install dependencies"
+        run: "composer update --no-interaction --no-progress"
+
+      - name: "Install ApiGen dependencies"
+        working-directory: "apigen"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Run ApiGen"
+        run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs -- src"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs'
+
+  deploy:
+    needs: build
+
+    # from https://github.com/actions/deploy-pages
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

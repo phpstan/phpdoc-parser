@@ -2,6 +2,7 @@
 *.php text eol=lf
 
 .github export-ignore
+apigen export-ignore
 build-cs export-ignore
 doc/grammars export-ignore
 tests export-ignore
