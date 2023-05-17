@@ -39,6 +39,9 @@ jobs:
       - name: "Run ApiGen"
         run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs -- src"
 
+      - name: "Copy favicon"
+        run: "cp apigen/favicon.png docs/favicon.png"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
