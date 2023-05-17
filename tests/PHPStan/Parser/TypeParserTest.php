@@ -771,6 +771,22 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'callable(): Foo<Bar>[]',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new ArrayTypeNode(new GenericTypeNode(
+						new IdentifierTypeNode('Foo'),
+						[
+							new IdentifierTypeNode('Bar'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+						]
+					))
+				),
+			],
+			[
 				'callable(): Foo|Bar',
 				new UnionTypeNode([
 					new CallableTypeNode(
@@ -1955,6 +1971,77 @@ class TypeParserTest extends TestCase
 			[
 				'callable(): ?int',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('int'))),
+			],
+			[
+				'callable(): object{foo: int}',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ObjectShapeNode([
+					new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+				])),
+			],
+			[
+				'callable(): object{foo: int}[]',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new ArrayTypeNode(
+						new ObjectShapeNode([
+							new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+						])
+					)
+				),
+			],
+			[
+				'callable(): $this',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ThisTypeNode()),
+			],
+			[
+				'callable(): $this[]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ThisTypeNode())),
+			],
+			[
+				'2.5|3',
+				new UnionTypeNode([
+					new ConstTypeNode(new ConstExprFloatNode('2.5')),
+					new ConstTypeNode(new ConstExprIntegerNode('3')),
+				]),
+			],
+			[
+				'callable(): 3.5',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstExprFloatNode('3.5'))),
+			],
+			[
+				'callable(): 3.5[]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(
+					new ConstTypeNode(new ConstExprFloatNode('3.5'))
+				)),
+			],
+			[
+				'callable(): Foo',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new IdentifierTypeNode('Foo')),
+			],
+			[
+				'callable(): (Foo)[]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'callable(): Foo::BAR',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', 'BAR'))),
+			],
+			[
+				'callable(): Foo::*',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', '*'))),
+			],
+			[
+				'?Foo[]',
+				new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'callable(): ?Foo',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('Foo'))),
+			],
+			[
+				'callable(): ?Foo[]',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo')))),
 			],
 		];
 	}

@@ -26,6 +26,7 @@ use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
@@ -41,6 +42,26 @@ use function count;
 
 class PrinterTest extends TestCase
 {
+
+	/** @var TypeParser */
+	private $typeParser;
+
+	/** @var PhpDocParser */
+	private $phpDocParser;
+
+	protected function setUp(): void
+	{
+		$usedAttributes = ['lines' => true, 'indexes' => true];
+		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
+		$this->typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$this->phpDocParser = new PhpDocParser(
+			$this->typeParser,
+			$constExprParser,
+			true,
+			true,
+			$usedAttributes
+		);
+	}
 
 	/**
 	 * @return iterable<array{string, string, NodeVisitor}>
@@ -1153,18 +1174,9 @@ class PrinterTest extends TestCase
 	 */
 	public function testPrintFormatPreserving(string $phpDoc, string $expectedResult, NodeVisitor $visitor): void
 	{
-		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser(
-			new TypeParser($constExprParser, true, $usedAttributes),
-			$constExprParser,
-			true,
-			true,
-			$usedAttributes
-		);
 		$lexer = new Lexer();
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
-		$phpDocNode = $phpDocParser->parse($tokens);
+		$phpDocNode = $this->phpDocParser->parse($tokens);
 		$cloningTraverser = new NodeTraverser([new NodeVisitor\CloningVisitor()]);
 		$newNodes = $cloningTraverser->traverse([$phpDocNode]);
 
@@ -1177,14 +1189,13 @@ class PrinterTest extends TestCase
 		$newPhpDoc = $printer->printFormatPreserving($newNode, $phpDocNode, $tokens);
 		$this->assertSame($expectedResult, $newPhpDoc);
 
-		$newTokens = new TokenIterator($lexer->tokenize($newPhpDoc));
 		$this->assertEquals(
 			$this->unsetAttributes($newNode),
-			$this->unsetAttributes($phpDocParser->parse($newTokens))
+			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($newPhpDoc))))
 		);
 	}
 
-	private function unsetAttributes(PhpDocNode $node): PhpDocNode
+	private function unsetAttributes(Node $node): Node
 	{
 		$visitor = new class extends AbstractNodeVisitor {
 
@@ -1205,6 +1216,69 @@ class PrinterTest extends TestCase
 
 		/** @var PhpDocNode */
 		return $traverser->traverse([$node])[0];
+	}
+
+	/**
+	 * @return iterable<list{TypeNode, string}>
+	 */
+	public function dataPrintType(): iterable
+	{
+		yield [
+			new IdentifierTypeNode('int'),
+			'int',
+		];
+	}
+
+	/**
+	 * @dataProvider dataPrintType
+	 */
+	public function testPrintType(TypeNode $node, string $expectedResult): void
+	{
+		$printer = new Printer();
+		$phpDoc = $printer->print($node);
+		$this->assertSame($expectedResult, $phpDoc);
+
+		$lexer = new Lexer();
+		$this->assertEquals(
+			$this->unsetAttributes($node),
+			$this->unsetAttributes($this->typeParser->parse(new TokenIterator($lexer->tokenize($phpDoc))))
+		);
+	}
+
+	/**
+	 * @return iterable<list{PhpDocNode, string}>
+	 */
+	public function dataPrintPhpDocNode(): iterable
+	{
+		yield [
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					''
+				)),
+			]),
+			'/**
+ * @param int $a
+ */',
+		];
+	}
+
+	/**
+	 * @dataProvider dataPrintPhpDocNode
+	 */
+	public function testPrintPhpDocNode(PhpDocNode $node, string $expectedResult): void
+	{
+		$printer = new Printer();
+		$phpDoc = $printer->print($node);
+		$this->assertSame($expectedResult, $phpDoc);
+
+		$lexer = new Lexer();
+		$this->assertEquals(
+			$this->unsetAttributes($node),
+			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($phpDoc))))
+		);
 	}
 
 }
