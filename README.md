@@ -7,10 +7,6 @@
 	<a href="https://phpstan.org/"><img src="https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat" alt="PHPStan Enabled"></a>
 </p>
 
-* [PHPStan](https://phpstan.org)
-
-------
-
 This library `phpstan/phpdoc-parser` represents PHPDocs with an AST (Abstract Syntax Tree). It supports parsing and modifying PHPDocs.
 
 For the complete list of supported PHPDoc features check out PHPStan documentation. PHPStan is the main (but not the only) user of this library.
