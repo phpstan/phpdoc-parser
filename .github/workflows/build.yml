@@ -46,7 +46,7 @@ jobs:
       - name: "Lint"
         run: "make lint"
 
-  coding-standards:
+  coding-standard:
     name: "Coding Standard"
 
     runs-on: "ubuntu-latest"
@@ -55,16 +55,26 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v3
 
+      - name: "Checkout build-cs"
+        uses: actions/checkout@v3
+        with:
+          repository: "phpstan/build-cs"
+          path: "build-cs"
+
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
-          php-version: "8.0"
+          php-version: "8.2"
 
       - name: "Validate Composer"
         run: "composer validate"
 
       - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Install build-cs dependencies"
+        working-directory: "build-cs"
         run: "composer install --no-interaction --no-progress"
 
       - name: "Lint"
