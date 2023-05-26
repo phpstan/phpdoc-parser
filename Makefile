@@ -21,11 +21,11 @@ cs-install:
 
 .PHONY: cs
 cs:
-	php build-cs/vendor/bin/phpcs --standard=build-cs/phpcs.xml src tests
+	php build-cs/vendor/bin/phpcs src tests
 
 .PHONY: cs-fix
 cs-fix:
-	php build-cs/vendor/bin/phpcbf --standard=build-cs/phpcs.xml src tests
+	php build-cs/vendor/bin/phpcbf src tests
 
 .PHONY: phpstan
 phpstan:

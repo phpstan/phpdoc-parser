@@ -8,7 +8,7 @@ namespace PHPStan\PhpDocParser\Ast;
  * Copyright (c) 2011, Nikita Popov
  * All rights reserved.
  */
-abstract class AbstractNodeVisitor implements NodeVisitor
+abstract class AbstractNodeVisitor implements NodeVisitor // phpcs:ignore SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming.SuperfluousPrefix
 {
 
 	public function beforeTraverse(array $nodes): ?array
