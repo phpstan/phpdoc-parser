@@ -3,7 +3,7 @@
 
 .github export-ignore
 apigen export-ignore
-build-cs export-ignore
+phpcs.xml export-ignore
 doc/grammars export-ignore
 tests export-ignore
 tmp export-ignore
