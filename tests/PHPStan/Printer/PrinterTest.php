@@ -1368,6 +1368,23 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @var string&(integer|float) */',
+			'/** @var string&(int|float) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof IdentifierTypeNode && $node->name === 'integer') {
+						$node->name = 'int';
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
