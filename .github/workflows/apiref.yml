@@ -3,7 +3,6 @@
 name: "Deploy API Reference"
 
 on:
-  pull_request:
   push:
     branches:
       - "1.21.x"
