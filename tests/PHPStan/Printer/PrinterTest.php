@@ -1462,6 +1462,23 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @phpstan-import-type Foo from \Bar as Lorem */',
+			'/** @phpstan-import-type Foo from Bar as Lorem */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof TypeAliasImportTagValueNode) {
+						$node->importedFrom = new IdentifierTypeNode('Bar');
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
