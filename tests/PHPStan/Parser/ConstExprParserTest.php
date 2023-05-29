@@ -272,6 +272,16 @@ class ConstExprParserTest extends TestCase
 		];
 
 		yield [
+			'123.4e+8',
+			new ConstExprFloatNode('123.4e+8'),
+		];
+
+		yield [
+			'.4e+8',
+			new ConstExprFloatNode('.4e+8'),
+		];
+
+		yield [
 			'123E+80',
 			new ConstExprFloatNode('123E+80'),
 		];
