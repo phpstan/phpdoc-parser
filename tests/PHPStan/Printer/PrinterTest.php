@@ -1385,6 +1385,27 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @var ArrayObject<int[]> */',
+			'/** @var ArrayObject<array<int>> */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayTypeNode) {
+						return new GenericTypeNode(new IdentifierTypeNode('array'), [
+							new IdentifierTypeNode('int'),
+						], [
+							GenericTypeNode::VARIANCE_INVARIANT,
+						]);
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
