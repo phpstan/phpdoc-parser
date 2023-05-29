@@ -5614,7 +5614,7 @@ Finder::findFiles('*.php')
 		yield [
 			'/** @phpstan-import-type TypeAlias from AnotherClass[] */',
 			[
-				[1, 1, 8, 12],
+				[1, 1, 8, 11],
 			],
 		];
 

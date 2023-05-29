@@ -7,6 +7,7 @@ use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
@@ -23,6 +24,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
@@ -1419,6 +1421,57 @@ class PrinterTest extends TestCase
 							new IdentifierTypeNode('int'),
 							new IdentifierTypeNode('null'),
 						];
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param \DateTimeImmutable::ATOM $date */',
+			'/** @param DateTimeImmutable::ATOM $date */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ParamTagValueNode) {
+						$node->type = new ConstTypeNode(new ConstFetchNode('DateTimeImmutable', 'ATOM'));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param \Lorem\Ipsum $ipsum */',
+			'/** @param Ipsum $ipsum */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ParamTagValueNode) {
+						$node->type = new IdentifierTypeNode('Ipsum');
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @phpstan-import-type Foo from \Bar as Lorem */',
+			'/** @phpstan-import-type Foo from Bar as Lorem */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof TypeAliasImportTagValueNode) {
+						$node->importedFrom = new IdentifierTypeNode('Bar');
 					}
 
 					return $node;
