@@ -491,6 +491,38 @@ class PhpDocParserTest extends TestCase
 				),
 			]),
 		];
+
+		yield [
+			'Ok Wordpress @param tag',
+			'/**' . PHP_EOL .
+			' * @param array $parameters {' . PHP_EOL .
+			' *     Optional. Parameters for filtering the list of user assignments. Default empty array.' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *     @type bool $is_active                Pass `true` to only return active user assignments and `false` to' . PHP_EOL .
+			' *                                          return  inactive user assignments.' . PHP_EOL .
+			' *     @type DateTime|string $updated_since Only return user assignments that have been updated since the given' . PHP_EOL .
+			' *                                          date and time.' . PHP_EOL .
+			' * }' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('array'),
+						false,
+						'$parameters',
+						'{' . PHP_EOL .
+						'    Optional. Parameters for filtering the list of user assignments. Default empty array.'
+					)
+				),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@type', new GenericTagValueNode('bool $is_active                Pass `true` to only return active user assignments and `false` to' . PHP_EOL .
+					'                                         return  inactive user assignments.')),
+				new PhpDocTagNode('@type', new GenericTagValueNode('DateTime|string $updated_since Only return user assignments that have been updated since the given' . PHP_EOL .
+					'                                         date and time.' . PHP_EOL .
+				'}')),
+			]),
+		];
 	}
 
 	public function provideTypelessParamTagsData(): Iterator
