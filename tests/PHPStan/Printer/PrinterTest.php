@@ -1406,6 +1406,26 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @return callable(): (null|null) */',
+			'/** @return callable(): (int|null) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof UnionTypeNode) {
+						$node->types = [
+							new IdentifierTypeNode('int'),
+							new IdentifierTypeNode('null'),
+						];
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
