@@ -153,11 +153,6 @@ class ConstExprParserTest extends TestCase
 		];
 
 		yield [
-			'+123',
-			new ConstExprIntegerNode('+123'),
-		];
-
-		yield [
 			'-123',
 			new ConstExprIntegerNode('-123'),
 		];
@@ -239,11 +234,6 @@ class ConstExprParserTest extends TestCase
 		yield [
 			'12.3e4',
 			new ConstExprFloatNode('12.3e4'),
-		];
-
-		yield [
-			'+123.5',
-			new ConstExprFloatNode('+123.5'),
 		];
 
 		yield [

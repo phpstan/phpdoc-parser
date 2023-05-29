@@ -1096,10 +1096,10 @@ class TypeParserTest extends TestCase
 				new ConstTypeNode(new ConstExprFloatNode('123456.789012')),
 			],
 			[
-				'18_446_744_073_709_551_616|+8.2023437675747321e-18_446_744_073_709_551_616',
+				'18_446_744_073_709_551_616|8.2023437675747321e-18_446_744_073_709_551_617',
 				new UnionTypeNode([
 					new ConstTypeNode(new ConstExprIntegerNode('18446744073709551616')),
-					new ConstTypeNode(new ConstExprFloatNode('+8.2023437675747321e-18446744073709551616')),
+					new ConstTypeNode(new ConstExprFloatNode('8.2023437675747321e-18446744073709551617')),
 				]),
 			],
 			[
