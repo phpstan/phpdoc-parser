@@ -90,7 +90,7 @@ ConstantFloat
 	/ ["-"] "." 1*ByteDecDigit *("_" 1*ByteDecDigit) [ConstantFloatExp]
 
 ConstantFloatExp
-	= "e" ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit)
+	= "e" ["+" / "-"] 1*ByteDecDigit *("_" 1*ByteDecDigit)
 
 ConstantInt
 	= ["-"] "0b" 1*ByteBinDigit *("_" 1*ByteBinDigit)
@@ -229,14 +229,14 @@ ByteHexDigit
 
 ByteIdentifierFirst
 	= %x41-5A ; A-Z
-	/ %x5F    ; _
+	/ "_"
 	/ %x61-7A ; a-z
 	/ %x80-FF
 
 ByteIdentifierSecond
 	= %x30-39 ; 0-9
 	/ %x41-5A ; A-Z
-	/ %x5F    ; _
+	/ "_"
 	/ %x61-7A ; a-z
 	/ %x80-FF
 
