@@ -1,0 +1,23 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: Merge maintained branch
+
+on:
+  push:
+    branches:
+      - "1.21.x"
+
+jobs:
+  merge:
+    name: Merge branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Merge branch"
+        uses: everlytic/branch-merge@1.1.5
+        with:
+          github_token: "${{ secrets.PHPSTAN_BOT_TOKEN }}"
+          source_ref: ${{ github.ref }}
+          target_branch: '1.22.x'
+          commit_message_template: 'Merge branch {source_ref} into {target_branch}'
