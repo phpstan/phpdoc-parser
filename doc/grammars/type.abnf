@@ -85,18 +85,18 @@ ConstantExpr
 	/ ConstantFetch *ByteHorizontalWs
 
 ConstantFloat
-	= ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit) "." [1*ByteDecDigit *("_" 1*ByteDecDigit)] [ConstantFloatExp]
-	/ ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit) ConstantFloatExp
-	/ ["-"] "." 1*ByteDecDigit *("_" 1*ByteDecDigit) [ConstantFloatExp]
+	= [ByteNumberSign] 1*ByteDecDigit *("_" 1*ByteDecDigit) "." [1*ByteDecDigit *("_" 1*ByteDecDigit)] [ConstantFloatExp]
+	/ [ByteNumberSign] 1*ByteDecDigit *("_" 1*ByteDecDigit) ConstantFloatExp
+	/ [ByteNumberSign] "." 1*ByteDecDigit *("_" 1*ByteDecDigit) [ConstantFloatExp]
 
 ConstantFloatExp
-	= "e" ["+" / "-"] 1*ByteDecDigit *("_" 1*ByteDecDigit)
+	= "e" [ByteNumberSign] 1*ByteDecDigit *("_" 1*ByteDecDigit)
 
 ConstantInt
-	= ["-"] "0b" 1*ByteBinDigit *("_" 1*ByteBinDigit)
-	/ ["-"] "0o" 1*ByteOctDigit *("_" 1*ByteOctDigit)
-	/ ["-"] "0x" 1*ByteHexDigit *("_" 1*ByteHexDigit)
-	/ ["-"] 1*ByteDecDigit *("_" 1*ByteDecDigit)
+	= [ByteNumberSign] "0b" 1*ByteBinDigit *("_" 1*ByteBinDigit)
+	/ [ByteNumberSign] "0o" 1*ByteOctDigit *("_" 1*ByteOctDigit)
+	/ [ByteNumberSign] "0x" 1*ByteHexDigit *("_" 1*ByteHexDigit)
+	/ [ByteNumberSign] 1*ByteDecDigit *("_" 1*ByteDecDigit)
 
 ConstantTrue
 	= "true"
@@ -212,6 +212,10 @@ TokenIdentifier
 ByteHorizontalWs
 	= %x09 ; horizontal tab
 	/ %x20 ; space
+
+ByteNumberSign
+	= "+"
+	/ "-"
 
 ByteBinDigit
 	= %x30-31 ; 0-1
