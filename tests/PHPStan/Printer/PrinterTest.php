@@ -12,6 +12,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\NodeVisitor;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
@@ -65,7 +66,8 @@ class PrinterTest extends TestCase
 			$constExprParser,
 			true,
 			true,
-			$usedAttributes
+			$usedAttributes,
+			true
 		);
 	}
 
@@ -1479,6 +1481,57 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @Foo({a: 1}) */',
+			'/** @Foo({1}) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineArrayItem) {
+						$node->key = null;
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @Foo({a: 1}) */',
+			'/** @Foo({b: 1}) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineArrayItem) {
+						$node->key = new IdentifierTypeNode('b');
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @Foo({a = 1}) */',
+			'/** @Foo({b = 1}) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineArrayItem) {
+						$node->key = new IdentifierTypeNode('b');
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
@@ -1486,7 +1539,7 @@ class PrinterTest extends TestCase
 	 */
 	public function testPrintFormatPreserving(string $phpDoc, string $expectedResult, NodeVisitor $visitor): void
 	{
-		$lexer = new Lexer();
+		$lexer = new Lexer(true);
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
 		$phpDocNode = $this->phpDocParser->parse($tokens);
 		$cloningTraverser = new NodeTraverser([new NodeVisitor\CloningVisitor()]);

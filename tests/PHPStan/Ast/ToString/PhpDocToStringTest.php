@@ -3,12 +3,18 @@
 namespace PHPStan\PhpDocParser\Ast\ToString;
 
 use Generator;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagPropertyValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineAnnotation;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
@@ -63,6 +69,7 @@ class PhpDocToStringTest extends TestCase
 	 * @dataProvider provideMethodCases
 	 * @dataProvider provideClassCases
 	 * @dataProvider provideAssertionCases
+	 * @dataProvider provideDoctrineCases
 	 */
 	public function testTagValueNodeToString(string $expected, Node $node): void
 	{
@@ -74,6 +81,7 @@ class PhpDocToStringTest extends TestCase
 	 * @dataProvider provideMethodCases
 	 * @dataProvider provideClassCases
 	 * @dataProvider provideAssertionCases
+	 * @dataProvider provideDoctrineCases
 	 */
 	public function testTagValueNodePrinter(string $expected, Node $node): void
 	{
@@ -348,6 +356,80 @@ class PhpDocToStringTest extends TestCase
 		yield from [
 			['string $foo', new ParamOutTagValueNode($string, '$foo', '')],
 			['string $foo Description.', new ParamOutTagValueNode($string, '$foo', 'Description.')],
+		];
+	}
+
+	/**
+	 * @return iterable<array{string, Node}>
+	 */
+	public static function provideDoctrineCases(): iterable
+	{
+		yield [
+			'@ORM\Entity()',
+			new PhpDocTagNode('@ORM\Entity', new DoctrineTagValueNode(
+				new DoctrineAnnotation('@ORM\Entity', []),
+				''
+			)),
+		];
+
+		yield [
+			'@ORM\Entity() test',
+			new PhpDocTagNode('@ORM\Entity', new DoctrineTagValueNode(
+				new DoctrineAnnotation('@ORM\Entity', []),
+				'test'
+			)),
+		];
+
+		yield [
+			'@ORM\Entity(1, b=2)',
+			new DoctrineTagValueNode(
+				new DoctrineAnnotation('@ORM\Entity', [
+					new DoctrineArgument(null, new ConstExprIntegerNode('1')),
+					new DoctrineArgument(new IdentifierTypeNode('b'), new ConstExprIntegerNode('2')),
+				]),
+				''
+			),
+		];
+
+		yield [
+			'{}',
+			new DoctrineArray([]),
+		];
+
+		yield [
+			'{1, a=2}',
+			new DoctrineArray([
+				new DoctrineArrayItem(null, new ConstExprIntegerNode('1')),
+				new DoctrineArrayItem(new ConstExprStringNode('a'), new ConstExprIntegerNode('2')),
+			]),
+		];
+
+		yield [
+			'1',
+			new DoctrineArrayItem(null, new ConstExprIntegerNode('1')),
+		];
+
+		yield [
+			'a=2',
+			new DoctrineArrayItem(new ConstExprStringNode('a'), new ConstExprIntegerNode('2')),
+		];
+
+		yield [
+			'@ORM\Entity(1, b=2)',
+			new DoctrineAnnotation('@ORM\Entity', [
+				new DoctrineArgument(null, new ConstExprIntegerNode('1')),
+				new DoctrineArgument(new IdentifierTypeNode('b'), new ConstExprIntegerNode('2')),
+			]),
+		];
+
+		yield [
+			'1',
+			new DoctrineArgument(null, new ConstExprIntegerNode('1')),
+		];
+
+		yield [
+			'b=2',
+			new DoctrineArgument(new IdentifierTypeNode('b'), new ConstExprIntegerNode('2')),
 		];
 	}
 

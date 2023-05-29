@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Parser;
 
+use Doctrine\Common\Annotations\DocParser;
 use Iterator;
 use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
@@ -15,6 +16,11 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagPropertyValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\DeprecatedTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineAnnotation;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
@@ -75,12 +81,12 @@ class PhpDocParserTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer();
+		$this->lexer = new Lexer(true);
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);
-		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
-		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true);
-		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, true);
+		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser, false, false, [], true);
+		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true, false, [], true);
+		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, true, [], true);
 	}
 
 
@@ -108,6 +114,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideTagsWithBackslash
 	 * @dataProvider provideSelfOutTagsData
 	 * @dataProvider provideParamOutTagsData
+	 * @dataProvider provideDoctrineData
 	 */
 	public function testParse(
 		string $label,
@@ -5378,7 +5385,10 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@ORM\Mapping\JoinColumn',
-					new GenericTagValueNode('(name="column_id", referencedColumnName="id")')
+					new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Mapping\JoinColumn', [
+						new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('column_id')),
+						new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new ConstExprStringNode('id')),
+					]), '')
 				),
 			]),
 		];
@@ -5487,6 +5497,273 @@ Finder::findFiles('*.php')
 					)
 				),
 			]),
+		];
+	}
+
+	public function provideDoctrineData(): Iterator
+	{
+		yield [
+			'single tag node with empty parameters',
+			'/**' . PHP_EOL .
+			' * @X() Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', []),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		$xWithZ = new Doctrine\X();
+		$xWithZ->a = new Doctrine\Z();
+		yield [
+			'single tag node with nested PHPDoc tag',
+			'/**' . PHP_EOL .
+			' * @X(@Z) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', [
+							new DoctrineArgument(null, new DoctrineAnnotation('@Z', [])),
+						]),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[$xWithZ],
+		];
+
+		yield [
+			'single tag node with nested PHPDoc tag with field name',
+			'/**' . PHP_EOL .
+			' * @X(a=@Z) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', [
+							new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineAnnotation('@Z', [])),
+						]),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[$xWithZ],
+		];
+
+		yield [
+			'single tag node with nested Doctrine tag',
+			'/**' . PHP_EOL .
+			' * @X(@\PHPStan\PhpDocParser\Parser\Doctrine\Z) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', [
+							new DoctrineArgument(null, new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\Z', [])),
+						]),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[$xWithZ],
+		];
+
+		yield [
+			'single tag node with nested Doctrine tag with field name',
+			'/**' . PHP_EOL .
+			' * @X( a = @\PHPStan\PhpDocParser\Parser\Doctrine\Z) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', [
+							new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\Z', [])),
+						]),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[$xWithZ],
+		];
+
+		yield [
+			'single tag node with empty parameters with crazy whitespace',
+			'/**' . PHP_EOL .
+			' * @X  (   ' . PHP_EOL .
+			' * ) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', []),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'single tag node with empty parameters with crazy whitespace with extra text node',
+			'/**' . PHP_EOL .
+			' * @X ()' . PHP_EOL .
+			' * Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@X', []),
+						''
+					)
+				),
+				new PhpDocTextNode('Content'),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'single FQN tag node without parentheses',
+			'/**' . PHP_EOL .
+			' * @\PHPStan\PhpDocParser\Parser\Doctrine\X Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@\PHPStan\PhpDocParser\Parser\Doctrine\X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\X', []),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'single FQN tag node with empty parameters',
+			'/**' . PHP_EOL .
+			' * @\PHPStan\PhpDocParser\Parser\Doctrine\X() Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@\PHPStan\PhpDocParser\Parser\Doctrine\X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\X', []),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		$x = new Doctrine\X();
+		$x->a = Doctrine\Y::SOME;
+
+		$z = new Doctrine\Z();
+		$z->code = 123;
+		$x->b = [$z];
+		yield [
+			'single tag node with other tags in parameters',
+			'/**' . PHP_EOL .
+			' * @X(' . PHP_EOL .
+			' *     a=Y::SOME,' . PHP_EOL .
+			' *     b={' . PHP_EOL .
+			' *         @Z(' . PHP_EOL .
+			' *             code=123' . PHP_EOL .
+			' *         )' . PHP_EOL .
+			' *     }' . PHP_EOL .
+			' * ) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation(
+							'@X',
+							[
+								new DoctrineArgument(new IdentifierTypeNode('a'), new ConstFetchNode('Y', 'SOME')),
+								new DoctrineArgument(new IdentifierTypeNode('b'), new DoctrineArray([
+									new DoctrineArrayItem(null, new DoctrineAnnotation('@Z', [
+										new DoctrineArgument(new IdentifierTypeNode('code'), new ConstExprIntegerNode('123')),
+									])),
+								])),
+							]
+						),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[$x],
+		];
+
+		yield [
+			'single tag node with other tags in parameters with crazy whitespace inbetween',
+			'/**' . PHP_EOL .
+			' * @X   (' . PHP_EOL .
+			' *     a' . PHP_EOL .
+			' *      =  Y::SOME,' . PHP_EOL .
+			' *     b = ' . PHP_EOL .
+			' *     {' . PHP_EOL .
+			' *         @Z (' . PHP_EOL .
+			' *             code=123,' . PHP_EOL .
+			' *         ),' . PHP_EOL .
+			' *     },' . PHP_EOL .
+			' * ) Content' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@X',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation(
+							'@X',
+							[
+								new DoctrineArgument(new IdentifierTypeNode('a'), new ConstFetchNode('Y', 'SOME')),
+								new DoctrineArgument(new IdentifierTypeNode('b'), new DoctrineArray([
+									new DoctrineArrayItem(null, new DoctrineAnnotation('@Z', [
+										new DoctrineArgument(new IdentifierTypeNode('code'), new ConstExprIntegerNode('123')),
+									])),
+								])),
+							]
+						),
+						'Content'
+					)
+				),
+			]),
+			null,
+			null,
+			[$x],
 		];
 	}
 
@@ -5767,6 +6044,7 @@ Finder::findFiles('*.php')
 	 * @dataProvider provideTagsWithBackslash
 	 * @dataProvider provideSelfOutTagsData
 	 * @dataProvider provideParamOutTagsData
+	 * @dataProvider provideDoctrineData
 	 */
 	public function testVerifyAttributes(string $label, string $input): void
 	{
@@ -5786,6 +6064,24 @@ Finder::findFiles('*.php')
 			$this->assertNotNull($node->getAttribute(Attribute::START_INDEX), sprintf('%s: %s', $label, $node));
 			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), sprintf('%s: %s', $label, $node));
 		}
+	}
+
+	/**
+	 * @dataProvider provideDoctrineData
+	 * @param list<object> $expectedAnnotations
+	 */
+	public function testDoctrine(
+		string $label,
+		string $input,
+		PhpDocNode $expectedPhpDocNode,
+		?PhpDocNode $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode = null,
+		?PhpDocNode $withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode = null,
+		array $expectedAnnotations = []
+	): void
+	{
+		$parser = new DocParser();
+		$parser->addNamespace('PHPStan\PhpDocParser\Parser\Doctrine');
+		$this->assertEquals($expectedAnnotations, $parser->parse($input, $label), $label);
 	}
 
 }
