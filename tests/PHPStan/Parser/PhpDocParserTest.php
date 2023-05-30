@@ -5970,12 +5970,12 @@ Finder::findFiles('*.php')
 				[2, 8, 2, 23], // PhpDocTagNode
 				[2, 8, 3, 23], // DoctrineTagValueNode
 				[2, 8, 3, 23], // DoctrineAnnotation
-				[2, 8, 4, 22], // DoctrineArgument
-				[2, 8, 4, 22], // DoctrineArray
+				[2, 8, 4, 21], // DoctrineArgument
+				[2, 8, 4, 21], // DoctrineArray
 				[3, 3, 7, 7], // DoctrineArrayItem
 				[3, 3, 7, 7], // ConstExprIntegerNode
-				[4, 5, 11, 12], // DoctrineArrayItem
-				[4, 5, 11, 12], // ConstExprIntegerNode
+				[4, 5, 11, 11], // DoctrineArrayItem
+				[4, 5, 11, 11], // ConstExprIntegerNode
 				[6, 6, 18, 18], // DoctrineArrayItem
 				[6, 6, 18, 18], // ConstExprIntegerNode
 			],

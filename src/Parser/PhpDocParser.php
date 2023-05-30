@@ -161,23 +161,14 @@ class PhpDocParser
 	 */
 	private function enrichWithAttributes(TokenIterator $tokens, Ast\Node $tag, int $startLine, int $startIndex): Ast\Node
 	{
-		$endLine = $tokens->currentTokenLine();
-		$endIndex = $tokens->currentTokenIndex();
-
 		if ($this->useLinesAttributes) {
 			$tag->setAttribute(Ast\Attribute::START_LINE, $startLine);
-			$tag->setAttribute(Ast\Attribute::END_LINE, $endLine);
+			$tag->setAttribute(Ast\Attribute::END_LINE, $tokens->currentTokenLine());
 		}
 
 		if ($this->useIndexAttributes) {
-			$tokensArray = $tokens->getTokens();
-			$endIndex--;
-			if ($tokensArray[$endIndex][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
-				$endIndex--;
-			}
-
 			$tag->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
-			$tag->setAttribute(Ast\Attribute::END_INDEX, $endIndex);
+			$tag->setAttribute(Ast\Attribute::END_INDEX, $tokens->endIndexOfLastRelevantToken());
 		}
 
 		return $tag;

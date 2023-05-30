@@ -102,6 +102,21 @@ class TokenIterator
 	}
 
 
+	public function endIndexOfLastRelevantToken(): int
+	{
+		$endIndex = $this->currentTokenIndex();
+		$endIndex--;
+		while (in_array($this->tokens[$endIndex][Lexer::TYPE_OFFSET], $this->skippedTokenTypes, true)) {
+			if (!isset($this->tokens[$endIndex - 1])) {
+				break;
+			}
+			$endIndex--;
+		}
+
+		return $endIndex;
+	}
+
+
 	public function isCurrentTokenValue(string $tokenValue): bool
 	{
 		return $this->tokens[$this->index][Lexer::VALUE_OFFSET] === $tokenValue;
