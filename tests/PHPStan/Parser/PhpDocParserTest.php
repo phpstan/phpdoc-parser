@@ -5949,6 +5949,67 @@ Finder::findFiles('*.php')
 		}
 	}
 
+
+	/**
+	 * @return iterable<array{string, list<array{int, int, int, int}>}>
+	 */
+	public function dataDeepNodesLinesAndIndexes(): iterable
+	{
+		yield [
+			'/**' . PHP_EOL .
+			' * @X({' . PHP_EOL .
+			' *     1,' . PHP_EOL .
+			' *     2' . PHP_EOL .
+			' *    ,    ' . PHP_EOL .
+			' *     3,' . PHP_EOL .
+			' * }' . PHP_EOL .
+			' * )' . PHP_EOL .
+			' */',
+			[
+				[1, 9, 0, 25], // PhpDocNode
+				[2, 8, 2, 23], // PhpDocTagNode
+				[2, 8, 3, 23], // DoctrineTagValueNode
+				[2, 8, 3, 23], // DoctrineAnnotation
+				[2, 8, 4, 22], // DoctrineArgument
+				[2, 8, 4, 22], // DoctrineArray
+				[3, 3, 7, 7], // DoctrineArrayItem
+				[3, 3, 7, 7], // ConstExprIntegerNode
+				[4, 5, 11, 12], // DoctrineArrayItem
+				[4, 5, 11, 12], // ConstExprIntegerNode
+				[6, 6, 18, 18], // DoctrineArrayItem
+				[6, 6, 18, 18], // ConstExprIntegerNode
+			],
+		];
+	}
+
+
+	/**
+	 * @dataProvider dataDeepNodesLinesAndIndexes
+	 * @param list<array{int, int, int, int}> $nodeAttributes
+	 */
+	public function testDeepNodesLinesAndIndexes(string $phpDoc, array $nodeAttributes): void
+	{
+		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
+		$usedAttributes = [
+			'lines' => true,
+			'indexes' => true,
+		];
+		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
+		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes, true);
+		$visitor = new NodeCollectingVisitor();
+		$traverser = new NodeTraverser([$visitor]);
+		$traverser->traverse([$phpDocParser->parse($tokens)]);
+		$nodes = $visitor->nodes;
+		$this->assertCount(count($nodeAttributes), $nodes);
+		foreach ($nodes as $i => $node) {
+			$this->assertSame($nodeAttributes[$i][0], $node->getAttribute(Attribute::START_LINE), sprintf('Start line of %d. node', $i + 1));
+			$this->assertSame($nodeAttributes[$i][1], $node->getAttribute(Attribute::END_LINE), sprintf('End line of %d. node', $i + 1));
+			$this->assertSame($nodeAttributes[$i][2], $node->getAttribute(Attribute::START_INDEX), sprintf('Start index of %d. node', $i + 1));
+			$this->assertSame($nodeAttributes[$i][3], $node->getAttribute(Attribute::END_INDEX), sprintf('End index of %d. node', $i + 1));
+		}
+	}
+
 	/**
 	 * @return array<mixed>
 	 */
