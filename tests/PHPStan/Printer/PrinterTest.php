@@ -12,6 +12,9 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\NodeVisitor;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineAnnotation;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
@@ -46,6 +49,7 @@ use function array_splice;
 use function array_unshift;
 use function array_values;
 use function count;
+use const PHP_EOL;
 
 class PrinterTest extends TestCase
 {
@@ -1525,6 +1529,105 @@ class PrinterTest extends TestCase
 				{
 					if ($node instanceof DoctrineArrayItem) {
 						$node->key = new IdentifierTypeNode('b');
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @Foo() */',
+			'/** @Foo(1, 2, 3) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineAnnotation) {
+						$node->arguments = [
+							new DoctrineArgument(null, new ConstExprIntegerNode('1')),
+							new DoctrineArgument(null, new ConstExprIntegerNode('2')),
+							new DoctrineArgument(null, new ConstExprIntegerNode('3')),
+						];
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @Foo(
+			  *     1,
+			  *     2,
+			  *  ) */',
+			'/** @Foo(
+			  *     1,
+			  *     2,
+			  *     3,
+			  *  ) */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineAnnotation) {
+						$node->arguments[] = new DoctrineArgument(null, new ConstExprIntegerNode('3'));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * @X({' . PHP_EOL .
+			' *     1,' . PHP_EOL .
+			' *     2' . PHP_EOL .
+			' *    ,    ' . PHP_EOL .
+			' *     3,' . PHP_EOL .
+			' * }' . PHP_EOL .
+			' * )' . PHP_EOL .
+			' */',
+			'/**' . PHP_EOL .
+			' * @X({' . PHP_EOL .
+			' *     1,' . PHP_EOL .
+			' *     2' . PHP_EOL .
+			' *    ,    ' . PHP_EOL .
+			' *     3,' . PHP_EOL .
+			' *     4,' . PHP_EOL .
+			' * }' . PHP_EOL .
+			' * )' . PHP_EOL .
+			' */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineArray) {
+						$node->items[] = new DoctrineArrayItem(null, new ConstExprIntegerNode('4'));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @Foo() */',
+			'/** @Bar() */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof PhpDocTagNode) {
+						$node->name = '@Bar';
+					}
+					if ($node instanceof DoctrineAnnotation) {
+						$node->name = '@Bar';
 					}
 
 					return $node;

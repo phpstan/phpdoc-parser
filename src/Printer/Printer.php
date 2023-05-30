@@ -100,6 +100,8 @@ final class Printer
 		GenericTypeNode::class . '->genericTypes' => ', ',
 		ConstExprArrayNode::class . '->items' => ', ',
 		MethodTagValueNode::class . '->parameters' => ', ',
+		DoctrineArray::class . '->items' => ', ',
+		DoctrineAnnotation::class . '->arguments' => ', ',
 	];
 
 	/**
@@ -111,6 +113,8 @@ final class Printer
 		CallableTypeNode::class . '->parameters' => ['(', '', ''],
 		ArrayShapeNode::class . '->items' => ['{', '', ''],
 		ObjectShapeNode::class . '->items' => ['{', '', ''],
+		DoctrineArray::class . '->items' => ['{', '', ''],
+		DoctrineAnnotation::class . '->arguments' => ['(', '', ''],
 	];
 
 	/** @var array<string, list<class-string<TypeNode>>> */

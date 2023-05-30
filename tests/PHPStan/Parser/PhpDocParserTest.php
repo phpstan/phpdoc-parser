@@ -5980,6 +5980,22 @@ Finder::findFiles('*.php')
 				[6, 6, 18, 18], // ConstExprIntegerNode
 			],
 		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * @\Foo\Bar({' . PHP_EOL .
+			' * }' . PHP_EOL .
+			' * )' . PHP_EOL .
+			' */',
+			[
+				[1, 5, 0, 10], // PhpDocNode
+				[2, 4, 2, 8], // PhpDocTagNode
+				[2, 4, 3, 8], // DoctrineTagValueNode
+				[2, 4, 3, 8], // DoctrineAnnotation
+				[2, 4, 4, 6], // DoctrineArgument
+				[2, 4, 4, 6], // DoctrineArray
+			],
+		];
 	}
 
 
