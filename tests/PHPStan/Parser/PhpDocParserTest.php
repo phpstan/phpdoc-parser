@@ -10,6 +10,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
@@ -115,6 +116,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideSelfOutTagsData
 	 * @dataProvider provideParamOutTagsData
 	 * @dataProvider provideDoctrineData
+	 * @dataProvider provideDoctrineWithoutDoctrineCheckData
 	 */
 	public function testParse(
 		string $label,
@@ -5767,6 +5769,197 @@ Finder::findFiles('*.php')
 		];
 	}
 
+	public function provideDoctrineWithoutDoctrineCheckData(): Iterator
+	{
+		yield [
+			'Dummy 1',
+			'/** @DummyAnnotation(dummyValue="hello") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@DummyAnnotation', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@DummyAnnotation', [
+						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new ConstExprStringNode('hello')),
+					]),
+					''
+				)),
+			]),
+		];
+		yield [
+			'Dummy 2',
+			'/**
+ * @DummyJoinTable(name="join_table",
+ *      joinColumns={@DummyJoinColumn(name="col1", referencedColumnName="col2")},
+ *      inverseJoinColumns={
+ *          @DummyJoinColumn(name="col3", referencedColumnName="col4")
+ *      })
+ */',
+			new PhpDocNode([
+				new PhpDocTagNode('@DummyJoinTable', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@DummyJoinTable', [
+						new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('join_table')),
+						new DoctrineArgument(new IdentifierTypeNode('joinColumns'), new DoctrineArray([
+							new DoctrineArrayItem(null, new DoctrineAnnotation('@DummyJoinColumn', [
+								new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('col1')),
+								new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new ConstExprStringNode('col2')),
+							])),
+						])),
+						new DoctrineArgument(new IdentifierTypeNode('inverseJoinColumns'), new DoctrineArray([
+							new DoctrineArrayItem(null, new DoctrineAnnotation('@DummyJoinColumn', [
+								new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('col3')),
+								new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new ConstExprStringNode('col4')),
+							])),
+						])),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Annotation in annotation',
+			'/** @AnnotationTargetAll(@AnnotationTargetAnnotation) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@AnnotationTargetAll', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@AnnotationTargetAll', [
+						new DoctrineArgument(null, new DoctrineAnnotation('@AnnotationTargetAnnotation', [])),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Dangling comma annotation',
+			'/** @DummyAnnotation(dummyValue = "bar",) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@DummyAnnotation', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@DummyAnnotation', [
+						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new ConstExprStringNode('bar')),
+					]),
+					''
+				)),
+			]),
+		];
+
+		//yield [
+		//	'Multiple on one line',
+		//	'/**
+		// * @DummyId @DummyColumn(type="integer") @DummyGeneratedValue
+		// * @var int
+		// */',
+		//          new PhpDocNode([]),
+		//      ];
+
+		yield [
+			'Parse error with dashes',
+			'/** @AlsoDoNot\Parse-me */',
+			new PhpDocNode([
+				new PhpDocTagNode('@AlsoDoNot\Parse-me', new GenericTagValueNode('')),
+			]),
+		];
+
+		yield [
+			'Annotation with constant',
+			'/** @AnnotationWithConstants(PHP_EOL) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@AnnotationWithConstants', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@AnnotationWithConstants', [
+						new DoctrineArgument(null, new IdentifierTypeNode('PHP_EOL')),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Nested arrays with nested annotations',
+			'/** @Name(foo={1,2, {"key"=@Name}}) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@Name', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@Name', [
+						new DoctrineArgument(new IdentifierTypeNode('foo'), new DoctrineArray([
+							new DoctrineArrayItem(null, new ConstExprIntegerNode('1')),
+							new DoctrineArrayItem(null, new ConstExprIntegerNode('2')),
+							new DoctrineArrayItem(null, new DoctrineArray([
+								new DoctrineArrayItem(new QuoteAwareConstExprStringNode('key', QuoteAwareConstExprStringNode::DOUBLE_QUOTED), new DoctrineAnnotation(
+									'@Name',
+									[]
+								)),
+							])),
+						])),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Namespaced constant',
+			'/** @AnnotationWithConstants(Doctrine\Tests\Common\Annotations\Fixtures\AnnotationWithConstants::FLOAT) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@AnnotationWithConstants', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@AnnotationWithConstants', [
+						new DoctrineArgument(null, new ConstFetchNode('Doctrine\Tests\Common\Annotations\Fixtures\AnnotationWithConstants', 'FLOAT')),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Another namespaced constant',
+			'/** @AnnotationWithConstants(\Doctrine\Tests\Common\Annotations\Fixtures\AnnotationWithConstants::FLOAT) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@AnnotationWithConstants', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@AnnotationWithConstants', [
+						new DoctrineArgument(null, new ConstFetchNode('\Doctrine\Tests\Common\Annotations\Fixtures\AnnotationWithConstants', 'FLOAT')),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Array with namespaced constants',
+			'/** @AnnotationWithConstants({
+    Doctrine\Tests\Common\Annotations\Fixtures\InterfaceWithConstants::SOME_KEY = AnnotationWithConstants::INTEGER
+}) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@AnnotationWithConstants', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@AnnotationWithConstants', [
+						new DoctrineArgument(null, new DoctrineArray([
+							new DoctrineArrayItem(
+								new ConstFetchNode('Doctrine\Tests\Common\Annotations\Fixtures\InterfaceWithConstants', 'SOME_KEY'),
+								new ConstFetchNode('AnnotationWithConstants', 'INTEGER')
+							),
+						])),
+					]),
+					''
+				)),
+			]),
+		];
+
+		yield [
+			'Array with colon',
+			'/** @Name({"foo": "bar"}) */',
+			new PhpDocNode([
+				new PhpDocTagNode('@Name', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@Name', [
+						new DoctrineArgument(null, new DoctrineArray([
+							new DoctrineArrayItem(new QuoteAwareConstExprStringNode('foo', QuoteAwareConstExprStringNode::DOUBLE_QUOTED), new ConstExprStringNode('bar')),
+						])),
+					]),
+					''
+				)),
+			]),
+		];
+
+		//yield [
+		//	'Escaped strings',
+		//	'/** @Doctrine\Tests\Common\Annotations\Name(foo="""bar""") */',
+		//	new PhpDocNode([]),
+		//];
+	}
+
 	public function provideSpecializedTags(): Iterator
 	{
 		yield [
@@ -6122,6 +6315,7 @@ Finder::findFiles('*.php')
 	 * @dataProvider provideSelfOutTagsData
 	 * @dataProvider provideParamOutTagsData
 	 * @dataProvider provideDoctrineData
+	 * @dataProvider provideDoctrineWithoutDoctrineCheckData
 	 */
 	public function testVerifyAttributes(string $label, string $input): void
 	{
