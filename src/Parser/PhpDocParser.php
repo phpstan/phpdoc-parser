@@ -78,10 +78,44 @@ class PhpDocParser
 
 		$children = [];
 
-		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-			$children[] = $this->parseChild($tokens);
-			while ($tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL) && !$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+		if ($this->parseDoctrineAnnotations) {
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+				$lastChild = $this->parseChild($tokens);
+				$children[] = $lastChild;
+				while (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+					if (
+						$lastChild instanceof Ast\PhpDoc\PhpDocTagNode
+						&& (
+							$lastChild->value instanceof Doctrine\DoctrineTagValueNode
+							|| $lastChild->value instanceof Ast\PhpDoc\GenericTagValueNode
+						)
+					) {
+						$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+						if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+							break;
+						}
+						$lastChild = $this->parseChild($tokens);
+						$children[] = $lastChild;
+						continue;
+					}
+
+					if (!$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+						break;
+					}
+					if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+						break;
+					}
+
+					$lastChild = $this->parseChild($tokens);
+					$children[] = $lastChild;
+				}
+			}
+		} else {
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
 				$children[] = $this->parseChild($tokens);
+				while ($tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL) && !$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+					$children[] = $this->parseChild($tokens);
+				}
 			}
 		}
 
@@ -119,6 +153,7 @@ class PhpDocParser
 	}
 
 
+	/** @phpstan-impure */
 	private function parseChild(TokenIterator $tokens): Ast\PhpDoc\PhpDocChildNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
@@ -199,6 +234,63 @@ class PhpDocParser
 		}
 
 		return new Ast\PhpDoc\PhpDocTextNode(trim($text, " \t"));
+	}
+
+
+	private function parseOptionalDescriptionAfterDoctrineTag(TokenIterator $tokens): string
+	{
+		$text = '';
+
+		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+				if (!$tokens->isPrecededByHorizontalWhitespace()) {
+					return trim($text . $this->parseText($tokens)->text, " \t");
+				}
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG)) {
+					$tokens->pushSavePoint();
+					$child = $this->parseChild($tokens);
+					if ($child instanceof Ast\PhpDoc\PhpDocTagNode) {
+						if (
+							$child->value instanceof Ast\PhpDoc\GenericTagValueNode
+							|| $child->value instanceof Doctrine\DoctrineTagValueNode
+						) {
+							$tokens->rollback();
+							break;
+						}
+						if ($child->value instanceof Ast\PhpDoc\InvalidTagValueNode) {
+							$tokens->rollback();
+							$tokens->pushSavePoint();
+							$tokens->next();
+							if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+								$tokens->rollback();
+								break;
+							}
+							$tokens->rollback();
+							return trim($text . $this->parseText($tokens)->text, " \t");
+						}
+					}
+
+					$tokens->rollback();
+					return trim($text . $this->parseText($tokens)->text, " \t");
+				}
+				break;
+			}
+
+			$tokens->pushSavePoint();
+			$tokens->next();
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)) {
+				$tokens->rollback();
+				break;
+			}
+
+			$tokens->dropSavePoint();
+			$text .= "\n";
+		}
+
+		return trim($text, " \t");
 	}
 
 
@@ -333,15 +425,17 @@ class PhpDocParser
 					break;
 
 				default:
-					if (
-						$this->parseDoctrineAnnotations
-						&& $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)
-					) {
-						$tagValue = $this->parseDoctrineTagValue($tokens, $tag);
+					if ($this->parseDoctrineAnnotations) {
+						if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+							$tagValue = $this->parseDoctrineTagValue($tokens, $tag);
+						} else {
+							$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescriptionAfterDoctrineTag($tokens));
+						}
 						break;
 					}
 
 					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
+
 					break;
 			}
 
@@ -368,7 +462,7 @@ class PhpDocParser
 				$startLine,
 				$startIndex
 			),
-			$this->parseOptionalDescription($tokens)
+			$this->parseOptionalDescriptionAfterDoctrineTag($tokens)
 		);
 	}
 

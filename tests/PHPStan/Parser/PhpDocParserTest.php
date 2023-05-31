@@ -155,8 +155,8 @@ class PhpDocParserTest extends TestCase
 		$actualPhpDocNode = $phpDocParser->parse($tokens);
 
 		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
-		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
-		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
+		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode, $label);
+		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType(), $label);
 	}
 
 
@@ -2544,7 +2544,11 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('lorem @bar ipsum')
+					new GenericTagValueNode('lorem')
+				),
+				new PhpDocTagNode(
+					'@bar',
+					new GenericTagValueNode('ipsum')
 				),
 			]),
 		];
@@ -5767,6 +5771,223 @@ Finder::findFiles('*.php')
 			null,
 			[$x],
 		];
+
+		yield [
+			'Multiline tag behaviour 1',
+			'/**' . PHP_EOL .
+			' * @X() test' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
+					'@X',
+					[]
+				), 'test')),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'Multiline tag behaviour 2',
+			'/**' . PHP_EOL .
+			' * @X() test' . PHP_EOL .
+			' * test2' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
+					'@X',
+					[]
+				), "test\ntest2")),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+		yield [
+			'Multiline tag behaviour 3',
+			'/**' . PHP_EOL .
+			' * @X() test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test2' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
+					'@X',
+					[]
+				), 'test')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('test2'),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+		yield [
+			'Multiline tag behaviour 4',
+			'/**' . PHP_EOL .
+			' * @X() test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test2' . PHP_EOL .
+			' * @Z()' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
+					'@X',
+					[]
+				), 'test')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('test2'),
+				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation(
+					'@Z',
+					[]
+				), '')),
+			]),
+			null,
+			null,
+			[new Doctrine\X(), new Doctrine\Z()],
+		];
+
+		yield [
+			'Multiline generic tag behaviour 1',
+			'/**' . PHP_EOL .
+			' * @X test' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'Multiline generic tag behaviour 2',
+			'/**' . PHP_EOL .
+			' * @X test' . PHP_EOL .
+			' * test2' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode("test\ntest2")),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+		yield [
+			'Multiline generic tag behaviour 3',
+			'/**' . PHP_EOL .
+			' * @X test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test2' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('test2'),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+		yield [
+			'Multiline generic tag behaviour 4',
+			'/**' . PHP_EOL .
+			' * @X test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test2' . PHP_EOL .
+			' * @Z' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('test2'),
+				new PhpDocTagNode('@Z', new GenericTagValueNode('')),
+			]),
+			null,
+			null,
+			[new Doctrine\X(), new Doctrine\Z()],
+		];
+
+		yield [
+			'More tags on the same line',
+			'/** @X() @Z() */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), '')),
+				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation('@Z', []), '')),
+			]),
+			null,
+			null,
+			[new Doctrine\X(), new Doctrine\Z()],
+		];
+
+		yield [
+			'More tags on the same line with description inbetween',
+			'/** @X() test @Z() */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), 'test')),
+				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation('@Z', []), '')),
+			]),
+			null,
+			null,
+			[new Doctrine\X(), new Doctrine\Z()],
+		];
+
+		yield [
+			'More tags on the same line with description inbetween, first one generic',
+			'/** @X test @Z() */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
+				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation('@Z', []), '')),
+			]),
+			null,
+			null,
+			[new Doctrine\X(), new Doctrine\Z()],
+		];
+
+		yield [
+			'More generic tags on the same line with description inbetween, 2nd one @param which should become description',
+			'/** @X @phpstan-param int $z */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('@phpstan-param int $z')),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'More generic tags on the same line with description inbetween, 2nd one @param which should become description can have a parse error',
+			'/** @X @phpstan-param |int $z */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('@phpstan-param |int $z')),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'More tags on the same line with description inbetween, 2nd one @param which should become description',
+			'/** @X() @phpstan-param int $z */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), '@phpstan-param int $z')),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'More tags on the same line with description inbetween, 2nd one @param which should become description can have a parse error',
+			'/** @X() @phpstan-param |int $z */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), '@phpstan-param |int $z')),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
 	}
 
 	public function provideDoctrineWithoutDoctrineCheckData(): Iterator
@@ -5840,14 +6061,24 @@ Finder::findFiles('*.php')
 			]),
 		];
 
-		//yield [
-		//	'Multiple on one line',
-		//	'/**
-		// * @DummyId @DummyColumn(type="integer") @DummyGeneratedValue
-		// * @var int
-		// */',
-		//          new PhpDocNode([]),
-		//      ];
+		yield [
+			'Multiple on one line',
+			'/**
+			 * @DummyId @DummyColumn(type="integer") @DummyGeneratedValue
+			 * @var int
+			 */',
+			new PhpDocNode([
+				new PhpDocTagNode('@DummyId', new GenericTagValueNode('')),
+				new PhpDocTagNode('@DummyColumn', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@DummyColumn', [
+						new DoctrineArgument(new IdentifierTypeNode('type'), new ConstExprStringNode('integer')),
+					]),
+					''
+				)),
+				new PhpDocTagNode('@DummyGeneratedValue', new GenericTagValueNode('')),
+				new PhpDocTagNode('@var', new VarTagValueNode(new IdentifierTypeNode('int'), '', '')),
+			]),
+		];
 
 		yield [
 			'Parse error with dashes',
@@ -5958,6 +6189,83 @@ Finder::findFiles('*.php')
 		//	'/** @Doctrine\Tests\Common\Annotations\Name(foo="""bar""") */',
 		//	new PhpDocNode([]),
 		//];
+
+		yield [
+			'More tags on the same line with description inbetween, second Doctrine one cannot have parse error',
+			'/** @X test @Z(test= */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
+				new PhpDocTagNode('@Z', new InvalidTagValueNode('(test=', new ParserException(
+					'=',
+					14,
+					19,
+					5,
+					null,
+					1
+				))),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'More tags on the same line with description inbetween, second Doctrine one cannot have parse error 2',
+			'/** @X() test @Z(test= */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), 'test')),
+				new PhpDocTagNode('@Z', new InvalidTagValueNode('(test=', new ParserException(
+					'=',
+					14,
+					21,
+					5,
+					null,
+					1
+				))),
+			]),
+			null,
+			null,
+			[new Doctrine\X()],
+		];
+
+		yield [
+			'Doctrine tag after common tag is just a description',
+			'/** @phpstan-param int $z @X() */',
+			new PhpDocNode([
+				new PhpDocTagNode('@phpstan-param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$z',
+					'@X()'
+				)),
+			]),
+		];
+
+		yield [
+			'Doctrine tag after common tag is just a description 2',
+			'/** @phpstan-param int $z @\X\Y() */',
+			new PhpDocNode([
+				new PhpDocTagNode('@phpstan-param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$z',
+					'@\X\Y()'
+				)),
+			]),
+		];
+
+		yield [
+			'Generic tag after common tag is just a description',
+			'/** @phpstan-param int $z @X */',
+			new PhpDocNode([
+				new PhpDocTagNode('@phpstan-param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$z',
+					'@X'
+				)),
+			]),
+		];
 	}
 
 	public function provideSpecializedTags(): Iterator
