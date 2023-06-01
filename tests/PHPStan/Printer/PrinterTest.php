@@ -75,8 +75,7 @@ class PrinterTest extends TestCase
 			$constExprParser,
 			true,
 			true,
-			$usedAttributes,
-			true
+			$usedAttributes
 		);
 	}
 
@@ -1871,7 +1870,7 @@ class PrinterTest extends TestCase
 	 */
 	public function testPrintFormatPreserving(string $phpDoc, string $expectedResult, NodeVisitor $visitor): void
 	{
-		$lexer = new Lexer(true);
+		$lexer = new Lexer();
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
 		$phpDocNode = $this->phpDocParser->parse($tokens);
 		$cloningTraverser = new NodeTraverser([new NodeVisitor\CloningVisitor()]);

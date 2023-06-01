@@ -46,7 +46,7 @@ class TokenIteratorTest extends TestCase
 	 */
 	public function testGetDetectedNewline(string $phpDoc, ?string $expectedNewline): void
 	{
-		$lexer = new Lexer(true);
+		$lexer = new Lexer();
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);

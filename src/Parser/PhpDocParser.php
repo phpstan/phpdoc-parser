@@ -45,9 +45,6 @@ class PhpDocParser
 	private $preserveTypeAliasesWithInvalidTypes;
 
 	/** @var bool */
-	private $parseDoctrineAnnotations;
-
-	/** @var bool */
 	private $useLinesAttributes;
 
 	/** @var bool */
@@ -65,7 +62,6 @@ class PhpDocParser
 		bool $requireWhitespaceBeforeDescription = false,
 		bool $preserveTypeAliasesWithInvalidTypes = false,
 		array $usedAttributes = [],
-		bool $parseDoctrineAnnotations = false,
 		bool $textBetweenTagsBelongsToDescription = false
 	)
 	{
@@ -74,7 +70,6 @@ class PhpDocParser
 		$this->doctrineConstantExprParser = $constantExprParser->toDoctrine();
 		$this->requireWhitespaceBeforeDescription = $requireWhitespaceBeforeDescription;
 		$this->preserveTypeAliasesWithInvalidTypes = $preserveTypeAliasesWithInvalidTypes;
-		$this->parseDoctrineAnnotations = $parseDoctrineAnnotations;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 		$this->textBetweenTagsBelongsToDescription = $textBetweenTagsBelongsToDescription;
@@ -88,44 +83,35 @@ class PhpDocParser
 
 		$children = [];
 
-		if ($this->parseDoctrineAnnotations) {
-			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-				$lastChild = $this->parseChild($tokens);
-				$children[] = $lastChild;
-				while (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-					if (
-						$lastChild instanceof Ast\PhpDoc\PhpDocTagNode
-						&& (
-							$lastChild->value instanceof Doctrine\DoctrineTagValueNode
-							|| $lastChild->value instanceof Ast\PhpDoc\GenericTagValueNode
-						)
-					) {
-						$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-						if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-							break;
-						}
-						$lastChild = $this->parseChild($tokens);
-						$children[] = $lastChild;
-						continue;
-					}
-
-					if (!$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-						break;
-					}
+		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+			$lastChild = $this->parseChild($tokens);
+			$children[] = $lastChild;
+			while (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+				if (
+					$lastChild instanceof Ast\PhpDoc\PhpDocTagNode
+					&& (
+						$lastChild->value instanceof Doctrine\DoctrineTagValueNode
+						|| $lastChild->value instanceof Ast\PhpDoc\GenericTagValueNode
+					)
+				) {
+					$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
 						break;
 					}
-
 					$lastChild = $this->parseChild($tokens);
 					$children[] = $lastChild;
+					continue;
 				}
-			}
-		} else {
-			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-				$children[] = $this->parseChild($tokens);
-				while ($tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL) && !$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-					$children[] = $this->parseChild($tokens);
+
+				if (!$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+					break;
 				}
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+					break;
+				}
+
+				$lastChild = $this->parseChild($tokens);
+				$children[] = $lastChild;
 			}
 		}
 
@@ -539,17 +525,11 @@ class PhpDocParser
 					break;
 
 				default:
-					if ($this->parseDoctrineAnnotations) {
-						if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-							$tagValue = $this->parseDoctrineTagValue($tokens, $tag);
-						} else {
-							$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescriptionAfterDoctrineTag($tokens));
-						}
-						break;
+					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+						$tagValue = $this->parseDoctrineTagValue($tokens, $tag);
+					} else {
+						$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescriptionAfterDoctrineTag($tokens));
 					}
-
-					$tagValue = new Ast\PhpDoc\GenericTagValueNode($this->parseOptionalDescription($tokens));
-
 					break;
 			}
 

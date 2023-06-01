@@ -87,12 +87,12 @@ class PhpDocParserTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer(true);
+		$this->lexer = new Lexer();
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);
-		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser, false, false, [], true);
-		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true, false, [], true);
-		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, true, [], true);
+		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser, false, false, []);
+		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true, false, []);
+		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, true, []);
 	}
 
 
@@ -7143,7 +7143,7 @@ Finder::findFiles('*.php')
 		];
 		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes, true);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
 		$traverser->traverse([$phpDocParser->parse($tokens)]);
@@ -7559,7 +7559,7 @@ Finder::findFiles('*.php')
 	{
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, [], true, true);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, [], true, true);
 
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$actualPhpDocNode = $phpDocParser->parse($tokens);
