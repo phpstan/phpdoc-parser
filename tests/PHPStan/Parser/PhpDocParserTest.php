@@ -79,9 +79,6 @@ class PhpDocParserTest extends TestCase
 	private $phpDocParser;
 
 	/** @var PhpDocParser */
-	private $phpDocParserWithRequiredWhitespaceBeforeDescription;
-
-	/** @var PhpDocParser */
 	private $phpDocParserWithPreserveTypeAliasesWithInvalidTypes;
 
 	protected function setUp(): void
@@ -90,9 +87,8 @@ class PhpDocParserTest extends TestCase
 		$this->lexer = new Lexer();
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);
-		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser, false, false, []);
-		$this->phpDocParserWithRequiredWhitespaceBeforeDescription = new PhpDocParser($typeParser, $constExprParser, true, false, []);
-		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, true, []);
+		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser, false, []);
+		$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes = new PhpDocParser($typeParser, $constExprParser, true, []);
 	}
 
 
@@ -133,7 +129,6 @@ class PhpDocParserTest extends TestCase
 		string $label,
 		string $input,
 		PhpDocNode $expectedPhpDocNode,
-		?PhpDocNode $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode = null,
 		?PhpDocNode $withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode = null
 	): void
 	{
@@ -145,17 +140,10 @@ class PhpDocParserTest extends TestCase
 		);
 
 		$this->executeTestParse(
-			$this->phpDocParserWithRequiredWhitespaceBeforeDescription,
-			$label,
-			$input,
-			$withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode ?? $expectedPhpDocNode
-		);
-
-		$this->executeTestParse(
 			$this->phpDocParserWithPreserveTypeAliasesWithInvalidTypes,
 			$label,
 			$input,
-			$withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode ?? $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode ?? $expectedPhpDocNode
+			$withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode ?? $expectedPhpDocNode
 		);
 	}
 
@@ -933,16 +921,6 @@ class PhpDocParserTest extends TestCase
 					)
 				),
 			]),
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@var',
-					new VarTagValueNode(
-						new IdentifierTypeNode('Foo'),
-						'$foo',
-						'#desc'
-					)
-				),
-			]),
 		];
 
 		yield [
@@ -1135,7 +1113,6 @@ class PhpDocParserTest extends TestCase
 					)
 				),
 			]),
-			null,
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@psalm-type',
@@ -1807,15 +1784,6 @@ class PhpDocParserTest extends TestCase
 		yield [
 			'invalid variadic callable',
 			'/** @return \Closure(...int, string): string */',
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@return',
-					new ReturnTagValueNode(
-						new IdentifierTypeNode('\Closure'),
-						'(...int, string): string'
-					)
-				),
-			]),
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
@@ -2911,16 +2879,6 @@ class PhpDocParserTest extends TestCase
 		yield [
 			'callable with incomplete signature without return type',
 			'/** @var callable(int) */',
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@var',
-					new VarTagValueNode(
-						new IdentifierTypeNode('callable'),
-						'',
-						'(int)'
-					)
-				),
-			]),
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@var',
@@ -4368,7 +4326,6 @@ some text in the middle'
 					)
 				),
 			]),
-			null,
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -4408,7 +4365,6 @@ some text in the middle'
 					)
 				),
 			]),
-			null,
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -4456,7 +4412,6 @@ some text in the middle'
 					)
 				),
 			]),
-			null,
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -4504,7 +4459,6 @@ some text in the middle'
 					)
 				),
 			]),
-			null,
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -4553,7 +4507,6 @@ some text in the middle'
 					)
 				),
 			]),
-			null,
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -5666,23 +5619,6 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@return',
-					new ReturnTagValueNode(
-						new GenericTypeNode(
-							new IdentifierTypeNode('Foo'),
-							[
-								new IdentifierTypeNode('strong'),
-							],
-							[
-								GenericTypeNode::VARIANCE_INVARIANT,
-							]
-						),
-						'Important description'
-					)
-				),
-			]),
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@return',
 					new InvalidTagValueNode(
 						'Foo <strong>Important description',
 						new ParserException(
@@ -5990,7 +5926,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[new Doctrine\X()],
 		];
 
@@ -6013,7 +5948,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[$xWithZ],
 		];
 
@@ -6033,7 +5967,6 @@ Finder::findFiles('*.php')
 					)
 				),
 			]),
-			null,
 			null,
 			[$xWithZ],
 		];
@@ -6055,7 +5988,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[$xWithZ],
 		];
 
@@ -6076,7 +6008,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[$xWithZ],
 		];
 
@@ -6095,7 +6026,6 @@ Finder::findFiles('*.php')
 					)
 				),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6117,7 +6047,6 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode('Content'),
 			]),
 			null,
-			null,
 			[new Doctrine\X()],
 		];
 
@@ -6136,7 +6065,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[new Doctrine\X()],
 		];
 
@@ -6154,7 +6082,6 @@ Finder::findFiles('*.php')
 					)
 				),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6197,7 +6124,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[$x],
 		];
 
@@ -6235,7 +6161,6 @@ Finder::findFiles('*.php')
 				),
 			]),
 			null,
-			null,
 			[$x],
 		];
 
@@ -6250,7 +6175,6 @@ Finder::findFiles('*.php')
 					[]
 				), 'test')),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6267,7 +6191,6 @@ Finder::findFiles('*.php')
 					[]
 				), 'test' . PHP_EOL . 'test2')),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6286,7 +6209,6 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode(''),
 				new PhpDocTextNode('test2'),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6311,7 +6233,6 @@ Finder::findFiles('*.php')
 				), '')),
 			]),
 			null,
-			null,
 			[new Doctrine\X(), new Doctrine\Z()],
 		];
 
@@ -6323,7 +6244,6 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6337,7 +6257,6 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new GenericTagValueNode('test' . PHP_EOL . 'test2')),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6353,7 +6272,6 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode(''),
 				new PhpDocTextNode('test2'),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6372,7 +6290,6 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@Z', new GenericTagValueNode('')),
 			]),
 			null,
-			null,
 			[new Doctrine\X(), new Doctrine\Z()],
 		];
 
@@ -6383,7 +6300,6 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), '')),
 				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation('@Z', []), '')),
 			]),
-			null,
 			null,
 			[new Doctrine\X(), new Doctrine\Z()],
 		];
@@ -6396,7 +6312,6 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation('@Z', []), '')),
 			]),
 			null,
-			null,
 			[new Doctrine\X(), new Doctrine\Z()],
 		];
 
@@ -6408,7 +6323,6 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation('@Z', []), '')),
 			]),
 			null,
-			null,
 			[new Doctrine\X(), new Doctrine\Z()],
 		];
 
@@ -6418,7 +6332,6 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new GenericTagValueNode('@phpstan-param int $z')),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6430,7 +6343,6 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@X', new GenericTagValueNode('@phpstan-param |int $z')),
 			]),
 			null,
-			null,
 			[new Doctrine\X()],
 		];
 
@@ -6441,7 +6353,6 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), '@phpstan-param int $z')),
 			]),
 			null,
-			null,
 			[new Doctrine\X()],
 		];
 
@@ -6451,7 +6362,6 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation('@X', []), '@phpstan-param |int $z')),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6515,7 +6425,6 @@ Finder::findFiles('*.php')
 				)),
 			]),
 			null,
-			null,
 			[$apiResource],
 		];
 
@@ -6532,7 +6441,6 @@ Finder::findFiles('*.php')
 					''
 				)),
 			]),
-			null,
 			null,
 			[$xWithString],
 		];
@@ -6551,7 +6459,6 @@ Finder::findFiles('*.php')
 				)),
 			]),
 			null,
-			null,
 			[$xWithString2],
 		];
 
@@ -6569,7 +6476,6 @@ Finder::findFiles('*.php')
 				)),
 			]),
 			null,
-			null,
 			[$xWithString3],
 		];
 
@@ -6586,7 +6492,6 @@ Finder::findFiles('*.php')
 					''
 				)),
 			]),
-			null,
 			null,
 			[$xWithString4],
 		];
@@ -6801,7 +6706,6 @@ Finder::findFiles('*.php')
 				))),
 			]),
 			null,
-			null,
 			[new Doctrine\X()],
 		];
 
@@ -6819,7 +6723,6 @@ Finder::findFiles('*.php')
 					1
 				))),
 			]),
-			null,
 			null,
 			[new Doctrine\X()],
 		];
@@ -6905,7 +6808,6 @@ Finder::findFiles('*.php')
 	public function testParseTagValue(string $tag, string $phpDoc, Node $expectedPhpDocNode): void
 	{
 		$this->executeTestParseTagValue($this->phpDocParser, $tag, $phpDoc, $expectedPhpDocNode);
-		$this->executeTestParseTagValue($this->phpDocParserWithRequiredWhitespaceBeforeDescription, $tag, $phpDoc, $expectedPhpDocNode);
 	}
 
 	private function executeTestParseTagValue(PhpDocParser $phpDocParser, string $tag, string $phpDoc, Node $expectedPhpDocNode): void
@@ -7059,7 +6961,7 @@ Finder::findFiles('*.php')
 		];
 		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);
 		$children = $phpDocNode->children;
 		$this->assertCount(count($childrenLines), $children);
@@ -7143,7 +7045,7 @@ Finder::findFiles('*.php')
 		];
 		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, $usedAttributes);
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
 		$traverser->traverse([$phpDocParser->parse($tokens)]);
@@ -7216,7 +7118,7 @@ Finder::findFiles('*.php')
 		];
 		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);
 		$returnTag = $phpDocNode->getReturnTagValues()[0];
 		$type = $returnTag->type;
@@ -7263,7 +7165,7 @@ Finder::findFiles('*.php')
 		$usedAttributes = ['lines' => true, 'indexes' => true];
 		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
 		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, $usedAttributes);
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 
 		$visitor = new NodeCollectingVisitor();
@@ -7286,7 +7188,6 @@ Finder::findFiles('*.php')
 		string $label,
 		string $input,
 		PhpDocNode $expectedPhpDocNode,
-		?PhpDocNode $withRequiredWhitespaceBeforeDescriptionExpectedPhpDocNode = null,
 		?PhpDocNode $withPreserveTypeAliasesWithInvalidTypesExpectedPhpDocNode = null,
 		array $expectedAnnotations = []
 	): void
@@ -7559,7 +7460,7 @@ Finder::findFiles('*.php')
 	{
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, [], true, true);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, [], true, true);
 
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$actualPhpDocNode = $phpDocParser->parse($tokens);

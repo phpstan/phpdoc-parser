@@ -39,9 +39,6 @@ class PhpDocParser
 	private $doctrineConstantExprParser;
 
 	/** @var bool */
-	private $requireWhitespaceBeforeDescription;
-
-	/** @var bool */
 	private $preserveTypeAliasesWithInvalidTypes;
 
 	/** @var bool */
@@ -59,7 +56,6 @@ class PhpDocParser
 	public function __construct(
 		TypeParser $typeParser,
 		ConstExprParser $constantExprParser,
-		bool $requireWhitespaceBeforeDescription = false,
 		bool $preserveTypeAliasesWithInvalidTypes = false,
 		array $usedAttributes = [],
 		bool $textBetweenTagsBelongsToDescription = false
@@ -68,7 +64,6 @@ class PhpDocParser
 		$this->typeParser = $typeParser;
 		$this->constantExprParser = $constantExprParser;
 		$this->doctrineConstantExprParser = $constantExprParser->toDoctrine();
-		$this->requireWhitespaceBeforeDescription = $requireWhitespaceBeforeDescription;
 		$this->preserveTypeAliasesWithInvalidTypes = $preserveTypeAliasesWithInvalidTypes;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
@@ -1255,8 +1250,7 @@ class PhpDocParser
 			}
 
 			if (
-				$this->requireWhitespaceBeforeDescription
-				&& !$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)
+				!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)
 				&& !$tokens->isPrecededByHorizontalWhitespace()
 			) {
 				$tokens->consumeTokenType(Lexer::TOKEN_HORIZONTAL_WS); // will throw exception

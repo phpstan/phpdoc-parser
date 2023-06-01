@@ -74,7 +74,6 @@ class PrinterTest extends TestCase
 			$this->typeParser,
 			$constExprParser,
 			true,
-			true,
 			$usedAttributes
 		);
 	}

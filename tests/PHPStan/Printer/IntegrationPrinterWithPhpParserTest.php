@@ -105,7 +105,6 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 					new TypeParser($constExprParser, true, $usedAttributes),
 					$constExprParser,
 					true,
-					true,
 					$usedAttributes
 				);
 				$lexer = new Lexer();
