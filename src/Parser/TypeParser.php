@@ -15,7 +15,7 @@ use function substr_compare;
 class TypeParser
 {
 
-	/** @var ConstExprParser|null */
+	/** @var ConstExprParser */
 	private $constExprParser;
 
 	/** @var bool */
@@ -28,7 +28,7 @@ class TypeParser
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
 	 */
 	public function __construct(
-		?ConstExprParser $constExprParser = null,
+		ConstExprParser $constExprParser,
 		array $usedAttributes = []
 	)
 	{
@@ -201,17 +201,6 @@ class TypeParser
 		$currentTokenType = $tokens->currentTokenType();
 		$currentTokenOffset = $tokens->currentTokenOffset();
 		$currentTokenLine = $tokens->currentTokenLine();
-
-		if ($this->constExprParser === null) {
-			throw new ParserException(
-				$currentTokenValue,
-				$currentTokenType,
-				$currentTokenOffset,
-				Lexer::TOKEN_IDENTIFIER,
-				null,
-				$currentTokenLine
-			);
-		}
 
 		try {
 			$constExpr = $this->constExprParser->parse($tokens);
