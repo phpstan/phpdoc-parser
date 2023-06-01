@@ -1,9 +1,9 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method PHPStan\\\\PhpDocParser\\\\Ast\\\\ConstExpr\\\\QuoteAwareConstExprStringNode\\:\\:escapeDoubleQuotedString\\(\\) should return string but returns string\\|null\\.$#"
+			message: "#^Method PHPStan\\\\PhpDocParser\\\\Ast\\\\ConstExpr\\\\ConstExprStringNode\\:\\:escapeDoubleQuotedString\\(\\) should return string but returns string\\|null\\.$#"
 			count: 1
-			path: src/Ast/ConstExpr/QuoteAwareConstExprStringNode.php
+			path: src/Ast/ConstExpr/ConstExprStringNode.php
 
 		-
 			message: "#^Cannot use array destructuring on array\\<int, array\\<PHPStan\\\\PhpDocParser\\\\Ast\\\\Node\\>\\|int\\|string\\>\\|null\\.$#"

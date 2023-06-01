@@ -7,8 +7,8 @@ use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
-use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\NodeVisitor;
@@ -68,8 +68,8 @@ class PrinterTest extends TestCase
 	protected function setUp(): void
 	{
 		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$this->typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$constExprParser = new ConstExprParser($usedAttributes);
+		$this->typeParser = new TypeParser($constExprParser, $usedAttributes);
 		$this->phpDocParser = new PhpDocParser(
 			$this->typeParser,
 			$constExprParser,
@@ -968,7 +968,7 @@ class PrinterTest extends TestCase
 			public function enterNode(Node $node)
 			{
 				if ($node instanceof ArrayShapeItemNode) {
-					$node->keyName = new QuoteAwareConstExprStringNode('test', QuoteAwareConstExprStringNode::SINGLE_QUOTED);
+					$node->keyName = new ConstExprStringNode('test', ConstExprStringNode::SINGLE_QUOTED);
 				}
 
 				return $node;

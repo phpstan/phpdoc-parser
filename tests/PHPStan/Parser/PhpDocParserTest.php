@@ -2616,11 +2616,11 @@ class PhpDocParserTest extends TestCase
 								new ConstExprArrayNode([
 									new ConstExprArrayItemNode(
 										null,
-										new ConstExprStringNode('\'a\'')
+										new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED)
 									),
 									new ConstExprArrayItemNode(
 										null,
-										new ConstExprStringNode('\'b\'')
+										new ConstExprStringNode('b', ConstExprStringNode::SINGLE_QUOTED)
 									),
 								])
 							),
@@ -4019,7 +4019,7 @@ some text in the middle'
 						'T',
 						new IdentifierTypeNode('string'),
 						'the value type',
-						new ConstTypeNode(new ConstExprStringNode(''))
+						new ConstTypeNode(new ConstExprStringNode('', ConstExprStringNode::SINGLE_QUOTED))
 					)
 				),
 			]),
@@ -5066,8 +5066,8 @@ Finder::findFiles('*.php')
 					'@return',
 					new ReturnTagValueNode(
 						new UnionTypeNode([
-							new ConstTypeNode(new ConstExprStringNode('foo')),
-							new ConstTypeNode(new ConstExprStringNode('bar')),
+							new ConstTypeNode(new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED)),
+							new ConstTypeNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED)),
 						]),
 						''
 					)
@@ -5352,7 +5352,7 @@ Finder::findFiles('*.php')
 											),
 										]),
 										new ArrayShapeNode([
-											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprStringNode(''))),
+											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprStringNode('', ConstExprStringNode::SINGLE_QUOTED))),
 											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
 										]),
 									]),
@@ -6811,8 +6811,8 @@ Finder::findFiles('*.php')
 			'lines' => true,
 			'indexes' => true,
 		];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$constExprParser = new ConstExprParser($usedAttributes);
+		$typeParser = new TypeParser($constExprParser, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);
 		$children = $phpDocNode->children;
@@ -6895,8 +6895,8 @@ Finder::findFiles('*.php')
 			'lines' => true,
 			'indexes' => true,
 		];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$constExprParser = new ConstExprParser($usedAttributes);
+		$typeParser = new TypeParser($constExprParser, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
@@ -6968,8 +6968,8 @@ Finder::findFiles('*.php')
 			'lines' => true,
 			'indexes' => true,
 		];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$constExprParser = new ConstExprParser($usedAttributes);
+		$typeParser = new TypeParser($constExprParser, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
 		$phpDocNode = $phpDocParser->parse($tokens);
 		$returnTag = $phpDocNode->getReturnTagValues()[0];
@@ -7015,8 +7015,8 @@ Finder::findFiles('*.php')
 	public function testVerifyAttributes(string $label, string $input): void
 	{
 		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-		$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
+		$constExprParser = new ConstExprParser($usedAttributes);
+		$typeParser = new TypeParser($constExprParser, $usedAttributes);
 		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 

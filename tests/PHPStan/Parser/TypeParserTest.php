@@ -6,8 +6,8 @@ use Exception;
 use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
-use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
@@ -50,7 +50,7 @@ class TypeParserTest extends TestCase
 	{
 		parent::setUp();
 		$this->lexer = new Lexer();
-		$this->typeParser = new TypeParser(new ConstExprParser(true, true), true);
+		$this->typeParser = new TypeParser(new ConstExprParser());
 	}
 
 
@@ -118,7 +118,7 @@ class TypeParserTest extends TestCase
 		}
 
 		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$typeParser = new TypeParser(new ConstExprParser(true, true, $usedAttributes), true, $usedAttributes);
+		$typeParser = new TypeParser(new ConstExprParser($usedAttributes), $usedAttributes);
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 
 		$visitor = new NodeCollectingVisitor();
@@ -550,7 +550,7 @@ class TypeParserTest extends TestCase
 				'array{"a": int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+						new ConstExprStringNode('a', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -560,7 +560,7 @@ class TypeParserTest extends TestCase
 				'array{\'a\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+						new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -570,7 +570,7 @@ class TypeParserTest extends TestCase
 				'array{\'$ref\': int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+						new ConstExprStringNode('$ref', ConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -580,7 +580,7 @@ class TypeParserTest extends TestCase
 				'array{"$ref": int}',
 				new ArrayShapeNode([
 					new ArrayShapeItemNode(
-						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+						new ConstExprStringNode('$ref', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -1582,8 +1582,8 @@ class TypeParserTest extends TestCase
 			[
 				"'foo'|'bar'",
 				new UnionTypeNode([
-					new ConstTypeNode(new QuoteAwareConstExprStringNode('foo', QuoteAwareConstExprStringNode::SINGLE_QUOTED)),
-					new ConstTypeNode(new QuoteAwareConstExprStringNode('bar', QuoteAwareConstExprStringNode::SINGLE_QUOTED)),
+					new ConstTypeNode(new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED)),
+					new ConstTypeNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED)),
 				]),
 			],
 			[
@@ -1632,7 +1632,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'"bar"',
-				new ConstTypeNode(new QuoteAwareConstExprStringNode('bar', QuoteAwareConstExprStringNode::DOUBLE_QUOTED)),
+				new ConstTypeNode(new ConstExprStringNode('bar', ConstExprStringNode::DOUBLE_QUOTED)),
 			],
 			[
 				'Foo::FOO_*',
@@ -1670,7 +1670,7 @@ class TypeParserTest extends TestCase
 			[
 				'( "foo" | Foo::FOO_* )',
 				new UnionTypeNode([
-					new ConstTypeNode(new QuoteAwareConstExprStringNode('foo', QuoteAwareConstExprStringNode::DOUBLE_QUOTED)),
+					new ConstTypeNode(new ConstExprStringNode('foo', ConstExprStringNode::DOUBLE_QUOTED)),
 					new ConstTypeNode(new ConstFetchNode('Foo', 'FOO_*')),
 				]),
 			],
@@ -2336,7 +2336,7 @@ class TypeParserTest extends TestCase
 				'object{"a": int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+						new ConstExprStringNode('a', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -2346,7 +2346,7 @@ class TypeParserTest extends TestCase
 				'object{\'a\': int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new QuoteAwareConstExprStringNode('a', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+						new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -2356,7 +2356,7 @@ class TypeParserTest extends TestCase
 				'object{\'$ref\': int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+						new ConstExprStringNode('$ref', ConstExprStringNode::SINGLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -2366,7 +2366,7 @@ class TypeParserTest extends TestCase
 				'object{"$ref": int}',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						new QuoteAwareConstExprStringNode('$ref', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+						new ConstExprStringNode('$ref', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new IdentifierTypeNode('int')
 					),
@@ -3123,7 +3123,7 @@ class TypeParserTest extends TestCase
 			'lines' => true,
 			'indexes' => true,
 		];
-		$typeParser = new TypeParser(new ConstExprParser(true, true), true, $usedAttributes);
+		$typeParser = new TypeParser(new ConstExprParser(), $usedAttributes);
 		$typeNode = $typeParser->parse($tokens);
 
 		foreach ($assertions as [$callable, $expectedContent, $startLine, $endLine, $startIndex, $endIndex]) {

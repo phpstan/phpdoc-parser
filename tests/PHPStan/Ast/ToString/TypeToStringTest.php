@@ -68,10 +68,10 @@ class TypeToStringTest extends TestCase
 				], false),
 			],
 			[
-				'array{foo: Foo, bar?: Bar, 1: Baz}',
+				'array{\'foo\': Foo, \'bar\'?: Bar, 1: Baz}',
 				new ArrayShapeNode([
-					new ArrayShapeItemNode(new ConstExprStringNode('foo'), false, new IdentifierTypeNode('Foo')),
-					new ArrayShapeItemNode(new ConstExprStringNode('bar'), true, new IdentifierTypeNode('Bar')),
+					new ArrayShapeItemNode(new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED), false, new IdentifierTypeNode('Foo')),
+					new ArrayShapeItemNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED), true, new IdentifierTypeNode('Bar')),
 					new ArrayShapeItemNode(new ConstExprIntegerNode('1'), false, new IdentifierTypeNode('Baz')),
 				]),
 			],

@@ -44,16 +44,17 @@ class ConstExprToStringTest extends TestCase
 			['false', new ConstExprFalseNode()],
 			['8', new ConstExprIntegerNode('8')],
 			['21.37', new ConstExprFloatNode('21.37')],
-			['foo', new ConstExprStringNode('foo')],
+			['\'foo\'', new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED)],
+			['"foo"', new ConstExprStringNode('foo', ConstExprStringNode::DOUBLE_QUOTED)],
 			['FooBar', new ConstFetchNode('', 'FooBar')],
 			['Foo\\Bar::Baz', new ConstFetchNode('Foo\\Bar', 'Baz')],
 			['[]', new ConstExprArrayNode([])],
 			[
-				'[foo, 4 => foo, bar => baz]',
+				"['foo', 4 => 'foo', 'bar' => 'baz']",
 				new ConstExprArrayNode([
-					new ConstExprArrayItemNode(null, new ConstExprStringNode('foo')),
-					new ConstExprArrayItemNode(new ConstExprIntegerNode('4'), new ConstExprStringNode('foo')),
-					new ConstExprArrayItemNode(new ConstExprStringNode('bar'), new ConstExprStringNode('baz')),
+					new ConstExprArrayItemNode(null, new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED)),
+					new ConstExprArrayItemNode(new ConstExprIntegerNode('4'), new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED)),
+					new ConstExprArrayItemNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED), new ConstExprStringNode('baz', ConstExprStringNode::SINGLE_QUOTED)),
 				]),
 			],
 		];

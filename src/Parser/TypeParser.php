@@ -11,16 +11,12 @@ use function str_replace;
 use function strlen;
 use function strpos;
 use function substr_compare;
-use function trim;
 
 class TypeParser
 {
 
 	/** @var ConstExprParser|null */
 	private $constExprParser;
-
-	/** @var bool */
-	private $quoteAwareConstExprString;
 
 	/** @var bool */
 	private $useLinesAttributes;
@@ -33,12 +29,10 @@ class TypeParser
 	 */
 	public function __construct(
 		?ConstExprParser $constExprParser = null,
-		bool $quoteAwareConstExprString = false,
 		array $usedAttributes = []
 	)
 	{
 		$this->constExprParser = $constExprParser;
-		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 	}
@@ -220,7 +214,7 @@ class TypeParser
 		}
 
 		try {
-			$constExpr = $this->constExprParser->parse($tokens, true);
+			$constExpr = $this->constExprParser->parse($tokens);
 			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
 				throw new ParserException(
 					$currentTokenValue,
@@ -735,7 +729,7 @@ class TypeParser
 		}
 
 		try {
-			$constExpr = $this->constExprParser->parse($tokens, true);
+			$constExpr = $this->constExprParser->parse($tokens);
 			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
 				throw new ParserException(
 					$currentTokenValue,
@@ -932,19 +926,11 @@ class TypeParser
 			$tokens->next();
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
-			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
-			} else {
-				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), "'"));
-			}
+			$key = new Ast\ConstExpr\ConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\ConstExprStringNode::SINGLE_QUOTED);
 			$tokens->next();
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
-			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED);
-			} else {
-				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), '"'));
-			}
+			$key = new Ast\ConstExpr\ConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\ConstExprStringNode::DOUBLE_QUOTED);
 
 			$tokens->next();
 
@@ -1069,19 +1055,11 @@ class TypeParser
 		$startIndex = $tokens->currentTokenIndex();
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
-			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED);
-			} else {
-				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), "'"));
-			}
+			$key = new Ast\ConstExpr\ConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\ConstExprStringNode::SINGLE_QUOTED);
 			$tokens->next();
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
-			if ($this->quoteAwareConstExprString) {
-				$key = new Ast\ConstExpr\QuoteAwareConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED);
-			} else {
-				$key = new Ast\ConstExpr\ConstExprStringNode(trim($tokens->currentTokenValue(), '"'));
-			}
+			$key = new Ast\ConstExpr\ConstExprStringNode(StringUnescaper::unescapeString($tokens->currentTokenValue()), Ast\ConstExpr\ConstExprStringNode::DOUBLE_QUOTED);
 			$tokens->next();
 
 		} else {

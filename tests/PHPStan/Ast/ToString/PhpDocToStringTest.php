@@ -280,8 +280,8 @@ class PhpDocToStringTest extends TestCase
 				new MethodTagValueParameterNode($string, true, false, 'foo', null),
 			],
 			[
-				'string &foo = bar',
-				new MethodTagValueParameterNode($string, true, false, 'foo', new ConstExprStringNode('bar')),
+				'string &foo = \'bar\'',
+				new MethodTagValueParameterNode($string, true, false, 'foo', new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED)),
 			],
 			[
 				'&...foo',
@@ -408,10 +408,10 @@ class PhpDocToStringTest extends TestCase
 		];
 
 		yield [
-			'{1, a=2}',
+			'{1, \'a\'=2}',
 			new DoctrineArray([
 				new DoctrineArrayItem(null, new ConstExprIntegerNode('1')),
-				new DoctrineArrayItem(new ConstExprStringNode('a'), new ConstExprIntegerNode('2')),
+				new DoctrineArrayItem(new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED), new ConstExprIntegerNode('2')),
 			]),
 		];
 
@@ -421,8 +421,8 @@ class PhpDocToStringTest extends TestCase
 		];
 
 		yield [
-			'a=2',
-			new DoctrineArrayItem(new ConstExprStringNode('a'), new ConstExprIntegerNode('2')),
+			'\'a\'=2',
+			new DoctrineArrayItem(new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED), new ConstExprIntegerNode('2')),
 		];
 
 		yield [

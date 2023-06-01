@@ -100,9 +100,9 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 				$phpDoc = $phpNode->getDocComment()->getText();
 
 				$usedAttributes = ['lines' => true, 'indexes' => true];
-				$constExprParser = new ConstExprParser(true, true, $usedAttributes);
+				$constExprParser = new ConstExprParser($usedAttributes);
 				$phpDocParser = new PhpDocParser(
-					new TypeParser($constExprParser, true, $usedAttributes),
+					new TypeParser($constExprParser, $usedAttributes),
 					$constExprParser,
 					$usedAttributes
 				);

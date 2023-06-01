@@ -6,16 +6,9 @@ use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function str_replace;
 use function strtolower;
-use function substr;
 
 class ConstExprParser
 {
-
-	/** @var bool */
-	private $unescapeStrings;
-
-	/** @var bool */
-	private $quoteAwareConstExprString;
 
 	/** @var bool */
 	private $useLinesAttributes;
@@ -30,13 +23,9 @@ class ConstExprParser
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
 	 */
 	public function __construct(
-		bool $unescapeStrings = false,
-		bool $quoteAwareConstExprString = false,
 		array $usedAttributes = []
 	)
 	{
-		$this->unescapeStrings = $unescapeStrings;
-		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 		$this->parseDoctrineStrings = false;
@@ -48,8 +37,6 @@ class ConstExprParser
 	public function toDoctrine(): self
 	{
 		$self = new self(
-			$this->unescapeStrings,
-			$this->quoteAwareConstExprString,
 			[
 				'lines' => $this->useLinesAttributes,
 				'indexes' => $this->useIndexAttributes,
@@ -59,7 +46,7 @@ class ConstExprParser
 		return $self;
 	}
 
-	public function parse(TokenIterator $tokens, bool $trimStrings = false): Ast\ConstExpr\ConstExprNode
+	public function parse(TokenIterator $tokens): Ast\ConstExpr\ConstExprNode
 	{
 		$startLine = $tokens->currentTokenLine();
 		$startIndex = $tokens->currentTokenIndex();
@@ -122,34 +109,19 @@ class ConstExprParser
 					$startIndex
 				);
 			}
-			$value = $tokens->currentTokenValue();
-			$type = $tokens->currentTokenType();
-			if ($trimStrings) {
-				if ($this->unescapeStrings) {
-					$value = StringUnescaper::unescapeString($value);
-				} else {
-					$value = substr($value, 1, -1);
-				}
-			}
-			$tokens->next();
 
-			if ($this->quoteAwareConstExprString) {
-				return $this->enrichWithAttributes(
-					$tokens,
-					new Ast\ConstExpr\QuoteAwareConstExprStringNode(
-						$value,
-						$type === Lexer::TOKEN_SINGLE_QUOTED_STRING
-							? Ast\ConstExpr\QuoteAwareConstExprStringNode::SINGLE_QUOTED
-							: Ast\ConstExpr\QuoteAwareConstExprStringNode::DOUBLE_QUOTED
-					),
-					$startLine,
-					$startIndex
-				);
-			}
+			$value = StringUnescaper::unescapeString($tokens->currentTokenValue());
+			$type = $tokens->currentTokenType();
+			$tokens->next();
 
 			return $this->enrichWithAttributes(
 				$tokens,
-				new Ast\ConstExpr\ConstExprStringNode($value),
+				new Ast\ConstExpr\ConstExprStringNode(
+					$value,
+					$type === Lexer::TOKEN_SINGLE_QUOTED_STRING
+						? Ast\ConstExpr\ConstExprStringNode::SINGLE_QUOTED
+						: Ast\ConstExpr\ConstExprStringNode::DOUBLE_QUOTED
+				),
 				$startLine,
 				$startIndex
 			);

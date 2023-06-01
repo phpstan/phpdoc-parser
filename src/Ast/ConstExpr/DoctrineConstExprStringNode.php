@@ -18,7 +18,7 @@ class DoctrineConstExprStringNode extends ConstExprStringNode
 
 	public function __construct(string $value)
 	{
-		parent::__construct($value);
+		parent::__construct($value, self::DOUBLE_QUOTED);
 		$this->value = $value;
 	}
 
