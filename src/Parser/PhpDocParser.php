@@ -39,9 +39,6 @@ class PhpDocParser
 	private $doctrineConstantExprParser;
 
 	/** @var bool */
-	private $preserveTypeAliasesWithInvalidTypes;
-
-	/** @var bool */
 	private $useLinesAttributes;
 
 	/** @var bool */
@@ -56,7 +53,6 @@ class PhpDocParser
 	public function __construct(
 		TypeParser $typeParser,
 		ConstExprParser $constantExprParser,
-		bool $preserveTypeAliasesWithInvalidTypes = false,
 		array $usedAttributes = [],
 		bool $textBetweenTagsBelongsToDescription = false
 	)
@@ -64,7 +60,6 @@ class PhpDocParser
 		$this->typeParser = $typeParser;
 		$this->constantExprParser = $constantExprParser;
 		$this->doctrineConstantExprParser = $constantExprParser->toDoctrine();
-		$this->preserveTypeAliasesWithInvalidTypes = $preserveTypeAliasesWithInvalidTypes;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 		$this->textBetweenTagsBelongsToDescription = $textBetweenTagsBelongsToDescription;
@@ -1085,37 +1080,31 @@ class PhpDocParser
 		// support phan-type/psalm-type syntax
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
 
-		if ($this->preserveTypeAliasesWithInvalidTypes) {
-			$startLine = $tokens->currentTokenLine();
-			$startIndex = $tokens->currentTokenIndex();
-			try {
-				$type = $this->typeParser->parse($tokens);
-				if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
-					if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-						throw new ParserException(
-							$tokens->currentTokenValue(),
-							$tokens->currentTokenType(),
-							$tokens->currentTokenOffset(),
-							Lexer::TOKEN_PHPDOC_EOL,
-							null,
-							$tokens->currentTokenLine()
-						);
-					}
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+		try {
+			$type = $this->typeParser->parse($tokens);
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PHPDOC)) {
+				if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+					throw new ParserException(
+						$tokens->currentTokenValue(),
+						$tokens->currentTokenType(),
+						$tokens->currentTokenOffset(),
+						Lexer::TOKEN_PHPDOC_EOL,
+						null,
+						$tokens->currentTokenLine()
+					);
 				}
-
-				return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
-			} catch (ParserException $e) {
-				$this->parseOptionalDescription($tokens);
-				return new Ast\PhpDoc\TypeAliasTagValueNode(
-					$alias,
-					$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex)
-				);
 			}
+
+			return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
+		} catch (ParserException $e) {
+			$this->parseOptionalDescription($tokens);
+			return new Ast\PhpDoc\TypeAliasTagValueNode(
+				$alias,
+				$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex)
+			);
 		}
-
-		$type = $this->typeParser->parse($tokens);
-
-		return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
 	}
 
 	private function parseTypeAliasImportTagValue(TokenIterator $tokens): Ast\PhpDoc\TypeAliasImportTagValueNode

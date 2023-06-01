@@ -73,7 +73,6 @@ class PrinterTest extends TestCase
 		$this->phpDocParser = new PhpDocParser(
 			$this->typeParser,
 			$constExprParser,
-			true,
 			$usedAttributes
 		);
 	}
