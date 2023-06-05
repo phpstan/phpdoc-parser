@@ -2567,6 +2567,25 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
+			'@example with description starting at next line',
+			'/** ' . PHP_EOL .
+			' * @example' . PHP_EOL .
+			' *   entity_managers:' . PHP_EOL .
+			' *     default:' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@example',
+					new GenericTagValueNode('')
+				),
+				new PhpDocTextNode(
+					'entity_managers:' . PHP_EOL .
+					'    default:'
+				),
+			]),
+		];
+
+		yield [
 			'callable with space between keyword and parameters',
 			'/** @var callable (int): void */',
 			new PhpDocNode([
