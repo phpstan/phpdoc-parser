@@ -85,11 +85,12 @@ jobs:
 
   tests:
     name: "Tests"
-    runs-on: "ubuntu-latest"
+    runs-on: ${{ matrix.operating-system }}
 
     strategy:
       fail-fast: false
       matrix:
+        operating-system: [ubuntu-latest, windows-latest]
         php-version:
           - "7.2"
           - "7.3"
