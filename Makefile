@@ -2,7 +2,7 @@
 check: lint cs tests phpstan
 
 .PHONY: tests
-tests: build-abnfgen
+tests:
 	php vendor/bin/phpunit
 
 .PHONY: lint
@@ -34,7 +34,3 @@ phpstan:
 .PHONY: phpstan-generate-baseline
 phpstan-generate-baseline:
 	php vendor/bin/phpstan --generate-baseline
-
-.PHONY: build-abnfgen
-build-abnfgen:
-	./build-abnfgen.sh

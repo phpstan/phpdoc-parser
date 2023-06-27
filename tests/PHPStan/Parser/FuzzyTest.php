@@ -13,6 +13,9 @@ use function mkdir;
 use function sprintf;
 use function unlink;
 
+/**
+ * @requires OS ^(?!win)
+ */
 class FuzzyTest extends TestCase
 {
 
