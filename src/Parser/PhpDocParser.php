@@ -230,7 +230,7 @@ class PhpDocParser
 			}
 
 			$tokens->dropSavePoint();
-			$text .= "\n";
+			$text .= $tokens->getDetectedNewline() ?? "\n";
 		}
 
 		return new Ast\PhpDoc\PhpDocTextNode(trim($text, " \t"));
@@ -287,7 +287,7 @@ class PhpDocParser
 			}
 
 			$tokens->dropSavePoint();
-			$text .= "\n";
+			$text .= $tokens->getDetectedNewline() ?? "\n";
 		}
 
 		return trim($text, " \t");
