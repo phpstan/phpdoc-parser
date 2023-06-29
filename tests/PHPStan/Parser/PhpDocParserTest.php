@@ -5332,7 +5332,7 @@ Finder::findFiles('*.php')
 						new ParserException(
 							'Important',
 							Lexer::TOKEN_IDENTIFIER,
-							27,
+							PHP_EOL === "\n" ? 27 : 28,
 							Lexer::TOKEN_HORIZONTAL_WS,
 							null,
 							2
@@ -5817,7 +5817,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
 					[]
-				), "test\ntest2")),
+				), 'test' . PHP_EOL . 'test2')),
 			]),
 			null,
 			null,
@@ -5887,7 +5887,7 @@ Finder::findFiles('*.php')
 			' * test2' . PHP_EOL .
 			' */',
 			new PhpDocNode([
-				new PhpDocTagNode('@X', new GenericTagValueNode("test\ntest2")),
+				new PhpDocTagNode('@X', new GenericTagValueNode('test' . PHP_EOL . 'test2')),
 			]),
 			null,
 			null,

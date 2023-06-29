@@ -516,7 +516,7 @@ final class Printer
 		[$isMultiline, $beforeAsteriskIndent, $afterAsteriskIndent] = $this->isMultiline($tokenIndex, $originalNodes, $originalTokens);
 
 		if ($insertStr === "\n * ") {
-			$insertStr = sprintf("\n%s*%s", $beforeAsteriskIndent, $afterAsteriskIndent);
+			$insertStr = sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
 		}
 
 		foreach ($diff as $i => $diffElem) {
@@ -549,7 +549,7 @@ final class Printer
 						}
 
 						if ($insertNewline) {
-							$result .= $insertStr . sprintf("\n%s*%s", $beforeAsteriskIndent, $afterAsteriskIndent);
+							$result .= $insertStr . sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
 						} else {
 							$result .= $insertStr;
 						}
@@ -593,7 +593,7 @@ final class Printer
 
 				$itemEndPos = $tokenIndex - 1;
 				if ($insertNewline) {
-					$result .= $insertStr . sprintf("\n%s*%s", $beforeAsteriskIndent, $afterAsteriskIndent);
+					$result .= $insertStr . sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
 				} else {
 					$result .= $insertStr;
 				}
@@ -662,7 +662,7 @@ final class Printer
 				if (!$first) {
 					$result .= $insertStr;
 					if ($insertNewline) {
-						$result .= sprintf("\n%s*%s", $beforeAsteriskIndent, $afterAsteriskIndent);
+						$result .= sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
 					}
 				}
 
