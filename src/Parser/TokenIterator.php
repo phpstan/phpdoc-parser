@@ -9,6 +9,7 @@ use function assert;
 use function count;
 use function in_array;
 use function strlen;
+use function substr;
 
 class TokenIterator
 {
@@ -24,6 +25,9 @@ class TokenIterator
 
 	/** @var list<int> */
 	private $skippedTokenTypes = [Lexer::TOKEN_HORIZONTAL_WS];
+
+	/** @var string|null */
+	private $newline = null;
 
 	/**
 	 * @param list<array{string, int, int}> $tokens
@@ -144,6 +148,12 @@ class TokenIterator
 			$this->throwError($tokenType);
 		}
 
+		if ($tokenType === Lexer::TOKEN_PHPDOC_EOL) {
+			if ($this->newline === null) {
+				$this->detectNewline();
+			}
+		}
+
 		$this->index++;
 		$this->skipIrrelevantTokens();
 	}
@@ -184,10 +194,27 @@ class TokenIterator
 			return false;
 		}
 
+		if ($tokenType === Lexer::TOKEN_PHPDOC_EOL) {
+			if ($this->newline === null) {
+				$this->detectNewline();
+			}
+		}
+
 		$this->index++;
 		$this->skipIrrelevantTokens();
 
 		return true;
+	}
+
+
+	private function detectNewline(): void
+	{
+		$value = $this->currentTokenValue();
+		if (substr($value, 0, 2) === "\r\n") {
+			$this->newline = "\r\n";
+		} elseif (substr($value, 0, 1) === "\n") {
+			$this->newline = "\n";
+		}
 	}
 
 
@@ -337,6 +364,11 @@ class TokenIterator
 		}
 
 		return false;
+	}
+
+	public function getDetectedNewline(): ?string
+	{
+		return $this->newline;
 	}
 
 	/**
