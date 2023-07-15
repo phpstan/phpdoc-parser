@@ -380,4 +380,37 @@ class TokenIterator
 			&& $this->hasTokenImmediatelyAfter($endPos, Lexer::TOKEN_CLOSE_PARENTHESES);
 	}
 
+	/**
+	 * Strip PHP style "one-line" comments (text starting with //)
+	 */
+	public function stripComments(): void
+	{
+		$line = 1;
+		$cleanTokens = [];
+		for ($i = 0; $i < count($this->tokens); $i++) {
+			$token = $this->tokens[$i];
+			if (
+				$token[Lexer::TYPE_OFFSET] === Lexer::TOKEN_OTHER
+				&& strpos($token[Lexer::VALUE_OFFSET], '//') === 0
+			) {
+				while (
+					strpos($this->tokens[$i][Lexer::VALUE_OFFSET], "\n") === false
+					&& $i < count($this->tokens)
+				) {
+					$i++;
+				}
+				if ($this->tokens[$i][Lexer::LINE_OFFSET] !== $line) {
+					for ($j = $i + 1; $j < count($this->tokens); $j++) {
+						$this->tokens[$j][Lexer::LINE_OFFSET]--;
+					}
+				}
+			} else {
+				$cleanTokens[] = $token;
+				$line = $token[Lexer::LINE_OFFSET];
+			}
+		}
+
+		$this->tokens = $cleanTokens;
+	}
+
 }

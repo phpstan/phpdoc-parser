@@ -1290,6 +1290,122 @@ class TypeParserTest extends TestCase
 				new UnionTypeNode([new IdentifierTypeNode('int'), new ArrayShapeNode([])]),
 			],
 			[
+				<<<EOT
+				array{ // Array with comments
+			        // Array with single quoted keys
+			        'single quote keys': array{            // Single quoted key
+			            'single_quote_key//1': int,        // Single quoted key with //
+			            'single_quote_key\'//2': string,   // Single quoted key with ' and //
+			            'single_quote_key\'//\'3': bool,   // Single quoted key with 2x ' and //
+			            'single_quote_key"//"4': float,    // Single quoted key with 2x " and //
+			            'single_quote_key"//\'5': array{   // Single quoted key with ', " and //
+			                'single_quote_key//5//1': int, // Single quoted key with 2x //
+			            },
+			            // 'commented_out_array_element//1': int
+			            'single_quote_key//no_whitespace':int,//Single quoted key without whitespace
+			        },
+			        // Array with double quoted keys
+			        "double quote keys": array{           // Double quoted key
+			            "double_quote_key//1": int,        // Double quoted key with //
+			            "double_quote_key'//2": string,    // Double quoted key with ' and //
+			            "double_quote_key\"//\"3": bool,   // Double quoted key with 2x ' and //
+			            "double_quote_key'//'4": float,    // Double quoted key with 2x " and //
+			            "double_quote_key\"//'5": array{  // Double quoted key with ', " and //
+			                "double_quote_key//5//1": int, // Double quoted key with 2x //
+			            },
+			            // "commented_out_array_element//1": int
+			            "double_quote_key//no_whitespace":int,//Double quoted key without whitespace
+			        },
+			    }
+EOT,
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new QuoteAwareConstExprStringNode('single quote keys', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+						false,
+						new ArrayShapeNode([
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('single_quote_key//1', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+								false,
+								new IdentifierTypeNode('int')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('single_quote_key\'//2', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+								false,
+								new IdentifierTypeNode('string')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('single_quote_key\'//\'3', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+								false,
+								new IdentifierTypeNode('bool')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('single_quote_key"//"4', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+								false,
+								new IdentifierTypeNode('float')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('single_quote_key"//\'5', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+								false,
+								new ArrayShapeNode([
+									new ArrayShapeItemNode(
+										new QuoteAwareConstExprStringNode('single_quote_key//5//1', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+										false,
+										new IdentifierTypeNode('int')
+									),
+								])
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('single_quote_key//no_whitespace', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+								false,
+								new IdentifierTypeNode('int')
+							),
+						])
+					),
+					new ArrayShapeItemNode(
+						new QuoteAwareConstExprStringNode("double quote keys", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+						false,
+						new ArrayShapeNode([
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode("double_quote_key//1", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								false,
+								new IdentifierTypeNode('int')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode("double_quote_key'//2", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								false,
+								new IdentifierTypeNode('string')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode("double_quote_key\"//\"3", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								false,
+								new IdentifierTypeNode('bool')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode("double_quote_key'//'4", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								false,
+								new IdentifierTypeNode('float')
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode("double_quote_key\"//'5", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								false,
+								new ArrayShapeNode([
+									new ArrayShapeItemNode(
+										new QuoteAwareConstExprStringNode("double_quote_key//5//1", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+										false,
+										new IdentifierTypeNode('int')
+									),
+								])
+							),
+							new ArrayShapeItemNode(
+								new QuoteAwareConstExprStringNode('double_quote_key//no_whitespace', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								false,
+								new IdentifierTypeNode('int')
+							),
+						])
+					),
+				]),
+			],
+			[
 				'callable(' . PHP_EOL .
 				'  Foo' . PHP_EOL .
 				'): void',
