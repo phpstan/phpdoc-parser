@@ -1362,11 +1362,11 @@ EOT,
 						])
 					),
 					new ArrayShapeItemNode(
-						new QuoteAwareConstExprStringNode("double quote keys", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+						new QuoteAwareConstExprStringNode('double quote keys', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 						false,
 						new ArrayShapeNode([
 							new ArrayShapeItemNode(
-								new QuoteAwareConstExprStringNode("double_quote_key//1", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								new QuoteAwareConstExprStringNode('double_quote_key//1', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 								false,
 								new IdentifierTypeNode('int')
 							),
@@ -1376,7 +1376,7 @@ EOT,
 								new IdentifierTypeNode('string')
 							),
 							new ArrayShapeItemNode(
-								new QuoteAwareConstExprStringNode("double_quote_key\"//\"3", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+								new QuoteAwareConstExprStringNode('double_quote_key"//"3', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 								false,
 								new IdentifierTypeNode('bool')
 							),
@@ -1390,7 +1390,7 @@ EOT,
 								false,
 								new ArrayShapeNode([
 									new ArrayShapeItemNode(
-										new QuoteAwareConstExprStringNode("double_quote_key//5//1", QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
+										new QuoteAwareConstExprStringNode('double_quote_key//5//1', QuoteAwareConstExprStringNode::DOUBLE_QUOTED),
 										false,
 										new IdentifierTypeNode('int')
 									),
