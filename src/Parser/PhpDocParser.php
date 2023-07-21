@@ -214,9 +214,11 @@ class PhpDocParser
 	{
 		$text = '';
 
+		// if the next token is EOL, everything below is skipped and empty string is returned
 		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
 			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
 
+			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
 				break;
 			}
@@ -224,10 +226,14 @@ class PhpDocParser
 			$tokens->pushSavePoint();
 			$tokens->next();
 
+			// if we're at EOL, check what's next
+			// if next is a PHPDoc tag, EOL, or end of PHPDoc, stop
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)) {
 				$tokens->rollback();
 				break;
 			}
+
+			// otherwise if the next is text, continue building the description string
 
 			$tokens->dropSavePoint();
 			$text .= $tokens->getDetectedNewline() ?? "\n";
@@ -241,9 +247,11 @@ class PhpDocParser
 	{
 		$text = '';
 
+		// if the next token is EOL, everything below is skipped and empty string is returned
 		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
 			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
 
+			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
 				if (!$tokens->isPrecededByHorizontalWhitespace()) {
 					return trim($text . $this->parseText($tokens)->text, " \t");
@@ -281,10 +289,14 @@ class PhpDocParser
 			$tokens->pushSavePoint();
 			$tokens->next();
 
+			// if we're at EOL, check what's next
+			// if next is a PHPDoc tag, EOL, or end of PHPDoc, stop
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)) {
 				$tokens->rollback();
 				break;
 			}
+
+			// otherwise if the next is text, continue building the description string
 
 			$tokens->dropSavePoint();
 			$text .= $tokens->getDetectedNewline() ?? "\n";
