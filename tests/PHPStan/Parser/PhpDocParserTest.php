@@ -6682,4 +6682,103 @@ Finder::findFiles('*.php')
 		$this->assertEquals($expectedAnnotations, $parser->parse($input, $label), $label);
 	}
 
+	/**
+	 * @return iterable<array{string, PhpDocNode}>
+	 */
+	public function dataTextBetweenTagsBelongsToDescription(): iterable
+	{
+		yield [
+			'/**' . PHP_EOL .
+			  ' * Real description' . PHP_EOL .
+			  ' * @param int $a' . PHP_EOL .
+			  ' *   paramA description' . PHP_EOL .
+			  ' * @param int $b' . PHP_EOL .
+			  ' *   paramB description' . PHP_EOL .
+			  ' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . '  paramA description')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', PHP_EOL . '  paramB description')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a aaaa' . PHP_EOL .
+			' *   bbbb' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * ccc' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @ORM\Column()' . PHP_EOL .
+			' *   bbbb' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * ccc' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @ORM\Column() aaaa' . PHP_EOL .
+			' *   bbbb' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * ccc' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @ORM\Column() aaaa' . PHP_EOL .
+			' *   bbbb' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * ccc' . PHP_EOL .
+			' * @param int $b' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '')),
+			]),
+		];
+	}
+
+	/**
+	 * @dataProvider dataTextBetweenTagsBelongsToDescription
+	 */
+	public function testTextBetweenTagsBelongsToDescription(
+		string $input,
+		PhpDocNode $expectedPhpDocNode
+	): void
+	{
+		$constExprParser = new ConstExprParser();
+		$typeParser = new TypeParser($constExprParser);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, [], true, true);
+
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+		$actualPhpDocNode = $phpDocParser->parse($tokens);
+
+		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode);
+		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode);
+		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
+	}
+
 }

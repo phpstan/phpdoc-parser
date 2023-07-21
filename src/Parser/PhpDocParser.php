@@ -49,6 +49,9 @@ class PhpDocParser
 	/** @var bool */
 	private $useIndexAttributes;
 
+	/** @var bool */
+	private $textBetweenTagsBelongsToDescription;
+
 	/**
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
 	 */
@@ -58,7 +61,8 @@ class PhpDocParser
 		bool $requireWhitespaceBeforeDescription = false,
 		bool $preserveTypeAliasesWithInvalidTypes = false,
 		array $usedAttributes = [],
-		bool $parseDoctrineAnnotations = false
+		bool $parseDoctrineAnnotations = false,
+		bool $textBetweenTagsBelongsToDescription = false
 	)
 	{
 		$this->typeParser = $typeParser;
@@ -68,6 +72,7 @@ class PhpDocParser
 		$this->parseDoctrineAnnotations = $parseDoctrineAnnotations;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
+		$this->textBetweenTagsBelongsToDescription = $textBetweenTagsBelongsToDescription;
 	}
 
 
@@ -215,10 +220,13 @@ class PhpDocParser
 		$text = '';
 
 		$endTokens = [Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
+		if ($this->textBetweenTagsBelongsToDescription) {
+			$endTokens = [Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
+		}
 
 		// if the next token is EOL, everything below is skipped and empty string is returned
-		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(...$endTokens);
+		while ($this->textBetweenTagsBelongsToDescription || !$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
@@ -250,10 +258,13 @@ class PhpDocParser
 		$text = '';
 
 		$endTokens = [Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
+		if ($this->textBetweenTagsBelongsToDescription) {
+			$endTokens = [Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
+		}
 
 		// if the next token is EOL, everything below is skipped and empty string is returned
-		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, ...$endTokens);
+		while ($this->textBetweenTagsBelongsToDescription || !$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
