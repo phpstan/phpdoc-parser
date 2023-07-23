@@ -6739,6 +6739,21 @@ Finder::findFiles('*.php')
 		yield [
 			'/**' . PHP_EOL .
 			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @param int $b' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
 			' * @param int $a aaaa' . PHP_EOL .
 			' *   bbbb' . PHP_EOL .
 			' *' . PHP_EOL .
@@ -6791,6 +6806,135 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode('Real description'),
 				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
 				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . PHP_EOL . PHP_EOL . 'test')),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'test')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *  test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test')),
+				new PhpDocTextNode(''),
+				//new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *  test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
+				//new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *  test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test 2' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
+				//new PhpDocTextNode(''),
+			]),
+		];
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *  test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test 2' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
+				new PhpDocTextNode(''),
+				//new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @ORM\Column()' . PHP_EOL .
+			' *  test' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test 2' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
+				new PhpDocTextNode(''),
+				//new PhpDocTextNode(''),
 			]),
 		];
 	}

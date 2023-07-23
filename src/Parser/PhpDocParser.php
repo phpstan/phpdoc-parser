@@ -14,6 +14,7 @@ use PHPStan\ShouldNotHappenException;
 use function array_key_exists;
 use function array_values;
 use function count;
+use function rtrim;
 use function str_replace;
 use function trim;
 
@@ -224,13 +225,26 @@ class PhpDocParser
 			$endTokens = [Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
 		}
 
+		$savepoint = false;
+
 		// if the next token is EOL, everything below is skipped and empty string is returned
 		while ($this->textBetweenTagsBelongsToDescription || !$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
+			$tmpText = $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
+			$text .= $tmpText;
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
 				break;
+			}
+
+			if ($this->textBetweenTagsBelongsToDescription) {
+				if (!$savepoint) {
+					$tokens->pushSavePoint();
+					$savepoint = true;
+				} elseif ($tmpText !== '') {
+					$tokens->dropSavePoint();
+					$savepoint = false;
+				}
 			}
 
 			$tokens->pushSavePoint();
@@ -249,6 +263,11 @@ class PhpDocParser
 			$text .= $tokens->getDetectedNewline() ?? "\n";
 		}
 
+		if ($savepoint) {
+			$tokens->rollback();
+			$text = rtrim($text, $tokens->getDetectedNewline() ?? "\n");
+		}
+
 		return new Ast\PhpDoc\PhpDocTextNode(trim($text, " \t"));
 	}
 
@@ -262,9 +281,12 @@ class PhpDocParser
 			$endTokens = [Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
 		}
 
+		$savepoint = false;
+
 		// if the next token is EOL, everything below is skipped and empty string is returned
 		while ($this->textBetweenTagsBelongsToDescription || !$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
+			$tmpText = $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
+			$text .= $tmpText;
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
@@ -301,6 +323,16 @@ class PhpDocParser
 				break;
 			}
 
+			if ($this->textBetweenTagsBelongsToDescription) {
+				if (!$savepoint) {
+					$tokens->pushSavePoint();
+					$savepoint = true;
+				} elseif ($tmpText !== '') {
+					$tokens->dropSavePoint();
+					$savepoint = false;
+				}
+			}
+
 			$tokens->pushSavePoint();
 			$tokens->next();
 
@@ -315,6 +347,11 @@ class PhpDocParser
 
 			$tokens->dropSavePoint();
 			$text .= $tokens->getDetectedNewline() ?? "\n";
+		}
+
+		if ($savepoint) {
+			$tokens->rollback();
+			$text = rtrim($text, $tokens->getDetectedNewline() ?? "\n");
 		}
 
 		return trim($text, " \t");
