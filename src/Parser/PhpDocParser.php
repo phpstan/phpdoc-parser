@@ -243,7 +243,7 @@ class PhpDocParser
 					$savepoint = true;
 				} elseif ($tmpText !== '') {
 					$tokens->dropSavePoint();
-					$savepoint = false;
+					$tokens->pushSavePoint();
 				}
 			}
 
@@ -329,7 +329,7 @@ class PhpDocParser
 					$savepoint = true;
 				} elseif ($tmpText !== '') {
 					$tokens->dropSavePoint();
-					$savepoint = false;
+					$tokens->pushSavePoint();
 				}
 			}
 

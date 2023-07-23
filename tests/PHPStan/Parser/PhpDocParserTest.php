@@ -6878,7 +6878,7 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode('Real description'),
 				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test')),
 				new PhpDocTextNode(''),
-				//new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
 			]),
 		];
 
@@ -6896,7 +6896,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test')),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
-				//new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
 			]),
 		];
 
@@ -6912,7 +6912,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
 				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
-				//new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
 			]),
 		];
 		yield [
@@ -6929,7 +6929,7 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode('Real description'),
 				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
 				new PhpDocTextNode(''),
-				//new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
 			]),
 		];
 
@@ -6947,7 +6947,7 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode('Real description'),
 				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
 				new PhpDocTextNode(''),
-				//new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
 			]),
 		];
 	}
