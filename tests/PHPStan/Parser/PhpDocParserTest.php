@@ -2654,11 +2654,11 @@ class PhpDocParserTest extends TestCase
 	}
 
 	/**
-	 * @return array<mixed>
+	 * @return iterable<array<mixed>>
 	 */
-	public function provideMultiLinePhpDocData(): array
+	public function provideMultiLinePhpDocData(): iterable
 	{
-		return [
+		yield from [
 			[
 				'multi-line with two tags',
 				'/**
@@ -3559,6 +3559,40 @@ some text in the middle'
 					),
 				]),
 			],
+		];
+
+		yield [
+			'Empty lines before end',
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'Empty lines before end 2',
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * test' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('test'),
+			]),
 		];
 	}
 
