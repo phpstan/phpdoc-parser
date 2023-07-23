@@ -6843,6 +6843,19 @@ Finder::findFiles('*.php')
 			' * Real description' . PHP_EOL .
 			' * @param int $a test' . PHP_EOL .
 			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Real description'),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'test')),
+				new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * Real description' . PHP_EOL .
+			' * @param int $a test' . PHP_EOL .
+			' *' . PHP_EOL .
 			' *' . PHP_EOL .
 			' */',
 			new PhpDocNode([
