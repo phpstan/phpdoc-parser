@@ -214,9 +214,11 @@ class PhpDocParser
 	{
 		$text = '';
 
+		$endTokens = [Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
+
 		// if the next token is EOL, everything below is skipped and empty string is returned
 		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(...$endTokens);
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
@@ -228,7 +230,7 @@ class PhpDocParser
 
 			// if we're at EOL, check what's next
 			// if next is a PHPDoc tag, EOL, or end of PHPDoc, stop
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)) {
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, ...$endTokens)) {
 				$tokens->rollback();
 				break;
 			}
@@ -247,9 +249,11 @@ class PhpDocParser
 	{
 		$text = '';
 
+		$endTokens = [Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
+
 		// if the next token is EOL, everything below is skipped and empty string is returned
 		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
-			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END);
+			$text .= $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, ...$endTokens);
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
@@ -291,7 +295,7 @@ class PhpDocParser
 
 			// if we're at EOL, check what's next
 			// if next is a PHPDoc tag, EOL, or end of PHPDoc, stop
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END)) {
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_TAG, Lexer::TOKEN_DOCTRINE_TAG, ...$endTokens)) {
 				$tokens->rollback();
 				break;
 			}
