@@ -30,6 +30,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\SpacelessPhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
@@ -197,6 +198,10 @@ final class Printer
 		if ($node instanceof PhpDocTagNode) {
 			if ($node->value instanceof DoctrineTagValueNode) {
 				return $this->print($node->value);
+			}
+
+			if ($node instanceof SpacelessPhpDocTagNode) {
+				return trim(sprintf('%s%s', $node->name, $this->print($node->value)));
 			}
 
 			return trim(sprintf('%s %s', $node->name, $this->print($node->value)));
