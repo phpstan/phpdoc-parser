@@ -23,6 +23,9 @@ class ConstExprParser
 	/** @var bool */
 	private $useIndexAttributes;
 
+	/** @var bool */
+	private $parseDoctrineStrings;
+
 	/**
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
 	 */
@@ -36,6 +39,24 @@ class ConstExprParser
 		$this->quoteAwareConstExprString = $quoteAwareConstExprString;
 		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
 		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
+		$this->parseDoctrineStrings = false;
+	}
+
+	/**
+	 * @internal
+	 */
+	public function toDoctrine(): self
+	{
+		$self = new self(
+			$this->unescapeStrings,
+			$this->quoteAwareConstExprString,
+			[
+				'lines' => $this->useLinesAttributes,
+				'indexes' => $this->useIndexAttributes,
+			]
+		);
+		$self->parseDoctrineStrings = true;
+		return $self;
 	}
 
 	public function parse(TokenIterator $tokens, bool $trimStrings = false): Ast\ConstExpr\ConstExprNode
@@ -66,7 +87,41 @@ class ConstExprParser
 			);
 		}
 
+		if ($this->parseDoctrineStrings && $tokens->isCurrentTokenType(Lexer::TOKEN_DOCTRINE_ANNOTATION_STRING)) {
+			$value = $tokens->currentTokenValue();
+			$tokens->next();
+
+			return $this->enrichWithAttributes(
+				$tokens,
+				new Ast\ConstExpr\DoctrineConstExprStringNode(Ast\ConstExpr\DoctrineConstExprStringNode::unescape($value)),
+				$startLine,
+				$startIndex
+			);
+		}
+
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING, Lexer::TOKEN_DOUBLE_QUOTED_STRING)) {
+			if ($this->parseDoctrineStrings) {
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {
+					throw new ParserException(
+						$tokens->currentTokenValue(),
+						$tokens->currentTokenType(),
+						$tokens->currentTokenOffset(),
+						Lexer::TOKEN_DOUBLE_QUOTED_STRING,
+						null,
+						$tokens->currentTokenLine()
+					);
+				}
+
+				$value = $tokens->currentTokenValue();
+				$tokens->next();
+
+				return $this->enrichWithAttributes(
+					$tokens,
+					$this->parseDoctrineString($value, $tokens),
+					$startLine,
+					$startIndex
+				);
+			}
 			$value = $tokens->currentTokenValue();
 			$type = $tokens->currentTokenType();
 			if ($trimStrings) {
@@ -211,6 +266,19 @@ class ConstExprParser
 			$startLine,
 			$startIndex
 		);
+	}
+
+
+	public function parseDoctrineString(string $value, TokenIterator $tokens): Ast\ConstExpr\DoctrineConstExprStringNode
+	{
+		$text = $value;
+
+		while ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING, Lexer::TOKEN_DOCTRINE_ANNOTATION_STRING)) {
+			$text .= $tokens->currentTokenValue();
+			$tokens->next();
+		}
+
+		return new Ast\ConstExpr\DoctrineConstExprStringNode(Ast\ConstExpr\DoctrineConstExprStringNode::unescape($text));
 	}
 
 

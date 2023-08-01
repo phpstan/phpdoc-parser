@@ -10,7 +10,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
-use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\DoctrineConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
@@ -5445,8 +5445,8 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@ORM\Mapping\JoinColumn',
 					new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Mapping\JoinColumn', [
-						new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('column_id')),
-						new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new ConstExprStringNode('id')),
+						new DoctrineArgument(new IdentifierTypeNode('name'), new DoctrineConstExprStringNode('column_id')),
+						new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new DoctrineConstExprStringNode('id')),
 					]), '')
 				),
 			]),
@@ -6041,6 +6041,141 @@ Finder::findFiles('*.php')
 			null,
 			[new Doctrine\X()],
 		];
+
+		$apiResource = new Doctrine\ApiResource();
+		$apiResource->itemOperations = [
+			'get' => [
+				'security' => 'is_granted(' . PHP_EOL .
+					"constant('REDACTED')," . PHP_EOL .
+					'object' . PHP_EOL . ')',
+				'normalization_context' => [
+					'groups' => ['Redacted:read'],
+				],
+			],
+		];
+		yield [
+			'Regression test for issue #207',
+			'/**' . PHP_EOL .
+			' * @ApiResource(' . PHP_EOL .
+			' *     itemOperations={' . PHP_EOL .
+			' *         "get"={' . PHP_EOL .
+			' *             "security"="is_granted(' . PHP_EOL .
+			"constant('REDACTED')," . PHP_EOL .
+			'object' . PHP_EOL .
+			')",' . PHP_EOL .
+			' *              "normalization_context"={"groups"={"Redacted:read"}}' . PHP_EOL .
+			' *         }' . PHP_EOL .
+			' *     }' . PHP_EOL .
+			' * )' . PHP_EOL .
+			'  */',
+			new PhpDocNode([
+				new PhpDocTagNode('@ApiResource', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@ApiResource', [
+						new DoctrineArgument(new IdentifierTypeNode('itemOperations'), new DoctrineArray([
+							new DoctrineArrayItem(
+								new DoctrineConstExprStringNode('get'),
+								new DoctrineArray([
+									new DoctrineArrayItem(
+										new DoctrineConstExprStringNode('security'),
+										new DoctrineConstExprStringNode('is_granted(' . PHP_EOL .
+											"constant('REDACTED')," . PHP_EOL .
+											'object' . PHP_EOL .
+											')')
+									),
+									new DoctrineArrayItem(
+										new DoctrineConstExprStringNode('normalization_context'),
+										new DoctrineArray([
+											new DoctrineArrayItem(
+												new DoctrineConstExprStringNode('groups'),
+												new DoctrineArray([
+													new DoctrineArrayItem(null, new DoctrineConstExprStringNode('Redacted:read')),
+												])
+											),
+										])
+									),
+								])
+							),
+						])),
+					]),
+					''
+				)),
+			]),
+			null,
+			null,
+			[$apiResource],
+		];
+
+		$xWithString = new Doctrine\X();
+		$xWithString->a = '"bar"';
+		yield [
+			'Escaped strings',
+			'/** @X(a="""bar""") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@X', [
+						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString->a)),
+					]),
+					''
+				)),
+			]),
+			null,
+			null,
+			[$xWithString],
+		];
+
+		$xWithString2 = new Doctrine\X();
+		$xWithString2->a = 'Allowed choices are "bar" or "baz".';
+		yield [
+			'Escaped strings 2',
+			'/** @X(a="Allowed choices are ""bar"" or ""baz"".") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@X', [
+						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString2->a)),
+					]),
+					''
+				)),
+			]),
+			null,
+			null,
+			[$xWithString2],
+		];
+
+		$xWithString3 = new Doctrine\X();
+		$xWithString3->a = 'In PHP, "" is an empty string';
+		yield [
+			'Escaped strings 3',
+			'/** @X(a="In PHP, """" is an empty string") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@X', [
+						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString3->a)),
+					]),
+					''
+				)),
+			]),
+			null,
+			null,
+			[$xWithString3],
+		];
+
+		$xWithString4 = new Doctrine\X();
+		$xWithString4->a = '"May the Force be with you," he said.';
+		yield [
+			'Escaped strings 4',
+			'/** @X(a="""May the Force be with you,"" he said.") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@X', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@X', [
+						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString4->a)),
+					]),
+					''
+				)),
+			]),
+			null,
+			null,
+			[$xWithString4],
+		];
 	}
 
 	public function provideDoctrineWithoutDoctrineCheckData(): Iterator
@@ -6051,7 +6186,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@DummyAnnotation', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@DummyAnnotation', [
-						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new ConstExprStringNode('hello')),
+						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new DoctrineConstExprStringNode('hello')),
 					]),
 					''
 				)),
@@ -6069,17 +6204,17 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@DummyJoinTable', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@DummyJoinTable', [
-						new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('join_table')),
+						new DoctrineArgument(new IdentifierTypeNode('name'), new DoctrineConstExprStringNode('join_table')),
 						new DoctrineArgument(new IdentifierTypeNode('joinColumns'), new DoctrineArray([
 							new DoctrineArrayItem(null, new DoctrineAnnotation('@DummyJoinColumn', [
-								new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('col1')),
-								new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new ConstExprStringNode('col2')),
+								new DoctrineArgument(new IdentifierTypeNode('name'), new DoctrineConstExprStringNode('col1')),
+								new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new DoctrineConstExprStringNode('col2')),
 							])),
 						])),
 						new DoctrineArgument(new IdentifierTypeNode('inverseJoinColumns'), new DoctrineArray([
 							new DoctrineArrayItem(null, new DoctrineAnnotation('@DummyJoinColumn', [
-								new DoctrineArgument(new IdentifierTypeNode('name'), new ConstExprStringNode('col3')),
-								new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new ConstExprStringNode('col4')),
+								new DoctrineArgument(new IdentifierTypeNode('name'), new DoctrineConstExprStringNode('col3')),
+								new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new DoctrineConstExprStringNode('col4')),
 							])),
 						])),
 					]),
@@ -6107,7 +6242,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@DummyAnnotation', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@DummyAnnotation', [
-						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new ConstExprStringNode('bar')),
+						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new DoctrineConstExprStringNode('bar')),
 					]),
 					''
 				)),
@@ -6124,7 +6259,7 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@DummyId', new GenericTagValueNode('')),
 				new PhpDocTagNode('@DummyColumn', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@DummyColumn', [
-						new DoctrineArgument(new IdentifierTypeNode('type'), new ConstExprStringNode('integer')),
+						new DoctrineArgument(new IdentifierTypeNode('type'), new DoctrineConstExprStringNode('integer')),
 					]),
 					''
 				)),
@@ -6164,7 +6299,7 @@ Finder::findFiles('*.php')
 							new DoctrineArrayItem(null, new ConstExprIntegerNode('1')),
 							new DoctrineArrayItem(null, new ConstExprIntegerNode('2')),
 							new DoctrineArrayItem(null, new DoctrineArray([
-								new DoctrineArrayItem(new QuoteAwareConstExprStringNode('key', QuoteAwareConstExprStringNode::DOUBLE_QUOTED), new DoctrineAnnotation(
+								new DoctrineArrayItem(new DoctrineConstExprStringNode('key'), new DoctrineAnnotation(
 									'@Name',
 									[]
 								)),
@@ -6229,19 +6364,13 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@Name', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@Name', [
 						new DoctrineArgument(null, new DoctrineArray([
-							new DoctrineArrayItem(new QuoteAwareConstExprStringNode('foo', QuoteAwareConstExprStringNode::DOUBLE_QUOTED), new ConstExprStringNode('bar')),
+							new DoctrineArrayItem(new DoctrineConstExprStringNode('foo'), new DoctrineConstExprStringNode('bar')),
 						])),
 					]),
 					''
 				)),
 			]),
 		];
-
-		//yield [
-		//	'Escaped strings',
-		//	'/** @Doctrine\Tests\Common\Annotations\Name(foo="""bar""") */',
-		//	new PhpDocNode([]),
-		//];
 
 		yield [
 			'More tags on the same line with description inbetween, second Doctrine one cannot have parse error',

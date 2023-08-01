@@ -7,6 +7,7 @@ parameters:
 		- tests
 	excludePaths:
 		- tests/PHPStan/*/data/*
+		- tests/PHPStan/Parser/Doctrine/ApiResource.php
 	level: 8
 	ignoreErrors:
 		- '#^Dynamic call to static method PHPUnit\\Framework\\Assert#'
