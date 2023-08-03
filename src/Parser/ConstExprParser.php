@@ -273,10 +273,8 @@ class ConstExprParser
 	 * This method is supposed to be called with TokenIterator after reading TOKEN_DOUBLE_QUOTED_STRING and shifting
 	 * to the next token.
 	 */
-	public function parseDoctrineString(string $value, TokenIterator $tokens): Ast\ConstExpr\DoctrineConstExprStringNode
+	public function parseDoctrineString(string $text, TokenIterator $tokens): Ast\ConstExpr\DoctrineConstExprStringNode
 	{
-		$text = $value;
-
 		// Because of how Lexer works, a valid Doctrine string
 		// can consist of a sequence of TOKEN_DOUBLE_QUOTED_STRING and TOKEN_DOCTRINE_ANNOTATION_STRING
 		while ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_QUOTED_STRING, Lexer::TOKEN_DOCTRINE_ANNOTATION_STRING)) {
