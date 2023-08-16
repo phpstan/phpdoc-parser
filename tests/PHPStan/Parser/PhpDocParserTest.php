@@ -6448,6 +6448,24 @@ Finder::findFiles('*.php')
 				)),
 			]),
 		];
+
+		yield [
+			'Slevomat CS issue #1608',
+			'/**' . PHP_EOL .
+			' * `"= "`' . PHP_EOL .
+			' * a' . PHP_EOL .
+			' * "' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @package foo' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('`"= "`' . PHP_EOL .
+					' * a' . PHP_EOL .
+					' * "'),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@package', new GenericTagValueNode('foo')),
+			]),
+		];
 	}
 
 	public function provideSpecializedTags(): Iterator
@@ -7077,6 +7095,23 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' * `"= "`' . PHP_EOL .
+			' * a' . PHP_EOL .
+			' * "' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @package foo' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('`"= "`' . PHP_EOL .
+					' * a' . PHP_EOL .
+					' * "'),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@package', new GenericTagValueNode('foo')),
 			]),
 		];
 	}
