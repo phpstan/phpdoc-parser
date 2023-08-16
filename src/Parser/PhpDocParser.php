@@ -682,24 +682,34 @@ class PhpDocParser
 			$tokens->dropSavePoint(); // because of ConstFetchNode
 		}
 
-		$exception = new ParserException(
-			$tokens->currentTokenValue(),
-			$tokens->currentTokenType(),
-			$tokens->currentTokenOffset(),
-			Lexer::TOKEN_IDENTIFIER,
-			null,
-			$tokens->currentTokenLine()
-		);
+		$currentTokenValue = $tokens->currentTokenValue();
+		$currentTokenType = $tokens->currentTokenType();
+		$currentTokenOffset = $tokens->currentTokenOffset();
+		$currentTokenLine = $tokens->currentTokenLine();
 
 		try {
 			$constExpr = $this->doctrineConstantExprParser->parse($tokens, true);
 			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
-				throw $exception;
+				throw new ParserException(
+					$currentTokenValue,
+					$currentTokenType,
+					$currentTokenOffset,
+					Lexer::TOKEN_IDENTIFIER,
+					null,
+					$currentTokenLine
+				);
 			}
 
 			return $constExpr;
 		} catch (LogicException $e) {
-			throw $exception;
+			throw new ParserException(
+				$currentTokenValue,
+				$currentTokenType,
+				$currentTokenOffset,
+				Lexer::TOKEN_IDENTIFIER,
+				null,
+				$currentTokenLine
+			);
 		}
 	}
 
