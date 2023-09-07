@@ -4563,21 +4563,56 @@ some text in the middle'
 		];
 
 		yield [
-			'invalid $this',
+			'OK $this',
 			'/** @phpstan-assert Type $this */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-assert',
-					new InvalidTagValueNode(
-						'Type $this',
-						new ParserException(
-							'*/',
-							Lexer::TOKEN_CLOSE_PHPDOC,
-							31,
-							Lexer::TOKEN_ARROW,
-							null,
-							1
-						)
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$this',
+						false,
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK $this with description',
+			'/** @phpstan-assert Type $this assert Type to $this */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new IdentifierTypeNode('Type'),
+						'$this',
+						false,
+						'assert Type to $this'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK $this with generic type',
+			'/** @phpstan-assert GenericType<T> $this */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-assert',
+					new AssertTagValueNode(
+						new GenericTypeNode(
+							new IdentifierTypeNode('GenericType'),
+							[
+								new IdentifierTypeNode('T'),
+							],
+							[
+								GenericTypeNode::VARIANCE_INVARIANT,
+							]
+						),
+						'$this',
+						false,
+						''
 					)
 				),
 			]),
