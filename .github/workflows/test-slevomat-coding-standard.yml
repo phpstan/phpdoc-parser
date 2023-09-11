@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Checkout Slevomat Coding Standard"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: slevomat/coding-standard
           path: slevomat-cs
