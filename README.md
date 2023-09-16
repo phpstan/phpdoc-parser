@@ -119,3 +119,8 @@ Afterwards you can either run the whole build including linting and coding stand
 or run only tests using
 
     make tests
+
+## Ecosystem
+
+The following project is inspired by this library
+- [@rightcapital/php-parser](https://github.com/RightCapitalHQ/phpdoc-parser) - PHP Parser TypeScript version
