@@ -1127,15 +1127,13 @@ class PhpDocParser
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
 			$parameter = '$this';
-			$requirePropertyOrMethod = true;
 			$tokens->next();
 		} else {
 			$parameter = $tokens->currentTokenValue();
-			$requirePropertyOrMethod = false;
 			$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
 		}
 
-		if ($requirePropertyOrMethod || $tokens->isCurrentTokenType(Lexer::TOKEN_ARROW)) {
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_ARROW)) {
 			$tokens->consumeTokenType(Lexer::TOKEN_ARROW);
 
 			$propertyOrMethod = $tokens->currentTokenValue();

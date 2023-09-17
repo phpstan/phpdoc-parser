@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use LogicException;
+use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function array_pop;
 use function assert;
@@ -17,6 +18,9 @@ class TokenIterator
 	/** @var list<array{string, int, int}> */
 	private $tokens;
 
+	/** @var array<Comment> */
+	private $comments = [];
+
 	/** @var int */
 	private $index;
 
@@ -24,7 +28,9 @@ class TokenIterator
 	private $savePoints = [];
 
 	/** @var list<int> */
-	private $skippedTokenTypes = [Lexer::TOKEN_HORIZONTAL_WS];
+	private $skippedTokenTypes = [
+		Lexer::TOKEN_HORIZONTAL_WS,
+		Lexer::TOKEN_COMMENT];
 
 	/** @var string|null */
 	private $newline = null;
@@ -154,8 +160,7 @@ class TokenIterator
 			}
 		}
 
-		$this->index++;
-		$this->skipIrrelevantTokens();
+		$this->next();
 	}
 
 
@@ -168,8 +173,7 @@ class TokenIterator
 			$this->throwError($tokenType, $tokenValue);
 		}
 
-		$this->index++;
-		$this->skipIrrelevantTokens();
+		$this->next();
 	}
 
 
@@ -180,12 +184,30 @@ class TokenIterator
 			return false;
 		}
 
-		$this->index++;
-		$this->skipIrrelevantTokens();
+		$this->next();
 
 		return true;
 	}
 
+	/**
+	 * @return Comment[]
+	 */
+	public function flushComments(): array
+	{
+		$res = $this->comments;
+		$this->comments = [];
+		return $res;
+	}
+
+	/** @phpstan-impure */
+	public function tryConsumeTokenTypeAll(int $tokenType): bool
+	{
+		$found = false;
+		while ($this->tryConsumeTokenType($tokenType)) {
+			$found = true;
+		}
+		return $found;
+	}
 
 	/** @phpstan-impure */
 	public function tryConsumeTokenType(int $tokenType): bool
@@ -200,8 +222,7 @@ class TokenIterator
 			}
 		}
 
-		$this->index++;
-		$this->skipIrrelevantTokens();
+		$this->next();
 
 		return true;
 	}
@@ -256,6 +277,11 @@ class TokenIterator
 			if (!isset($this->tokens[$this->index + 1])) {
 				break;
 			}
+
+			if ($this->currentTokenType() === Lexer::TOKEN_COMMENT) {
+				$this->comments[] = new Comment($this->currentTokenValue(), $this->currentTokenLine(), $this->currentTokenIndex());
+			}
+
 			$this->index++;
 		}
 	}
@@ -298,7 +324,6 @@ class TokenIterator
 		assert($index !== null);
 		$this->index = $index;
 	}
-
 
 	/**
 	 * @throws ParserException

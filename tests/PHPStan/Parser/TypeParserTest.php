@@ -86,13 +86,11 @@ class TypeParserTest extends TestCase
 		$this->assertPrintedNode($typeNode, (string) $typeNode);
 	}
 
-
 	private function assertPrintedNodeViaPrinter(TypeNode $typeNode): void
 	{
 		$printer = new Printer();
 		$this->assertPrintedNode($typeNode, $printer->print($typeNode));
 	}
-
 
 	private function assertPrintedNode(TypeNode $typeNode, string $typeNodeString): void
 	{
@@ -102,7 +100,6 @@ class TypeParserTest extends TestCase
 		$this->assertInstanceOf(get_class($typeNode), $parsedAgainTypeNode);
 		$this->assertEquals($typeNode, $parsedAgainTypeNode);
 	}
-
 
 	/**
 	 * @dataProvider provideParseData
@@ -115,7 +112,7 @@ class TypeParserTest extends TestCase
 			$this->expectExceptionMessage($expectedResult->getMessage());
 		}
 
-		$usedAttributes = ['lines' => true, 'indexes' => true];
+		$usedAttributes = ['lines' => true, 'indexes' => true, 'comments' => true];
 		$typeParser = new TypeParser(new ConstExprParser(true, true, $usedAttributes), true, $usedAttributes);
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 
@@ -138,6 +135,61 @@ class TypeParserTest extends TestCase
 	public function provideParseData(): array
 	{
 		return [
+			[
+				'array{
+					// a is for apple
+					a: int,
+				}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'array{
+					// a is for apple
+					// a is also for awesome
+					a: int,
+				}',
+				new ArrayShapeNode([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int')
+					),
+				]),
+			],
+			[
+				'string',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				'  string  ',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				' ( string ) ',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				'( ( string ) )',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				'\\Foo\Bar\\Baz',
+				new IdentifierTypeNode('\\Foo\Bar\\Baz'),
+			],
+			[
+				'  \\Foo\Bar\\Baz  ',
+				new IdentifierTypeNode('\\Foo\Bar\\Baz'),
+			],
+			[
+				' ( \\Foo\Bar\\Baz ) ',
+				new IdentifierTypeNode('\\Foo\Bar\\Baz'),
+			],
 			[
 				'string',
 				new IdentifierTypeNode('string'),
@@ -356,7 +408,11 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
-				'array<int, Foo\\Bar>',
+				'array<
+					// index with an int
+					int,
+					Foo\\Bar
+				>',
 				new GenericTypeNode(
 					new IdentifierTypeNode('array'),
 					[
@@ -1385,7 +1441,13 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
-				'(Foo is Bar ? never : int)',
+				'(
+					Foo is Bar
+					?
+					// never, I say
+					never
+					:
+					int)',
 				new ConditionalTypeNode(
 					new IdentifierTypeNode('Foo'),
 					new IdentifierTypeNode('Bar'),
@@ -1866,6 +1928,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'object{
+					// a is for apple
 				 	a: int,
 				 }',
 				new ObjectShapeNode([
@@ -1873,24 +1936,6 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('a'),
 						false,
 						new IdentifierTypeNode('int')
-					),
-				]),
-			],
-			[
-				'object{
-				 	a: int,
-				 	b: string,
-				 }',
-				new ObjectShapeNode([
-					new ObjectShapeItemNode(
-						new IdentifierTypeNode('a'),
-						false,
-						new IdentifierTypeNode('int')
-					),
-					new ObjectShapeItemNode(
-						new IdentifierTypeNode('b'),
-						false,
-						new IdentifierTypeNode('string')
 					),
 				]),
 			],
@@ -2153,6 +2198,18 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Lorem'),
 					]),
 				]),
+			],
+			[
+				'Closure(Container):($serviceId is class-string<TService> ? TService : mixed)',
+				new CallableTypeNode(new IdentifierTypeNode('Closure'), [
+					new CallableTypeParameterNode(new IdentifierTypeNode('Container'), false, false, '', false),
+				], new ConditionalTypeForParameterNode(
+					'$serviceId',
+					new GenericTypeNode(new IdentifierTypeNode('class-string'), [new IdentifierTypeNode('TService')], ['invariant']),
+					new IdentifierTypeNode('TService'),
+					new IdentifierTypeNode('mixed'),
+					false
+				)),
 			],
 		];
 	}
