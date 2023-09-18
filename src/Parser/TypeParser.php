@@ -415,6 +415,7 @@ class TypeParser
 			$isFirst = false;
 
 			[$genericTypes[], $variances[]] = $this->parseGenericTypeArgument($tokens);
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		}
 
 		$type = new Ast\Type\GenericTypeNode($baseType, $genericTypes, $variances);
@@ -422,7 +423,6 @@ class TypeParser
 			$type = $this->enrichWithAttributes($tokens, $type, $startLine, $startIndex);
 		}
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 
 		return $type;
