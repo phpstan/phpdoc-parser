@@ -2165,7 +2165,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('mixed'),
 					false
 				)),
-			]
+			],
 		];
 	}
 
