@@ -2154,6 +2154,18 @@ class TypeParserTest extends TestCase
 					]),
 				]),
 			],
+			[
+				'Closure(Container):($serviceId is class-string<TService> ? TService : mixed)',
+				new CallableTypeNode(new IdentifierTypeNode('Closure'), [
+					new CallableTypeParameterNode(new IdentifierTypeNode('Container'), false, false, '', false),
+				], new ConditionalTypeForParameterNode(
+					'$serviceId',
+					new GenericTypeNode(new IdentifierTypeNode('class-string'), [new IdentifierTypeNode('TService')], ['invariant']),
+					new IdentifierTypeNode('TService'),
+					new IdentifierTypeNode('mixed'),
+					false
+				)),
+			]
 		];
 	}
 
