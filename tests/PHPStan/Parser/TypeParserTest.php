@@ -15,6 +15,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeTemplateNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
@@ -895,6 +896,104 @@ class TypeParserTest extends TestCase
 						),
 					],
 					new IdentifierTypeNode('Foo')
+				),
+			],
+			[
+				'callable<A>(B): C',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('B'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new IdentifierTypeNode('C'),
+					[
+						new CallableTypeTemplateNode(new IdentifierTypeNode('A'), null),
+					]
+				),
+			],
+			[
+				'callable<>(): void',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_END,
+					9,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'Closure<T of Model>(T, int): (T|false)',
+				new CallableTypeNode(
+					new IdentifierTypeNode('Closure'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('T'),
+							false,
+							false,
+							'',
+							false
+						),
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('int'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new UnionTypeNode([
+						new IdentifierTypeNode('T'),
+						new IdentifierTypeNode('false'),
+					]),
+					[
+						new CallableTypeTemplateNode(new IdentifierTypeNode('T'), new IdentifierTypeNode('Model')),
+					]
+				),
+			],
+			[
+				'\Closure<Tx of X|Z, Ty of Y>(Tx, Ty): array{ Ty, Tx }',
+				new CallableTypeNode(
+					new IdentifierTypeNode('\Closure'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('Tx'),
+							false,
+							false,
+							'',
+							false
+						),
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('Ty'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new ArrayShapeNode([
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('Ty')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('Tx')
+						),
+					]),
+					[
+						new CallableTypeTemplateNode(new IdentifierTypeNode('Tx'), new UnionTypeNode([
+							new IdentifierTypeNode('X'),
+							new IdentifierTypeNode('Z'),
+						])),
+						new CallableTypeTemplateNode(new IdentifierTypeNode('Ty'), new IdentifierTypeNode('Y')),
+					]
 				),
 			],
 			[

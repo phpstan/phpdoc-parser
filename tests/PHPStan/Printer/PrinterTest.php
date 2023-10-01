@@ -28,6 +28,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\CallableTypeTemplateNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
@@ -588,6 +589,34 @@ class PrinterTest extends TestCase
 			}
 
 		};
+
+		$addCallableTemplateType = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof CallableTypeNode) {
+					$node->templates[] = new CallableTypeTemplateNode(
+						new IdentifierTypeNode('T'),
+						new IdentifierTypeNode('int')
+					);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @var Closure(): T */',
+			'/** @var Closure<T of int>(): T */',
+			$addCallableTemplateType,
+		];
+
+		yield [
+			'/** @var \Closure<U>(U): T */',
+			'/** @var \Closure<U, T of int>(U): T */',
+			$addCallableTemplateType,
+		];
 
 		yield [
 			'/**

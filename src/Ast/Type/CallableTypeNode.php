@@ -13,6 +13,9 @@ class CallableTypeNode implements TypeNode
 	/** @var IdentifierTypeNode */
 	public $identifier;
 
+	/** @var CallableTypeTemplateNode[] */
+	public $templates;
+
 	/** @var CallableTypeParameterNode[] */
 	public $parameters;
 
@@ -21,12 +24,14 @@ class CallableTypeNode implements TypeNode
 
 	/**
 	 * @param CallableTypeParameterNode[] $parameters
+	 * @param CallableTypeTemplateNode[]  $templates
 	 */
-	public function __construct(IdentifierTypeNode $identifier, array $parameters, TypeNode $returnType)
+	public function __construct(IdentifierTypeNode $identifier, array $parameters, TypeNode $returnType, array $templates = [])
 	{
 		$this->identifier = $identifier;
 		$this->parameters = $parameters;
 		$this->returnType = $returnType;
+		$this->templates = $templates;
 	}
 
 
@@ -36,8 +41,11 @@ class CallableTypeNode implements TypeNode
 		if ($returnType instanceof self) {
 			$returnType = "({$returnType})";
 		}
+		$template = $this->templates !== []
+			? '<' . implode(', ', $this->templates) . '>'
+			: '';
 		$parameters = implode(', ', $this->parameters);
-		return "{$this->identifier}({$parameters}): {$returnType}";
+		return "{$this->identifier}{$template}({$parameters}): {$returnType}";
 	}
 
 }

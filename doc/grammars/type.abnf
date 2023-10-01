@@ -35,7 +35,13 @@ GenericTypeArgument
     / TokenWildcard
 
 Callable
-	= TokenParenthesesOpen [CallableParameters] TokenParenthesesClose TokenColon CallableReturnType
+	= [CallableTemplate] TokenParenthesesOpen [CallableParameters] TokenParenthesesClose TokenColon CallableReturnType
+
+CallableTemplate
+	= TokenAngleBracketOpen CallableTemplateArgument *(TokenComma CallableTemplateArgument) TokenAngleBracketClose
+
+CallableTemplateArgument
+    = TokenIdentifier [1*ByteHorizontalWs TokenOf Type]
 
 CallableParameters
 	= CallableParameter *(TokenComma CallableParameter)
@@ -192,6 +198,9 @@ TokenIs
 TokenNot
 	= %s"not" 1*ByteHorizontalWs
 
+TokenOf
+	= %s"of" 1*ByteHorizontalWs
+
 TokenContravariant
     = %s"contravariant" 1*ByteHorizontalWs
 
@@ -211,7 +220,7 @@ TokenIdentifier
 
 ByteHorizontalWs
 	= %x09 ; horizontal tab
-	/ %x20 ; space
+	/ " "
 
 ByteNumberSign
 	= "+"
@@ -238,11 +247,8 @@ ByteIdentifierFirst
 	/ %x80-FF
 
 ByteIdentifierSecond
-	= %x30-39 ; 0-9
-	/ %x41-5A ; A-Z
-	/ "_"
-	/ %x61-7A ; a-z
-	/ %x80-FF
+	= ByteIdentifierFirst
+	/ %x30-39 ; 0-9
 
 ByteSingleQuote
 	= %x27    ; '

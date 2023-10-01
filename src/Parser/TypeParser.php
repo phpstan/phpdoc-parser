@@ -162,13 +162,17 @@ class TypeParser
 						return $type;
 					}
 
-					$type = $this->parseGeneric($tokens, $type);
+					$origType = $type;
+					$type = $this->tryParseCallable($tokens, $type, true);
+					if ($type === $origType) {
+						$type = $this->parseGeneric($tokens, $type);
 
-					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
-						$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
+						if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
+							$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
+						}
 					}
 				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-					$type = $this->tryParseCallable($tokens, $type);
+					$type = $this->tryParseCallable($tokens, $type, false);
 
 				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 					$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
@@ -458,8 +462,12 @@ class TypeParser
 
 
 	/** @phpstan-impure */
-	private function parseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
+	private function parseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier, bool $hasTemplate): Ast\Type\TypeNode
 	{
+		$templates = $hasTemplate
+			? $this->parseCallableTemplates($tokens)
+			: [];
+
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
@@ -484,7 +492,65 @@ class TypeParser
 		$startIndex = $tokens->currentTokenIndex();
 		$returnType = $this->enrichWithAttributes($tokens, $this->parseCallableReturnType($tokens), $startLine, $startIndex);
 
-		return new Ast\Type\CallableTypeNode($identifier, $parameters, $returnType);
+		return new Ast\Type\CallableTypeNode($identifier, $parameters, $returnType, $templates);
+	}
+
+
+	/**
+	 * @return Ast\Type\CallableTypeTemplateNode[]
+	 *
+	 * @phpstan-impure
+	 */
+	private function parseCallableTemplates(TokenIterator $tokens): array
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
+
+		$templates = [];
+
+		$isFirst = true;
+		while ($isFirst || $tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+			// trailing comma case
+			if (!$isFirst && $tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
+				break;
+			}
+			$isFirst = false;
+
+			$templates[] = $this->parseCallableTemplateArgument($tokens);
+			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		}
+
+		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
+
+		return $templates;
+	}
+
+
+	private function parseCallableTemplateArgument(TokenIterator $tokens): Ast\Type\CallableTypeTemplateNode
+	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+
+		$identifier = $this->enrichWithAttributes(
+			$tokens,
+			new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue()),
+			$startLine,
+			$startIndex
+		);
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		$bound = null;
+		if ($tokens->tryConsumeTokenValue('of')) {
+			$bound = $this->parse($tokens);
+		}
+
+		return $this->enrichWithAttributes(
+			$tokens,
+			new Ast\Type\CallableTypeTemplateNode($identifier, $bound),
+			$startLine,
+			$startIndex
+		);
 	}
 
 
@@ -662,11 +728,11 @@ class TypeParser
 
 
 	/** @phpstan-impure */
-	private function tryParseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier): Ast\Type\TypeNode
+	private function tryParseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier, bool $hasTemplate): Ast\Type\TypeNode
 	{
 		try {
 			$tokens->pushSavePoint();
-			$type = $this->parseCallable($tokens, $identifier);
+			$type = $this->parseCallable($tokens, $identifier, $hasTemplate);
 			$tokens->dropSavePoint();
 
 		} catch (ParserException $e) {
