@@ -117,6 +117,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideParamOutTagsData
 	 * @dataProvider provideDoctrineData
 	 * @dataProvider provideDoctrineWithoutDoctrineCheckData
+	 * @dataProvider provideCommentLikeDescriptions
 	 */
 	public function testParse(
 		string $label,
@@ -5557,6 +5558,98 @@ Finder::findFiles('*.php')
 						'description'
 					)
 				),
+			]),
+		];
+	}
+
+	public function provideCommentLikeDescriptions(): Iterator
+	{
+		yield [
+			'Comment after @param',
+			'/** @param int $a // this is a description */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					'// this is a description'
+				)),
+			]),
+		];
+
+		yield [
+			'Comment on a separate line',
+			'/**' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' * // this is a comment' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					''
+				)),
+				new PhpDocTextNode('// this is a comment'),
+			]),
+		];
+		yield [
+			'Comment on a separate line 2',
+			'/**' . PHP_EOL .
+			' * @param int $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * // this is a comment' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					''
+				)),
+				new PhpDocTextNode(''),
+				new PhpDocTextNode('// this is a comment'),
+			]),
+		];
+		yield [
+			'Comment after Doctrine tag 1',
+			'/** @ORM\Doctrine // this is a description */',
+			new PhpDocNode([
+				new PhpDocTagNode('@ORM\Doctrine', new GenericTagValueNode('// this is a description')),
+			]),
+		];
+		yield [
+			'Comment after Doctrine tag 2',
+			'/** @\ORM\Doctrine // this is a description */',
+			new PhpDocNode([
+				new PhpDocTagNode('@\ORM\Doctrine', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@\ORM\Doctrine', []),
+					'// this is a description'
+				)),
+			]),
+		];
+		yield [
+			'Comment after Doctrine tag 3',
+			'/** @\ORM\Doctrine() // this is a description */',
+			new PhpDocNode([
+				new PhpDocTagNode('@\ORM\Doctrine', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@\ORM\Doctrine', []),
+					'// this is a description'
+				)),
+			]),
+		];
+		yield [
+			'Comment after Doctrine tag 4',
+			'/** @\ORM\Doctrine() @\ORM\Entity() // this is a description */',
+			new PhpDocNode([
+				new PhpDocTagNode('@\ORM\Doctrine', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@\ORM\Doctrine', []),
+					''
+				)),
+				new PhpDocTagNode('@\ORM\Entity', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@\ORM\Entity', []),
+					'// this is a description'
+				)),
 			]),
 		];
 	}
