@@ -7,7 +7,9 @@ use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function in_array;
 use function str_replace;
+use function strlen;
 use function strpos;
+use function substr_compare;
 use function trim;
 
 class TypeParser
@@ -380,10 +382,16 @@ class TypeParser
 			return false;
 		}
 
+		$endTag = '</' . $htmlTagName . '>';
+		$endTagSearchOffset = - strlen($endTag);
+
 		while (!$tokens->isCurrentTokenType(Lexer::TOKEN_END)) {
 			if (
-				$tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)
-				&& strpos($tokens->currentTokenValue(), '/' . $htmlTagName . '>') !== false
+				(
+					$tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)
+					&& strpos($tokens->currentTokenValue(), '/' . $htmlTagName . '>') !== false
+				)
+				|| substr_compare($tokens->currentTokenValue(), $endTag, $endTagSearchOffset) === 0
 			) {
 				return true;
 			}

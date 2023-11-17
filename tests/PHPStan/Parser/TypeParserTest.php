@@ -2166,6 +2166,11 @@ class TypeParserTest extends TestCase
 					false
 				)),
 			],
+			[
+				'MongoCollection <p>Returns a collection object representing the new collection.</p>',
+				new IdentifierTypeNode('MongoCollection'),
+				Lexer::TOKEN_OPEN_ANGLE_BRACKET,
+			],
 		];
 	}
 
