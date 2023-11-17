@@ -1302,6 +1302,20 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
+			'OK with HTML description',
+			'/** @return MongoCollection <p>Returns a collection object representing the new collection.</p> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('MongoCollection'),
+						'<p>Returns a collection object representing the new collection.</p>'
+					)
+				),
+			]),
+		];
+
+		yield [
 			'invalid without type and description',
 			'/** @return */',
 			new PhpDocNode([
