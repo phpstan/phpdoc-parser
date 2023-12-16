@@ -534,10 +534,6 @@ final class Printer
 					throw new LogicException();
 				}
 
-				if ($itemEndPos < $itemStartPos) {
-					return null;
-				}
-
 				$result .= $originalTokens->getContentBetween($tokenIndex, $itemStartPos);
 
 				if (count($delayedAdd) > 0) {
@@ -744,10 +740,6 @@ final class Printer
 		$endPos = $originalNode->getAttribute(Attribute::END_INDEX);
 		if ($startPos < 0 || $endPos < 0) {
 			throw new LogicException();
-		}
-
-		if ($endPos < $startPos) {
-			return $this->print($node);
 		}
 
 		$result = '';
