@@ -6765,6 +6765,13 @@ Finder::findFiles('*.php')
 				[1, 1, 1, 3],
 			],
 		];
+
+		yield [
+			'/** @api */',
+			[
+				[1, 1, 1, 1],
+			],
+		];
 	}
 
 	/**
@@ -6837,6 +6844,15 @@ Finder::findFiles('*.php')
 				[2, 4, 3, 8], // DoctrineAnnotation
 				[2, 4, 4, 6], // DoctrineArgument
 				[2, 4, 4, 6], // DoctrineArray
+			],
+		];
+
+		yield [
+			'/** @api */',
+			[
+				[1, 1, 0, 3],
+				[1, 1, 1, 1],
+				[1, 1, 3, 1], // GenericTagValueNode is empty so start index is higher than end index
 			],
 		];
 	}

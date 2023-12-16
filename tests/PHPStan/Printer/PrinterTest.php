@@ -84,6 +84,7 @@ class PrinterTest extends TestCase
 
 		};
 		yield ['/** */', '/** */', $noopVisitor];
+		yield ['/** @api */', '/** @api */', $noopVisitor];
 		yield ['/**
  */', '/**
  */', $noopVisitor];
