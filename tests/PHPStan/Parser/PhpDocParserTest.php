@@ -36,6 +36,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\RequireImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
@@ -102,6 +103,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideThrowsTagsData
 	 * @dataProvider provideMixinTagsData
 	 * @dataProvider provideRequireExtendsTagsData
+	 * @dataProvider provideRequireImplementsTagsData
 	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
@@ -1966,6 +1968,72 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							29,
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
+						)
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideRequireImplementsTagsData(): Iterator
+	{
+		yield [
+			'OK without description',
+			'/** @phpstan-require-implements Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-require-implements',
+					new RequireImplementsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-require-implements Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-require-implements',
+					new RequireImplementsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with psalm-prefix description',
+			'/** @psalm-require-implements Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-require-implements',
+					new RequireImplementsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @phpstan-require-implements */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-require-implements',
+					new InvalidTagValueNode(
+						'',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							32,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
 							1

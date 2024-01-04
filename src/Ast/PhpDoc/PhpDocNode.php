@@ -200,6 +200,18 @@ class PhpDocNode implements Node
 		);
 	}
 
+	/**
+	 * @return RequireImplementsTagValueNode[]
+	 */
+	public function getRequireImplementsTagValues(string $tagName = '@phpstan-require-implements'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof RequireImplementsTagValueNode;
+			}
+		);
+	}
 
 	/**
 	 * @return DeprecatedTagValueNode[]
