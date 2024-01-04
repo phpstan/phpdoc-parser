@@ -28,6 +28,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
@@ -211,6 +212,11 @@ class PhpDocToStringTest extends TestCase
 		yield from [
 			['PHPUnit\\TestCase', new MixinTagValueNode(new IdentifierTypeNode('PHPUnit\\TestCase'), '')],
 			['Foo\\Bar Baz', new MixinTagValueNode(new IdentifierTypeNode('Foo\\Bar'), 'Baz')],
+		];
+
+		yield from [
+			['PHPUnit\\TestCase', new RequireExtendsTagValueNode(new IdentifierTypeNode('PHPUnit\\TestCase'), '')],
+			['Foo\\Bar Baz', new RequireExtendsTagValueNode(new IdentifierTypeNode('Foo\\Bar'), 'Baz')],
 		];
 
 		yield from [
