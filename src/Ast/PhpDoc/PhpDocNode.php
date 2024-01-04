@@ -187,6 +187,19 @@ class PhpDocNode implements Node
 		);
 	}
 
+	/**
+	 * @return RequireExtendsTagValueNode[]
+	 */
+	public function getRequireExtendsTagValues(string $tagName = '@require-extends'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof RequireExtendsTagValueNode;
+			}
+		);
+	}
+
 
 	/**
 	 * @return DeprecatedTagValueNode[]

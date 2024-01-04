@@ -35,6 +35,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
@@ -100,6 +101,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
 	 * @dataProvider provideMixinTagsData
+	 * @dataProvider provideRequireExtendsTagsData
 	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
@@ -1902,6 +1904,86 @@ class PhpDocParserTest extends TestCase
 							GenericTypeNode::VARIANCE_INVARIANT,
 						]),
 						''
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideRequireExtendsTagsData(): Iterator
+	{
+		yield [
+			'OK without description',
+			'/** @require-extends Foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@require-extends',
+					new RequireExtendsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @require-extends Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@require-extends',
+					new RequireExtendsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with phpstan-prefix description',
+			'/** @phpstan-require-extends Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-require-extends',
+					new RequireExtendsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with psalm-prefix description',
+			'/** @psalm-require-extends Foo optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-require-extends',
+					new RequireExtendsTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'optional description'
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @require-extends */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@require-extends',
+					new InvalidTagValueNode(
+						'',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							21,
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1
+						)
 					)
 				),
 			]),

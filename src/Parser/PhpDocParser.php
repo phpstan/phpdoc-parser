@@ -408,6 +408,12 @@ class PhpDocParser
 					$tagValue = $this->parseMixinTagValue($tokens);
 					break;
 
+				case '@require-extends':
+				case '@psalm-require-extends':
+				case '@phpstan-require-extends':
+					$tagValue = $this->parseRequireExtendsTagValue($tokens);
+					break;
+
 				case '@deprecated':
 					$tagValue = $this->parseDeprecatedTagValue($tokens);
 					break;
@@ -875,6 +881,13 @@ class PhpDocParser
 		$type = $this->typeParser->parse($tokens);
 		$description = $this->parseOptionalDescription($tokens, true);
 		return new Ast\PhpDoc\MixinTagValueNode($type, $description);
+	}
+
+	private function parseRequireExtendsTagValue(TokenIterator $tokens): Ast\PhpDoc\RequireExtendsTagValueNode
+	{
+		$type = $this->typeParser->parse($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
+		return new Ast\PhpDoc\RequireExtendsTagValueNode($type, $description);
 	}
 
 	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode
