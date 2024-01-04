@@ -187,6 +187,31 @@ class PhpDocNode implements Node
 		);
 	}
 
+	/**
+	 * @return RequireExtendsTagValueNode[]
+	 */
+	public function getRequireExtendsTagValues(string $tagName = '@phpstan-require-extends'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof RequireExtendsTagValueNode;
+			}
+		);
+	}
+
+	/**
+	 * @return RequireImplementsTagValueNode[]
+	 */
+	public function getRequireImplementsTagValues(string $tagName = '@phpstan-require-implements'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof RequireImplementsTagValueNode;
+			}
+		);
+	}
 
 	/**
 	 * @return DeprecatedTagValueNode[]
