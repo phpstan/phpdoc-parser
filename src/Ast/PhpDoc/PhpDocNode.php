@@ -190,7 +190,7 @@ class PhpDocNode implements Node
 	/**
 	 * @return RequireExtendsTagValueNode[]
 	 */
-	public function getRequireExtendsTagValues(string $tagName = '@require-extends'): array
+	public function getRequireExtendsTagValues(string $tagName = '@phpstan-require-extends'): array
 	{
 		return array_filter(
 			array_column($this->getTagsByName($tagName), 'value'),

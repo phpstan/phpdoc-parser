@@ -1914,10 +1914,10 @@ class PhpDocParserTest extends TestCase
 	{
 		yield [
 			'OK without description',
-			'/** @require-extends Foo */',
+			'/** @phpstan-require-extends Foo */',
 			new PhpDocNode([
 				new PhpDocTagNode(
-					'@require-extends',
+					'@phpstan-require-extends',
 					new RequireExtendsTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						''
@@ -1928,20 +1928,6 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'OK with description',
-			'/** @require-extends Foo optional description */',
-			new PhpDocNode([
-				new PhpDocTagNode(
-					'@require-extends',
-					new RequireExtendsTagValueNode(
-						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
-				),
-			]),
-		];
-
-		yield [
-			'OK with phpstan-prefix description',
 			'/** @phpstan-require-extends Foo optional description */',
 			new PhpDocNode([
 				new PhpDocTagNode(
@@ -1970,16 +1956,16 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'invalid without type and description',
-			'/** @require-extends */',
+			'/** @phpstan-require-extends */',
 			new PhpDocNode([
 				new PhpDocTagNode(
-					'@require-extends',
+					'@phpstan-require-extends',
 					new InvalidTagValueNode(
 						'',
 						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
-							21,
+							29,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
 							1
