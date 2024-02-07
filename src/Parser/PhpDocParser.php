@@ -919,10 +919,16 @@ class PhpDocParser
 
 	private function parseMethodTagValue(TokenIterator $tokens): Ast\PhpDoc\MethodTagValueNode
 	{
-		$isStatic = $tokens->tryConsumeTokenValue('static');
-		$startLine = $tokens->currentTokenLine();
-		$startIndex = $tokens->currentTokenIndex();
-		$returnTypeOrMethodName = $this->typeParser->parse($tokens);
+		$staticKeywordOrReturnTypeOrMethodName = $this->typeParser->parse($tokens);
+
+		if ($staticKeywordOrReturnTypeOrMethodName instanceof Ast\Type\IdentifierTypeNode && $staticKeywordOrReturnTypeOrMethodName->name === 'static') {
+			$isStatic = true;
+			$returnTypeOrMethodName = $this->typeParser->parse($tokens);
+
+		} else {
+			$isStatic = false;
+			$returnTypeOrMethodName = $staticKeywordOrReturnTypeOrMethodName;
+		}
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
 			$returnType = $returnTypeOrMethodName;
@@ -930,9 +936,7 @@ class PhpDocParser
 			$tokens->next();
 
 		} elseif ($returnTypeOrMethodName instanceof Ast\Type\IdentifierTypeNode) {
-			$returnType = $isStatic
-				? $this->typeParser->enrichWithAttributes($tokens, new Ast\Type\IdentifierTypeNode('static'), $startLine, $startIndex)
-				: null;
+			$returnType = $isStatic ? $staticKeywordOrReturnTypeOrMethodName : null;
 			$methodName = $returnTypeOrMethodName->name;
 			$isStatic = false;
 

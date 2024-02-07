@@ -2626,6 +2626,26 @@ class PhpDocParserTest extends TestCase
 				),
 			]),
 		];
+
+		yield [
+			'OK non-static with return type that starts with static type',
+			'/** @method static|null foo() */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						false,
+						new UnionTypeNode([
+							new IdentifierTypeNode('static'),
+							new IdentifierTypeNode('null'),
+						]),
+						'foo',
+						[],
+						''
+					)
+				),
+			]),
+		];
 	}
 
 
