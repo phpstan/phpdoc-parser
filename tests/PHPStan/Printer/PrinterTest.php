@@ -23,6 +23,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -1810,6 +1811,66 @@ class PrinterTest extends TestCase
 			'/**
  * @param int $a
  */',
+		];
+
+		yield [
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(
+									new IdentifierTypeNode('T'),
+									false,
+									false,
+									'',
+									false
+								)
+							],
+							new IdentifierTypeNode('T')
+						),
+						['T' => null]
+					)
+				),
+			]),
+			<<<DOC
+/**
+ * @phpstan-type TypeAlias<T> callable(T): T
+ */
+DOC,
+		];
+
+		yield [
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(
+									new IdentifierTypeNode('T'),
+									false,
+									false,
+									'',
+									false
+								)
+							],
+							new IdentifierTypeNode('T')
+						),
+						['T' => new IdentifierTypeNode('string')]
+					)
+				),
+			]),
+			<<<DOC
+/**
+ * @phpstan-type TypeAlias<T of string> callable(T): T
+ */
+DOC,
 		];
 	}
 

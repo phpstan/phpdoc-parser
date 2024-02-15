@@ -331,8 +331,16 @@ final class Printer
 			);
 		}
 		if ($node instanceof TypeAliasTagValueNode) {
+			$args = '';
+			if (count($node->typeArguments) > 0) {
+				$printedArgs = [];
+				foreach ($node->typeArguments as $name => $bound) {
+					$printedArgs[] = $name . ($bound === null ? '' : (' of ' . $this->printType($bound)));
+				}
+				$args = '<' . implode(', ', $printedArgs) . '>';
+			}
 			$type = $this->printType($node->type);
-			return trim("{$node->alias} {$type}");
+			return trim("{$node->alias}{$args} {$type}");
 		}
 		if ($node instanceof UsesTagValueNode) {
 			$type = $this->printType($node->type);

@@ -1061,6 +1061,25 @@ class PhpDocParser
 		$alias = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
+		$typeArguments = [];
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+			while ($tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
+				$name = $tokens->currentTokenValue();
+				$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+				if ($tokens->tryConsumeTokenValue('of')) {
+					$bound = $this->typeParser->parse($tokens);
+				} else {
+					$bound = null;
+				}
+				$typeArguments[$name] = $bound;
+				if ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+					continue;
+				}
+				break;
+			}
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
+		}
+
 		// support psalm-type syntax
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
 
@@ -1082,19 +1101,20 @@ class PhpDocParser
 					}
 				}
 
-				return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
+				return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type, $typeArguments);
 			} catch (ParserException $e) {
 				$this->parseOptionalDescription($tokens);
 				return new Ast\PhpDoc\TypeAliasTagValueNode(
 					$alias,
-					$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex)
+					$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex),
+					$typeArguments
 				);
 			}
 		}
 
 		$type = $this->typeParser->parse($tokens);
 
-		return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
+		return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type, $typeArguments);
 	}
 
 	private function parseTypeAliasImportTagValue(TokenIterator $tokens): Ast\PhpDoc\TypeAliasImportTagValueNode

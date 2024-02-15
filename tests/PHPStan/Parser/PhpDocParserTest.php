@@ -4470,6 +4470,60 @@ some text in the middle'
 				),
 			]),
 		];
+
+		yield [
+			'Type argument',
+			'/** @phpstan-type TypeAlias<T> callable(T): T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(
+									new IdentifierTypeNode('T'),
+									false,
+									false,
+									'',
+									false
+								)
+							],
+							new IdentifierTypeNode('T')
+						),
+						['T' => null]
+					)
+				),
+			]),
+		];
+
+		yield [
+			'Bound type argument',
+			'/** @phpstan-type TypeAlias<T of string> callable(T): T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'TypeAlias',
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[
+								new CallableTypeParameterNode(
+									new IdentifierTypeNode('T'),
+									false,
+									false,
+									'',
+									false
+								)
+							],
+							new IdentifierTypeNode('T')
+						),
+						['T' => new IdentifierTypeNode('string')]
+					)
+				),
+			]),
+		];
 	}
 
 	public function provideTypeAliasImportTagsData(): Iterator
