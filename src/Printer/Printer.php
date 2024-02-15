@@ -335,7 +335,7 @@ final class Printer
 			if (count($node->typeArguments) > 0) {
 				$printedArgs = [];
 				foreach ($node->typeArguments as $name => $bound) {
-					$printedArgs[] = $name . ($bound === null ? '' : (' of ' . $this->printType($bound)));
+					$printedArgs[] = $name . ($bound === null ? '' : ' of ' . $this->printType($bound));
 				}
 				$args = '<' . implode(', ', $printedArgs) . '>';
 			}

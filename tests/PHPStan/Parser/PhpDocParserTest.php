@@ -4488,7 +4488,7 @@ some text in the middle'
 									false,
 									'',
 									false
-								)
+								),
 							],
 							new IdentifierTypeNode('T')
 						),
@@ -4515,7 +4515,7 @@ some text in the middle'
 									false,
 									'',
 									false
-								)
+								),
 							],
 							new IdentifierTypeNode('T')
 						),

@@ -1828,7 +1828,7 @@ class PrinterTest extends TestCase
 									false,
 									'',
 									false
-								)
+								),
 							],
 							new IdentifierTypeNode('T')
 						),
@@ -1858,7 +1858,7 @@ DOC,
 									false,
 									'',
 									false
-								)
+								),
 							],
 							new IdentifierTypeNode('T')
 						),
