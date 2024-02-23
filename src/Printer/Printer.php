@@ -99,6 +99,7 @@ final class Printer
 		ArrayShapeNode::class . '->items' => ', ',
 		ObjectShapeNode::class . '->items' => ', ',
 		CallableTypeNode::class . '->parameters' => ', ',
+		CallableTypeNode::class . '->templateTypes' => ', ',
 		GenericTypeNode::class . '->genericTypes' => ', ',
 		ConstExprArrayNode::class . '->items' => ', ',
 		MethodTagValueNode::class . '->parameters' => ', ',
@@ -380,10 +381,15 @@ final class Printer
 			} else {
 				$returnType = $this->printType($node->returnType);
 			}
+			$template = $node->templateTypes !== []
+				? '<' . implode(', ', array_map(function (TemplateTagValueNode $templateNode): string {
+					return $this->print($templateNode);
+				}, $node->templateTypes)) . '>'
+				: '';
 			$parameters = implode(', ', array_map(function (CallableTypeParameterNode $parameterNode): string {
 				return $this->print($parameterNode);
 			}, $node->parameters));
-			return "{$node->identifier}({$parameters}): {$returnType}";
+			return "{$node->identifier}{$template}({$parameters}): {$returnType}";
 		}
 		if ($node instanceof ConditionalTypeForParameterNode) {
 			return sprintf(

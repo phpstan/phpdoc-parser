@@ -10,6 +10,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
@@ -895,6 +896,104 @@ class TypeParserTest extends TestCase
 						),
 					],
 					new IdentifierTypeNode('Foo')
+				),
+			],
+			[
+				'callable<A>(B): C',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('B'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new IdentifierTypeNode('C'),
+					[
+						new TemplateTagValueNode('A', null, ''),
+					]
+				),
+			],
+			[
+				'callable<>(): void',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_END,
+					9,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'Closure<T of Model>(T, int): (T|false)',
+				new CallableTypeNode(
+					new IdentifierTypeNode('Closure'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('T'),
+							false,
+							false,
+							'',
+							false
+						),
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('int'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new UnionTypeNode([
+						new IdentifierTypeNode('T'),
+						new IdentifierTypeNode('false'),
+					]),
+					[
+						new TemplateTagValueNode('T', new IdentifierTypeNode('Model'), ''),
+					]
+				),
+			],
+			[
+				'\Closure<Tx of X|Z, Ty of Y>(Tx, Ty): array{ Ty, Tx }',
+				new CallableTypeNode(
+					new IdentifierTypeNode('\Closure'),
+					[
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('Tx'),
+							false,
+							false,
+							'',
+							false
+						),
+						new CallableTypeParameterNode(
+							new IdentifierTypeNode('Ty'),
+							false,
+							false,
+							'',
+							false
+						),
+					],
+					new ArrayShapeNode([
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('Ty')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('Tx')
+						),
+					]),
+					[
+						new TemplateTagValueNode('Tx', new UnionTypeNode([
+							new IdentifierTypeNode('X'),
+							new IdentifierTypeNode('Z'),
+						]), ''),
+						new TemplateTagValueNode('Ty', new IdentifierTypeNode('Y'), ''),
+					]
 				),
 			],
 			[

@@ -590,6 +590,35 @@ class PrinterTest extends TestCase
 
 		};
 
+		$addCallableTemplateType = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof CallableTypeNode) {
+					$node->templateTypes[] = new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('int'),
+						''
+					);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @var Closure(): T */',
+			'/** @var Closure<T of int>(): T */',
+			$addCallableTemplateType,
+		];
+
+		yield [
+			'/** @var \Closure<U>(U): T */',
+			'/** @var \Closure<U, T of int>(U): T */',
+			$addCallableTemplateType,
+		];
+
 		yield [
 			'/**
  * @param callable(): void $cb
