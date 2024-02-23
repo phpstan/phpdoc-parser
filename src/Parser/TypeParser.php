@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use LogicException;
 use PHPStan\PhpDocParser\Ast;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function in_array;
 use function str_replace;
@@ -460,6 +461,40 @@ class TypeParser
 		return [$type, $variance];
 	}
 
+	/**
+	 * @throws ParserException
+	 * @param ?callable(TokenIterator): string $parseDescription
+	 */
+	public function parseTemplateTagValue(
+		TokenIterator $tokens,
+		?callable $parseDescription = null
+	): TemplateTagValueNode
+	{
+		$name = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		if ($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as')) {
+			$bound = $this->parse($tokens);
+
+		} else {
+			$bound = null;
+		}
+
+		if ($tokens->tryConsumeTokenValue('=')) {
+			$default = $this->parse($tokens);
+		} else {
+			$default = null;
+		}
+
+		if ($parseDescription !== null) {
+			$description = $parseDescription($tokens);
+		} else {
+			$description = '';
+		}
+
+		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description, $default);
+	}
+
 
 	/** @phpstan-impure */
 	private function parseCallable(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $identifier, bool $hasTemplate): Ast\Type\TypeNode
@@ -497,7 +532,7 @@ class TypeParser
 
 
 	/**
-	 * @return Ast\Type\CallableTypeTemplateNode[]
+	 * @return Ast\PhpDoc\TemplateTagValueNode[]
 	 *
 	 * @phpstan-impure
 	 */
@@ -527,27 +562,14 @@ class TypeParser
 	}
 
 
-	private function parseCallableTemplateArgument(TokenIterator $tokens): Ast\Type\CallableTypeTemplateNode
+	private function parseCallableTemplateArgument(TokenIterator $tokens): Ast\PhpDoc\TemplateTagValueNode
 	{
 		$startLine = $tokens->currentTokenLine();
 		$startIndex = $tokens->currentTokenIndex();
 
-		$identifier = $this->enrichWithAttributes(
-			$tokens,
-			new Ast\Type\IdentifierTypeNode($tokens->currentTokenValue()),
-			$startLine,
-			$startIndex
-		);
-		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
-
-		$bound = null;
-		if ($tokens->tryConsumeTokenValue('of')) {
-			$bound = $this->parse($tokens);
-		}
-
 		return $this->enrichWithAttributes(
 			$tokens,
-			new Ast\Type\CallableTypeTemplateNode($identifier, $bound),
+			$this->parseTemplateTagValue($tokens),
 			$startLine,
 			$startIndex
 		);

@@ -41,7 +41,6 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
-use PHPStan\PhpDocParser\Ast\Type\CallableTypeTemplateNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
@@ -98,7 +97,7 @@ final class Printer
 		ArrayShapeNode::class . '->items' => ', ',
 		ObjectShapeNode::class . '->items' => ', ',
 		CallableTypeNode::class . '->parameters' => ', ',
-		CallableTypeNode::class . '->templates' => ', ',
+		CallableTypeNode::class . '->templateTypes' => ', ',
 		GenericTypeNode::class . '->genericTypes' => ', ',
 		ConstExprArrayNode::class . '->items' => ', ',
 		MethodTagValueNode::class . '->parameters' => ', ',
@@ -225,11 +224,6 @@ final class Printer
 			$isVariadic = $node->isVariadic ? '...' : '';
 			$isOptional = $node->isOptional ? '=' : '';
 			return trim("{$type}{$isReference}{$isVariadic}{$node->parameterName}") . $isOptional;
-		}
-		if ($node instanceof CallableTypeTemplateNode) {
-			$identifier = $this->printType($node->identifier);
-			$bound = $node->bound !== null ? ' of ' . $this->printType($node->bound) : '';
-			return "{$identifier}{$bound}";
 		}
 		if ($node instanceof DoctrineAnnotation) {
 			return (string) $node;
@@ -377,10 +371,10 @@ final class Printer
 			} else {
 				$returnType = $this->printType($node->returnType);
 			}
-			$template = $node->templates !== []
-				? '<' . implode(', ', array_map(function (CallableTypeTemplateNode $templateNode): string {
+			$template = $node->templateTypes !== []
+				? '<' . implode(', ', array_map(function (TemplateTagValueNode $templateNode): string {
 					return $this->print($templateNode);
-				}, $node->templates)) . '>'
+				}, $node->templateTypes)) . '>'
 				: '';
 			$parameters = implode(', ', array_map(function (CallableTypeParameterNode $parameterNode): string {
 				return $this->print($parameterNode);

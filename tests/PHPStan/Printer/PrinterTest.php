@@ -28,7 +28,6 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
-use PHPStan\PhpDocParser\Ast\Type\CallableTypeTemplateNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
@@ -595,9 +594,10 @@ class PrinterTest extends TestCase
 			public function enterNode(Node $node)
 			{
 				if ($node instanceof CallableTypeNode) {
-					$node->templates[] = new CallableTypeTemplateNode(
-						new IdentifierTypeNode('T'),
-						new IdentifierTypeNode('int')
+					$node->templateTypes[] = new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('int'),
+						''
 					);
 				}
 

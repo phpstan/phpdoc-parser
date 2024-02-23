@@ -10,12 +10,12 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
-use PHPStan\PhpDocParser\Ast\Type\CallableTypeTemplateNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
@@ -913,7 +913,7 @@ class TypeParserTest extends TestCase
 					],
 					new IdentifierTypeNode('C'),
 					[
-						new CallableTypeTemplateNode(new IdentifierTypeNode('A'), null),
+						new TemplateTagValueNode('A', null, ''),
 					]
 				),
 			],
@@ -951,7 +951,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('false'),
 					]),
 					[
-						new CallableTypeTemplateNode(new IdentifierTypeNode('T'), new IdentifierTypeNode('Model')),
+						new TemplateTagValueNode('T', new IdentifierTypeNode('Model'), ''),
 					]
 				),
 			],
@@ -988,11 +988,11 @@ class TypeParserTest extends TestCase
 						),
 					]),
 					[
-						new CallableTypeTemplateNode(new IdentifierTypeNode('Tx'), new UnionTypeNode([
+						new TemplateTagValueNode('Tx', new UnionTypeNode([
 							new IdentifierTypeNode('X'),
 							new IdentifierTypeNode('Z'),
-						])),
-						new CallableTypeTemplateNode(new IdentifierTypeNode('Ty'), new IdentifierTypeNode('Y')),
+						]), ''),
+						new TemplateTagValueNode('Ty', new IdentifierTypeNode('Y'), ''),
 					]
 				),
 			],
