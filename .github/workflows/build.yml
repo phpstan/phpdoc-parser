@@ -16,8 +16,6 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.2"
-          - "7.3"
           - "7.4"
           - "8.0"
           - "8.1"
@@ -38,10 +36,6 @@ jobs:
 
       - name: "Install dependencies"
         run: "composer install --no-interaction --no-progress"
-
-      - name: "Downgrade PHPUnit"
-        if: matrix.php-version == '7.2' || matrix.php-version == '7.3'
-        run: "composer require --dev phpunit/phpunit:^7.5.20 --update-with-dependencies"
 
       - name: "Lint"
         run: "make lint"
@@ -92,8 +86,6 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest, windows-latest]
         php-version:
-          - "7.2"
-          - "7.3"
           - "7.4"
           - "8.0"
           - "8.1"
@@ -120,10 +112,6 @@ jobs:
         if: ${{ matrix.dependencies == 'highest' }}
         run: "composer update --no-interaction --no-progress"
 
-      - name: "Downgrade PHPUnit"
-        if: matrix.php-version == '7.2' || matrix.php-version == '7.3'
-        run: "composer require --dev phpunit/phpunit:^7.5.20 --update-with-dependencies"
-
       - name: "Tests"
         run: "make tests"
 
@@ -135,8 +123,6 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - "7.2"
-          - "7.3"
           - "7.4"
           - "8.0"
           - "8.1"
@@ -156,10 +142,6 @@ jobs:
 
       - name: "Install dependencies"
         run: "composer update --no-interaction --no-progress"
-
-      - name: "Downgrade PHPUnit"
-        if: matrix.php-version == '7.2' || matrix.php-version == '7.3'
-        run: "composer require --dev phpunit/phpunit:^7.5.20 --update-with-dependencies"
 
       - name: "PHPStan"
         run: "make phpstan"
