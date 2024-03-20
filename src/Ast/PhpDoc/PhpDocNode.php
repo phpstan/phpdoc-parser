@@ -91,6 +91,34 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return ParamImmediatelyInvokedCallableTagValueNode[]
+	 */
+	public function getParamImmediatelyInvokedCallableTagValues(string $tagName = '@param-immediately-invoked-callable'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof ParamImmediatelyInvokedCallableTagValueNode;
+			}
+		);
+	}
+
+
+	/**
+	 * @return ParamLaterInvokedCallableTagValueNode[]
+	 */
+	public function getParamLaterInvokedCallableTagValues(string $tagName = '@param-later-invoked-callable'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof ParamLaterInvokedCallableTagValueNode;
+			}
+		);
+	}
+
+
+	/**
 	 * @return TemplateTagValueNode[]
 	 */
 	public function getTemplateTagValues(string $tagName = '@template'): array

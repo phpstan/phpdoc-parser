@@ -17,6 +17,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
@@ -1658,6 +1660,42 @@ class PrinterTest extends TestCase
 					}
 					if ($node instanceof DoctrineAnnotation) {
 						$node->name = '@Bar';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param-immediately-invoked-callable $foo test */',
+			'/** @param-immediately-invoked-callable $bar foo */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ParamImmediatelyInvokedCallableTagValueNode) {
+						$node->parameterName = '$bar';
+						$node->description = 'foo';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param-later-invoked-callable $foo test */',
+			'/** @param-later-invoked-callable $bar foo */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ParamLaterInvokedCallableTagValueNode) {
+						$node->parameterName = '$bar';
+						$node->description = 'foo';
 					}
 
 					return $node;

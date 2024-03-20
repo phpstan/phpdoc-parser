@@ -29,6 +29,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
@@ -97,6 +99,8 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideTagsWithNumbers
 	 * @dataProvider provideSpecializedTags
 	 * @dataProvider provideParamTagsData
+	 * @dataProvider provideParamImmediatelyInvokedCallableTagsData
+	 * @dataProvider provideParamLaterInvokedCallableTagsData
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
@@ -614,6 +618,68 @@ class PhpDocParserTest extends TestCase
 						'$foo',
 						'',
 						false
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideParamImmediatelyInvokedCallableTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @param-immediately-invoked-callable $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-immediately-invoked-callable',
+					new ParamImmediatelyInvokedCallableTagValueNode(
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @param-immediately-invoked-callable $foo test two three */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-immediately-invoked-callable',
+					new ParamImmediatelyInvokedCallableTagValueNode(
+						'$foo',
+						'test two three'
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideParamLaterInvokedCallableTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @param-later-invoked-callable $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-later-invoked-callable',
+					new ParamLaterInvokedCallableTagValueNode(
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @param-later-invoked-callable $foo test two three */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-later-invoked-callable',
+					new ParamLaterInvokedCallableTagValueNode(
+						'$foo',
+						'test two three'
 					)
 				),
 			]),
@@ -7117,6 +7183,8 @@ Finder::findFiles('*.php')
 	 * @dataProvider provideSpecializedTags
 	 * @dataProvider provideParamTagsData
 	 * @dataProvider provideTypelessParamTagsData
+	 * @dataProvider provideParamImmediatelyInvokedCallableTagsData
+	 * @dataProvider provideParamLaterInvokedCallableTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData

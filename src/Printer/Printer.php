@@ -20,6 +20,8 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocChildNode;
@@ -303,6 +305,12 @@ final class Printer
 			$variadic = $node->isVariadic ? '...' : '';
 			$type = $this->printType($node->type);
 			return trim("{$type} {$reference}{$variadic}{$node->parameterName} {$node->description}");
+		}
+		if ($node instanceof ParamImmediatelyInvokedCallableTagValueNode) {
+			return trim("{$node->parameterName} {$node->description}");
+		}
+		if ($node instanceof ParamLaterInvokedCallableTagValueNode) {
+			return trim("{$node->parameterName} {$node->description}");
 		}
 		if ($node instanceof PropertyTagValueNode) {
 			$type = $this->printType($node->type);
