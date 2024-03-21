@@ -397,6 +397,11 @@ class PhpDocParser
 					$tagValue = $this->parseParamLaterInvokedCallableTagValue($tokens);
 					break;
 
+				case '@param-closure-this':
+				case '@phpstan-param-closure-this':
+					$tagValue = $this->parseParamClosureThisTagValue($tokens);
+					break;
+
 				case '@var':
 				case '@phpstan-var':
 				case '@psalm-var':
@@ -886,6 +891,16 @@ class PhpDocParser
 		$description = $this->parseOptionalDescription($tokens);
 
 		return new Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode($parameterName, $description);
+	}
+
+
+	private function parseParamClosureThisTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamClosureThisTagValueNode
+	{
+		$type = $this->typeParser->parse($tokens);
+		$parameterName = $this->parseRequiredVariableName($tokens);
+		$description = $this->parseOptionalDescription($tokens);
+
+		return new Ast\PhpDoc\ParamClosureThisTagValueNode($type, $parameterName, $description);
 	}
 
 

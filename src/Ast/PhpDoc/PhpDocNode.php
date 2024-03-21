@@ -119,6 +119,20 @@ class PhpDocNode implements Node
 
 
 	/**
+	 * @return ParamClosureThisTagValueNode[]
+	 */
+	public function getParamClosureThisTagValues(string $tagName = '@param-closure-this'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static function (PhpDocTagValueNode $value): bool {
+				return $value instanceof ParamClosureThisTagValueNode;
+			}
+		);
+	}
+
+
+	/**
 	 * @return TemplateTagValueNode[]
 	 */
 	public function getTemplateTagValues(string $tagName = '@template'): array

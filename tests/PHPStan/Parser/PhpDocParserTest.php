@@ -29,6 +29,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureThisTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamOutTagValueNode;
@@ -102,6 +103,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideParamImmediatelyInvokedCallableTagsData
 	 * @dataProvider provideParamLaterInvokedCallableTagsData
 	 * @dataProvider provideTypelessParamTagsData
+	 * @dataProvider provideParamClosureThisTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
@@ -680,6 +682,54 @@ class PhpDocParserTest extends TestCase
 					new ParamLaterInvokedCallableTagValueNode(
 						'$foo',
 						'test two three'
+					)
+				),
+			]),
+		];
+	}
+
+	public function provideParamClosureThisTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @param-closure-this Foo $a */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-closure-this',
+					new ParamClosureThisTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$a',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with prefix',
+			'/** @phpstan-param-closure-this Foo $a */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-param-closure-this',
+					new ParamClosureThisTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$a',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @param-closure-this Foo $a test */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-closure-this',
+					new ParamClosureThisTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$a',
+						'test'
 					)
 				),
 			]),
@@ -7185,6 +7235,7 @@ Finder::findFiles('*.php')
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideParamImmediatelyInvokedCallableTagsData
 	 * @dataProvider provideParamLaterInvokedCallableTagsData
+	 * @dataProvider provideParamClosureThisTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
