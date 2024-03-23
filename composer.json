@@ -7,7 +7,7 @@
 	},
 	"require-dev": {
 		"doctrine/annotations": "^2.0",
-		"nikic/php-parser": "^4.15",
+		"nikic/php-parser": "^4.15|^5.0",
 		"php-parallel-lint/php-parallel-lint": "^1.2",
 		"phpstan/extension-installer": "^1.0",
 		"phpstan/phpstan": "^1.5",
