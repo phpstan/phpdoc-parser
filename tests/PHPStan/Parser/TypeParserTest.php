@@ -769,6 +769,22 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'pure-callable(): Foo',
+				new CallableTypeNode(
+					new IdentifierTypeNode('pure-callable'),
+					[],
+					new IdentifierTypeNode('Foo')
+				),
+			],
+			[
+				'pure-Closure(): Foo',
+				new CallableTypeNode(
+					new IdentifierTypeNode('pure-Closure'),
+					[],
+					new IdentifierTypeNode('Foo')
+				),
+			],
+			[
 				'callable(): ?Foo',
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
