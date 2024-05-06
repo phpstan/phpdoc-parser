@@ -1068,6 +1068,13 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'self::TYPES[ int ]',
+				new OffsetAccessTypeNode(
+					new ConstTypeNode(new ConstFetchNode('self', 'TYPES')),
+					new IdentifierTypeNode('int')
+				),
+			],
+			[
 				"?\t\xA009", // edge-case with \h
 				new NullableTypeNode(
 					new IdentifierTypeNode("\xA009")
