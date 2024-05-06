@@ -1723,6 +1723,23 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @return Foo[abc] */',
+			'/** @return self::FOO[abc] */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ReturnTagValueNode && $node->type instanceof OffsetAccessTypeNode) {
+						$node->type->type = new ConstTypeNode(new ConstFetchNode('self', 'FOO'));
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
@@ -1861,6 +1878,13 @@ class PrinterTest extends TestCase
 				]),
 			]),
 			'Foo|Bar|(Baz|Lorem)',
+		];
+		yield [
+			new OffsetAccessTypeNode(
+				new ConstTypeNode(new ConstFetchNode('self', 'TYPES')),
+				new IdentifierTypeNode('int')
+			),
+			'self::TYPES[int]',
 		];
 	}
 
