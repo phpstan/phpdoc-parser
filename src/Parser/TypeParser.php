@@ -221,7 +221,7 @@ class TypeParser
 
 		try {
 			$constExpr = $this->constExprParser->parse($tokens, true);
-			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
+			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode || $constExpr instanceof Ast\ConstExpr\ConstExprNewNode) {
 				throw new ParserException(
 					$currentTokenValue,
 					$currentTokenType,
@@ -732,7 +732,7 @@ class TypeParser
 
 		try {
 			$constExpr = $this->constExprParser->parse($tokens, true);
-			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
+			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode || $constExpr instanceof Ast\ConstExpr\ConstExprNewNode) {
 				throw new ParserException(
 					$currentTokenValue,
 					$currentTokenType,

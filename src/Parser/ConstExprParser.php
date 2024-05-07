@@ -183,6 +183,8 @@ class ConstExprParser
 				case 'array':
 					$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
 					return $this->parseArray($tokens, Lexer::TOKEN_CLOSE_PARENTHESES, $startIndex);
+				case 'new':
+					return $this->parseNew($tokens, $startIndex);
 			}
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
@@ -263,6 +265,30 @@ class ConstExprParser
 		return $this->enrichWithAttributes(
 			$tokens,
 			new Ast\ConstExpr\ConstExprArrayNode($items),
+			$startLine,
+			$startIndex
+		);
+	}
+
+
+	private function parseNew(TokenIterator $tokens, int $startIndex): Ast\ConstExpr\ConstExprNewNode
+	{
+		$startLine = $tokens->currentTokenLine();
+
+		$class = $tokens->currentTokenValue();
+		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+		$arguments = [];
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
+			do {
+				$arguments[] = $this->parse($tokens);
+			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA) && !$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES));
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
+		}
+
+		return $this->enrichWithAttributes(
+			$tokens,
+			new Ast\ConstExpr\ConstExprNewNode($class, $arguments),
 			$startLine,
 			$startIndex
 		);
