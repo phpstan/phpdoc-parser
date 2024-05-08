@@ -26,6 +26,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\SubtractionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -275,6 +276,66 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('int'),
 				]),
 				Lexer::TOKEN_INTERSECTION,
+			],
+			[
+				'string~int',
+				new SubtractionTypeNode(
+					new IdentifierTypeNode('string'),
+					new IdentifierTypeNode('int')
+				),
+			],
+			[
+				'string ~ int',
+				new SubtractionTypeNode(
+					new IdentifierTypeNode('string'),
+					new IdentifierTypeNode('int')
+				),
+			],
+			[
+				'(string ~ int)',
+				new SubtractionTypeNode(
+					new IdentifierTypeNode('string'),
+					new IdentifierTypeNode('int')
+				),
+			],
+			[
+				'(' . PHP_EOL .
+				'  string' . PHP_EOL .
+				'  ~' . PHP_EOL .
+				'  int' . PHP_EOL .
+				')',
+				new SubtractionTypeNode(
+					new IdentifierTypeNode('string'),
+					new IdentifierTypeNode('int')
+				),
+			],
+			[
+				'string~int~float',
+				new SubtractionTypeNode(
+					new IdentifierTypeNode('string'),
+					new IdentifierTypeNode('int')
+				),
+				Lexer::TOKEN_SUBTRACTION,
+			],
+			[
+				'(string&int)~float',
+				new SubtractionTypeNode(
+					new IntersectionTypeNode([
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int'),
+					]),
+					new IdentifierTypeNode('float')
+				),
+			],
+			[
+				'float~(string&int)',
+				new SubtractionTypeNode(
+					new IdentifierTypeNode('float'),
+					new IntersectionTypeNode([
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int'),
+					])
+				),
 			],
 			[
 				'string[]',

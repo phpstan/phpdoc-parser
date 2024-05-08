@@ -57,6 +57,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\SubtractionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -129,11 +130,13 @@ final class Printer
 			CallableTypeNode::class,
 			UnionTypeNode::class,
 			IntersectionTypeNode::class,
+			SubtractionTypeNode::class,
 		],
 		ArrayTypeNode::class . '->type' => [
 			CallableTypeNode::class,
 			UnionTypeNode::class,
 			IntersectionTypeNode::class,
+			SubtractionTypeNode::class,
 			ConstTypeNode::class,
 			NullableTypeNode::class,
 		],
@@ -141,7 +144,18 @@ final class Printer
 			CallableTypeNode::class,
 			UnionTypeNode::class,
 			IntersectionTypeNode::class,
+			SubtractionTypeNode::class,
 			NullableTypeNode::class,
+		],
+		SubtractionTypeNode::class . '->type' => [
+			UnionTypeNode::class,
+			IntersectionTypeNode::class,
+			SubtractionTypeNode::class,
+		],
+		SubtractionTypeNode::class . '->subtractedType' => [
+			UnionTypeNode::class,
+			IntersectionTypeNode::class,
+			SubtractionTypeNode::class,
 		],
 	];
 
@@ -150,11 +164,13 @@ final class Printer
 		IntersectionTypeNode::class . '->types' => [
 			IntersectionTypeNode::class,
 			UnionTypeNode::class,
+			SubtractionTypeNode::class,
 			NullableTypeNode::class,
 		],
 		UnionTypeNode::class . '->types' => [
 			IntersectionTypeNode::class,
 			UnionTypeNode::class,
+			SubtractionTypeNode::class,
 			NullableTypeNode::class,
 		],
 	];
@@ -387,7 +403,12 @@ final class Printer
 			return $this->printOffsetAccessType($node->type) . '[]';
 		}
 		if ($node instanceof CallableTypeNode) {
-			if ($node->returnType instanceof CallableTypeNode || $node->returnType instanceof UnionTypeNode || $node->returnType instanceof IntersectionTypeNode) {
+			if (
+				$node->returnType instanceof CallableTypeNode
+				|| $node->returnType instanceof UnionTypeNode
+				|| $node->returnType instanceof IntersectionTypeNode
+				|| $node->returnType instanceof SubtractionTypeNode
+			) {
 				$returnType = $this->wrapInParentheses($node->returnType);
 			} else {
 				$returnType = $this->printType($node->returnType);
@@ -450,6 +471,7 @@ final class Printer
 				if (
 					$type instanceof IntersectionTypeNode
 					|| $type instanceof UnionTypeNode
+					|| $type instanceof SubtractionTypeNode
 					|| $type instanceof NullableTypeNode
 				) {
 					$items[] = $this->wrapInParentheses($type);
@@ -461,11 +483,14 @@ final class Printer
 
 			return implode($node instanceof IntersectionTypeNode ? '&' : '|', $items);
 		}
+		if ($node instanceof SubtractionTypeNode) {
+			return $this->printSubtractionType($node->type) . '~' . $this->printSubtractionType($node->subtractedType);
+		}
 		if ($node instanceof InvalidTypeNode) {
 			return (string) $node;
 		}
 		if ($node instanceof NullableTypeNode) {
-			if ($node->type instanceof IntersectionTypeNode || $node->type instanceof UnionTypeNode) {
+			if ($node->type instanceof IntersectionTypeNode || $node->type instanceof UnionTypeNode || $node->type instanceof SubtractionTypeNode) {
 				return '?(' . $this->printType($node->type) . ')';
 			}
 
@@ -513,6 +538,15 @@ final class Printer
 			|| $type instanceof IntersectionTypeNode
 			|| $type instanceof NullableTypeNode
 		) {
+			return $this->wrapInParentheses($type);
+		}
+
+		return $this->printType($type);
+	}
+
+	private function printSubtractionType(TypeNode $type): string
+	{
+		if ($type instanceof UnionTypeNode || $type instanceof IntersectionTypeNode) {
 			return $this->wrapInParentheses($type);
 		}
 
