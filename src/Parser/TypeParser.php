@@ -510,6 +510,10 @@ class TypeParser
 			$description = '';
 		}
 
+		if ($name === '') {
+			throw new LogicException('Template tag name cannot be empty.');
+		}
+
 		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description, $default);
 	}
 
