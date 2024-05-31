@@ -1792,7 +1792,7 @@ class PrinterTest extends TestCase
 	}
 
 	/**
-	 * @return iterable<list{TypeNode, string}>
+	 * @return iterable<array{TypeNode, string}>
 	 */
 	public function dataPrintType(): iterable
 	{
@@ -1905,7 +1905,7 @@ class PrinterTest extends TestCase
 	}
 
 	/**
-	 * @return iterable<list{PhpDocNode, string}>
+	 * @return iterable<array{PhpDocNode, string}>
 	 */
 	public function dataPrintPhpDocNode(): iterable
 	{
