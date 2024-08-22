@@ -25,13 +25,10 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
-          php-version: "7.4"
+          php-version: "8.3"
 
       - name: "Install dependencies"
         run: "composer install --no-dev --no-interaction --no-progress --no-suggest"
-
-      - name: "allow composer plugins"
-        run: "composer config --no-plugins --global allow-plugins.ocramius/package-versions true"
 
       - name: "Install BackwardCompatibilityCheck"
         run: "composer global require --dev roave/backward-compatibility-check"
