@@ -848,6 +848,7 @@ class TypeParser
 
 		$items = [];
 		$sealed = true;
+		$extraItemType = null;
 
 		do {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
@@ -858,6 +859,19 @@ class TypeParser
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC)) {
 				$sealed = false;
+				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+					$extraItemType = $this->parseGeneric(
+						$tokens,
+						$this->enrichWithAttributes(
+							$tokens,
+							new Ast\Type\IdentifierTypeNode($kind),
+							$tokens->currentTokenLine(),
+							$tokens->currentTokenIndex()
+						)
+					);
+					$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				}
 				$tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA);
 				break;
 			}
@@ -870,7 +884,7 @@ class TypeParser
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
-		return new Ast\Type\ArrayShapeNode($items, $sealed, $kind);
+		return new Ast\Type\ArrayShapeNode($items, $sealed, $kind, $extraItemType);
 	}
 
 
