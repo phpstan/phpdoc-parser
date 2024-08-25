@@ -2,11 +2,8 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
-use InvalidArgumentException;
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
 use function implode;
-use function strlen;
-use function substr;
 
 class ArrayShapeNode implements TypeNode
 {
@@ -25,8 +22,11 @@ class ArrayShapeNode implements TypeNode
 	/** @var self::KIND_* */
 	public $kind;
 
-	/** @var GenericTypeNode|null */
-	public $extraItemType;
+	/** @var TypeNode|null */
+	public $extraKeyType;
+
+	/** @var TypeNode|null */
+	public $extraValueType;
 
 	/**
 	 * @param ArrayShapeItemNode[] $items
@@ -36,16 +36,15 @@ class ArrayShapeNode implements TypeNode
 		array $items,
 		bool $sealed = true,
 		string $kind = self::KIND_ARRAY,
-		?GenericTypeNode $extraItemType = null
+		?TypeNode $extraKeyType = null,
+		?TypeNode $extraValueType = null
 	)
 	{
 		$this->items = $items;
 		$this->sealed = $sealed;
 		$this->kind = $kind;
-		$this->extraItemType = $extraItemType;
-		if ($sealed && $extraItemType !== null) {
-			throw new InvalidArgumentException('An extra item type may only be set for an unsealed array shape');
-		}
+		$this->extraKeyType = $extraKeyType;
+		$this->extraValueType = $extraValueType;
 	}
 
 
@@ -55,8 +54,13 @@ class ArrayShapeNode implements TypeNode
 
 		if (! $this->sealed) {
 			$item = '...';
-			if ($this->extraItemType !== null) {
-				$item .= substr((string) $this->extraItemType, strlen((string) $this->extraItemType->type));
+			if ($this->extraValueType !== null) {
+				$extraTypes = [];
+				if ($this->extraKeyType !== null) {
+					$extraTypes[] = (string) $this->extraKeyType;
+				}
+				$extraTypes[] = (string) $this->extraValueType;
+				$item .= '<' . implode(', ', $extraTypes) . '>';
 			}
 			$items[] = $item;
 		}

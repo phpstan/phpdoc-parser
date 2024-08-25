@@ -848,7 +848,8 @@ class TypeParser
 
 		$items = [];
 		$sealed = true;
-		$extraItemType = null;
+		$extraKeyType = null;
+		$extraValueType = null;
 
 		do {
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
@@ -859,19 +860,28 @@ class TypeParser
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC)) {
 				$sealed = false;
+
 				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
-				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
-					$extraItemType = $this->parseGeneric(
-						$tokens,
-						$this->enrichWithAttributes(
-							$tokens,
-							new Ast\Type\IdentifierTypeNode($kind),
-							$tokens->currentTokenLine(),
-							$tokens->currentTokenIndex()
-						)
-					);
+				if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+					$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+					$extraValueType = $this->parse($tokens);
+					$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+					if ($kind === Ast\Type\ArrayShapeNode::KIND_ARRAY) {
+						if ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+							$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+							$extraKeyType = $extraValueType;
+							$extraValueType = $this->parse($tokens);
+							$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+						}
+					}
+
+					$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 					$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 				}
+
 				$tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA);
 				break;
 			}
@@ -884,7 +894,7 @@ class TypeParser
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
-		return new Ast\Type\ArrayShapeNode($items, $sealed, $kind, $extraItemType);
+		return new Ast\Type\ArrayShapeNode($items, $sealed, $kind, $extraKeyType, $extraValueType);
 	}
 
 

@@ -74,7 +74,6 @@ use function preg_match_all;
 use function sprintf;
 use function strlen;
 use function strpos;
-use function substr;
 use function trim;
 use const PREG_SET_ORDER;
 
@@ -368,8 +367,13 @@ final class Printer
 
 			if (! $node->sealed) {
 				$item = '...';
-				if ($node->extraItemType !== null) {
-					$item .= substr($this->printType($node->extraItemType), strlen((string) $node->extraItemType->type));
+				if ($node->extraValueType !== null) {
+					$extraTypes = [];
+					if ($node->extraKeyType !== null) {
+						$extraTypes[] = $this->printType($node->extraKeyType);
+					}
+					$extraTypes[] = $this->printType($node->extraValueType);
+					$item .= '<' . implode(', ', $extraTypes) . '>';
 				}
 				$items[] = $item;
 			}

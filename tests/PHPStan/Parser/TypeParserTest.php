@@ -766,15 +766,8 @@ class TypeParserTest extends TestCase
 					[],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -794,15 +787,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -822,15 +808,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -855,15 +834,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -872,17 +844,8 @@ class TypeParserTest extends TestCase
 					[],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('int'),
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -902,17 +865,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('int'),
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -932,17 +886,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('int'),
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -969,17 +914,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new GenericTypeNode(
-						new IdentifierTypeNode('array'),
-						[
-							new IdentifierTypeNode('int'),
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -988,15 +924,8 @@ class TypeParserTest extends TestCase
 					[],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -1016,15 +945,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -1044,15 +966,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -1077,15 +992,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -1105,15 +1013,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -1133,15 +1034,8 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
 				),
 			],
 			[
@@ -1166,15 +1060,71 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[
-							new IdentifierTypeNode('string'),
-						],
-						[
-							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+					null,
+					new IdentifierTypeNode('string')
+				),
+			],
+			[
+				'array{...<>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					10,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'array{...<int,>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					14,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'array{...<int, string,>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					21,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'array{...<int, string, string>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					21,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'list{...<>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					9,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'list{...<int,>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					12,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'list{...<int, string>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					12,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
 				),
 			],
 			[
