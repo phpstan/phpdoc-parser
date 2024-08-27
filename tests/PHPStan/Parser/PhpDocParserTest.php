@@ -8,6 +8,7 @@ use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNewNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\DoctrineConstExprStringNode;
@@ -2757,6 +2758,66 @@ class PhpDocParserTest extends TestCase
 						]),
 						'foo',
 						[],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK static with parameter using new in initializer',
+			'/** @method static void myFunction(DateInterval $date = new DateInterval("P1Y")) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						true,
+						new IdentifierTypeNode('void'),
+						'myFunction',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('DateInterval'),
+								false,
+								false,
+								'$date',
+								new ConstExprNewNode(
+									'DateInterval',
+									[
+										new ConstExprStringNode('"P1Y"'),
+									]
+								)
+							),
+						],
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK static with parameter using new in initializer with nested new',
+			'/** @method static void myFunction(SomeClass $object = new SomeClass(new SomeClass)) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@method',
+					new MethodTagValueNode(
+						true,
+						new IdentifierTypeNode('void'),
+						'myFunction',
+						[
+							new MethodTagValueParameterNode(
+								new IdentifierTypeNode('SomeClass'),
+								false,
+								false,
+								'$object',
+								new ConstExprNewNode(
+									'SomeClass',
+									[
+										new ConstExprNewNode('SomeClass', []),
+									]
+								)
+							),
+						],
 						''
 					)
 				),

@@ -5,6 +5,7 @@ namespace PHPStan\PhpDocParser\Printer;
 use LogicException;
 use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNewNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
@@ -105,6 +106,7 @@ final class Printer
 		CallableTypeNode::class . '->templateTypes' => ', ',
 		GenericTypeNode::class . '->genericTypes' => ', ',
 		ConstExprArrayNode::class . '->items' => ', ',
+		ConstExprNewNode::class . '->arguments' => ', ',
 		MethodTagValueNode::class . '->parameters' => ', ',
 		DoctrineArray::class . '->items' => ', ',
 		DoctrineAnnotation::class . '->arguments' => ', ',

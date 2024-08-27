@@ -7,6 +7,7 @@ use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNewNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\QuoteAwareConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
@@ -1739,6 +1740,31 @@ class PrinterTest extends TestCase
 				}
 
 			},
+		];
+
+		$addItemsToConstExprNewArguments = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ConstExprNewNode) {
+					$node->arguments[] = new ConstExprIntegerNode('123');
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @method int doFoo(Foo $foo = new Foo) */',
+			'/** @method int doFoo(Foo $foo = new Foo(123)) */',
+			$addItemsToConstExprNewArguments,
+		];
+
+		yield [
+			'/** @method int doFoo(Foo $foo = new Foo(420)) */',
+			'/** @method int doFoo(Foo $foo = new Foo(420, 123)) */',
+			$addItemsToConstExprNewArguments,
 		];
 	}
 
