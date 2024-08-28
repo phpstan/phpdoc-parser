@@ -13,6 +13,7 @@ use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -766,8 +767,10 @@ class TypeParserTest extends TestCase
 					[],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -787,8 +790,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -808,8 +813,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -834,8 +841,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -844,8 +853,10 @@ class TypeParserTest extends TestCase
 					[],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new IdentifierTypeNode('int'),
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
 				),
 			],
 			[
@@ -865,8 +876,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new IdentifierTypeNode('int'),
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
 				),
 			],
 			[
@@ -886,8 +899,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new IdentifierTypeNode('int'),
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
 				),
 			],
 			[
@@ -914,8 +929,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
-					new IdentifierTypeNode('int'),
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
 				),
 			],
 			[
@@ -924,8 +941,10 @@ class TypeParserTest extends TestCase
 					[],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -945,8 +964,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -966,8 +987,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -992,8 +1015,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -1013,8 +1038,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -1034,8 +1061,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[
@@ -1060,8 +1089,10 @@ class TypeParserTest extends TestCase
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
-					null,
-					new IdentifierTypeNode('string')
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
 				),
 			],
 			[

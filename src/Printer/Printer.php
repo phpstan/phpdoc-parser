@@ -43,6 +43,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -366,16 +367,7 @@ final class Printer
 			}, $node->items);
 
 			if (! $node->sealed) {
-				$item = '...';
-				if ($node->extraValueType !== null) {
-					$extraTypes = [];
-					if ($node->extraKeyType !== null) {
-						$extraTypes[] = $this->printType($node->extraKeyType);
-					}
-					$extraTypes[] = $this->printType($node->extraValueType);
-					$item .= '<' . implode(', ', $extraTypes) . '>';
-				}
-				$items[] = $item;
+				$items[] = '...' . ($node->unsealedType === null ? '' : $this->printType($node->unsealedType));
 			}
 
 			return $node->kind . '{' . implode(', ', $items) . '}';
@@ -391,6 +383,12 @@ final class Printer
 			}
 
 			return $this->printType($node->valueType);
+		}
+		if ($node instanceof ArrayShapeUnsealedTypeNode) {
+			if ($node->keyType !== null) {
+				return sprintf('<%s, %s>', $this->printType($node->keyType), $this->printType($node->valueType));
+			}
+			return sprintf('<%s>', $this->printType($node->valueType));
 		}
 		if ($node instanceof ArrayTypeNode) {
 			return $this->printOffsetAccessType($node->type) . '[]';

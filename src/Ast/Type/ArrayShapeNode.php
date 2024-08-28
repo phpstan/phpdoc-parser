@@ -22,11 +22,8 @@ class ArrayShapeNode implements TypeNode
 	/** @var self::KIND_* */
 	public $kind;
 
-	/** @var TypeNode|null */
-	public $extraKeyType;
-
-	/** @var TypeNode|null */
-	public $extraValueType;
+	/** @var ArrayShapeUnsealedTypeNode|null */
+	public $unsealedType;
 
 	/**
 	 * @param ArrayShapeItemNode[] $items
@@ -36,15 +33,13 @@ class ArrayShapeNode implements TypeNode
 		array $items,
 		bool $sealed = true,
 		string $kind = self::KIND_ARRAY,
-		?TypeNode $extraKeyType = null,
-		?TypeNode $extraValueType = null
+		?ArrayShapeUnsealedTypeNode $unsealedType = null
 	)
 	{
 		$this->items = $items;
 		$this->sealed = $sealed;
 		$this->kind = $kind;
-		$this->extraKeyType = $extraKeyType;
-		$this->extraValueType = $extraValueType;
+		$this->unsealedType = $unsealedType;
 	}
 
 
@@ -53,16 +48,7 @@ class ArrayShapeNode implements TypeNode
 		$items = $this->items;
 
 		if (! $this->sealed) {
-			$item = '...';
-			if ($this->extraValueType !== null) {
-				$extraTypes = [];
-				if ($this->extraKeyType !== null) {
-					$extraTypes[] = (string) $this->extraKeyType;
-				}
-				$extraTypes[] = (string) $this->extraValueType;
-				$item .= '<' . implode(', ', $extraTypes) . '>';
-			}
-			$items[] = $item;
+			$items[] = '...' . $this->unsealedType;
 		}
 
 		return $this->kind . '{' . implode(', ', $items) . '}';
