@@ -1812,6 +1812,58 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		yield [
+			'/** @return list{int, ...} */',
+			'/** @return list{int} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						$node->sealed = true;
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @return list{int, ...} */',
+			'/** @return list{int, ...<string>} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						$node->unsealedType = new ArrayShapeUnsealedTypeNode(new IdentifierTypeNode('string'), null);
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @return list{int, ...<string>} */',
+			'/** @return list{int} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						$node->sealed = true;
+						$node->unsealedType = null;
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**
