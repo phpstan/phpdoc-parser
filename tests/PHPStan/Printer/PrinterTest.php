@@ -28,6 +28,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -51,6 +52,7 @@ use function array_pop;
 use function array_splice;
 use function array_unshift;
 use function array_values;
+use function assert;
 use function count;
 use const PHP_EOL;
 
@@ -1733,6 +1735,76 @@ class PrinterTest extends TestCase
 				{
 					if ($node instanceof ReturnTagValueNode && $node->type instanceof OffsetAccessTypeNode) {
 						$node->type->type = new ConstTypeNode(new ConstFetchNode('self', 'FOO'));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @return array{foo: int, ...} */',
+			'/** @return array{foo: int} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						$node->sealed = true;
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @return array{foo: int, ...} */',
+			'/** @return array{foo: int, ...<string>} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						$node->unsealedType = new ArrayShapeUnsealedTypeNode(new IdentifierTypeNode('string'), null);
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @return array{foo: int, ...<string>} */',
+			'/** @return array{foo: int, ...<int, string>} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						assert($node->unsealedType !== null);
+						$node->unsealedType->keyType = new IdentifierTypeNode('int');
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @return array{foo: int, ...<string>} */',
+			'/** @return array{foo: int} */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ArrayShapeNode) {
+						$node->sealed = true;
+						$node->unsealedType = null;
 					}
 
 					return $node;
