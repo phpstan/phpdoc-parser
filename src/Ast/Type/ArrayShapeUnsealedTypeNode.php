@@ -2,10 +2,11 @@
 
 namespace PHPStan\PhpDocParser\Ast\Type;
 
+use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
 use function sprintf;
 
-class ArrayShapeUnsealedTypeNode implements TypeNode
+class ArrayShapeUnsealedTypeNode implements Node
 {
 
 	use NodeAttributes;

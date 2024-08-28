@@ -230,6 +230,12 @@ final class Printer
 			$isOptional = $node->isOptional ? '=' : '';
 			return trim("{$type}{$isReference}{$isVariadic}{$node->parameterName}") . $isOptional;
 		}
+		if ($node instanceof ArrayShapeUnsealedTypeNode) {
+			if ($node->keyType !== null) {
+				return sprintf('<%s, %s>', $this->printType($node->keyType), $this->printType($node->valueType));
+			}
+			return sprintf('<%s>', $this->printType($node->valueType));
+		}
 		if ($node instanceof DoctrineAnnotation) {
 			return (string) $node;
 		}
@@ -367,7 +373,7 @@ final class Printer
 			}, $node->items);
 
 			if (! $node->sealed) {
-				$items[] = '...' . ($node->unsealedType === null ? '' : $this->printType($node->unsealedType));
+				$items[] = '...' . ($node->unsealedType === null ? '' : $this->print($node->unsealedType));
 			}
 
 			return $node->kind . '{' . implode(', ', $items) . '}';
@@ -383,12 +389,6 @@ final class Printer
 			}
 
 			return $this->printType($node->valueType);
-		}
-		if ($node instanceof ArrayShapeUnsealedTypeNode) {
-			if ($node->keyType !== null) {
-				return sprintf('<%s, %s>', $this->printType($node->keyType), $this->printType($node->valueType));
-			}
-			return sprintf('<%s>', $this->printType($node->valueType));
 		}
 		if ($node instanceof ArrayTypeNode) {
 			return $this->printOffsetAccessType($node->type) . '[]';
