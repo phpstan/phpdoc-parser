@@ -13,6 +13,7 @@ use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
@@ -758,6 +759,403 @@ class TypeParserTest extends TestCase
 					],
 					true,
 					ArrayShapeNode::KIND_LIST
+				),
+			],
+			[
+				'array{...<string>}',
+				new ArrayShapeNode(
+					[],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'array{a: int, b?: int, ...<string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('b'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'array{a:int,b?:int,...<string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('b'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'array{a: int, b?: int, ...  ' . PHP_EOL
+				. '  <  ' . PHP_EOL
+				. '  string  ' . PHP_EOL
+				. '  >  ' . PHP_EOL
+				. '  ,  ' . PHP_EOL
+				. ' }',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('b'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'array{...<int, string>}',
+				new ArrayShapeNode(
+					[],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
+				),
+			],
+			[
+				'array{a: int, b?: int, ...<int, string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('b'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
+				),
+			],
+			[
+				'array{a:int,b?:int,...<int,string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('b'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
+				),
+			],
+			[
+				'array{a: int, b?: int, ...  ' . PHP_EOL
+				. '  <  ' . PHP_EOL
+				. '  int  ' . PHP_EOL
+				. '  ,  ' . PHP_EOL
+				. '  string  ' . PHP_EOL
+				. '  >  ' . PHP_EOL
+				. '  ,  ' . PHP_EOL
+				. '  }',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('b'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_ARRAY,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('int')
+					)
+				),
+			],
+			[
+				'list{...<string>}',
+				new ArrayShapeNode(
+					[],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'list{int, int, ...<string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'list{int,int,...<string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'list{int, int, ...  ' . PHP_EOL
+				. '  <  ' . PHP_EOL
+				. '  string  ' . PHP_EOL
+				. '  >  ' . PHP_EOL
+				. '  ,  ' . PHP_EOL
+				. '  }',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'list{0: int, 1?: int, ...<string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new ConstExprIntegerNode('0'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new ConstExprIntegerNode('1'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'list{0:int,1?:int,...<string>}',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new ConstExprIntegerNode('0'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new ConstExprIntegerNode('1'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'list{0: int, 1?: int, ...  ' . PHP_EOL
+				. '  <  ' . PHP_EOL
+				. '  string  ' . PHP_EOL
+				. '  >  ' . PHP_EOL
+				. '  ,  ' . PHP_EOL
+				. '  }',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							new ConstExprIntegerNode('0'),
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							new ConstExprIntegerNode('1'),
+							true,
+							new IdentifierTypeNode('int')
+						),
+					],
+					false,
+					ArrayShapeNode::KIND_LIST,
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						null
+					)
+				),
+			],
+			[
+				'array{...<>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					10,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'array{...<int,>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					14,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'array{...<int, string,>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					21,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'array{...<int, string, string>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					21,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'list{...<>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					9,
+					Lexer::TOKEN_IDENTIFIER
+				),
+			],
+			[
+				'list{...<int,>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					12,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+				),
+			],
+			[
+				'list{...<int, string>}',
+				new ParserException(
+					',',
+					Lexer::TOKEN_COMMA,
+					12,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
 				),
 			],
 			[
