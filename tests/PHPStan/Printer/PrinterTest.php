@@ -2010,6 +2010,36 @@ class PrinterTest extends TestCase
 			),
 			'self::TYPES[int]',
 		];
+		yield [
+			new ArrayShapeNode([
+				new ArrayShapeItemNode(
+					new IdentifierTypeNode('name'),
+					false,
+					new IdentifierTypeNode('string')
+				),
+				new ArrayShapeItemNode(
+					new QuoteAwareConstExprStringNode('Full Name', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+					false,
+					new IdentifierTypeNode('string')
+				),
+			]),
+			"array{name: string, 'Full Name': string}",
+		];
+		yield [
+			new ObjectShapeNode([
+				new ObjectShapeItemNode(
+					new IdentifierTypeNode('name'),
+					false,
+					new IdentifierTypeNode('string')
+				),
+				new ObjectShapeItemNode(
+					new QuoteAwareConstExprStringNode('Full Name', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+					false,
+					new IdentifierTypeNode('string')
+				),
+			]),
+			"object{name: string, 'Full Name': string}",
+		];
 	}
 
 	/**
