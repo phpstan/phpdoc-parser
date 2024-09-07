@@ -2953,10 +2953,10 @@ some text in the middle',
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description with empty lines' . PHP_EOL .
-							PHP_EOL .
-							PHP_EOL .
-							'some text in the middle',
+							'1st multi world description with empty lines
+
+
+some text in the middle',
 						),
 					),
 					new PhpDocTextNode(''),
@@ -2967,10 +2967,10 @@ some text in the middle',
 							new IdentifierTypeNode('Bar'),
 							false,
 							'$bar',
-							'2nd multi world description with empty lines' . PHP_EOL .
-							PHP_EOL .
-							PHP_EOL .
-							'test',
+							'2nd multi world description with empty lines
+
+
+test',
 						),
 					),
 
@@ -4948,7 +4948,8 @@ time are not reliable as field settings might be missing.'),
 						new IdentifierTypeNode('\Drupal\Core\Field\FieldStorageDefinitionInterface'),
 						false,
 						'$field_definition',
-						PHP_EOL . '  The field definition.',
+						'
+  The field definition.',
 					),
 				),
 				new PhpDocTextNode(''),
@@ -4956,7 +4957,8 @@ time are not reliable as field settings might be missing.'),
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('array'),
-						PHP_EOL . "  An empty array if there is no schema, or an associative array with the
+						"
+  An empty array if there is no schema, or an associative array with the
   following key/value pairs:
   - columns: An array of Schema API column specifications, keyed by column
     name. The columns need to be a subset of the properties defined in
