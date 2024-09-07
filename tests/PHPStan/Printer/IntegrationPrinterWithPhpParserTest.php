@@ -3,12 +3,11 @@
 namespace PHPStan\PhpDocParser\Printer;
 
 use PhpParser\Comment\Doc;
-use PhpParser\Lexer\Emulative;
 use PhpParser\Node as PhpNode;
 use PhpParser\NodeTraverser as PhpParserNodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor as PhpParserCloningVisitor;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\Parser\Php7;
+use PhpParser\ParserFactory;
 use PHPStan\PhpDocParser\Ast\AbstractNodeVisitor;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
@@ -66,14 +65,8 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 	 */
 	public function testPrint(string $file, string $expectedFile, NodeVisitor $visitor): void
 	{
-		$lexer = new Emulative([
-			'usedAttributes' => [
-				'comments',
-				'startLine', 'endLine',
-				'startTokenPos', 'endTokenPos',
-			],
-		]);
-		$phpParser = new Php7($lexer);
+		$phpParserFactory = new ParserFactory();
+		$phpParser = $phpParserFactory->createForNewestSupportedVersion();
 		$phpTraverser = new PhpParserNodeTraverser();
 		$phpTraverser->addVisitor(new PhpParserCloningVisitor());
 
@@ -85,7 +78,7 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 
 		/** @var PhpNode[] $oldStmts */
 		$oldStmts = $phpParser->parse($fileContents);
-		$oldTokens = $lexer->getTokens();
+		$oldTokens = $phpParser->getTokens();
 
 		$phpTraverser2 = new PhpParserNodeTraverser();
 		$phpTraverser2->addVisitor(new class ($visitor) extends NodeVisitorAbstract {
