@@ -7547,6 +7547,41 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@package', new GenericTagValueNode('foo')),
 			]),
 		];
+
+		yield [
+			'/** @deprecated in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+			*   Drupal 9 there will be no way to set the status and in Drupal 8 this
+			*   ability has been removed because mb_*() functions are supplied using
+			*   Symfony\'s polyfill. */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@deprecated',
+					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+  Drupal 9 there will be no way to set the status and in Drupal 8 this
+  ability has been removed because mb_*() functions are supplied using
+  Symfony\'s polyfill.')
+				),
+			]),
+		];
+
+		yield [
+			'/** @\ORM\Column() in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+			*   Drupal 9 there will be no way to set the status and in Drupal 8 this
+			*   ability has been removed because mb_*() functions are supplied using
+			*   Symfony\'s polyfill. */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@\ORM\Column',
+					new DoctrineTagValueNode(
+						new DoctrineAnnotation('@\ORM\Column', []),
+						'in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
+  Drupal 9 there will be no way to set the status and in Drupal 8 this
+  ability has been removed because mb_*() functions are supplied using
+  Symfony\'s polyfill.'
+					)
+				),
+			]),
+		];
 	}
 
 	/**

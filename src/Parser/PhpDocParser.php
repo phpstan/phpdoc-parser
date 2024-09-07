@@ -237,7 +237,7 @@ class PhpDocParser
 			$text .= $tmpText;
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
-			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC)) {
 				break;
 			}
 
@@ -293,7 +293,7 @@ class PhpDocParser
 			$text .= $tmpText;
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
-			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL, Lexer::TOKEN_CLOSE_PHPDOC)) {
 				if (!$tokens->isPrecededByHorizontalWhitespace()) {
 					return trim($text . $this->parseText($tokens)->text, " \t");
 				}
