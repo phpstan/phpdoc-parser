@@ -5,7 +5,7 @@ name: "Deploy API Reference"
 on:
   push:
     branches:
-      - "1.23.x"
+      - "2.0.x"
 
 concurrency:
   group: "pages"
