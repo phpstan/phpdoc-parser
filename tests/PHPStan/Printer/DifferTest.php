@@ -44,9 +44,7 @@ class DifferTest extends TestCase
 	 */
 	public function testDiff(string $oldStr, string $newStr, string $expectedDiffStr): void
 	{
-		$differ = new Differ(static function ($a, $b) {
-			return $a === $b;
-		});
+		$differ = new Differ(static fn ($a, $b) => $a === $b);
 		$diff = $differ->diff(str_split($oldStr), str_split($newStr));
 		$this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
 	}
@@ -72,9 +70,7 @@ class DifferTest extends TestCase
 	 */
 	public function testDiffWithReplacements(string $oldStr, string $newStr, string $expectedDiffStr): void
 	{
-		$differ = new Differ(static function ($a, $b) {
-			return $a === $b;
-		});
+		$differ = new Differ(static fn ($a, $b) => $a === $b);
 		$diff = $differ->diffWithReplacements(str_split($oldStr), str_split($newStr));
 		$this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
 	}

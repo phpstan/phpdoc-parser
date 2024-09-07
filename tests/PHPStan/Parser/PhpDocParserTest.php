@@ -72,11 +72,9 @@ use const PHP_EOL;
 class PhpDocParserTest extends TestCase
 {
 
-	/** @var Lexer */
-	private $lexer;
+	private Lexer $lexer;
 
-	/** @var PhpDocParser */
-	private $phpDocParser;
+	private PhpDocParser $phpDocParser;
 
 	protected function setUp(): void
 	{
@@ -131,7 +129,7 @@ class PhpDocParserTest extends TestCase
 			$this->phpDocParser,
 			$label,
 			$input,
-			$expectedPhpDocNode
+			$expectedPhpDocNode,
 		);
 	}
 
@@ -159,8 +157,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						false,
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -175,8 +173,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						false,
 						'$foo',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -191,8 +189,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						true,
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -207,8 +205,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						true,
 						'$foo',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -224,8 +222,8 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -241,8 +239,8 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'optional description',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -258,8 +256,8 @@ class PhpDocParserTest extends TestCase
 						true,
 						'$foo',
 						'',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -275,8 +273,8 @@ class PhpDocParserTest extends TestCase
 						true,
 						'$foo',
 						'optional description',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -291,8 +289,8 @@ class PhpDocParserTest extends TestCase
 						new ConstTypeNode(new ConstFetchNode('self', '*')),
 						false,
 						'$foo',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -311,9 +309,9 @@ class PhpDocParserTest extends TestCase
 							11,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -332,9 +330,9 @@ class PhpDocParserTest extends TestCase
 							11,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -353,9 +351,9 @@ class PhpDocParserTest extends TestCase
 							16,
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -374,9 +372,9 @@ class PhpDocParserTest extends TestCase
 							16,
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -395,9 +393,9 @@ class PhpDocParserTest extends TestCase
 							19,
 							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -416,9 +414,9 @@ class PhpDocParserTest extends TestCase
 							16,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -437,9 +435,9 @@ class PhpDocParserTest extends TestCase
 							15,
 							Lexer::TOKEN_VARIABLE,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -460,9 +458,9 @@ class PhpDocParserTest extends TestCase
 							21,
 							Lexer::TOKEN_VARIABLE,
 							null,
-							2
-						)
-					)
+							2,
+						),
+					),
 				),
 			]),
 		];
@@ -481,9 +479,9 @@ class PhpDocParserTest extends TestCase
 							15,
 							Lexer::TOKEN_VARIABLE,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -508,8 +506,8 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$parameters',
 						'{' . PHP_EOL .
-						'    Optional. Parameters for filtering the list of user assignments. Default empty array.'
-					)
+						'    Optional. Parameters for filtering the list of user assignments. Default empty array.',
+					),
 				),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode('@type', new GenericTagValueNode('bool $is_active                Pass `true` to only return active user assignments and `false` to' . PHP_EOL .
@@ -532,8 +530,8 @@ class PhpDocParserTest extends TestCase
 					new TypelessParamTagValueNode(
 						false,
 						'$foo',
-						'description'
-					)
+						'description',
+					),
 				),
 			]),
 		];
@@ -548,8 +546,8 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'description',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -563,8 +561,8 @@ class PhpDocParserTest extends TestCase
 					new TypelessParamTagValueNode(
 						true,
 						'$foo',
-						'description'
-					)
+						'description',
+					),
 				),
 			]),
 		];
@@ -579,8 +577,8 @@ class PhpDocParserTest extends TestCase
 						true,
 						'$foo',
 						'description',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -595,8 +593,8 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'',
-						false
-					)
+						false,
+					),
 				),
 			]),
 		];
@@ -612,8 +610,8 @@ class PhpDocParserTest extends TestCase
 					'@param-immediately-invoked-callable',
 					new ParamImmediatelyInvokedCallableTagValueNode(
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -626,8 +624,8 @@ class PhpDocParserTest extends TestCase
 					'@param-immediately-invoked-callable',
 					new ParamImmediatelyInvokedCallableTagValueNode(
 						'$foo',
-						'test two three'
-					)
+						'test two three',
+					),
 				),
 			]),
 		];
@@ -643,8 +641,8 @@ class PhpDocParserTest extends TestCase
 					'@param-later-invoked-callable',
 					new ParamLaterInvokedCallableTagValueNode(
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -657,8 +655,8 @@ class PhpDocParserTest extends TestCase
 					'@param-later-invoked-callable',
 					new ParamLaterInvokedCallableTagValueNode(
 						'$foo',
-						'test two three'
-					)
+						'test two three',
+					),
 				),
 			]),
 		];
@@ -675,8 +673,8 @@ class PhpDocParserTest extends TestCase
 					new ParamClosureThisTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$a',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -690,8 +688,8 @@ class PhpDocParserTest extends TestCase
 					new ParamClosureThisTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$a',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -705,8 +703,8 @@ class PhpDocParserTest extends TestCase
 					new ParamClosureThisTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$a',
-						'test'
-					)
+						'test',
+					),
 				),
 			]),
 		];
@@ -723,8 +721,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -738,8 +736,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -753,8 +751,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -768,8 +766,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -782,11 +780,11 @@ class PhpDocParserTest extends TestCase
 					'@var',
 					new VarTagValueNode(
 						new ArrayTypeNode(
-							new IdentifierTypeNode('callable')
+							new IdentifierTypeNode('callable'),
 						),
 						'',
-						'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created'
-					)
+						'function (Configurator $sender, DI\Compiler $compiler); Occurs after the compiler is created',
+					),
 				),
 			]),
 		];
@@ -800,8 +798,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'',
-						'@inject'
-					)
+						'@inject',
+					),
 				),
 			]),
 		];
@@ -815,8 +813,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'',
-						'(Bar)'
-					)
+						'(Bar)',
+					),
 				),
 			]),
 		];
@@ -830,8 +828,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$foo',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -845,8 +843,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$this',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -860,8 +858,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$this',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -875,8 +873,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$this',
-						'Testing'
-					)
+						'Testing',
+					),
 				),
 			]),
 		];
@@ -890,8 +888,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$this',
-						'Testing'
-					)
+						'Testing',
+					),
 				),
 			]),
 		];
@@ -905,8 +903,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$foo',
-						'#desc'
-					)
+						'#desc',
+					),
 				),
 			]),
 		];
@@ -920,8 +918,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new ConstTypeNode(new ConstFetchNode('self', '*')),
 						'$foo',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -935,8 +933,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$var',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -950,8 +948,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -970,9 +968,9 @@ class PhpDocParserTest extends TestCase
 							9,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -991,9 +989,9 @@ class PhpDocParserTest extends TestCase
 							9,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1012,9 +1010,9 @@ class PhpDocParserTest extends TestCase
 							14,
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1033,9 +1031,9 @@ class PhpDocParserTest extends TestCase
 							14,
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1054,9 +1052,9 @@ class PhpDocParserTest extends TestCase
 							17,
 							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1075,9 +1073,9 @@ class PhpDocParserTest extends TestCase
 							14,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1097,10 +1095,10 @@ class PhpDocParserTest extends TestCase
 								46,
 								Lexer::TOKEN_PHPDOC_EOL,
 								null,
-								1
-							)
-						)
-					)
+								1,
+							),
+						),
+					),
 				),
 			]),
 		];
@@ -1118,8 +1116,8 @@ class PhpDocParserTest extends TestCase
 					new PropertyTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1133,8 +1131,8 @@ class PhpDocParserTest extends TestCase
 					new PropertyTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$foo',
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -1153,9 +1151,9 @@ class PhpDocParserTest extends TestCase
 							14,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1174,9 +1172,9 @@ class PhpDocParserTest extends TestCase
 							14,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1195,9 +1193,9 @@ class PhpDocParserTest extends TestCase
 							19,
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1216,9 +1214,9 @@ class PhpDocParserTest extends TestCase
 							19,
 							Lexer::TOKEN_CLOSE_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1237,9 +1235,9 @@ class PhpDocParserTest extends TestCase
 							22,
 							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1258,9 +1256,9 @@ class PhpDocParserTest extends TestCase
 							19,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1279,9 +1277,9 @@ class PhpDocParserTest extends TestCase
 							18,
 							Lexer::TOKEN_VARIABLE,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1300,9 +1298,9 @@ class PhpDocParserTest extends TestCase
 							18,
 							Lexer::TOKEN_VARIABLE,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1319,8 +1317,8 @@ class PhpDocParserTest extends TestCase
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1333,8 +1331,8 @@ class PhpDocParserTest extends TestCase
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -1347,8 +1345,8 @@ class PhpDocParserTest extends TestCase
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'[Bar]'
-					)
+						'[Bar]',
+					),
 				),
 			]),
 		];
@@ -1362,10 +1360,10 @@ class PhpDocParserTest extends TestCase
 					new ReturnTagValueNode(
 						new OffsetAccessTypeNode(
 							new IdentifierTypeNode('Foo'),
-							new IdentifierTypeNode('Bar')
+							new IdentifierTypeNode('Bar'),
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1378,8 +1376,8 @@ class PhpDocParserTest extends TestCase
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('MongoCollection'),
-						'<p>Returns a collection object representing the new collection.</p>'
-					)
+						'<p>Returns a collection object representing the new collection.</p>',
+					),
 				),
 			]),
 		];
@@ -1398,9 +1396,9 @@ class PhpDocParserTest extends TestCase
 							12,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1419,9 +1417,9 @@ class PhpDocParserTest extends TestCase
 							12,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1440,9 +1438,9 @@ class PhpDocParserTest extends TestCase
 							18,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1461,9 +1459,9 @@ class PhpDocParserTest extends TestCase
 							18,
 							Lexer::TOKEN_OTHER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1482,9 +1480,9 @@ class PhpDocParserTest extends TestCase
 							18,
 							Lexer::TOKEN_OTHER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1503,9 +1501,9 @@ class PhpDocParserTest extends TestCase
 							24,
 							Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1526,11 +1524,11 @@ class PhpDocParserTest extends TestCase
 								],
 								[
 									GenericTypeNode::VARIANCE_INVARIANT,
-								]
+								],
 							),
 						]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1543,8 +1541,8 @@ class PhpDocParserTest extends TestCase
 					'@return',
 					new ReturnTagValueNode(
 						new ConstTypeNode(new ConstFetchNode('self', '*')),
-						'example description'
-					)
+						'example description',
+					),
 				),
 			]),
 		];
@@ -1561,10 +1559,10 @@ class PhpDocParserTest extends TestCase
 							new IdentifierTypeNode('Bar'),
 							new IdentifierTypeNode('never'),
 							new IdentifierTypeNode('int'),
-							false
+							false,
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1581,10 +1579,10 @@ class PhpDocParserTest extends TestCase
 							new IdentifierTypeNode('Bar'),
 							new IdentifierTypeNode('never'),
 							new IdentifierTypeNode('int'),
-							true
+							true,
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1607,12 +1605,12 @@ class PhpDocParserTest extends TestCase
 								new ConstTypeNode(new ConstFetchNode('self', 'TYPE_INT')),
 								new IdentifierTypeNode('int'),
 								new IdentifierTypeNode('bool'),
-								false
+								false,
 							),
-							false
+							false,
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1625,8 +1623,8 @@ class PhpDocParserTest extends TestCase
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'is not Bar ? never : int'
-					)
+						'is not Bar ? never : int',
+					),
 				),
 			]),
 		];
@@ -1643,10 +1641,10 @@ class PhpDocParserTest extends TestCase
 							new IdentifierTypeNode('Bar'),
 							new IdentifierTypeNode('never'),
 							new IdentifierTypeNode('int'),
-							false
+							false,
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1663,10 +1661,10 @@ class PhpDocParserTest extends TestCase
 							new IdentifierTypeNode('Bar'),
 							new IdentifierTypeNode('never'),
 							new IdentifierTypeNode('int'),
-							true
+							true,
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1689,12 +1687,12 @@ class PhpDocParserTest extends TestCase
 								new ConstTypeNode(new ConstFetchNode('self', 'TYPE_INT')),
 								new IdentifierTypeNode('int'),
 								new IdentifierTypeNode('bool'),
-								false
+								false,
 							),
-							false
+							false,
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1713,9 +1711,9 @@ class PhpDocParserTest extends TestCase
 							12,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1735,20 +1733,20 @@ class PhpDocParserTest extends TestCase
 									false,
 									true,
 									'$u',
-									false
+									false,
 								),
 								new CallableTypeParameterNode(
 									new IdentifierTypeNode('string'),
 									false,
 									false,
 									'',
-									false
+									false,
 								),
 							],
-							new IdentifierTypeNode('string')
+							new IdentifierTypeNode('string'),
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1767,9 +1765,9 @@ class PhpDocParserTest extends TestCase
 							20,
 							Lexer::TOKEN_HORIZONTAL_WS,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1786,8 +1784,8 @@ class PhpDocParserTest extends TestCase
 					'@throws',
 					new ThrowsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1800,8 +1798,8 @@ class PhpDocParserTest extends TestCase
 					'@throws',
 					new ThrowsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -1814,8 +1812,8 @@ class PhpDocParserTest extends TestCase
 					'@throws',
 					new ThrowsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'[Bar]'
-					)
+						'[Bar]',
+					),
 				),
 			]),
 		];
@@ -1834,9 +1832,9 @@ class PhpDocParserTest extends TestCase
 							12,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1855,9 +1853,9 @@ class PhpDocParserTest extends TestCase
 							18,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1873,8 +1871,8 @@ class PhpDocParserTest extends TestCase
 					'@mixin',
 					new MixinTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1887,8 +1885,8 @@ class PhpDocParserTest extends TestCase
 					'@mixin',
 					new MixinTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -1901,8 +1899,8 @@ class PhpDocParserTest extends TestCase
 					'@mixin',
 					new MixinTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'[Bar]'
-					)
+						'[Bar]',
+					),
 				),
 			]),
 		];
@@ -1921,9 +1919,9 @@ class PhpDocParserTest extends TestCase
 							11,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1942,9 +1940,9 @@ class PhpDocParserTest extends TestCase
 							17,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -1961,8 +1959,8 @@ class PhpDocParserTest extends TestCase
 						], [
 							GenericTypeNode::VARIANCE_INVARIANT,
 						]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1978,8 +1976,8 @@ class PhpDocParserTest extends TestCase
 					'@phpstan-require-extends',
 					new RequireExtendsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -1992,8 +1990,8 @@ class PhpDocParserTest extends TestCase
 					'@phpstan-require-extends',
 					new RequireExtendsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -2006,8 +2004,8 @@ class PhpDocParserTest extends TestCase
 					'@psalm-require-extends',
 					new RequireExtendsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -2026,9 +2024,9 @@ class PhpDocParserTest extends TestCase
 							29,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -2044,8 +2042,8 @@ class PhpDocParserTest extends TestCase
 					'@phpstan-require-implements',
 					new RequireImplementsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2058,8 +2056,8 @@ class PhpDocParserTest extends TestCase
 					'@phpstan-require-implements',
 					new RequireImplementsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -2072,8 +2070,8 @@ class PhpDocParserTest extends TestCase
 					'@psalm-require-implements',
 					new RequireImplementsTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -2092,9 +2090,9 @@ class PhpDocParserTest extends TestCase
 							32,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -2108,7 +2106,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('')
+					new DeprecatedTagValueNode(''),
 				),
 			]),
 		];
@@ -2119,7 +2117,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('text string')
+					new DeprecatedTagValueNode('text string'),
 				),
 			]),
 		];
@@ -2132,12 +2130,12 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('text first')
+					new DeprecatedTagValueNode('text first'),
 				),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('text second')
+					new DeprecatedTagValueNode('text second'),
 				),
 			]),
 		];
@@ -2150,11 +2148,11 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('text first')
+					new DeprecatedTagValueNode('text first'),
 				),
 				new PhpDocTagNode(
 					'@deprecated',
-					new DeprecatedTagValueNode('text second')
+					new DeprecatedTagValueNode('text second'),
 				),
 			]),
 		];
@@ -2171,7 +2169,7 @@ class PhpDocParserTest extends TestCase
 					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
   Drupal 9 there will be no way to set the status and in Drupal 8 this
   ability has been removed because mb_*() functions are supplied using
-  Symfony\'s polyfill.')
+  Symfony\'s polyfill.'),
 				),
 			]),
 		];
@@ -2192,7 +2190,7 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@author',
-					new GenericTagValueNode('Foo Baz <foo@baz.com>')
+					new GenericTagValueNode('Foo Baz <foo@baz.com>'),
 				),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
@@ -2200,7 +2198,7 @@ class PhpDocParserTest extends TestCase
 					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
   Drupal 9 there will be no way to set the status and in Drupal 8 this
   ability has been removed because mb_*() functions are supplied using
-  Symfony\'s polyfill.')
+  Symfony\'s polyfill.'),
 				),
 			]),
 		];
@@ -2219,8 +2217,8 @@ class PhpDocParserTest extends TestCase
 						null,
 						'foo',
 						[],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2236,8 +2234,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						'foo',
 						[],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2253,8 +2251,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('static'),
 						'foo',
 						[],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2270,8 +2268,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						'foo',
 						[],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2287,8 +2285,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('static'),
 						'foo',
 						[],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2304,8 +2302,8 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						'foo',
 						[],
-						'optional description'
-					)
+						'optional description',
+					),
 				),
 			]),
 		];
@@ -2326,11 +2324,11 @@ class PhpDocParserTest extends TestCase
 								false,
 								false,
 								'$a',
-								null
+								null,
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2351,11 +2349,11 @@ class PhpDocParserTest extends TestCase
 								false,
 								false,
 								'$a',
-								null
+								null,
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2376,11 +2374,11 @@ class PhpDocParserTest extends TestCase
 								true,
 								false,
 								'$a',
-								null
+								null,
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2401,11 +2399,11 @@ class PhpDocParserTest extends TestCase
 								false,
 								true,
 								'$a',
-								null
+								null,
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2426,11 +2424,11 @@ class PhpDocParserTest extends TestCase
 								true,
 								true,
 								'$a',
-								null
+								null,
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2451,11 +2449,11 @@ class PhpDocParserTest extends TestCase
 								false,
 								false,
 								'$a',
-								new ConstExprIntegerNode('123')
+								new ConstExprIntegerNode('123'),
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2476,11 +2474,11 @@ class PhpDocParserTest extends TestCase
 								true,
 								true,
 								'$a',
-								new ConstExprIntegerNode('123')
+								new ConstExprIntegerNode('123'),
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2501,25 +2499,25 @@ class PhpDocParserTest extends TestCase
 								false,
 								false,
 								'$a',
-								null
+								null,
 							),
 							new MethodTagValueParameterNode(
 								null,
 								false,
 								false,
 								'$b',
-								null
+								null,
 							),
 							new MethodTagValueParameterNode(
 								null,
 								false,
 								false,
 								'$c',
-								null
+								null,
 							),
 						],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2538,9 +2536,9 @@ class PhpDocParserTest extends TestCase
 							16,
 							Lexer::TOKEN_OPEN_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -2559,9 +2557,9 @@ class PhpDocParserTest extends TestCase
 							23,
 							Lexer::TOKEN_OPEN_PARENTHESES,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -2580,9 +2578,9 @@ class PhpDocParserTest extends TestCase
 							17,
 							Lexer::TOKEN_VARIABLE,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -2608,7 +2606,7 @@ class PhpDocParserTest extends TestCase
 									[
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
-									]
+									],
 								),
 								false,
 								false,
@@ -2616,13 +2614,13 @@ class PhpDocParserTest extends TestCase
 								new ConstExprArrayNode([
 									new ConstExprArrayItemNode(
 										null,
-										new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED)
+										new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED),
 									),
 									new ConstExprArrayItemNode(
 										null,
-										new ConstExprStringNode('b', ConstExprStringNode::SINGLE_QUOTED)
+										new ConstExprStringNode('b', ConstExprStringNode::SINGLE_QUOTED),
 									),
-								])
+								]),
 							),
 						],
 						'',
@@ -2631,10 +2629,10 @@ class PhpDocParserTest extends TestCase
 								'T',
 								null,
 								'',
-								new IdentifierTypeNode('string')
+								new IdentifierTypeNode('string'),
 							),
-						]
-					)
+						],
+					),
 				),
 			]),
 		];
@@ -2655,21 +2653,21 @@ class PhpDocParserTest extends TestCase
 								false,
 								false,
 								'$t1',
-								null
+								null,
 							),
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('T2'),
 								false,
 								false,
 								'$t2',
-								null
+								null,
 							),
 							new MethodTagValueParameterNode(
 								new IdentifierTypeNode('T3'),
 								false,
 								false,
 								'$t3',
-								null
+								null,
 							),
 						],
 						'',
@@ -2677,8 +2675,8 @@ class PhpDocParserTest extends TestCase
 							new TemplateTagValueNode('T1', null, ''),
 							new TemplateTagValueNode('T2', new IdentifierTypeNode('Bar'), ''),
 							new TemplateTagValueNode('T3', new IdentifierTypeNode('Baz'), ''),
-						]
-					)
+						],
+					),
 				),
 			]),
 		];
@@ -2697,8 +2695,8 @@ class PhpDocParserTest extends TestCase
 						]),
 						'foo',
 						[],
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2718,7 +2716,7 @@ class PhpDocParserTest extends TestCase
 			'/** /**/',
 			new PhpDocNode([
 				new PhpDocTextNode(
-					'/*'
+					'/*',
 				),
 			]),
 		];
@@ -2728,7 +2726,7 @@ class PhpDocParserTest extends TestCase
 			'/** text */',
 			new PhpDocNode([
 				new PhpDocTextNode(
-					'text'
+					'text',
 				),
 			]),
 		];
@@ -2738,7 +2736,7 @@ class PhpDocParserTest extends TestCase
 			'/** text @foo bar */',
 			new PhpDocNode([
 				new PhpDocTextNode(
-					'text @foo bar'
+					'text @foo bar',
 				),
 			]),
 		];
@@ -2749,7 +2747,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('')
+					new GenericTagValueNode(''),
 				),
 			]),
 		];
@@ -2760,7 +2758,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('lorem ipsum')
+					new GenericTagValueNode('lorem ipsum'),
 				),
 			]),
 		];
@@ -2771,11 +2769,11 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@foo',
-					new GenericTagValueNode('lorem')
+					new GenericTagValueNode('lorem'),
 				),
 				new PhpDocTagNode(
 					'@bar',
-					new GenericTagValueNode('ipsum')
+					new GenericTagValueNode('ipsum'),
 				),
 			]),
 		];
@@ -2787,8 +2785,8 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@varFoo',
 					new GenericTagValueNode(
-						'$foo'
-					)
+						'$foo',
+					),
 				),
 			]),
 		];
@@ -2803,11 +2801,11 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@example',
-					new GenericTagValueNode('')
+					new GenericTagValueNode(''),
 				),
 				new PhpDocTextNode(
 					'entity_managers:' . PHP_EOL .
-					'    default:'
+					'    default:',
 				),
 			]),
 		];
@@ -2824,11 +2822,11 @@ class PhpDocParserTest extends TestCase
 							[
 								new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false),
 							],
-							new IdentifierTypeNode('void')
+							new IdentifierTypeNode('void'),
 						),
 						'',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -2842,8 +2840,8 @@ class PhpDocParserTest extends TestCase
 					new VarTagValueNode(
 						new IdentifierTypeNode('callable'),
 						'',
-						'(int)'
-					)
+						'(int)',
+					),
 				),
 			]),
 		];
@@ -2862,9 +2860,9 @@ class PhpDocParserTest extends TestCase
 							17,
 							Lexer::TOKEN_HORIZONTAL_WS,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -2889,8 +2887,8 @@ class PhpDocParserTest extends TestCase
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description'
-						)
+							'1st multi world description',
+						),
 					),
 					new PhpDocTagNode(
 						'@param',
@@ -2898,8 +2896,8 @@ class PhpDocParserTest extends TestCase
 							new IdentifierTypeNode('Bar'),
 							false,
 							'$bar',
-							'2nd multi world description'
-						)
+							'2nd multi world description',
+						),
 					),
 				]),
 			],
@@ -2918,8 +2916,8 @@ class PhpDocParserTest extends TestCase
 							false,
 							'$foo',
 							'1st multi world description
-some text in the middle'
-						)
+some text in the middle',
+						),
 					),
 					new PhpDocTagNode(
 						'@param',
@@ -2927,8 +2925,8 @@ some text in the middle'
 							new IdentifierTypeNode('Bar'),
 							false,
 							'$bar',
-							'2nd multi world description'
-						)
+							'2nd multi world description',
+						),
 					),
 				]),
 			],
@@ -2957,8 +2955,8 @@ some text in the middle'
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description with empty lines'
-						)
+							'1st multi world description with empty lines',
+						),
 					),
 					new PhpDocTextNode(''),
 					new PhpDocTextNode(''),
@@ -2971,8 +2969,8 @@ some text in the middle'
 							new IdentifierTypeNode('Bar'),
 							false,
 							'$bar',
-							'2nd multi world description with empty lines'
-						)
+							'2nd multi world description with empty lines',
+						),
 					),
 					new PhpDocTextNode(''),
 					new PhpDocTextNode(''),
@@ -3004,8 +3002,8 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							false,
 							'$foo',
-							'@param string $bar'
-						)
+							'@param string $bar',
+						),
 					),
 				]),
 			],
@@ -3063,18 +3061,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3088,18 +3086,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									null,
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3111,8 +3109,8 @@ some text in the middle'
 							]),
 							'getFooOrBar',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3121,8 +3119,8 @@ some text in the middle'
 							null,
 							'methodWithNoReturnType',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3136,18 +3134,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3161,18 +3159,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									null,
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3184,8 +3182,8 @@ some text in the middle'
 							]),
 							'getFooOrBarStatically',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3194,8 +3192,8 @@ some text in the middle'
 							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStatically',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3209,18 +3207,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							'Get an integer with a description.'
-						)
+							'Get an integer with a description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3234,18 +3232,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									null,
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							'Do something with a description.'
-						)
+							'Do something with a description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3257,8 +3255,8 @@ some text in the middle'
 							]),
 							'getFooOrBarWithDescription',
 							[],
-							'Get a Foo or a Bar with a description.'
-						)
+							'Get a Foo or a Bar with a description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3267,8 +3265,8 @@ some text in the middle'
 							null,
 							'methodWithNoReturnTypeWithDescription',
 							[],
-							'Do something with a description but what, who knows!'
-						)
+							'Do something with a description but what, who knows!',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3282,18 +3280,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									new IdentifierTypeNode('int'),
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							'Get an integer with a description statically.'
-						)
+							'Get an integer with a description statically.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3307,18 +3305,18 @@ some text in the middle'
 									false,
 									false,
 									'$a',
-									null
+									null,
 								),
 								new MethodTagValueParameterNode(
 									null,
 									false,
 									false,
 									'$b',
-									null
+									null,
 								),
 							],
-							'Do something with a description statically.'
-						)
+							'Do something with a description statically.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3330,8 +3328,8 @@ some text in the middle'
 							]),
 							'getFooOrBarStaticallyWithDescription',
 							[],
-							'Get a Foo or a Bar with a description statically.'
-						)
+							'Get a Foo or a Bar with a description statically.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3340,8 +3338,8 @@ some text in the middle'
 							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStaticallyWithDescription',
 							[],
-							'Do something with a description statically, but what, who knows!'
-						)
+							'Do something with a description statically, but what, who knows!',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3350,8 +3348,8 @@ some text in the middle'
 							new IdentifierTypeNode('bool'),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClass',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3360,8 +3358,8 @@ some text in the middle'
 							new IdentifierTypeNode('string'),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescription',
 							[],
-							'A Description.'
-						)
+							'A Description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3370,8 +3368,8 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3380,8 +3378,8 @@ some text in the middle'
 							new IdentifierTypeNode('void'),
 							'doSomethingNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3393,8 +3391,8 @@ some text in the middle'
 							]),
 							'getFooOrBarNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3403,8 +3401,8 @@ some text in the middle'
 							null,
 							'methodWithNoReturnTypeNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3413,8 +3411,8 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerStaticallyNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3423,8 +3421,8 @@ some text in the middle'
 							new IdentifierTypeNode('void'),
 							'doSomethingStaticallyNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3436,8 +3434,8 @@ some text in the middle'
 							]),
 							'getFooOrBarStaticallyNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3446,8 +3444,8 @@ some text in the middle'
 							new IdentifierTypeNode('static'),
 							'methodWithNoReturnTypeStaticallyNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3456,8 +3454,8 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerWithDescriptionNoParams',
 							[],
-							'Get an integer with a description.'
-						)
+							'Get an integer with a description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3466,8 +3464,8 @@ some text in the middle'
 							new IdentifierTypeNode('void'),
 							'doSomethingWithDescriptionNoParams',
 							[],
-							'Do something with a description.'
-						)
+							'Do something with a description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3479,8 +3477,8 @@ some text in the middle'
 							]),
 							'getFooOrBarWithDescriptionNoParams',
 							[],
-							'Get a Foo or a Bar with a description.'
-						)
+							'Get a Foo or a Bar with a description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3489,8 +3487,8 @@ some text in the middle'
 							new IdentifierTypeNode('int'),
 							'getIntegerStaticallyWithDescriptionNoParams',
 							[],
-							'Get an integer with a description statically.'
-						)
+							'Get an integer with a description statically.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3499,8 +3497,8 @@ some text in the middle'
 							new IdentifierTypeNode('void'),
 							'doSomethingStaticallyWithDescriptionNoParams',
 							[],
-							'Do something with a description statically.'
-						)
+							'Do something with a description statically.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3512,8 +3510,8 @@ some text in the middle'
 							]),
 							'getFooOrBarStaticallyWithDescriptionNoParams',
 							[],
-							'Get a Foo or a Bar with a description statically.'
-						)
+							'Get a Foo or a Bar with a description statically.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3525,8 +3523,8 @@ some text in the middle'
 							]),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassNoParams',
 							[],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3538,8 +3536,8 @@ some text in the middle'
 							]),
 							'aStaticMethodThatHasAUniqueReturnTypeInThisClassWithDescriptionNoParams',
 							[],
-							'A Description.'
-						)
+							'A Description.',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3553,11 +3551,11 @@ some text in the middle'
 									false,
 									false,
 									'$args',
-									null
+									null,
 								),
 							],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3571,18 +3569,18 @@ some text in the middle'
 									true,
 									true,
 									'$angle',
-									new ConstExprArrayNode([])
+									new ConstExprArrayNode([]),
 								),
 								new MethodTagValueParameterNode(
 									null,
 									false,
 									false,
 									'$backgroundColor',
-									null
+									null,
 								),
 							],
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3591,8 +3589,8 @@ some text in the middle'
 							new IdentifierTypeNode('Foo'),
 							'overridenMethod',
 							[],
-							''
-						)
+							'',
+						),
 					),
 				]),
 			],
@@ -3606,11 +3604,11 @@ some text in the middle'
 				new PhpDocNode([
 					new PhpDocTagNode(
 						'@template',
-						new TemplateTagValueNode('TKey', new IdentifierTypeNode('array-key'), '')
+						new TemplateTagValueNode('TKey', new IdentifierTypeNode('array-key'), ''),
 					),
 					new PhpDocTagNode(
 						'@template',
-						new TemplateTagValueNode('TValue', null, '')
+						new TemplateTagValueNode('TValue', null, ''),
 					),
 					new PhpDocTagNode(
 						'@method',
@@ -3627,11 +3625,11 @@ some text in the middle'
 									false,
 									false,
 									'$v',
-									null
+									null,
 								),
 							],
-							'find index of $v'
-						)
+							'find index of $v',
+						),
 					),
 				]),
 			],
@@ -3653,11 +3651,11 @@ some text in the middle'
 				new PhpDocNode([
 					new PhpDocTagNode(
 						'@template',
-						new TemplateTagValueNode('TRandKey', new IdentifierTypeNode('array-key'), '')
+						new TemplateTagValueNode('TRandKey', new IdentifierTypeNode('array-key'), ''),
 					),
 					new PhpDocTagNode(
 						'@template',
-						new TemplateTagValueNode('TRandVal', null, '')
+						new TemplateTagValueNode('TRandVal', null, ''),
 					),
 					new PhpDocTagNode(
 						'@template',
@@ -3673,7 +3671,7 @@ some text in the middle'
 									[
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
-									]
+									],
 								),
 								new GenericTypeNode(
 									new IdentifierTypeNode('XIterator'),
@@ -3684,7 +3682,7 @@ some text in the middle'
 									[
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
-									]
+									],
 								),
 								new GenericTypeNode(
 									new IdentifierTypeNode('Traversable'),
@@ -3695,11 +3693,11 @@ some text in the middle'
 									[
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
-									]
+									],
 								),
 							]),
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTextNode(''),
 					new PhpDocTagNode(
@@ -3708,8 +3706,8 @@ some text in the middle'
 							new IdentifierTypeNode('TRandList'),
 							false,
 							'$list',
-							''
-						)
+							'',
+						),
 					),
 					new PhpDocTextNode(''),
 					new PhpDocTagNode(
@@ -3727,7 +3725,7 @@ some text in the middle'
 									[
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
-									]
+									],
 								),
 								new ConditionalTypeNode(
 									new IdentifierTypeNode('TRandList'),
@@ -3741,7 +3739,7 @@ some text in the middle'
 										[
 											GenericTypeNode::VARIANCE_INVARIANT,
 											GenericTypeNode::VARIANCE_INVARIANT,
-										]
+										],
 									),
 									new UnionTypeNode([
 										new GenericTypeNode(
@@ -3753,7 +3751,7 @@ some text in the middle'
 											[
 												GenericTypeNode::VARIANCE_INVARIANT,
 												GenericTypeNode::VARIANCE_INVARIANT,
-											]
+											],
 										),
 										new GenericTypeNode(
 											new IdentifierTypeNode('LimitIterator'),
@@ -3764,15 +3762,15 @@ some text in the middle'
 											[
 												GenericTypeNode::VARIANCE_INVARIANT,
 												GenericTypeNode::VARIANCE_INVARIANT,
-											]
+											],
 										),
 									]),
-									false
+									false,
 								),
-								false
+								false,
 							),
-							''
-						)
+							'',
+						),
 					),
 				]),
 			],
@@ -3824,8 +3822,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						null,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -3839,8 +3837,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						null,
-						'the value type'
-					)
+						'the value type',
+					),
 				),
 			]),
 		];
@@ -3854,8 +3852,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						new IdentifierTypeNode('DateTime'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -3869,8 +3867,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						new IdentifierTypeNode('DateTime'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -3884,8 +3882,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						new IdentifierTypeNode('DateTime'),
-						'the value type'
-					)
+						'the value type',
+					),
 				),
 			]),
 		];
@@ -3899,8 +3897,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						new IdentifierTypeNode('DateTime'),
-						'the value type'
-					)
+						'the value type',
+					),
 				),
 			]),
 		];
@@ -3919,9 +3917,9 @@ some text in the middle'
 							14,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -3940,9 +3938,9 @@ some text in the middle'
 							14,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -3956,8 +3954,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						null,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -3971,8 +3969,8 @@ some text in the middle'
 					new TemplateTagValueNode(
 						'T',
 						null,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -3987,8 +3985,8 @@ some text in the middle'
 						'T',
 						null,
 						'',
-						new IdentifierTypeNode('string')
-					)
+						new IdentifierTypeNode('string'),
+					),
 				),
 			]),
 		];
@@ -4003,8 +4001,8 @@ some text in the middle'
 						'T',
 						null,
 						'the value type',
-						new IdentifierTypeNode('string')
-					)
+						new IdentifierTypeNode('string'),
+					),
 				),
 			]),
 		];
@@ -4019,8 +4017,8 @@ some text in the middle'
 						'T',
 						new IdentifierTypeNode('string'),
 						'the value type',
-						new ConstTypeNode(new ConstExprStringNode('', ConstExprStringNode::SINGLE_QUOTED))
-					)
+						new ConstTypeNode(new ConstExprStringNode('', ConstExprStringNode::SINGLE_QUOTED)),
+					),
 				),
 			]),
 		];
@@ -4042,10 +4040,10 @@ some text in the middle'
 							],
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4066,10 +4064,10 @@ some text in the middle'
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4090,10 +4088,10 @@ some text in the middle'
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4114,10 +4112,10 @@ some text in the middle'
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4132,10 +4130,10 @@ some text in the middle'
 						new GenericTypeNode(
 							new IdentifierTypeNode('Foo'),
 							[new IdentifierTypeNode('A')],
-							[GenericTypeNode::VARIANCE_INVARIANT]
+							[GenericTypeNode::VARIANCE_INVARIANT],
 						),
-						'extends foo'
-					)
+						'extends foo',
+					),
 				),
 			]),
 		];
@@ -4154,9 +4152,9 @@ some text in the middle'
 							13,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4175,9 +4173,9 @@ some text in the middle'
 							17,
 							Lexer::TOKEN_OPEN_ANGLE_BRACKET,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4190,8 +4188,8 @@ some text in the middle'
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('class-string'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4204,8 +4202,8 @@ some text in the middle'
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('class-string'),
-						'some description'
-					)
+						'some description',
+					),
 				),
 			]),
 		];
@@ -4220,8 +4218,8 @@ some text in the middle'
 						new IdentifierTypeNode('class-string'),
 						false,
 						'$test',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4236,8 +4234,8 @@ some text in the middle'
 						new IdentifierTypeNode('class-string'),
 						false,
 						'$test',
-						'some description'
-					)
+						'some description',
+					),
 				),
 			]),
 		];
@@ -4256,8 +4254,8 @@ some text in the middle'
 						new UnionTypeNode([
 							new IdentifierTypeNode('string'),
 							new IdentifierTypeNode('int'),
-						])
-					)
+						]),
+					),
 				),
 			]),
 		];
@@ -4273,8 +4271,8 @@ some text in the middle'
 						new UnionTypeNode([
 							new IdentifierTypeNode('string'),
 							new IdentifierTypeNode('int'),
-						])
-					)
+						]),
+					),
 				),
 			]),
 		];
@@ -4293,9 +4291,9 @@ some text in the middle'
 							28,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						))
-					)
+							1,
+						)),
+					),
 				),
 			]),
 		];
@@ -4316,9 +4314,9 @@ some text in the middle'
 							34,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							2
-						))
-					)
+							2,
+						)),
+					),
 				),
 			]),
 		];
@@ -4340,16 +4338,16 @@ some text in the middle'
 							34,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							2
-						))
-					)
+							2,
+						)),
+					),
 				),
 				new PhpDocTagNode(
 					'@mixin',
 					new MixinTagValueNode(
 						new IdentifierTypeNode('T'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4365,8 +4363,8 @@ some text in the middle'
 					'@phpstan-type',
 					new TypeAliasTagValueNode(
 						'Foo',
-						new ArrayShapeNode([])
-					)
+						new ArrayShapeNode([]),
+					),
 				),
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -4378,9 +4376,9 @@ some text in the middle'
 							65,
 							Lexer::TOKEN_PHPDOC_EOL,
 							null,
-							3
-						))
-					)
+							3,
+						)),
+					),
 				),
 			]),
 		];
@@ -4397,8 +4395,8 @@ some text in the middle'
 					'@phpstan-type',
 					new TypeAliasTagValueNode(
 						'Foo',
-						new ArrayShapeNode([])
-					)
+						new ArrayShapeNode([]),
+					),
 				),
 				new PhpDocTagNode(
 					'@phpstan-type',
@@ -4410,16 +4408,16 @@ some text in the middle'
 							65,
 							Lexer::TOKEN_PHPDOC_EOL,
 							null,
-							3
-						))
-					)
+							3,
+						)),
+					),
 				),
 				new PhpDocTagNode(
 					'@phpstan-type',
 					new TypeAliasTagValueNode(
 						'Bar',
-						new ArrayShapeNode([])
-					)
+						new ArrayShapeNode([]),
+					),
 				),
 			]),
 		];
@@ -4438,9 +4436,9 @@ some text in the middle'
 							18,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4457,8 +4455,8 @@ some text in the middle'
 					new TypeAliasImportTagValueNode(
 						'TypeAlias',
 						new IdentifierTypeNode('AnotherClass'),
-						null
-					)
+						null,
+					),
 				),
 			]),
 		];
@@ -4472,8 +4470,8 @@ some text in the middle'
 					new TypeAliasImportTagValueNode(
 						'TypeAlias',
 						new IdentifierTypeNode('AnotherClass'),
-						'DifferentAlias'
-					)
+						'DifferentAlias',
+					),
 				),
 			]),
 		];
@@ -4492,9 +4490,9 @@ some text in the middle'
 							40,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4513,9 +4511,9 @@ some text in the middle'
 							52,
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4534,9 +4532,9 @@ some text in the middle'
 							35,
 							Lexer::TOKEN_IDENTIFIER,
 							'from',
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4555,9 +4553,9 @@ some text in the middle'
 							35,
 							Lexer::TOKEN_IDENTIFIER,
 							'from',
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4576,9 +4574,9 @@ some text in the middle'
 							25,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
-							1
-						)
-					)
+							1,
+						),
+					),
 				),
 			]),
 		];
@@ -4596,8 +4594,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$var',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4612,8 +4610,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$var',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4628,8 +4626,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$var',
 						false,
-						'assert Type to $var'
-					)
+						'assert Type to $var',
+					),
 				),
 			]),
 		];
@@ -4647,8 +4645,8 @@ some text in the middle'
 						]),
 						'$var',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4664,8 +4662,8 @@ some text in the middle'
 						'$var',
 						'method',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4681,8 +4679,8 @@ some text in the middle'
 						'$var',
 						'property',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4697,8 +4695,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$this',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4713,8 +4711,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$this',
 						false,
-						'assert Type to $this'
-					)
+						'assert Type to $this',
+					),
 				),
 			]),
 		];
@@ -4733,12 +4731,12 @@ some text in the middle'
 							],
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
 						'$this',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4754,8 +4752,8 @@ some text in the middle'
 						'$this',
 						'method',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4771,8 +4769,8 @@ some text in the middle'
 						'$this',
 						'property',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4787,8 +4785,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$var',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4803,8 +4801,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$var',
 						false,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4819,8 +4817,8 @@ some text in the middle'
 						new IdentifierTypeNode('Type'),
 						'$var',
 						true,
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -4836,8 +4834,8 @@ some text in the middle'
 						'$var',
 						false,
 						'',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -4853,8 +4851,8 @@ some text in the middle'
 						'$var',
 						true,
 						'',
-						true
-					)
+						true,
+					),
 				),
 			]),
 		];
@@ -4943,8 +4941,8 @@ time are not reliable as field settings might be missing.'),
 						new IdentifierTypeNode('\Drupal\Core\Field\FieldStorageDefinitionInterface'),
 						false,
 						'$field_definition',
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTextNode('The field definition.'),
 				new PhpDocTextNode(''),
@@ -4952,8 +4950,8 @@ time are not reliable as field settings might be missing.'),
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('array'),
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTextNode("An empty array if there is no schema, or an associative array with the
   following key/value pairs:
@@ -5020,16 +5018,16 @@ time are not reliable as field settings might be missing.'),
 						new IdentifierTypeNode('Request'),
 						false,
 						'$request',
-						'- The request object'
-					)
+						'- The request object',
+					),
 				),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('array'),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5069,8 +5067,8 @@ Finder::findFiles('*.php')
 							new ConstTypeNode(new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED)),
 							new ConstTypeNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED)),
 						]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5103,10 +5101,10 @@ Finder::findFiles('*.php')
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5132,10 +5130,10 @@ Finder::findFiles('*.php')
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5161,10 +5159,10 @@ Finder::findFiles('*.php')
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5186,12 +5184,12 @@ Finder::findFiles('*.php')
 								new CallableTypeParameterNode(new IdentifierTypeNode('A'), false, false, '', false),
 								new CallableTypeParameterNode(new IdentifierTypeNode('B'), false, false, '', false),
 							],
-							new IdentifierTypeNode('void')
+							new IdentifierTypeNode('void'),
 						),
 						false,
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5214,12 +5212,12 @@ Finder::findFiles('*.php')
 								new CallableTypeParameterNode(new IdentifierTypeNode('A'), false, false, '', false),
 								new CallableTypeParameterNode(new IdentifierTypeNode('B'), false, false, '', false),
 							],
-							new IdentifierTypeNode('void')
+							new IdentifierTypeNode('void'),
 						),
 						false,
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5242,12 +5240,12 @@ Finder::findFiles('*.php')
 								new CallableTypeParameterNode(new IdentifierTypeNode('A'), false, false, '', false),
 								new CallableTypeParameterNode(new IdentifierTypeNode('B'), false, false, '', false),
 							],
-							new IdentifierTypeNode('void')
+							new IdentifierTypeNode('void'),
 						),
 						false,
 						'$foo',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5287,10 +5285,10 @@ Finder::findFiles('*.php')
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
@@ -5299,8 +5297,8 @@ Finder::findFiles('*.php')
 						new IdentifierTypeNode('string'),
 						false,
 						'$pattern',
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTagNode(
 					'@param',
@@ -5308,8 +5306,8 @@ Finder::findFiles('*.php')
 						new IdentifierTypeNode('string'),
 						false,
 						'$subject',
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTagNode(
 					'@param',
@@ -5317,8 +5315,8 @@ Finder::findFiles('*.php')
 						new IdentifierTypeNode('mixed'),
 						false,
 						'$matches',
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTagNode(
 					'@param',
@@ -5326,8 +5324,8 @@ Finder::findFiles('*.php')
 						new IdentifierTypeNode('TFlags'),
 						false,
 						'$flags',
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTagNode(
 					'@param-out',
@@ -5348,7 +5346,7 @@ Finder::findFiles('*.php')
 												new UnionTypeNode([
 													new ConstTypeNode(new ConstExprIntegerNode('0')),
 													new IdentifierTypeNode('positive-int'),
-												])
+												]),
 											),
 										]),
 										new ArrayShapeNode([
@@ -5360,7 +5358,7 @@ Finder::findFiles('*.php')
 								[
 									GenericTypeNode::VARIANCE_INVARIANT,
 									GenericTypeNode::VARIANCE_INVARIANT,
-								]
+								],
 							),
 							new ConditionalTypeNode(
 								new IdentifierTypeNode('TFlags'),
@@ -5377,7 +5375,7 @@ Finder::findFiles('*.php')
 									[
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
-									]
+									],
 								),
 								new ConditionalTypeNode(
 									new IdentifierTypeNode('TFlags'),
@@ -5395,7 +5393,7 @@ Finder::findFiles('*.php')
 														new UnionTypeNode([
 															new ConstTypeNode(new ConstExprIntegerNode('0')),
 															new IdentifierTypeNode('positive-int'),
-														])
+														]),
 													),
 												]),
 												new ArrayShapeNode([
@@ -5407,7 +5405,7 @@ Finder::findFiles('*.php')
 										[
 											GenericTypeNode::VARIANCE_INVARIANT,
 											GenericTypeNode::VARIANCE_INVARIANT,
-										]
+										],
 									),
 									new GenericTypeNode(
 										new IdentifierTypeNode('array'),
@@ -5418,17 +5416,17 @@ Finder::findFiles('*.php')
 										[
 											GenericTypeNode::VARIANCE_INVARIANT,
 											GenericTypeNode::VARIANCE_INVARIANT,
-										]
+										],
 									),
-									false
+									false,
 								),
-								false
+								false,
 							),
-							false
+							false,
 						),
 						'$matches',
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTagNode(
 					'@return',
@@ -5438,8 +5436,8 @@ Finder::findFiles('*.php')
 							new ConstTypeNode(new ConstExprIntegerNode('0')),
 							new IdentifierTypeNode('false'),
 						]),
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTagNode('@psalm-ignore-falsable-return', new GenericTagValueNode('')),
 			]),
@@ -5458,8 +5456,8 @@ Finder::findFiles('*.php')
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('Foo'),
-						'<strong>Important <i>description</i></strong>'
-					)
+						'<strong>Important <i>description</i></strong>',
+					),
 				),
 			]),
 		];
@@ -5474,8 +5472,8 @@ Finder::findFiles('*.php')
 					'@throws',
 					new ThrowsTagValueNode(
 						new IdentifierTypeNode('FooException'),
-						'<strong>Important <em>description</em> etc</strong>'
-					)
+						'<strong>Important <em>description</em> etc</strong>',
+					),
 				),
 			]),
 		];
@@ -5490,8 +5488,8 @@ Finder::findFiles('*.php')
 					'@mixin',
 					new MixinTagValueNode(
 						new IdentifierTypeNode('Mixin'),
-						'<strong>Important description</strong>'
-					)
+						'<strong>Important description</strong>',
+					),
 				),
 			]),
 		];
@@ -5512,9 +5510,9 @@ Finder::findFiles('*.php')
 							PHP_EOL === "\n" ? 27 : 28,
 							Lexer::TOKEN_HORIZONTAL_WS,
 							null,
-							2
-						)
-					)
+							2,
+						),
+					),
 				),
 			]),
 		];
@@ -5533,7 +5531,7 @@ Finder::findFiles('*.php')
 					new ConstTypeNode(new ConstFetchNode('DateTimeImmutable', 'ATOM')),
 					false,
 					'$a',
-					''
+					'',
 				),
 			],
 			[
@@ -5547,8 +5545,8 @@ Finder::findFiles('*.php')
 						0,
 						Lexer::TOKEN_IDENTIFIER,
 						null,
-						1
-					)
+						1,
+					),
 				),
 			],
 		];
@@ -5562,7 +5560,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@special3',
-					new GenericTagValueNode('Foo')
+					new GenericTagValueNode('Foo'),
 				),
 			]),
 		];
@@ -5576,7 +5574,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@ORM\Mapping\Entity',
-					new GenericTagValueNode('User')
+					new GenericTagValueNode('User'),
 				),
 			]),
 		];
@@ -5590,7 +5588,7 @@ Finder::findFiles('*.php')
 					new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Mapping\JoinColumn', [
 						new DoctrineArgument(new IdentifierTypeNode('name'), new DoctrineConstExprStringNode('column_id')),
 						new DoctrineArgument(new IdentifierTypeNode('referencedColumnName'), new DoctrineConstExprStringNode('id')),
-					]), '')
+					]), ''),
 				),
 			]),
 		];
@@ -5606,8 +5604,8 @@ Finder::findFiles('*.php')
 					'@phpstan-self-out',
 					new SelfOutTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5620,8 +5618,8 @@ Finder::findFiles('*.php')
 					'@phpstan-this-out',
 					new SelfOutTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5634,8 +5632,8 @@ Finder::findFiles('*.php')
 					'@psalm-self-out',
 					new SelfOutTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5648,8 +5646,8 @@ Finder::findFiles('*.php')
 					'@psalm-this-out',
 					new SelfOutTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5662,8 +5660,8 @@ Finder::findFiles('*.php')
 					'@phpstan-self-out',
 					new SelfOutTagValueNode(
 						new GenericTypeNode(new IdentifierTypeNode('self'), [new IdentifierTypeNode('T')], [GenericTypeNode::VARIANCE_INVARIANT]),
-						'description'
-					)
+						'description',
+					),
 				),
 			]),
 		];
@@ -5679,7 +5677,7 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$a',
-					'// this is a description'
+					'// this is a description',
 				)),
 			]),
 		];
@@ -5695,7 +5693,7 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$a',
-					''
+					'',
 				)),
 				new PhpDocTextNode('// this is a comment'),
 			]),
@@ -5712,7 +5710,7 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$a',
-					''
+					'',
 				)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode('// this is a comment'),
@@ -5731,7 +5729,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@\ORM\Doctrine', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@\ORM\Doctrine', []),
-					'// this is a description'
+					'// this is a description',
 				)),
 			]),
 		];
@@ -5741,7 +5739,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@\ORM\Doctrine', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@\ORM\Doctrine', []),
-					'// this is a description'
+					'// this is a description',
 				)),
 			]),
 		];
@@ -5751,11 +5749,11 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@\ORM\Doctrine', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@\ORM\Doctrine', []),
-					''
+					'',
 				)),
 				new PhpDocTagNode('@\ORM\Entity', new DoctrineTagValueNode(
 					new DoctrineAnnotation('@\ORM\Entity', []),
-					'// this is a description'
+					'// this is a description',
 				)),
 			]),
 		];
@@ -5772,8 +5770,8 @@ Finder::findFiles('*.php')
 					new ParamOutTagValueNode(
 						new IdentifierTypeNode('string'),
 						'$s',
-						''
-					)
+						'',
+					),
 				),
 			]),
 		];
@@ -5787,8 +5785,8 @@ Finder::findFiles('*.php')
 					new ParamOutTagValueNode(
 						new IdentifierTypeNode('string'),
 						'$s',
-						'description'
-					)
+						'description',
+					),
 				),
 			]),
 		];
@@ -5806,8 +5804,8 @@ Finder::findFiles('*.php')
 					'@X',
 					new DoctrineTagValueNode(
 						new DoctrineAnnotation('@X', []),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[new Doctrine\X()],
@@ -5827,8 +5825,8 @@ Finder::findFiles('*.php')
 						new DoctrineAnnotation('@X', [
 							new DoctrineArgument(null, new DoctrineAnnotation('@Z', [])),
 						]),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[$xWithZ],
@@ -5846,8 +5844,8 @@ Finder::findFiles('*.php')
 						new DoctrineAnnotation('@X', [
 							new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineAnnotation('@Z', [])),
 						]),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[$xWithZ],
@@ -5865,8 +5863,8 @@ Finder::findFiles('*.php')
 						new DoctrineAnnotation('@X', [
 							new DoctrineArgument(null, new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\Z', [])),
 						]),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[$xWithZ],
@@ -5884,8 +5882,8 @@ Finder::findFiles('*.php')
 						new DoctrineAnnotation('@X', [
 							new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\Z', [])),
 						]),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[$xWithZ],
@@ -5902,8 +5900,8 @@ Finder::findFiles('*.php')
 					'@X',
 					new DoctrineTagValueNode(
 						new DoctrineAnnotation('@X', []),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[new Doctrine\X()],
@@ -5920,8 +5918,8 @@ Finder::findFiles('*.php')
 					'@X',
 					new DoctrineTagValueNode(
 						new DoctrineAnnotation('@X', []),
-						''
-					)
+						'',
+					),
 				),
 				new PhpDocTextNode('Content'),
 			]),
@@ -5938,8 +5936,8 @@ Finder::findFiles('*.php')
 					'@\PHPStan\PhpDocParser\Parser\Doctrine\X',
 					new DoctrineTagValueNode(
 						new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\X', []),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[new Doctrine\X()],
@@ -5955,8 +5953,8 @@ Finder::findFiles('*.php')
 					'@\PHPStan\PhpDocParser\Parser\Doctrine\X',
 					new DoctrineTagValueNode(
 						new DoctrineAnnotation('@\PHPStan\PhpDocParser\Parser\Doctrine\X', []),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[new Doctrine\X()],
@@ -5993,10 +5991,10 @@ Finder::findFiles('*.php')
 										new DoctrineArgument(new IdentifierTypeNode('code'), new ConstExprIntegerNode('123')),
 									])),
 								])),
-							]
+							],
 						),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[$x],
@@ -6029,10 +6027,10 @@ Finder::findFiles('*.php')
 										new DoctrineArgument(new IdentifierTypeNode('code'), new ConstExprIntegerNode('123')),
 									])),
 								])),
-							]
+							],
 						),
-						'Content'
-					)
+						'Content',
+					),
 				),
 			]),
 			[$x],
@@ -6046,7 +6044,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
-					[]
+					[],
 				), 'test')),
 			]),
 			[new Doctrine\X()],
@@ -6061,7 +6059,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
-					[]
+					[],
 				), 'test' . PHP_EOL . 'test2')),
 			]),
 			[new Doctrine\X()],
@@ -6076,7 +6074,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
-					[]
+					[],
 				), 'test')),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode('test2'),
@@ -6094,13 +6092,13 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
-					[]
+					[],
 				), 'test')),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode('test2'),
 				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@Z',
-					[]
+					[],
 				), '')),
 			]),
 			[new Doctrine\X(), new Doctrine\Z()],
@@ -6263,7 +6261,7 @@ Finder::findFiles('*.php')
 										new DoctrineConstExprStringNode('is_granted(' . PHP_EOL .
 											"constant('REDACTED')," . PHP_EOL .
 											'object' . PHP_EOL .
-											')')
+											')'),
 									),
 									new DoctrineArrayItem(
 										new DoctrineConstExprStringNode('normalization_context'),
@@ -6272,15 +6270,15 @@ Finder::findFiles('*.php')
 												new DoctrineConstExprStringNode('groups'),
 												new DoctrineArray([
 													new DoctrineArrayItem(null, new DoctrineConstExprStringNode('Redacted:read')),
-												])
+												]),
 											),
-										])
+										]),
 									),
-								])
+								]),
 							),
 						])),
 					]),
-					''
+					'',
 				)),
 			]),
 			[$apiResource],
@@ -6296,7 +6294,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@X', [
 						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString->a)),
 					]),
-					''
+					'',
 				)),
 			]),
 			[$xWithString],
@@ -6312,7 +6310,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@X', [
 						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString2->a)),
 					]),
-					''
+					'',
 				)),
 			]),
 			[$xWithString2],
@@ -6328,7 +6326,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@X', [
 						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString3->a)),
 					]),
-					''
+					'',
 				)),
 			]),
 			[$xWithString3],
@@ -6344,7 +6342,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@X', [
 						new DoctrineArgument(new IdentifierTypeNode('a'), new DoctrineConstExprStringNode($xWithString4->a)),
 					]),
-					''
+					'',
 				)),
 			]),
 			[$xWithString4],
@@ -6361,7 +6359,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@DummyAnnotation', [
 						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new DoctrineConstExprStringNode('hello')),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6391,7 +6389,7 @@ Finder::findFiles('*.php')
 							])),
 						])),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6404,7 +6402,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@AnnotationTargetAll', [
 						new DoctrineArgument(null, new DoctrineAnnotation('@AnnotationTargetAnnotation', [])),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6417,7 +6415,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@DummyAnnotation', [
 						new DoctrineArgument(new IdentifierTypeNode('dummyValue'), new DoctrineConstExprStringNode('bar')),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6434,7 +6432,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@DummyColumn', [
 						new DoctrineArgument(new IdentifierTypeNode('type'), new DoctrineConstExprStringNode('integer')),
 					]),
-					''
+					'',
 				)),
 				new PhpDocTagNode('@DummyGeneratedValue', new GenericTagValueNode('')),
 				new PhpDocTagNode('@var', new VarTagValueNode(new IdentifierTypeNode('int'), '', '')),
@@ -6457,7 +6455,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@AnnotationWithConstants', [
 						new DoctrineArgument(null, new IdentifierTypeNode('PHP_EOL')),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6474,12 +6472,12 @@ Finder::findFiles('*.php')
 							new DoctrineArrayItem(null, new DoctrineArray([
 								new DoctrineArrayItem(new DoctrineConstExprStringNode('key'), new DoctrineAnnotation(
 									'@Name',
-									[]
+									[],
 								)),
 							])),
 						])),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6492,7 +6490,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@AnnotationWithConstants', [
 						new DoctrineArgument(null, new ConstFetchNode('Doctrine\Tests\Common\Annotations\Fixtures\AnnotationWithConstants', 'FLOAT')),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6505,7 +6503,7 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@AnnotationWithConstants', [
 						new DoctrineArgument(null, new ConstFetchNode('\Doctrine\Tests\Common\Annotations\Fixtures\AnnotationWithConstants', 'FLOAT')),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6521,11 +6519,11 @@ Finder::findFiles('*.php')
 						new DoctrineArgument(null, new DoctrineArray([
 							new DoctrineArrayItem(
 								new ConstFetchNode('Doctrine\Tests\Common\Annotations\Fixtures\InterfaceWithConstants', 'SOME_KEY'),
-								new ConstFetchNode('AnnotationWithConstants', 'INTEGER')
+								new ConstFetchNode('AnnotationWithConstants', 'INTEGER'),
 							),
 						])),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6540,7 +6538,7 @@ Finder::findFiles('*.php')
 							new DoctrineArrayItem(new DoctrineConstExprStringNode('foo'), new DoctrineConstExprStringNode('bar')),
 						])),
 					]),
-					''
+					'',
 				)),
 			]),
 		];
@@ -6556,7 +6554,7 @@ Finder::findFiles('*.php')
 					19,
 					5,
 					null,
-					1
+					1,
 				))),
 			]),
 			[new Doctrine\X()],
@@ -6573,7 +6571,7 @@ Finder::findFiles('*.php')
 					21,
 					5,
 					null,
-					1
+					1,
 				))),
 			]),
 			[new Doctrine\X()],
@@ -6587,7 +6585,7 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$z',
-					'@X()'
+					'@X()',
 				)),
 			]),
 		];
@@ -6600,7 +6598,7 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$z',
-					'@\X\Y()'
+					'@\X\Y()',
 				)),
 			]),
 		];
@@ -6613,7 +6611,7 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$z',
-					'@X'
+					'@X',
 				)),
 			]),
 		];
@@ -6646,8 +6644,8 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode(
 					'@special:param',
 					new GenericTagValueNode(
-						'this is special'
-					)
+						'this is special',
+					),
 				),
 			]),
 		];

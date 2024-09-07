@@ -11,14 +11,12 @@ class ParamOutTagValueNode implements PhpDocTagValueNode
 
 	use NodeAttributes;
 
-	/** @var TypeNode */
-	public $type;
+	public TypeNode $type;
 
-	/** @var string */
-	public $parameterName;
+	public string $parameterName;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 	public function __construct(TypeNode $type, string $parameterName, string $description)
 	{

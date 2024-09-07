@@ -29,23 +29,17 @@ class PhpDocParser
 		Lexer::TOKEN_INTERSECTION,
 	];
 
-	/** @var TypeParser */
-	private $typeParser;
+	private TypeParser $typeParser;
 
-	/** @var ConstExprParser */
-	private $constantExprParser;
+	private ConstExprParser $constantExprParser;
 
-	/** @var ConstExprParser */
-	private $doctrineConstantExprParser;
+	private ConstExprParser $doctrineConstantExprParser;
 
-	/** @var bool */
-	private $useLinesAttributes;
+	private bool $useLinesAttributes;
 
-	/** @var bool */
-	private $useIndexAttributes;
+	private bool $useIndexAttributes;
 
-	/** @var bool */
-	private $textBetweenTagsBelongsToDescription;
+	private bool $textBetweenTagsBelongsToDescription;
 
 	/**
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
@@ -126,8 +120,8 @@ class PhpDocParser
 					$tokens,
 					new Ast\PhpDoc\InvalidTagValueNode($e->getMessage(), $e),
 					$startLine,
-					$startIndex
-				)
+					$startIndex,
+				),
 			);
 
 			$tokens->forwardToTheEnd();
@@ -163,8 +157,8 @@ class PhpDocParser
 					$tokens,
 					$this->parseDoctrineTagValue($tokens, $tag),
 					$tagStartLine,
-					$tagStartIndex
-				)
+					$tagStartIndex,
+				),
 			), $startLine, $startIndex);
 		}
 
@@ -452,9 +446,7 @@ class PhpDocParser
 				case '@psalm-template-contravariant':
 					$tagValue = $this->typeParser->parseTemplateTagValue(
 						$tokens,
-						function ($tokens) {
-							return $this->parseOptionalDescription($tokens);
-						}
+						fn ($tokens) => $this->parseOptionalDescription($tokens),
 					);
 					break;
 
@@ -544,9 +536,9 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineAnnotation($tag, $this->parseDoctrineArguments($tokens, false)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			),
-			$this->parseOptionalDescriptionAfterDoctrineTag($tokens)
+			$this->parseOptionalDescriptionAfterDoctrineTag($tokens),
 		);
 	}
 
@@ -597,7 +589,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineArgument(null, $this->parseDoctrineArgumentValue($tokens)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 
@@ -613,7 +605,7 @@ class PhpDocParser
 				$tokens,
 				new IdentifierTypeNode($currentValue),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 			$tokens->consumeTokenType(Lexer::TOKEN_EQUAL);
 
@@ -625,7 +617,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineArgument($key, $value),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		} catch (ParserException $e) {
 			$tokens->rollback();
@@ -634,7 +626,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineArgument(null, $this->parseDoctrineArgumentValue($tokens)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 	}
@@ -656,7 +648,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineAnnotation($name, $this->parseDoctrineArguments($tokens, true)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 
@@ -675,7 +667,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineArray($items),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 
@@ -686,7 +678,7 @@ class PhpDocParser
 				$tokens,
 				new Ast\Type\IdentifierTypeNode($currentTokenValue),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
 				$tokens->dropSavePoint();
@@ -712,7 +704,7 @@ class PhpDocParser
 					$currentTokenOffset,
 					Lexer::TOKEN_IDENTIFIER,
 					null,
-					$currentTokenLine
+					$currentTokenLine,
 				);
 			}
 
@@ -724,7 +716,7 @@ class PhpDocParser
 				$currentTokenOffset,
 				Lexer::TOKEN_IDENTIFIER,
 				null,
-				$currentTokenLine
+				$currentTokenLine,
 			);
 		}
 	}
@@ -753,7 +745,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineArrayItem($key, $value),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		} catch (ParserException $e) {
 			$tokens->rollback();
@@ -762,7 +754,7 @@ class PhpDocParser
 				$tokens,
 				new Doctrine\DoctrineArrayItem(null, $this->parseDoctrineArgumentValue($tokens)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 	}
@@ -805,7 +797,7 @@ class PhpDocParser
 					$tokens->currentTokenOffset(),
 					Lexer::TOKEN_IDENTIFIER,
 					null,
-					$tokens->currentTokenLine()
+					$tokens->currentTokenLine(),
 				);
 			}
 
@@ -816,7 +808,7 @@ class PhpDocParser
 					$tokens,
 					new IdentifierTypeNode($currentTokenValue),
 					$startLine,
-					$startIndex
+					$startIndex,
 				);
 			}
 
@@ -829,7 +821,7 @@ class PhpDocParser
 					$tokens->currentTokenOffset(),
 					Lexer::TOKEN_IDENTIFIER,
 					null,
-					$tokens->currentTokenLine()
+					$tokens->currentTokenLine(),
 				);
 			}
 
@@ -993,7 +985,7 @@ class PhpDocParser
 					$tokens,
 					$this->typeParser->parseTemplateTagValue($tokens),
 					$startLine,
-					$startIndex
+					$startIndex,
 				);
 			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
@@ -1046,7 +1038,7 @@ class PhpDocParser
 			$tokens,
 			new Ast\PhpDoc\MethodTagValueParameterNode($parameterType, $isReference, $isVariadic, $parameterName, $defaultValue),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 
@@ -1059,7 +1051,7 @@ class PhpDocParser
 
 		$type = $this->typeParser->parseGeneric(
 			$tokens,
-			$this->typeParser->enrichWithAttributes($tokens, $baseType, $startLine, $startIndex)
+			$this->typeParser->enrichWithAttributes($tokens, $baseType, $startLine, $startIndex),
 		);
 
 		$description = $this->parseOptionalDescription($tokens);
@@ -1096,7 +1088,7 @@ class PhpDocParser
 						$tokens->currentTokenOffset(),
 						Lexer::TOKEN_PHPDOC_EOL,
 						null,
-						$tokens->currentTokenLine()
+						$tokens->currentTokenLine(),
 					);
 				}
 			}
@@ -1106,7 +1098,7 @@ class PhpDocParser
 			$this->parseOptionalDescription($tokens);
 			return new Ast\PhpDoc\TypeAliasTagValueNode(
 				$alias,
-				$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex)
+				$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex),
 			);
 		}
 	}
@@ -1126,7 +1118,7 @@ class PhpDocParser
 			$tokens,
 			new IdentifierTypeNode($importedFrom),
 			$identifierStartLine,
-			$identifierStartIndex
+			$identifierStartIndex,
 		);
 
 		$importedAs = null;

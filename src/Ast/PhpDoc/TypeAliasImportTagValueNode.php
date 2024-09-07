@@ -11,14 +11,11 @@ class TypeAliasImportTagValueNode implements PhpDocTagValueNode
 
 	use NodeAttributes;
 
-	/** @var string */
-	public $importedAlias;
+	public string $importedAlias;
 
-	/** @var IdentifierTypeNode */
-	public $importedFrom;
+	public IdentifierTypeNode $importedFrom;
 
-	/** @var string|null */
-	public $importedAs;
+	public ?string $importedAs = null;
 
 	public function __construct(string $importedAlias, IdentifierTypeNode $importedFrom, ?string $importedAs)
 	{
@@ -31,7 +28,7 @@ class TypeAliasImportTagValueNode implements PhpDocTagValueNode
 	{
 		return trim(
 			"{$this->importedAlias} from {$this->importedFrom}"
-			. ($this->importedAs !== null ? " as {$this->importedAs}" : '')
+			. ($this->importedAs !== null ? " as {$this->importedAs}" : ''),
 		);
 	}
 

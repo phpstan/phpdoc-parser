@@ -11,7 +11,7 @@ class DeprecatedTagValueNode implements PhpDocTagValueNode
 	use NodeAttributes;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 	public function __construct(string $description)
 	{

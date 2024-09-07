@@ -21,11 +21,9 @@ use PHPUnit\Framework\TestCase;
 class ConstExprParserTest extends TestCase
 {
 
-	/** @var Lexer */
-	private $lexer;
+	private Lexer $lexer;
 
-	/** @var ConstExprParser */
-	private $constExprParser;
+	private ConstExprParser $constExprParser;
 
 	protected function setUp(): void
 	{
@@ -352,7 +350,7 @@ class ConstExprParserTest extends TestCase
 			new ConstExprArrayNode([
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('123')
+					new ConstExprIntegerNode('123'),
 				),
 			]),
 		];
@@ -362,15 +360,15 @@ class ConstExprParserTest extends TestCase
 			new ConstExprArrayNode([
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('1')
+					new ConstExprIntegerNode('1'),
 				),
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('2')
+					new ConstExprIntegerNode('2'),
 				),
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('3')
+					new ConstExprIntegerNode('3'),
 				),
 			]),
 		];
@@ -380,15 +378,15 @@ class ConstExprParserTest extends TestCase
 			new ConstExprArrayNode([
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('1')
+					new ConstExprIntegerNode('1'),
 				),
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('2')
+					new ConstExprIntegerNode('2'),
 				),
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('3')
+					new ConstExprIntegerNode('3'),
 				),
 			]),
 		];
@@ -398,7 +396,7 @@ class ConstExprParserTest extends TestCase
 			new ConstExprArrayNode([
 				new ConstExprArrayItemNode(
 					new ConstExprIntegerNode('1'),
-					new ConstExprIntegerNode('2')
+					new ConstExprIntegerNode('2'),
 				),
 			]),
 		];
@@ -408,11 +406,11 @@ class ConstExprParserTest extends TestCase
 			new ConstExprArrayNode([
 				new ConstExprArrayItemNode(
 					new ConstExprIntegerNode('1'),
-					new ConstExprIntegerNode('2')
+					new ConstExprIntegerNode('2'),
 				),
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('3')
+					new ConstExprIntegerNode('3'),
 				),
 			]),
 		];
@@ -422,20 +420,20 @@ class ConstExprParserTest extends TestCase
 			new ConstExprArrayNode([
 				new ConstExprArrayItemNode(
 					null,
-					new ConstExprIntegerNode('1')
+					new ConstExprIntegerNode('1'),
 				),
 				new ConstExprArrayItemNode(
 					null,
 					new ConstExprArrayNode([
 						new ConstExprArrayItemNode(
 							null,
-							new ConstExprIntegerNode('2')
+							new ConstExprIntegerNode('2'),
 						),
 						new ConstExprArrayItemNode(
 							null,
-							new ConstExprIntegerNode('3')
+							new ConstExprIntegerNode('3'),
 						),
-					])
+					]),
 				),
 			]),
 		];

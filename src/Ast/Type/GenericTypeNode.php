@@ -16,14 +16,13 @@ class GenericTypeNode implements TypeNode
 
 	use NodeAttributes;
 
-	/** @var IdentifierTypeNode */
-	public $type;
+	public IdentifierTypeNode $type;
 
 	/** @var TypeNode[] */
-	public $genericTypes;
+	public array $genericTypes;
 
 	/** @var (self::VARIANCE_*)[] */
-	public $variances;
+	public array $variances;
 
 	/**
 	 * @param TypeNode[] $genericTypes

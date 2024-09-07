@@ -31,7 +31,7 @@ class StringUnescaper
 			return str_replace(
 				['\\\\', '\\\''],
 				['\\', '\''],
-				substr($string, 1, -1)
+				substr($string, 1, -1),
 			);
 		}
 
@@ -65,7 +65,7 @@ class StringUnescaper
 
 				return chr((int) octdec($str));
 			},
-			$str
+			$str,
 		);
 	}
 

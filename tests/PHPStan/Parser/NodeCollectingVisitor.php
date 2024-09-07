@@ -9,7 +9,7 @@ class NodeCollectingVisitor extends AbstractNodeVisitor
 {
 
 	/** @var list<Node> */
-	public $nodes = [];
+	public array $nodes = [];
 
 	public function enterNode(Node $node)
 	{

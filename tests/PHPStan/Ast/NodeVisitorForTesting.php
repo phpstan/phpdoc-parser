@@ -15,13 +15,12 @@ class NodeVisitorForTesting implements NodeVisitor
 {
 
 	/** @var list<array{string, Node|Node[]}> */
-	public $trace = [];
+	public array $trace = [];
 
 	/** @var list<list<mixed>> */
-	private $returns;
+	private array $returns;
 
-	/** @var int */
-	private $returnsPos;
+	private int $returnsPos;
 
 	/**
 	 * @param list<list<mixed>> $returns

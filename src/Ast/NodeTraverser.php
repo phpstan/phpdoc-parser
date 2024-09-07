@@ -62,10 +62,10 @@ final class NodeTraverser
 	public const DONT_TRAVERSE_CURRENT_AND_CHILDREN = 4;
 
 	/** @var list<NodeVisitor> Visitors */
-	private $visitors = [];
+	private array $visitors = [];
 
 	/** @var bool Whether traversal should be stopped */
-	private $stopTraversal;
+	private bool $stopTraversal;
 
 	/**
 	 * @param list<NodeVisitor> $visitors
@@ -151,7 +151,7 @@ final class NodeTraverser
 						break 2;
 					} else {
 						throw new LogicException(
-							'enterNode() returned invalid value of type ' . gettype($return)
+							'enterNode() returned invalid value of type ' . gettype($return),
 						);
 					}
 				}
@@ -176,11 +176,11 @@ final class NodeTraverser
 						} elseif (is_array($return)) {
 							throw new LogicException(
 								'leaveNode() may only return an array ' .
-								'if the parent structure is an array'
+								'if the parent structure is an array',
 							);
 						} else {
 							throw new LogicException(
-								'leaveNode() returned invalid value of type ' . gettype($return)
+								'leaveNode() returned invalid value of type ' . gettype($return),
 							);
 						}
 					}
@@ -237,7 +237,7 @@ final class NodeTraverser
 						break 2;
 					} else {
 						throw new LogicException(
-							'enterNode() returned invalid value of type ' . gettype($return)
+							'enterNode() returned invalid value of type ' . gettype($return),
 						);
 					}
 				}
@@ -267,7 +267,7 @@ final class NodeTraverser
 							break 2;
 						} else {
 							throw new LogicException(
-								'leaveNode() returned invalid value of type ' . gettype($return)
+								'leaveNode() returned invalid value of type ' . gettype($return),
 							);
 						}
 					}

@@ -136,7 +136,7 @@ class TypeToStringTest extends TestCase
 				new GenericTypeNode(
 					new IdentifierTypeNode('array'),
 					[new IdentifierTypeNode('string'), new IdentifierTypeNode('int')],
-					[GenericTypeNode::VARIANCE_INVARIANT, GenericTypeNode::VARIANCE_BIVARIANT]
+					[GenericTypeNode::VARIANCE_INVARIANT, GenericTypeNode::VARIANCE_BIVARIANT],
 				),
 			],
 			[
@@ -144,7 +144,7 @@ class TypeToStringTest extends TestCase
 				new GenericTypeNode(
 					new IdentifierTypeNode('Foo\\Bar'),
 					[new IdentifierTypeNode('string'), new IdentifierTypeNode('int')],
-					[GenericTypeNode::VARIANCE_COVARIANT, GenericTypeNode::VARIANCE_CONTRAVARIANT]
+					[GenericTypeNode::VARIANCE_COVARIANT, GenericTypeNode::VARIANCE_CONTRAVARIANT],
 				),
 			],
 		];
@@ -160,7 +160,7 @@ class TypeToStringTest extends TestCase
 					new IdentifierTypeNode('int'),
 					new GenericTypeNode(new IdentifierTypeNode('list'), [new IdentifierTypeNode('int')]),
 					new GenericTypeNode(new IdentifierTypeNode('list'), [new IdentifierTypeNode('string')]),
-					false
+					false,
 				),
 			],
 			[
@@ -170,7 +170,7 @@ class TypeToStringTest extends TestCase
 					new IdentifierTypeNode('array'),
 					new IdentifierTypeNode('int'),
 					new ArrayTypeNode(new IdentifierTypeNode('int')),
-					true
+					true,
 				),
 			],
 			[
@@ -180,7 +180,7 @@ class TypeToStringTest extends TestCase
 					new IdentifierTypeNode('Exception'),
 					new IdentifierTypeNode('never'),
 					new IdentifierTypeNode('string'),
-					false
+					false,
 				),
 			],
 			[
@@ -190,7 +190,7 @@ class TypeToStringTest extends TestCase
 					new IdentifierTypeNode('Exception'),
 					new IdentifierTypeNode('string'),
 					new IdentifierTypeNode('never'),
-					true
+					true,
 				),
 			],
 		];

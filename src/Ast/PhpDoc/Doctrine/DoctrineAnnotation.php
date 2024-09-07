@@ -11,11 +11,10 @@ class DoctrineAnnotation implements Node
 
 	use NodeAttributes;
 
-	/** @var string */
-	public $name;
+	public string $name;
 
 	/** @var list<DoctrineArgument> */
-	public $arguments;
+	public array $arguments;
 
 	/**
 	 * @param list<DoctrineArgument> $arguments

@@ -11,11 +11,10 @@ class ImplementsTagValueNode implements PhpDocTagValueNode
 
 	use NodeAttributes;
 
-	/** @var GenericTypeNode */
-	public $type;
+	public GenericTypeNode $type;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 	public function __construct(GenericTypeNode $type, string $description)
 	{

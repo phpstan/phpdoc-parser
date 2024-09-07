@@ -12,16 +12,14 @@ class TemplateTagValueNode implements PhpDocTagValueNode
 	use NodeAttributes;
 
 	/** @var non-empty-string */
-	public $name;
+	public string $name;
 
-	/** @var TypeNode|null */
-	public $bound;
+	public ?TypeNode $bound = null;
 
-	/** @var TypeNode|null */
-	public $default;
+	public ?TypeNode $default = null;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 	/**
 	 * @param non-empty-string $name

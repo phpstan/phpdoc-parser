@@ -10,14 +10,11 @@ use function strtolower;
 class ConstExprParser
 {
 
-	/** @var bool */
-	private $useLinesAttributes;
+	private bool $useLinesAttributes;
 
-	/** @var bool */
-	private $useIndexAttributes;
+	private bool $useIndexAttributes;
 
-	/** @var bool */
-	private $parseDoctrineStrings;
+	private bool $parseDoctrineStrings;
 
 	/**
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
@@ -40,7 +37,7 @@ class ConstExprParser
 			[
 				'lines' => $this->useLinesAttributes,
 				'indexes' => $this->useIndexAttributes,
-			]
+			],
 		);
 		$self->parseDoctrineStrings = true;
 		return $self;
@@ -58,7 +55,7 @@ class ConstExprParser
 				$tokens,
 				new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', $value)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 
@@ -70,7 +67,7 @@ class ConstExprParser
 				$tokens,
 				new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $value)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 
@@ -82,7 +79,7 @@ class ConstExprParser
 				$tokens,
 				new Ast\ConstExpr\DoctrineConstExprStringNode(Ast\ConstExpr\DoctrineConstExprStringNode::unescape($value)),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 
@@ -95,7 +92,7 @@ class ConstExprParser
 						$tokens->currentTokenOffset(),
 						Lexer::TOKEN_DOUBLE_QUOTED_STRING,
 						null,
-						$tokens->currentTokenLine()
+						$tokens->currentTokenLine(),
 					);
 				}
 
@@ -106,7 +103,7 @@ class ConstExprParser
 					$tokens,
 					$this->parseDoctrineString($value, $tokens),
 					$startLine,
-					$startIndex
+					$startIndex,
 				);
 			}
 
@@ -120,10 +117,10 @@ class ConstExprParser
 					$value,
 					$type === Lexer::TOKEN_SINGLE_QUOTED_STRING
 						? Ast\ConstExpr\ConstExprStringNode::SINGLE_QUOTED
-						: Ast\ConstExpr\ConstExprStringNode::DOUBLE_QUOTED
+						: Ast\ConstExpr\ConstExprStringNode::DOUBLE_QUOTED,
 				),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
@@ -136,21 +133,21 @@ class ConstExprParser
 						$tokens,
 						new Ast\ConstExpr\ConstExprTrueNode(),
 						$startLine,
-						$startIndex
+						$startIndex,
 					);
 				case 'false':
 					return $this->enrichWithAttributes(
 						$tokens,
 						new Ast\ConstExpr\ConstExprFalseNode(),
 						$startLine,
-						$startIndex
+						$startIndex,
 					);
 				case 'null':
 					return $this->enrichWithAttributes(
 						$tokens,
 						new Ast\ConstExpr\ConstExprNullNode(),
 						$startLine,
-						$startIndex
+						$startIndex,
 					);
 				case 'array':
 					$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
@@ -192,7 +189,7 @@ class ConstExprParser
 					$tokens,
 					new Ast\ConstExpr\ConstFetchNode($identifier, $classConstantName),
 					$startLine,
-					$startIndex
+					$startIndex,
 				);
 
 			}
@@ -201,7 +198,7 @@ class ConstExprParser
 				$tokens,
 				new Ast\ConstExpr\ConstFetchNode('', $identifier),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 
 		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
@@ -214,7 +211,7 @@ class ConstExprParser
 			$tokens->currentTokenOffset(),
 			Lexer::TOKEN_IDENTIFIER,
 			null,
-			$tokens->currentTokenLine()
+			$tokens->currentTokenLine(),
 		);
 	}
 
@@ -236,7 +233,7 @@ class ConstExprParser
 			$tokens,
 			new Ast\ConstExpr\ConstExprArrayNode($items),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 
@@ -278,7 +275,7 @@ class ConstExprParser
 			$tokens,
 			new Ast\ConstExpr\ConstExprArrayItemNode($key, $value),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 

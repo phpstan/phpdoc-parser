@@ -21,8 +21,7 @@ class ConstExprStringNode implements ConstExprNode
 
 	use NodeAttributes;
 
-	/** @var string */
-	public $value;
+	public string $value;
 
 	/** @var self::SINGLE_QUOTED|self::DOUBLE_QUOTED */
 	public $quoteType;

@@ -10,20 +10,15 @@ class ConditionalTypeForParameterNode implements TypeNode
 
 	use NodeAttributes;
 
-	/** @var string */
-	public $parameterName;
+	public string $parameterName;
 
-	/** @var TypeNode */
-	public $targetType;
+	public TypeNode $targetType;
 
-	/** @var TypeNode */
-	public $if;
+	public TypeNode $if;
 
-	/** @var TypeNode */
-	public $else;
+	public TypeNode $else;
 
-	/** @var bool */
-	public $negated;
+	public bool $negated;
 
 	public function __construct(string $parameterName, TypeNode $targetType, TypeNode $if, TypeNode $else, bool $negated)
 	{
@@ -42,7 +37,7 @@ class ConditionalTypeForParameterNode implements TypeNode
 			$this->negated ? 'is not' : 'is',
 			$this->targetType,
 			$this->if,
-			$this->else
+			$this->else,
 		);
 	}
 

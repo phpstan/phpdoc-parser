@@ -19,14 +19,11 @@ use function unlink;
 class FuzzyTest extends TestCase
 {
 
-	/** @var Lexer */
-	private $lexer;
+	private Lexer $lexer;
 
-	/** @var TypeParser */
-	private $typeParser;
+	private TypeParser $typeParser;
 
-	/** @var ConstExprParser */
-	private $constExprParser;
+	private ConstExprParser $constExprParser;
 
 	protected function setUp(): void
 	{
@@ -47,7 +44,7 @@ class FuzzyTest extends TestCase
 		$this->assertSame(
 			Lexer::TOKEN_END,
 			$tokens->currentTokenType(),
-			sprintf('Failed to parse input %s', $input)
+			sprintf('Failed to parse input %s', $input),
 		);
 	}
 
@@ -67,7 +64,7 @@ class FuzzyTest extends TestCase
 		$this->assertSame(
 			Lexer::TOKEN_END,
 			$tokens->currentTokenType(),
-			sprintf('Failed to parse input %s', $input)
+			sprintf('Failed to parse input %s', $input),
 		);
 	}
 

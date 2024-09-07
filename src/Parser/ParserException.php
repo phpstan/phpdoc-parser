@@ -14,23 +14,17 @@ use const JSON_UNESCAPED_UNICODE;
 class ParserException extends Exception
 {
 
-	/** @var string */
-	private $currentTokenValue;
+	private string $currentTokenValue;
 
-	/** @var int */
-	private $currentTokenType;
+	private int $currentTokenType;
 
-	/** @var int */
-	private $currentOffset;
+	private int $currentOffset;
 
-	/** @var int */
-	private $expectedTokenType;
+	private int $expectedTokenType;
 
-	/** @var string|null */
-	private $expectedTokenValue;
+	private ?string $expectedTokenValue = null;
 
-	/** @var int|null */
-	private $currentTokenLine;
+	private ?int $currentTokenLine = null;
 
 	public function __construct(
 		string $currentTokenValue,
@@ -54,7 +48,7 @@ class ParserException extends Exception
 			Lexer::TOKEN_LABELS[$expectedTokenType],
 			$expectedTokenValue !== null ? sprintf(' (%s)', $this->formatValue($expectedTokenValue)) : '',
 			$currentOffset,
-			$currentTokenLine === null ? '' : sprintf(' on line %d', $currentTokenLine)
+			$currentTokenLine === null ? '' : sprintf(' on line %d', $currentTokenLine),
 		));
 	}
 

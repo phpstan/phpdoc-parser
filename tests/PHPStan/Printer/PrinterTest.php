@@ -59,11 +59,9 @@ use const PHP_EOL;
 class PrinterTest extends TestCase
 {
 
-	/** @var TypeParser */
-	private $typeParser;
+	private TypeParser $typeParser;
 
-	/** @var PhpDocParser */
-	private $phpDocParser;
+	private PhpDocParser $phpDocParser;
 
 	protected function setUp(): void
 	{
@@ -73,7 +71,7 @@ class PrinterTest extends TestCase
 		$this->phpDocParser = new PhpDocParser(
 			$this->typeParser,
 			$constExprParser,
-			$usedAttributes
+			$usedAttributes,
 		);
 	}
 
@@ -600,7 +598,7 @@ class PrinterTest extends TestCase
 					$node->templateTypes[] = new TemplateTagValueNode(
 						'T',
 						new IdentifierTypeNode('int'),
-						''
+						'',
 					);
 				}
 
@@ -1191,7 +1189,7 @@ class PrinterTest extends TestCase
 					$node->templateTypes[] = new TemplateTagValueNode(
 						'T',
 						new IdentifierTypeNode('int'),
-						''
+						'',
 					);
 				}
 
@@ -1212,27 +1210,24 @@ class PrinterTest extends TestCase
 			$addMethodTemplateType,
 		];
 
-		$changeCallableReturnTypeFactory = function (TypeNode $type): NodeVisitor {
-			return new class ($type) extends AbstractNodeVisitor {
+		$changeCallableReturnTypeFactory = static fn (TypeNode $type): NodeVisitor => new class ($type) extends AbstractNodeVisitor {
 
-				/** @var TypeNode */
-				private $type;
+			private TypeNode $type;
 
-				public function __construct(TypeNode $type)
-				{
-					$this->type = $type;
+			public function __construct(TypeNode $type)
+			{
+				$this->type = $type;
+			}
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof CallableTypeNode) {
+					$node->returnType = $this->type;
 				}
 
-				public function enterNode(Node $node)
-				{
-					if ($node instanceof CallableTypeNode) {
-						$node->returnType = $this->type;
-					}
+				return $node;
+			}
 
-					return $node;
-				}
-
-			};
 		};
 
 		yield [
@@ -1265,44 +1260,38 @@ class PrinterTest extends TestCase
 			])),
 		];
 
-		$changeCallableReturnTypeCallbackFactory = function (callable $callback): NodeVisitor {
-			return new class ($callback) extends AbstractNodeVisitor {
+		$changeCallableReturnTypeCallbackFactory = fn (callable $callback): NodeVisitor => new class ($callback) extends AbstractNodeVisitor {
 
-				/** @var callable(TypeNode): TypeNode */
-				private $callback;
+			/** @var callable(TypeNode): TypeNode */
+			private $callback;
 
-				public function __construct(callable $callback)
-				{
-					$this->callback = $callback;
+			public function __construct(callable $callback)
+			{
+				$this->callback = $callback;
+			}
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof CallableTypeNode) {
+					$cb = $this->callback;
+					$node->returnType = $cb($node->returnType);
 				}
 
-				public function enterNode(Node $node)
-				{
-					if ($node instanceof CallableTypeNode) {
-						$cb = $this->callback;
-						$node->returnType = $cb($node->returnType);
-					}
+				return $node;
+			}
 
-					return $node;
-				}
-
-			};
 		};
 
 		yield [
 			'/** @param callable(): int $a */',
 			'/** @param callable(): string $a */',
-			$changeCallableReturnTypeCallbackFactory(static function (TypeNode $typeNode): TypeNode {
-				return new IdentifierTypeNode('string');
-			}),
+			$changeCallableReturnTypeCallbackFactory(static fn (TypeNode $typeNode) => new IdentifierTypeNode('string')),
 		];
 
 		yield [
 			'/** @param callable(): (int) $a */',
 			'/** @param callable(): string $a */',
-			$changeCallableReturnTypeCallbackFactory(static function (TypeNode $typeNode): TypeNode {
-				return new IdentifierTypeNode('string');
-			}),
+			$changeCallableReturnTypeCallbackFactory(static fn (TypeNode $typeNode) => new IdentifierTypeNode('string')),
 		];
 
 		yield [
@@ -1885,7 +1874,7 @@ class PrinterTest extends TestCase
 
 		$this->assertEquals(
 			$this->unsetAttributes($newNode),
-			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($newPhpDoc))))
+			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($newPhpDoc)))),
 		);
 	}
 
@@ -1941,7 +1930,7 @@ class PrinterTest extends TestCase
 				[
 					GenericTypeNode::VARIANCE_INVARIANT,
 					GenericTypeNode::VARIANCE_INVARIANT,
-				]
+				],
 			),
 			'array<int, int|string>',
 		];
@@ -1959,8 +1948,8 @@ class PrinterTest extends TestCase
 		yield [
 			new ArrayTypeNode(
 				new ArrayTypeNode(
-					new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int')))
-				)
+					new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int'))),
+				),
 			),
 			'(callable(): int[])[][]',
 		];
@@ -2003,7 +1992,7 @@ class PrinterTest extends TestCase
 		yield [
 			new OffsetAccessTypeNode(
 				new ConstTypeNode(new ConstFetchNode('self', 'TYPES')),
-				new IdentifierTypeNode('int')
+				new IdentifierTypeNode('int'),
 			),
 			'self::TYPES[int]',
 		];
@@ -2021,7 +2010,7 @@ class PrinterTest extends TestCase
 		$lexer = new Lexer();
 		$this->assertEquals(
 			$this->unsetAttributes($node),
-			$this->unsetAttributes($this->typeParser->parse(new TokenIterator($lexer->tokenize($phpDoc))))
+			$this->unsetAttributes($this->typeParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
 		);
 	}
 
@@ -2036,7 +2025,7 @@ class PrinterTest extends TestCase
 					new IdentifierTypeNode('int'),
 					false,
 					'$a',
-					''
+					'',
 				)),
 			]),
 			'/**
@@ -2057,7 +2046,7 @@ class PrinterTest extends TestCase
 		$lexer = new Lexer();
 		$this->assertEquals(
 			$this->unsetAttributes($node),
-			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($phpDoc))))
+			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
 		);
 	}
 

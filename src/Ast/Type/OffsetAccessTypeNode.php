@@ -9,11 +9,9 @@ class OffsetAccessTypeNode implements TypeNode
 
 	use NodeAttributes;
 
-	/** @var TypeNode */
-	public $type;
+	public TypeNode $type;
 
-	/** @var TypeNode */
-	public $offset;
+	public TypeNode $offset;
 
 	public function __construct(TypeNode $type, TypeNode $offset)
 	{

@@ -12,7 +12,7 @@ class UnionTypeNode implements TypeNode
 	use NodeAttributes;
 
 	/** @var TypeNode[] */
-	public $types;
+	public array $types;
 
 	/**
 	 * @param TypeNode[] $types

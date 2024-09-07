@@ -163,7 +163,7 @@ class NodeTraverserTest extends TestCase
 
 		$this->assertEquals(
 			[$strStart, $strR1, $strR2, $strEnd],
-			$traverser->traverse([$strStart, $strMiddle, $strEnd])
+			$traverser->traverse([$strStart, $strMiddle, $strEnd]),
 		);
 	}
 

@@ -11,11 +11,10 @@ class DoctrineTagValueNode implements PhpDocTagValueNode
 
 	use NodeAttributes;
 
-	/** @var DoctrineAnnotation */
-	public $annotation;
+	public DoctrineAnnotation $annotation;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 
 	public function __construct(

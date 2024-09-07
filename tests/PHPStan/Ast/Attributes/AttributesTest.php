@@ -13,8 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class AttributesTest extends TestCase
 {
 
-	/** @var PhpDocNode */
-	private $phpDocNode;
+	private PhpDocNode $phpDocNode;
 
 	protected function setUp(): void
 	{

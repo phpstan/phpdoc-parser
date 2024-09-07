@@ -15,14 +15,11 @@ use function substr_compare;
 class TypeParser
 {
 
-	/** @var ConstExprParser */
-	private $constExprParser;
+	private ConstExprParser $constExprParser;
 
-	/** @var bool */
-	private $useLinesAttributes;
+	private bool $useLinesAttributes;
 
-	/** @var bool */
-	private $useIndexAttributes;
+	private bool $useIndexAttributes;
 
 	/**
 	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
@@ -184,7 +181,7 @@ class TypeParser
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 						$type = $this->tryParseArrayOrOffsetAccess(
 							$tokens,
-							$this->enrichWithAttributes($tokens, $type, $startLine, $startIndex)
+							$this->enrichWithAttributes($tokens, $type, $startLine, $startIndex),
 						);
 					}
 				}
@@ -211,7 +208,7 @@ class TypeParser
 					$currentTokenOffset,
 					Lexer::TOKEN_IDENTIFIER,
 					null,
-					$currentTokenLine
+					$currentTokenLine,
 				);
 			}
 
@@ -219,7 +216,7 @@ class TypeParser
 				$tokens,
 				new Ast\Type\ConstTypeNode($constExpr),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
@@ -233,7 +230,7 @@ class TypeParser
 				$currentTokenOffset,
 				Lexer::TOKEN_IDENTIFIER,
 				null,
-				$currentTokenLine
+				$currentTokenLine,
 			);
 		}
 	}
@@ -576,7 +573,7 @@ class TypeParser
 			$tokens,
 			$this->parseTemplateTagValue($tokens),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 
@@ -603,7 +600,7 @@ class TypeParser
 			$tokens,
 			new Ast\Type\CallableTypeParameterNode($type, $isReference, $isVariadic, $parameterName, $isOptional),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 
@@ -631,7 +628,7 @@ class TypeParser
 					$tokens,
 					$type,
 					$startLine,
-					$startIndex
+					$startIndex,
 				));
 			}
 
@@ -650,15 +647,15 @@ class TypeParser
 								$tokens,
 								$type,
 								$startLine,
-								$startIndex
-							)
+								$startIndex,
+							),
 						);
 						if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 							$type = $this->tryParseArrayOrOffsetAccess($tokens, $this->enrichWithAttributes(
 								$tokens,
 								$type,
 								$startLine,
-								$startIndex
+								$startIndex,
 							));
 						}
 
@@ -667,7 +664,7 @@ class TypeParser
 							$tokens,
 							$type,
 							$startLine,
-							$startIndex
+							$startIndex,
 						));
 
 					} elseif (in_array($type->name, ['array', 'list', 'object'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
@@ -678,7 +675,7 @@ class TypeParser
 								$tokens,
 								$type,
 								$startLine,
-								$startIndex
+								$startIndex,
 							), $type->name);
 						}
 
@@ -687,7 +684,7 @@ class TypeParser
 								$tokens,
 								$type,
 								$startLine,
-								$startIndex
+								$startIndex,
 							));
 						}
 					}
@@ -706,17 +703,6 @@ class TypeParser
 		$currentTokenOffset = $tokens->currentTokenOffset();
 		$currentTokenLine = $tokens->currentTokenLine();
 
-		if ($this->constExprParser === null) {
-			throw new ParserException(
-				$currentTokenValue,
-				$currentTokenType,
-				$currentTokenOffset,
-				Lexer::TOKEN_IDENTIFIER,
-				null,
-				$currentTokenLine
-			);
-		}
-
 		try {
 			$constExpr = $this->constExprParser->parse($tokens);
 			if ($constExpr instanceof Ast\ConstExpr\ConstExprArrayNode) {
@@ -726,7 +712,7 @@ class TypeParser
 					$currentTokenOffset,
 					Lexer::TOKEN_IDENTIFIER,
 					null,
-					$currentTokenLine
+					$currentTokenLine,
 				);
 			}
 
@@ -734,7 +720,7 @@ class TypeParser
 				$tokens,
 				new Ast\Type\ConstTypeNode($constExpr),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 			if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 				$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
@@ -748,7 +734,7 @@ class TypeParser
 				$currentTokenOffset,
 				Lexer::TOKEN_IDENTIFIER,
 				null,
-				$currentTokenLine
+				$currentTokenLine,
 			);
 		}
 	}
@@ -794,7 +780,7 @@ class TypeParser
 							$tokens,
 							$type,
 							$startLine,
-							$startIndex
+							$startIndex,
 						);
 					}
 				} else {
@@ -807,7 +793,7 @@ class TypeParser
 							$tokens,
 							$type,
 							$startLine,
-							$startIndex
+							$startIndex,
 						);
 					}
 				}
@@ -886,7 +872,7 @@ class TypeParser
 				$tokens,
 				new Ast\Type\ArrayShapeItemNode($key, $optional, $value),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		} catch (ParserException $e) {
 			$tokens->rollback();
@@ -896,7 +882,7 @@ class TypeParser
 				$tokens,
 				new Ast\Type\ArrayShapeItemNode(null, false, $value),
 				$startLine,
-				$startIndex
+				$startIndex,
 			);
 		}
 	}
@@ -932,7 +918,7 @@ class TypeParser
 			$tokens,
 			$key,
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 
@@ -965,7 +951,7 @@ class TypeParser
 			$tokens,
 			new Ast\Type\ArrayShapeUnsealedTypeNode($valueType, $keyType),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 
@@ -989,7 +975,7 @@ class TypeParser
 			$tokens,
 			new Ast\Type\ArrayShapeUnsealedTypeNode($valueType, null),
 			$startLine,
-			$startIndex
+			$startIndex,
 		);
 	}
 

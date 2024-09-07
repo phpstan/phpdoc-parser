@@ -16,7 +16,7 @@ lint:
 .PHONY: cs-install
 cs-install:
 	git clone https://github.com/phpstan/build-cs.git || true
-	git -C build-cs fetch origin && git -C build-cs reset --hard origin/1.x
+	git -C build-cs fetch origin && git -C build-cs reset --hard origin/2.x
 	composer install --working-dir build-cs
 
 .PHONY: cs

@@ -180,7 +180,7 @@ class Differ
 					$newDiff[] = new DiffElem(
 						DiffElem::TYPE_REPLACE,
 						$diff[$i + $n]->old,
-						$diff[$j + $n]->new
+						$diff[$j + $n]->new,
 					);
 				}
 			} else {

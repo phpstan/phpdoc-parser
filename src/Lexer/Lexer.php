@@ -94,8 +94,7 @@ class Lexer
 	public const TYPE_OFFSET = 1;
 	public const LINE_OFFSET = 2;
 
-	/** @var string|null */
-	private $regexp;
+	private ?string $regexp = null;
 
 	/**
 	 * @return list<array{string, int, int}>

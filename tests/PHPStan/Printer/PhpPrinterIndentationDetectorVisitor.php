@@ -16,14 +16,11 @@ use const PREG_SET_ORDER;
 class PhpPrinterIndentationDetectorVisitor extends NodeVisitorAbstract
 {
 
-	/** @var string */
-	public $indentCharacter = ' ';
+	public string $indentCharacter = ' ';
 
-	/** @var int */
-	public $indentSize = 4;
+	public int $indentSize = 4;
 
-	/** @var TokenStream */
-	private $origTokens;
+	private TokenStream $origTokens;
 
 	public function __construct(TokenStream $origTokens)
 	{

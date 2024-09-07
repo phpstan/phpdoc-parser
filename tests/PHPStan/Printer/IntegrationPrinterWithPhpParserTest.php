@@ -41,7 +41,7 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 						new IdentifierTypeNode('Bar'),
 						false,
 						'$b',
-						''
+						'',
 					));
 				}
 				return $node;
@@ -83,8 +83,7 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 		$phpTraverser2 = new PhpParserNodeTraverser();
 		$phpTraverser2->addVisitor(new class ($visitor) extends NodeVisitorAbstract {
 
-			/** @var NodeVisitor */
-			private $visitor;
+			private NodeVisitor $visitor;
 
 			public function __construct(NodeVisitor $visitor)
 			{
@@ -104,7 +103,7 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 				$phpDocParser = new PhpDocParser(
 					new TypeParser($constExprParser, $usedAttributes),
 					$constExprParser,
-					$usedAttributes
+					$usedAttributes,
 				);
 				$lexer = new Lexer();
 				$tokens = new TokenIterator($lexer->tokenize($phpDoc));

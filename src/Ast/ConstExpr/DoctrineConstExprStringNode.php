@@ -13,8 +13,7 @@ class DoctrineConstExprStringNode extends ConstExprStringNode
 
 	use NodeAttributes;
 
-	/** @var string */
-	public $value;
+	public string $value;
 
 	public function __construct(string $value)
 	{

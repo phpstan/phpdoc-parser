@@ -14,16 +14,14 @@ class ArrayShapeNode implements TypeNode
 	use NodeAttributes;
 
 	/** @var ArrayShapeItemNode[] */
-	public $items;
+	public array $items;
 
-	/** @var bool */
-	public $sealed;
+	public bool $sealed;
 
 	/** @var self::KIND_* */
 	public $kind;
 
-	/** @var ArrayShapeUnsealedTypeNode|null */
-	public $unsealedType;
+	public ?ArrayShapeUnsealedTypeNode $unsealedType = null;
 
 	/**
 	 * @param ArrayShapeItemNode[] $items

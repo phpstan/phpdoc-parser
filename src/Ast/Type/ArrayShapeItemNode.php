@@ -15,11 +15,9 @@ class ArrayShapeItemNode implements TypeNode
 	/** @var ConstExprIntegerNode|ConstExprStringNode|IdentifierTypeNode|null */
 	public $keyName;
 
-	/** @var bool */
-	public $optional;
+	public bool $optional;
 
-	/** @var TypeNode */
-	public $valueType;
+	public TypeNode $valueType;
 
 	/**
 	 * @param ConstExprIntegerNode|ConstExprStringNode|IdentifierTypeNode|null $keyName
@@ -39,7 +37,7 @@ class ArrayShapeItemNode implements TypeNode
 				'%s%s: %s',
 				(string) $this->keyName,
 				$this->optional ? '?' : '',
-				(string) $this->valueType
+				(string) $this->valueType,
 			);
 		}
 

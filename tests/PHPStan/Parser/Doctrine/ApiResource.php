@@ -13,22 +13,16 @@ namespace PHPStan\PhpDocParser\Parser\Doctrine;
 final class ApiResource
 {
 
-	/** @var string */
-	public $shortName;
+	public string $shortName;
 
-	/** @var string */
-	public $description;
+	public string $description;
 
-	/** @var string */
-	public $iri;
+	public string $iri;
 
-	/** @var array */
-	public $itemOperations;
+	public array $itemOperations;
 
-	/** @var array */
-	public $collectionOperations;
+	public array $collectionOperations;
 
-	/** @var array */
-	public $attributes = [];
+	public array $attributes = [];
 
 }

@@ -11,7 +11,7 @@ class ObjectShapeNode implements TypeNode
 	use NodeAttributes;
 
 	/** @var ObjectShapeItemNode[] */
-	public $items;
+	public array $items;
 
 	/**
 	 * @param ObjectShapeItemNode[] $items

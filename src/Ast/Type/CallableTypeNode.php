@@ -11,17 +11,15 @@ class CallableTypeNode implements TypeNode
 
 	use NodeAttributes;
 
-	/** @var IdentifierTypeNode */
-	public $identifier;
+	public IdentifierTypeNode $identifier;
 
 	/** @var TemplateTagValueNode[] */
-	public $templateTypes;
+	public array $templateTypes;
 
 	/** @var CallableTypeParameterNode[] */
-	public $parameters;
+	public array $parameters;
 
-	/** @var TypeNode */
-	public $returnType;
+	public TypeNode $returnType;
 
 	/**
 	 * @param CallableTypeParameterNode[] $parameters

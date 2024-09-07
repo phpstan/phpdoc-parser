@@ -9,11 +9,9 @@ use function str_repeat;
 class PhpPrinter extends Standard
 {
 
-	/** @var string */
-	private $indentCharacter = ' ';
+	private string $indentCharacter = ' ';
 
-	/** @var int */
-	private $indentSize = 4;
+	private int $indentSize = 4;
 
 	protected function resetState(): void
 	{

@@ -10,11 +10,10 @@ class ParamImmediatelyInvokedCallableTagValueNode implements PhpDocTagValueNode
 
 	use NodeAttributes;
 
-	/** @var string */
-	public $parameterName;
+	public string $parameterName;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 	public function __construct(string $parameterName, string $description)
 	{

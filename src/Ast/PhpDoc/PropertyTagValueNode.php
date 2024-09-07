@@ -11,14 +11,12 @@ class PropertyTagValueNode implements PhpDocTagValueNode
 
 	use NodeAttributes;
 
-	/** @var TypeNode */
-	public $type;
+	public TypeNode $type;
 
-	/** @var string */
-	public $propertyName;
+	public string $propertyName;
 
 	/** @var string (may be empty) */
-	public $description;
+	public string $description;
 
 	public function __construct(TypeNode $type, string $propertyName, string $description)
 	{

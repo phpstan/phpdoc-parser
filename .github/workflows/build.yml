@@ -56,7 +56,7 @@ jobs:
         with:
           repository: "phpstan/build-cs"
           path: "build-cs"
-          ref: "1.x"
+          ref: "2.x"
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"

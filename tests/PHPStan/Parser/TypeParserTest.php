@@ -40,11 +40,9 @@ use const PHP_EOL;
 class TypeParserTest extends TestCase
 {
 
-	/** @var Lexer */
-	private $lexer;
+	private Lexer $lexer;
 
-	/** @var TypeParser */
-	private $typeParser;
+	private TypeParser $typeParser;
 
 	protected function setUp(): void
 	{
@@ -280,13 +278,13 @@ class TypeParserTest extends TestCase
 			[
 				'string[]',
 				new ArrayTypeNode(
-					new IdentifierTypeNode('string')
+					new IdentifierTypeNode('string'),
 				),
 			],
 			[
 				'string [  ] ',
 				new ArrayTypeNode(
-					new IdentifierTypeNode('string')
+					new IdentifierTypeNode('string'),
 				),
 			],
 			[
@@ -296,7 +294,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('string'),
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('float'),
-					])
+					]),
 				),
 			],
 			[
@@ -304,9 +302,9 @@ class TypeParserTest extends TestCase
 				new ArrayTypeNode(
 					new ArrayTypeNode(
 						new ArrayTypeNode(
-							new IdentifierTypeNode('string')
-						)
-					)
+							new IdentifierTypeNode('string'),
+						),
+					),
 				),
 			],
 			[
@@ -314,9 +312,9 @@ class TypeParserTest extends TestCase
 				new ArrayTypeNode(
 					new ArrayTypeNode(
 						new ArrayTypeNode(
-							new IdentifierTypeNode('string')
-						)
-					)
+							new IdentifierTypeNode('string'),
+						),
+					),
 				),
 			],
 			[
@@ -328,9 +326,9 @@ class TypeParserTest extends TestCase
 								new IdentifierTypeNode('string'),
 								new IdentifierTypeNode('int'),
 								new IdentifierTypeNode('float'),
-							])
-						)
-					)
+							]),
+						),
+					),
 				),
 			],
 			[
@@ -340,7 +338,7 @@ class TypeParserTest extends TestCase
 			[
 				'?int',
 				new NullableTypeNode(
-					new IdentifierTypeNode('int')
+					new IdentifierTypeNode('int'),
 				),
 			],
 			[
@@ -353,8 +351,8 @@ class TypeParserTest extends TestCase
 						],
 						[
 							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+						],
+					),
 				),
 			],
 			[
@@ -368,7 +366,7 @@ class TypeParserTest extends TestCase
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -383,7 +381,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -394,8 +392,8 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('a'),
 						false,
 						new NullableTypeNode(
-							new IdentifierTypeNode('int')
-						)
+							new IdentifierTypeNode('int'),
+						),
 					),
 				]),
 			],
@@ -406,8 +404,8 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('a'),
 						true,
 						new NullableTypeNode(
-							new IdentifierTypeNode('int')
-						)
+							new IdentifierTypeNode('int'),
+						),
 					),
 				]),
 			],
@@ -417,7 +415,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new ConstExprIntegerNode('0'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -427,7 +425,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new ConstExprIntegerNode('0'),
 						true,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -437,12 +435,12 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						null,
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						null,
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -452,12 +450,12 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -467,27 +465,27 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						true,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 					new ArrayShapeItemNode(
 						new ConstExprIntegerNode('0'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new ConstExprIntegerNode('1'),
 						true,
-						new IdentifierTypeNode('DateTime')
+						new IdentifierTypeNode('DateTime'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('hello'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -497,7 +495,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
@@ -509,10 +507,10 @@ class TypeParserTest extends TestCase
 								new CallableTypeNode(
 									new IdentifierTypeNode('callable'),
 									[],
-									new IdentifierTypeNode('int')
-								)
+									new IdentifierTypeNode('int'),
+								),
 							),
-						])
+						]),
 					),
 				]),
 			],
@@ -523,9 +521,9 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
-					])
+					]),
 				),
 			],
 			[
@@ -534,7 +532,7 @@ class TypeParserTest extends TestCase
 					'',
 					Lexer::TOKEN_END,
 					6,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -543,7 +541,7 @@ class TypeParserTest extends TestCase
 					'=>',
 					Lexer::TOKEN_OTHER,
 					8,
-					Lexer::TOKEN_CLOSE_CURLY_BRACKET
+					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
 				),
 			],
 			[
@@ -552,7 +550,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('a', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -562,7 +560,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -572,7 +570,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('$ref', ConstExprStringNode::SINGLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -582,7 +580,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('$ref', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -594,7 +592,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -606,7 +604,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -619,12 +617,12 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -638,17 +636,17 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('c'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -661,12 +659,12 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -676,12 +674,12 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				], false),
 			],
@@ -691,12 +689,12 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						null,
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ArrayShapeItemNode(
 						null,
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				], false),
 			],
@@ -713,7 +711,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				], false),
 			],
@@ -726,7 +724,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				], false),
 			],
@@ -736,7 +734,7 @@ class TypeParserTest extends TestCase
 					'string',
 					Lexer::TOKEN_IDENTIFIER,
 					16,
-					Lexer::TOKEN_CLOSE_CURLY_BRACKET
+					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
 				),
 			],
 			[
@@ -749,16 +747,16 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('string')
+							new IdentifierTypeNode('string'),
 						),
 					],
 					true,
-					ArrayShapeNode::KIND_LIST
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
@@ -769,8 +767,8 @@ class TypeParserTest extends TestCase
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -780,20 +778,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('b'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -803,20 +801,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('b'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -831,20 +829,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('b'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -855,8 +853,8 @@ class TypeParserTest extends TestCase
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						new IdentifierTypeNode('int')
-					)
+						new IdentifierTypeNode('int'),
+					),
 				),
 			],
 			[
@@ -866,20 +864,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('b'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						new IdentifierTypeNode('int')
-					)
+						new IdentifierTypeNode('int'),
+					),
 				),
 			],
 			[
@@ -889,20 +887,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('b'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						new IdentifierTypeNode('int')
-					)
+						new IdentifierTypeNode('int'),
+					),
 				),
 			],
 			[
@@ -919,20 +917,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('b'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						new IdentifierTypeNode('int')
-					)
+						new IdentifierTypeNode('int'),
+					),
 				),
 			],
 			[
@@ -943,8 +941,8 @@ class TypeParserTest extends TestCase
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -954,20 +952,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -977,20 +975,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -1005,20 +1003,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -1028,20 +1026,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('0'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('1'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -1051,20 +1049,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('0'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('1'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -1079,20 +1077,20 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('0'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('1'),
 							true,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
 					],
 					false,
 					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
-						null
-					)
+						null,
+					),
 				),
 			],
 			[
@@ -1101,7 +1099,7 @@ class TypeParserTest extends TestCase
 					'>',
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					10,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -1110,7 +1108,7 @@ class TypeParserTest extends TestCase
 					'>',
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					14,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -1119,7 +1117,7 @@ class TypeParserTest extends TestCase
 					',',
 					Lexer::TOKEN_COMMA,
 					21,
-					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 				),
 			],
 			[
@@ -1128,7 +1126,7 @@ class TypeParserTest extends TestCase
 					',',
 					Lexer::TOKEN_COMMA,
 					21,
-					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 				),
 			],
 			[
@@ -1137,7 +1135,7 @@ class TypeParserTest extends TestCase
 					'>',
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					9,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -1146,7 +1144,7 @@ class TypeParserTest extends TestCase
 					',',
 					Lexer::TOKEN_COMMA,
 					12,
-					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 				),
 			],
 			[
@@ -1155,7 +1153,7 @@ class TypeParserTest extends TestCase
 					',',
 					Lexer::TOKEN_COMMA,
 					12,
-					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 				),
 			],
 			[
@@ -1163,7 +1161,7 @@ class TypeParserTest extends TestCase
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
 					[],
-					new IdentifierTypeNode('Foo')
+					new IdentifierTypeNode('Foo'),
 				),
 			],
 			[
@@ -1171,7 +1169,7 @@ class TypeParserTest extends TestCase
 				new CallableTypeNode(
 					new IdentifierTypeNode('pure-callable'),
 					[],
-					new IdentifierTypeNode('Foo')
+					new IdentifierTypeNode('Foo'),
 				),
 			],
 			[
@@ -1179,7 +1177,7 @@ class TypeParserTest extends TestCase
 				new CallableTypeNode(
 					new IdentifierTypeNode('pure-Closure'),
 					[],
-					new IdentifierTypeNode('Foo')
+					new IdentifierTypeNode('Foo'),
 				),
 			],
 			[
@@ -1188,8 +1186,8 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('callable'),
 					[],
 					new NullableTypeNode(
-						new IdentifierTypeNode('Foo')
-					)
+						new IdentifierTypeNode('Foo'),
+					),
 				),
 			],
 			[
@@ -1204,8 +1202,8 @@ class TypeParserTest extends TestCase
 						],
 						[
 							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+						],
+					),
 				),
 			],
 			[
@@ -1220,8 +1218,8 @@ class TypeParserTest extends TestCase
 						],
 						[
 							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					))
+						],
+					)),
 				),
 			],
 			[
@@ -1230,7 +1228,7 @@ class TypeParserTest extends TestCase
 					new CallableTypeNode(
 						new IdentifierTypeNode('callable'),
 						[],
-						new IdentifierTypeNode('Foo')
+						new IdentifierTypeNode('Foo'),
 					),
 					new IdentifierTypeNode('Bar'),
 				]),
@@ -1241,7 +1239,7 @@ class TypeParserTest extends TestCase
 					new CallableTypeNode(
 						new IdentifierTypeNode('callable'),
 						[],
-						new IdentifierTypeNode('Foo')
+						new IdentifierTypeNode('Foo'),
 					),
 					new IdentifierTypeNode('Bar'),
 				]),
@@ -1254,7 +1252,7 @@ class TypeParserTest extends TestCase
 					new UnionTypeNode([
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
-					])
+					]),
 				),
 			],
 			[
@@ -1265,7 +1263,7 @@ class TypeParserTest extends TestCase
 					new IntersectionTypeNode([
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
-					])
+					]),
 				),
 			],
 			[
@@ -1277,9 +1275,9 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
-					])
+					]),
 				),
 			],
 			[
@@ -1292,24 +1290,24 @@ class TypeParserTest extends TestCase
 							true,
 							true,
 							'$a',
-							true
+							true,
 						),
 						new CallableTypeParameterNode(
 							new IdentifierTypeNode('B'),
 							true,
 							true,
 							'',
-							true
+							true,
 						),
 						new CallableTypeParameterNode(
 							new IdentifierTypeNode('C'),
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 					],
-					new IdentifierTypeNode('Foo')
+					new IdentifierTypeNode('Foo'),
 				),
 			],
 			[
@@ -1322,13 +1320,13 @@ class TypeParserTest extends TestCase
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 					],
 					new IdentifierTypeNode('C'),
 					[
 						new TemplateTagValueNode('A', null, ''),
-					]
+					],
 				),
 			],
 			[
@@ -1337,7 +1335,7 @@ class TypeParserTest extends TestCase
 					'>',
 					Lexer::TOKEN_END,
 					9,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -1350,14 +1348,14 @@ class TypeParserTest extends TestCase
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 						new CallableTypeParameterNode(
 							new IdentifierTypeNode('int'),
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 					],
 					new UnionTypeNode([
@@ -1366,7 +1364,7 @@ class TypeParserTest extends TestCase
 					]),
 					[
 						new TemplateTagValueNode('T', new IdentifierTypeNode('Model'), ''),
-					]
+					],
 				),
 			],
 			[
@@ -1379,26 +1377,26 @@ class TypeParserTest extends TestCase
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 						new CallableTypeParameterNode(
 							new IdentifierTypeNode('Ty'),
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 					],
 					new ArrayShapeNode([
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('Ty')
+							new IdentifierTypeNode('Ty'),
 						),
 						new ArrayShapeItemNode(
 							null,
 							false,
-							new IdentifierTypeNode('Tx')
+							new IdentifierTypeNode('Tx'),
 						),
 					]),
 					[
@@ -1407,7 +1405,7 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('Z'),
 						]), ''),
 						new TemplateTagValueNode('Ty', new IdentifierTypeNode('Y'), ''),
-					]
+					],
 				),
 			],
 			[
@@ -1425,7 +1423,7 @@ class TypeParserTest extends TestCase
 								[
 									GenericTypeNode::VARIANCE_INVARIANT,
 									GenericTypeNode::VARIANCE_INVARIANT,
-								]
+								],
 							),
 							new UnionTypeNode([
 								new IdentifierTypeNode('int'),
@@ -1438,17 +1436,17 @@ class TypeParserTest extends TestCase
 											],
 											[
 												GenericTypeNode::VARIANCE_INVARIANT,
-											]
+											],
 										),
 										new IdentifierTypeNode('bar'),
-									])
+									]),
 								),
 							]),
 						],
 						[
 							GenericTypeNode::VARIANCE_INVARIANT,
 							GenericTypeNode::VARIANCE_INVARIANT,
-						]
+						],
 					),
 					new IdentifierTypeNode('Lorem'),
 				]),
@@ -1462,20 +1460,20 @@ class TypeParserTest extends TestCase
 				'array[ int ]',
 				new OffsetAccessTypeNode(
 					new IdentifierTypeNode('array'),
-					new IdentifierTypeNode('int')
+					new IdentifierTypeNode('int'),
 				),
 			],
 			[
 				'self::TYPES[ int ]',
 				new OffsetAccessTypeNode(
 					new ConstTypeNode(new ConstFetchNode('self', 'TYPES')),
-					new IdentifierTypeNode('int')
+					new IdentifierTypeNode('int'),
 				),
 			],
 			[
 				"?\t\xA009", // edge-case with \h
 				new NullableTypeNode(
-					new IdentifierTypeNode("\xA009")
+					new IdentifierTypeNode("\xA009"),
 				),
 			],
 			[
@@ -1490,8 +1488,8 @@ class TypeParserTest extends TestCase
 						[
 							GenericTypeNode::VARIANCE_INVARIANT,
 							GenericTypeNode::VARIANCE_INVARIANT,
-						]
-					)
+						],
+					),
 				),
 			],
 			[
@@ -1508,8 +1506,8 @@ class TypeParserTest extends TestCase
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
-						)
+							],
+						),
 					),
 				]),
 			],
@@ -1520,9 +1518,9 @@ class TypeParserTest extends TestCase
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('foo'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
-					])
+					]),
 				),
 			],
 			[
@@ -1534,16 +1532,16 @@ class TypeParserTest extends TestCase
 							new ArrayShapeItemNode(
 								new IdentifierTypeNode('foo'),
 								false,
-								new IdentifierTypeNode('int')
+								new IdentifierTypeNode('int'),
 							),
-						])
+						]),
 					),
 				]),
 			],
 			[
 				'$this[]',
 				new ArrayTypeNode(
-					new ThisTypeNode()
+					new ThisTypeNode(),
 				),
 			],
 			[
@@ -1551,7 +1549,7 @@ class TypeParserTest extends TestCase
 				new UnionTypeNode([
 					new IdentifierTypeNode('int'),
 					new ArrayTypeNode(
-						new ThisTypeNode()
+						new ThisTypeNode(),
 					),
 				]),
 			],
@@ -1561,16 +1559,16 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('callable'),
 					[],
 					new ArrayTypeNode(
-						new IdentifierTypeNode('int')
-					)
+						new IdentifierTypeNode('int'),
+					),
 				),
 			],
 			[
 				'?int[]',
 				new NullableTypeNode(
 					new ArrayTypeNode(
-						new IdentifierTypeNode('int')
-					)
+						new IdentifierTypeNode('int'),
+					),
 				),
 			],
 			[
@@ -1707,7 +1705,7 @@ class TypeParserTest extends TestCase
 					],
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -1724,7 +1722,7 @@ class TypeParserTest extends TestCase
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -1740,7 +1738,7 @@ class TypeParserTest extends TestCase
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -1761,13 +1759,13 @@ class TypeParserTest extends TestCase
 							],
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
 					],
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -1788,13 +1786,13 @@ class TypeParserTest extends TestCase
 							],
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
 					],
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -1818,7 +1816,7 @@ class TypeParserTest extends TestCase
 					[
 						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
 					],
-					new IdentifierTypeNode('void')
+					new IdentifierTypeNode('void'),
 				),
 			],
 			[
@@ -1832,7 +1830,7 @@ class TypeParserTest extends TestCase
 						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
 						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 					],
-					new IdentifierTypeNode('void')
+					new IdentifierTypeNode('void'),
 				),
 			],
 			[
@@ -1845,7 +1843,7 @@ class TypeParserTest extends TestCase
 						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
 						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 					],
-					new IdentifierTypeNode('void')
+					new IdentifierTypeNode('void'),
 				),
 			],
 			[
@@ -1865,15 +1863,15 @@ class TypeParserTest extends TestCase
 								[
 									new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 								],
-								new IdentifierTypeNode('void')
+								new IdentifierTypeNode('void'),
 							),
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 					],
-					new IdentifierTypeNode('void')
+					new IdentifierTypeNode('void'),
 				),
 			],
 			[
@@ -1893,15 +1891,15 @@ class TypeParserTest extends TestCase
 								[
 									new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 								],
-								new IdentifierTypeNode('void')
+								new IdentifierTypeNode('void'),
 							),
 							false,
 							false,
 							'',
-							false
+							false,
 						),
 					],
-					new IdentifierTypeNode('void')
+					new IdentifierTypeNode('void'),
 				),
 			],
 			[
@@ -1911,7 +1909,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('Bar'),
 					new IdentifierTypeNode('never'),
 					new IdentifierTypeNode('int'),
-					false
+					false,
 				),
 			],
 			[
@@ -1921,7 +1919,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('Bar'),
 					new IdentifierTypeNode('never'),
 					new IdentifierTypeNode('int'),
-					true
+					true,
 				),
 			],
 			[
@@ -1935,9 +1933,9 @@ class TypeParserTest extends TestCase
 						new ConstTypeNode(new ConstFetchNode('self', 'TYPE_INT')),
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('bool'),
-						false
+						false,
 					),
-					false
+					false,
 				),
 			],
 			[
@@ -1953,7 +1951,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('string'),
 					]),
-					false
+					false,
 				),
 			],
 			[
@@ -1974,7 +1972,7 @@ class TypeParserTest extends TestCase
 						[
 							GenericTypeNode::VARIANCE_INVARIANT,
 							GenericTypeNode::VARIANCE_INVARIANT,
-						]
+						],
 					),
 					new ConditionalTypeNode(
 						new IdentifierTypeNode('TRandList'),
@@ -1988,7 +1986,7 @@ class TypeParserTest extends TestCase
 							[
 								GenericTypeNode::VARIANCE_INVARIANT,
 								GenericTypeNode::VARIANCE_INVARIANT,
-							]
+							],
 						),
 						new UnionTypeNode([
 							new GenericTypeNode(
@@ -2000,7 +1998,7 @@ class TypeParserTest extends TestCase
 								[
 									GenericTypeNode::VARIANCE_INVARIANT,
 									GenericTypeNode::VARIANCE_INVARIANT,
-								]
+								],
 							),
 							new GenericTypeNode(
 								new IdentifierTypeNode('LimitIterator'),
@@ -2011,12 +2009,12 @@ class TypeParserTest extends TestCase
 								[
 									GenericTypeNode::VARIANCE_INVARIANT,
 									GenericTypeNode::VARIANCE_INVARIANT,
-								]
+								],
 							),
 						]),
-						false
+						false,
 					),
-					false
+					false,
 				),
 			],
 			[
@@ -2032,7 +2030,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('string'),
 					]),
-					false
+					false,
 				),
 			],
 			[
@@ -2052,7 +2050,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('int'),
 						new IdentifierTypeNode('string'),
 					]),
-					false
+					false,
 				),
 			],
 			[
@@ -2061,9 +2059,9 @@ class TypeParserTest extends TestCase
 					new ConstTypeNode(
 						new ConstFetchNode(
 							'Currency',
-							'CURRENCY_*'
-						)
-					)
+							'CURRENCY_*',
+						),
+					),
 				),
 			],
 			[
@@ -2077,9 +2075,9 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Bar'),
 						new IdentifierTypeNode('false'),
 						new IdentifierTypeNode('null'),
-						false
+						false,
 					),
-					false
+					false,
 				),
 			],
 			[
@@ -2088,7 +2086,7 @@ class TypeParserTest extends TestCase
 					'is',
 					Lexer::TOKEN_IDENTIFIER,
 					14,
-					Lexer::TOKEN_COLON
+					Lexer::TOKEN_COLON,
 				),
 			],
 			[
@@ -2102,9 +2100,9 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Bar'),
 						new IdentifierTypeNode('false'),
 						new IdentifierTypeNode('null'),
-						false
+						false,
 					),
-					false
+					false,
 				),
 			],
 			[
@@ -2113,7 +2111,7 @@ class TypeParserTest extends TestCase
 					'$foo',
 					Lexer::TOKEN_VARIABLE,
 					15,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -2127,7 +2125,7 @@ class TypeParserTest extends TestCase
 					[
 						GenericTypeNode::VARIANCE_COVARIANT,
 						GenericTypeNode::VARIANCE_INVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -2141,7 +2139,7 @@ class TypeParserTest extends TestCase
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_CONTRAVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -2150,7 +2148,7 @@ class TypeParserTest extends TestCase
 					'>',
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					13,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -2159,7 +2157,7 @@ class TypeParserTest extends TestCase
 					'Bar',
 					Lexer::TOKEN_IDENTIFIER,
 					16,
-					Lexer::TOKEN_CLOSE_ANGLE_BRACKET
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 				),
 			],
 			[
@@ -2173,7 +2171,7 @@ class TypeParserTest extends TestCase
 					[
 						GenericTypeNode::VARIANCE_INVARIANT,
 						GenericTypeNode::VARIANCE_BIVARIANT,
-					]
+					],
 				),
 			],
 			[
@@ -2182,7 +2180,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2193,8 +2191,8 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('a'),
 						false,
 						new NullableTypeNode(
-							new IdentifierTypeNode('int')
-						)
+							new IdentifierTypeNode('int'),
+						),
 					),
 				]),
 			],
@@ -2205,8 +2203,8 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('a'),
 						true,
 						new NullableTypeNode(
-							new IdentifierTypeNode('int')
-						)
+							new IdentifierTypeNode('int'),
+						),
 					),
 				]),
 			],
@@ -2216,12 +2214,12 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -2231,7 +2229,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
@@ -2243,10 +2241,10 @@ class TypeParserTest extends TestCase
 								new CallableTypeNode(
 									new IdentifierTypeNode('callable'),
 									[],
-									new IdentifierTypeNode('int')
-								)
+									new IdentifierTypeNode('int'),
+								),
 							),
-						])
+						]),
 					),
 				]),
 			],
@@ -2256,7 +2254,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
@@ -2268,10 +2266,10 @@ class TypeParserTest extends TestCase
 								new CallableTypeNode(
 									new IdentifierTypeNode('callable'),
 									[],
-									new IdentifierTypeNode('int')
-								)
+									new IdentifierTypeNode('int'),
+								),
 							),
-						])
+						]),
 					),
 				]),
 			],
@@ -2282,9 +2280,9 @@ class TypeParserTest extends TestCase
 						new ObjectShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
-					])
+					]),
 				),
 			],
 			[
@@ -2293,7 +2291,7 @@ class TypeParserTest extends TestCase
 					'',
 					Lexer::TOKEN_END,
 					7,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -2302,7 +2300,7 @@ class TypeParserTest extends TestCase
 					'=>',
 					Lexer::TOKEN_OTHER,
 					9,
-					Lexer::TOKEN_COLON
+					Lexer::TOKEN_COLON,
 				),
 			],
 			[
@@ -2311,7 +2309,7 @@ class TypeParserTest extends TestCase
 					'}',
 					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
 					10,
-					Lexer::TOKEN_COLON
+					Lexer::TOKEN_COLON,
 				),
 			],
 			[
@@ -2320,7 +2318,7 @@ class TypeParserTest extends TestCase
 					'0',
 					Lexer::TOKEN_END,
 					7,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -2329,7 +2327,7 @@ class TypeParserTest extends TestCase
 					'0',
 					Lexer::TOKEN_END,
 					7,
-					Lexer::TOKEN_IDENTIFIER
+					Lexer::TOKEN_IDENTIFIER,
 				),
 			],
 			[
@@ -2338,7 +2336,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new ConstExprStringNode('a', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2348,7 +2346,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2358,7 +2356,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new ConstExprStringNode('$ref', ConstExprStringNode::SINGLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2368,7 +2366,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new ConstExprStringNode('$ref', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2380,7 +2378,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2392,7 +2390,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 				]),
 			],
@@ -2405,12 +2403,12 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -2424,17 +2422,17 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('c'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -2447,12 +2445,12 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
-						new IdentifierTypeNode('int')
+						new IdentifierTypeNode('int'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -2463,9 +2461,9 @@ class TypeParserTest extends TestCase
 						new ObjectShapeItemNode(
 							new IdentifierTypeNode('foo'),
 							false,
-							new IdentifierTypeNode('int')
+							new IdentifierTypeNode('int'),
 						),
-					])
+					]),
 				),
 			],
 			[
@@ -2477,9 +2475,9 @@ class TypeParserTest extends TestCase
 							new ObjectShapeItemNode(
 								new IdentifierTypeNode('foo'),
 								false,
-								new IdentifierTypeNode('int')
+								new IdentifierTypeNode('int'),
 							),
-						])
+						]),
 					),
 				]),
 			],
@@ -2501,12 +2499,12 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('attribute'),
 						false,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('value'),
 						true,
-						new IdentifierTypeNode('string')
+						new IdentifierTypeNode('string'),
 					),
 				]),
 			],
@@ -2522,8 +2520,8 @@ class TypeParserTest extends TestCase
 						[
 							new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
 						],
-						new IdentifierTypeNode('Bar')
-					)
+						new IdentifierTypeNode('Bar'),
+					),
 				),
 			],
 			[
@@ -2544,8 +2542,8 @@ class TypeParserTest extends TestCase
 					new ArrayTypeNode(
 						new ObjectShapeNode([
 							new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
-						])
-					)
+						]),
+					),
 				),
 			],
 			[
@@ -2560,8 +2558,8 @@ class TypeParserTest extends TestCase
 				'(callable(): int[])[][]',
 				new ArrayTypeNode(
 					new ArrayTypeNode(
-						new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int')))
-					)
+						new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int'))),
+					),
 				),
 			],
 			[
@@ -2586,7 +2584,7 @@ class TypeParserTest extends TestCase
 			[
 				'callable(): 3.5[]',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(
-					new ConstTypeNode(new ConstExprFloatNode('3.5'))
+					new ConstTypeNode(new ConstExprFloatNode('3.5')),
 				)),
 			],
 			[
@@ -2683,7 +2681,7 @@ class TypeParserTest extends TestCase
 					new GenericTypeNode(new IdentifierTypeNode('class-string'), [new IdentifierTypeNode('TService')], ['invariant']),
 					new IdentifierTypeNode('TService'),
 					new IdentifierTypeNode('mixed'),
-					false
+					false,
 				)),
 			],
 			[
@@ -2703,9 +2701,7 @@ class TypeParserTest extends TestCase
 			'int | object{foo: int}[]',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'int | object{foo: int}[]',
 					1,
 					1,
@@ -2713,9 +2709,7 @@ class TypeParserTest extends TestCase
 					12,
 				],
 				[
-					static function (UnionTypeNode $typeNode): TypeNode {
-						return $typeNode->types[0];
-					},
+					static fn (UnionTypeNode $typeNode): TypeNode => $typeNode->types[0],
 					'int',
 					1,
 					1,
@@ -2723,9 +2717,7 @@ class TypeParserTest extends TestCase
 					0,
 				],
 				[
-					static function (UnionTypeNode $typeNode): TypeNode {
-						return $typeNode->types[1];
-					},
+					static fn (UnionTypeNode $typeNode): TypeNode => $typeNode->types[1],
 					'object{foo: int}[]',
 					1,
 					1,
@@ -2739,9 +2731,7 @@ class TypeParserTest extends TestCase
 			'int | object{foo: int}[]    ',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'int | object{foo: int}[]',
 					1,
 					1,
@@ -2749,9 +2739,7 @@ class TypeParserTest extends TestCase
 					12,
 				],
 				[
-					static function (UnionTypeNode $typeNode): TypeNode {
-						return $typeNode->types[0];
-					},
+					static fn (UnionTypeNode $typeNode): TypeNode => $typeNode->types[0],
 					'int',
 					1,
 					1,
@@ -2759,9 +2747,7 @@ class TypeParserTest extends TestCase
 					0,
 				],
 				[
-					static function (UnionTypeNode $typeNode): TypeNode {
-						return $typeNode->types[1];
-					},
+					static fn (UnionTypeNode $typeNode): TypeNode => $typeNode->types[1],
 					'object{foo: int}[]',
 					1,
 					1,
@@ -2778,9 +2764,7 @@ class TypeParserTest extends TestCase
 			 }',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'array{
 				a: int,
 				b: string
@@ -2797,9 +2781,7 @@ class TypeParserTest extends TestCase
 			'callable(Foo, Bar): void',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'callable(Foo, Bar): void',
 					1,
 					1,
@@ -2807,9 +2789,7 @@ class TypeParserTest extends TestCase
 					9,
 				],
 				[
-					static function (CallableTypeNode $typeNode): TypeNode {
-						return $typeNode->identifier;
-					},
+					static fn (CallableTypeNode $typeNode): TypeNode => $typeNode->identifier,
 					'callable',
 					1,
 					1,
@@ -2817,9 +2797,7 @@ class TypeParserTest extends TestCase
 					0,
 				],
 				[
-					static function (CallableTypeNode $typeNode): Node {
-						return $typeNode->parameters[0];
-					},
+					static fn (CallableTypeNode $typeNode): Node => $typeNode->parameters[0],
 					'Foo',
 					1,
 					1,
@@ -2827,9 +2805,7 @@ class TypeParserTest extends TestCase
 					2,
 				],
 				[
-					static function (CallableTypeNode $typeNode): TypeNode {
-						return $typeNode->returnType;
-					},
+					static fn (CallableTypeNode $typeNode): TypeNode => $typeNode->returnType,
 					'void',
 					1,
 					1,
@@ -2843,9 +2819,7 @@ class TypeParserTest extends TestCase
 			'$this',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'$this',
 					1,
 					1,
@@ -2859,9 +2833,7 @@ class TypeParserTest extends TestCase
 			'array{foo: int}',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'array{foo: int}',
 					1,
 					1,
@@ -2869,9 +2841,7 @@ class TypeParserTest extends TestCase
 					6,
 				],
 				[
-					static function (ArrayShapeNode $typeNode): TypeNode {
-						return $typeNode->items[0];
-					},
+					static fn (ArrayShapeNode $typeNode): TypeNode => $typeNode->items[0],
 					'foo: int',
 					1,
 					1,
@@ -2885,9 +2855,7 @@ class TypeParserTest extends TestCase
 			'array{}',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'array{}',
 					1,
 					1,
@@ -2901,9 +2869,7 @@ class TypeParserTest extends TestCase
 			'object{foo: int}',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'object{foo: int}',
 					1,
 					1,
@@ -2911,9 +2877,7 @@ class TypeParserTest extends TestCase
 					6,
 				],
 				[
-					static function (ObjectShapeNode $typeNode): TypeNode {
-						return $typeNode->items[0];
-					},
+					static fn (ObjectShapeNode $typeNode): TypeNode => $typeNode->items[0],
 					'foo: int',
 					1,
 					1,
@@ -2927,9 +2891,7 @@ class TypeParserTest extends TestCase
 			'object{}',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'object{}',
 					1,
 					1,
@@ -2943,9 +2905,7 @@ class TypeParserTest extends TestCase
 			'object{}[]',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'object{}[]',
 					1,
 					1,
@@ -2959,9 +2919,7 @@ class TypeParserTest extends TestCase
 			'int[][][]',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'int[][][]',
 					1,
 					1,
@@ -2969,9 +2927,7 @@ class TypeParserTest extends TestCase
 					6,
 				],
 				[
-					static function (ArrayTypeNode $typeNode): TypeNode {
-						return $typeNode->type;
-					},
+					static fn (ArrayTypeNode $typeNode): TypeNode => $typeNode->type,
 					'int[][]',
 					1,
 					1,
@@ -3016,9 +2972,7 @@ class TypeParserTest extends TestCase
 			'int[foo][bar][baz]',
 			[
 				[
-					static function (TypeNode $typeNode): TypeNode {
-						return $typeNode;
-					},
+					static fn (TypeNode $typeNode): TypeNode => $typeNode,
 					'int[foo][bar][baz]',
 					1,
 					1,
@@ -3026,9 +2980,7 @@ class TypeParserTest extends TestCase
 					9,
 				],
 				[
-					static function (OffsetAccessTypeNode $typeNode): TypeNode {
-						return $typeNode->type;
-					},
+					static fn (OffsetAccessTypeNode $typeNode): TypeNode => $typeNode->type,
 					'int[foo][bar]',
 					1,
 					1,
@@ -3036,9 +2988,7 @@ class TypeParserTest extends TestCase
 					6,
 				],
 				[
-					static function (OffsetAccessTypeNode $typeNode): TypeNode {
-						return $typeNode->offset;
-					},
+					static fn (OffsetAccessTypeNode $typeNode): TypeNode => $typeNode->offset,
 					'baz',
 					1,
 					1,
