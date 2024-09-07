@@ -64,6 +64,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function count;
 use function sprintf;
@@ -79,10 +80,11 @@ class PhpDocParserTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer();
-		$constExprParser = new ConstExprParser();
-		$typeParser = new TypeParser($constExprParser);
-		$this->phpDocParser = new PhpDocParser($typeParser, $constExprParser, []);
+		$config = new ParserConfig([]);
+		$this->lexer = new Lexer($config);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$this->phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 	}
 
 
@@ -6807,13 +6809,13 @@ Finder::findFiles('*.php')
 	public function testLinesAndIndexes(string $phpDoc, array $childrenLines): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
-		$usedAttributes = [
+		$config = new ParserConfig([
 			'lines' => true,
 			'indexes' => true,
-		];
-		$constExprParser = new ConstExprParser($usedAttributes);
-		$typeParser = new TypeParser($constExprParser, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
+		]);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 		$phpDocNode = $phpDocParser->parse($tokens);
 		$children = $phpDocNode->children;
 		$this->assertCount(count($childrenLines), $children);
@@ -6891,13 +6893,13 @@ Finder::findFiles('*.php')
 	public function testDeepNodesLinesAndIndexes(string $phpDoc, array $nodeAttributes): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
-		$usedAttributes = [
+		$config = new ParserConfig([
 			'lines' => true,
 			'indexes' => true,
-		];
-		$constExprParser = new ConstExprParser($usedAttributes);
-		$typeParser = new TypeParser($constExprParser, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
+		]);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
 		$traverser->traverse([$phpDocParser->parse($tokens)]);
@@ -6964,13 +6966,13 @@ Finder::findFiles('*.php')
 	public function testReturnTypeLinesAndIndexes(string $phpDoc, array $lines): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($phpDoc));
-		$usedAttributes = [
+		$config = new ParserConfig([
 			'lines' => true,
 			'indexes' => true,
-		];
-		$constExprParser = new ConstExprParser($usedAttributes);
-		$typeParser = new TypeParser($constExprParser, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
+		]);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 		$phpDocNode = $phpDocParser->parse($tokens);
 		$returnTag = $phpDocNode->getReturnTagValues()[0];
 		$type = $returnTag->type;
@@ -7014,10 +7016,13 @@ Finder::findFiles('*.php')
 	 */
 	public function testVerifyAttributes(string $label, string $input): void
 	{
-		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$constExprParser = new ConstExprParser($usedAttributes);
-		$typeParser = new TypeParser($constExprParser, $usedAttributes);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, $usedAttributes);
+		$config = new ParserConfig([
+			'lines' => true,
+			'indexes' => true,
+		]);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 
 		$visitor = new NodeCollectingVisitor();
@@ -7344,9 +7349,10 @@ Finder::findFiles('*.php')
 		PhpDocNode $expectedPhpDocNode
 	): void
 	{
-		$constExprParser = new ConstExprParser();
-		$typeParser = new TypeParser($constExprParser);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, []);
+		$config = new ParserConfig([]);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$actualPhpDocNode = $phpDocParser->parse($tokens);

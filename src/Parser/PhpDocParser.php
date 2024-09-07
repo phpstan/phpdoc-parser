@@ -10,6 +10,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPStan\ShouldNotHappenException;
 use function array_key_exists;
 use function array_values;
@@ -29,30 +30,24 @@ class PhpDocParser
 		Lexer::TOKEN_INTERSECTION,
 	];
 
+	private ParserConfig $config;
+
 	private TypeParser $typeParser;
 
 	private ConstExprParser $constantExprParser;
 
 	private ConstExprParser $doctrineConstantExprParser;
 
-	private bool $useLinesAttributes;
-
-	private bool $useIndexAttributes;
-
-	/**
-	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
-	 */
 	public function __construct(
+		ParserConfig $config,
 		TypeParser $typeParser,
-		ConstExprParser $constantExprParser,
-		array $usedAttributes = []
+		ConstExprParser $constantExprParser
 	)
 	{
+		$this->config = $config;
 		$this->typeParser = $typeParser;
 		$this->constantExprParser = $constantExprParser;
 		$this->doctrineConstantExprParser = $constantExprParser->toDoctrine();
-		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
-		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 	}
 
 
@@ -172,12 +167,12 @@ class PhpDocParser
 	 */
 	private function enrichWithAttributes(TokenIterator $tokens, Ast\Node $tag, int $startLine, int $startIndex): Ast\Node
 	{
-		if ($this->useLinesAttributes) {
+		if ($this->config->useLinesAttributes) {
 			$tag->setAttribute(Ast\Attribute::START_LINE, $startLine);
 			$tag->setAttribute(Ast\Attribute::END_LINE, $tokens->currentTokenLine());
 		}
 
-		if ($this->useIndexAttributes) {
+		if ($this->config->useIndexAttributes) {
 			$tag->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
 			$tag->setAttribute(Ast\Attribute::END_INDEX, $tokens->endIndexOfLastRelevantToken());
 		}

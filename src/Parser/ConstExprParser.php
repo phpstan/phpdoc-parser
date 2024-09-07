@@ -4,27 +4,22 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use function str_replace;
 use function strtolower;
 
 class ConstExprParser
 {
 
-	private bool $useLinesAttributes;
-
-	private bool $useIndexAttributes;
+	private ParserConfig $config;
 
 	private bool $parseDoctrineStrings;
 
-	/**
-	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
-	 */
 	public function __construct(
-		array $usedAttributes = []
+		ParserConfig $config
 	)
 	{
-		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
-		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
+		$this->config = $config;
 		$this->parseDoctrineStrings = false;
 	}
 
@@ -33,12 +28,7 @@ class ConstExprParser
 	 */
 	public function toDoctrine(): self
 	{
-		$self = new self(
-			[
-				'lines' => $this->useLinesAttributes,
-				'indexes' => $this->useIndexAttributes,
-			],
-		);
+		$self = new self($this->config);
 		$self->parseDoctrineStrings = true;
 		return $self;
 	}
@@ -286,12 +276,12 @@ class ConstExprParser
 	 */
 	private function enrichWithAttributes(TokenIterator $tokens, Ast\ConstExpr\ConstExprNode $node, int $startLine, int $startIndex): Ast\ConstExpr\ConstExprNode
 	{
-		if ($this->useLinesAttributes) {
+		if ($this->config->useLinesAttributes) {
 			$node->setAttribute(Ast\Attribute::START_LINE, $startLine);
 			$node->setAttribute(Ast\Attribute::END_LINE, $tokens->currentTokenLine());
 		}
 
-		if ($this->useIndexAttributes) {
+		if ($this->config->useIndexAttributes) {
 			$node->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
 			$node->setAttribute(Ast\Attribute::END_INDEX, $tokens->endIndexOfLastRelevantToken());
 		}

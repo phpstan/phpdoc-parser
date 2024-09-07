@@ -34,6 +34,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
@@ -41,10 +42,11 @@ use PHPStan\PhpDocParser\Parser\TypeParser;
 
 // basic setup
 
-$lexer = new Lexer();
-$constExprParser = new ConstExprParser();
-$typeParser = new TypeParser($constExprParser);
-$phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+$config = new ParserConfig(usedAttributes: []);
+$lexer = new Lexer($config);
+$constExprParser = new ConstExprParser($config);
+$typeParser = new TypeParser($config, $constExprParser);
+$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 
 // parsing and reading a PHPDoc string
 
@@ -72,6 +74,7 @@ use PHPStan\PhpDocParser\Ast\NodeVisitor\CloningVisitor;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
@@ -80,12 +83,11 @@ use PHPStan\PhpDocParser\Printer\Printer;
 
 // basic setup with enabled required lexer attributes
 
-$usedAttributes = ['lines' => true, 'indexes' => true];
-
-$lexer = new Lexer();
-$constExprParser = new ConstExprParser(true, true, $usedAttributes);
-$typeParser = new TypeParser($constExprParser, true, $usedAttributes);
-$phpDocParser = new PhpDocParser($typeParser, $constExprParser, true, true, $usedAttributes);
+$config = new ParserConfig(usedAttributes: ['lines' => true, 'indexes' => true]);
+$lexer = new Lexer($config);
+$constExprParser = new ConstExprParser($config);
+$typeParser = new TypeParser($config, $constExprParser);
+$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 
 $tokens = new TokenIterator($lexer->tokenize('/** @param Lorem $a */'));
 $phpDocNode = $phpDocParser->parse($tokens); // PhpDocNode

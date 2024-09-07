@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Parser;
 
 use Iterator;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 use function file_get_contents;
@@ -28,9 +29,10 @@ class FuzzyTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer();
-		$this->typeParser = new TypeParser(new ConstExprParser());
-		$this->constExprParser = new ConstExprParser();
+		$config = new ParserConfig([]);
+		$this->lexer = new Lexer($config);
+		$this->typeParser = new TypeParser($config, new ConstExprParser($config));
+		$this->constExprParser = new ConstExprParser($config);
 	}
 
 	/**

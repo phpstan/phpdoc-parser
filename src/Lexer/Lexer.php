@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Lexer;
 
+use PHPStan\PhpDocParser\ParserConfig;
 use function implode;
 use function preg_match_all;
 use const PREG_SET_ORDER;
@@ -94,7 +95,15 @@ class Lexer
 	public const TYPE_OFFSET = 1;
 	public const LINE_OFFSET = 2;
 
+	private ParserConfig $config; // @phpstan-ignore property.onlyWritten
+
 	private ?string $regexp = null;
+
+	public function __construct(ParserConfig $config)
+	{
+		$this->config = $config;
+	}
+
 
 	/**
 	 * @return list<array{string, int, int}>

@@ -21,6 +21,7 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function file_get_contents;
 
@@ -98,14 +99,14 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 
 				$phpDoc = $phpNode->getDocComment()->getText();
 
-				$usedAttributes = ['lines' => true, 'indexes' => true];
-				$constExprParser = new ConstExprParser($usedAttributes);
+				$config = new ParserConfig(['lines' => true, 'indexes' => true]);
+				$constExprParser = new ConstExprParser($config);
 				$phpDocParser = new PhpDocParser(
-					new TypeParser($constExprParser, $usedAttributes),
+					$config,
+					new TypeParser($config, $constExprParser),
 					$constExprParser,
-					$usedAttributes,
 				);
-				$lexer = new Lexer();
+				$lexer = new Lexer($config);
 				$tokens = new TokenIterator($lexer->tokenize($phpDoc));
 				$phpDocNode = $phpDocParser->parse($tokens);
 				$cloningTraverser = new NodeTraverser([new NodeVisitor\CloningVisitor()]);

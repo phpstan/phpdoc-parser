@@ -16,6 +16,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprTrueNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 
 class ConstExprParserTest extends TestCase
@@ -28,8 +29,9 @@ class ConstExprParserTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer();
-		$this->constExprParser = new ConstExprParser();
+		$config = new ParserConfig([]);
+		$this->lexer = new Lexer($config);
+		$this->constExprParser = new ConstExprParser($config);
 	}
 
 
@@ -67,10 +69,11 @@ class ConstExprParserTest extends TestCase
 	public function testVerifyAttributes(string $input): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
-		$constExprParser = new ConstExprParser([
+		$config = new ParserConfig([
 			'lines' => true,
 			'indexes' => true,
 		]);
+		$constExprParser = new ConstExprParser($config);
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
 		$traverser->traverse([$constExprParser->parse($tokens)]);

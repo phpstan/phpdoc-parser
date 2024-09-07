@@ -6,6 +6,7 @@ use LogicException;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use function in_array;
 use function str_replace;
 use function strlen;
@@ -15,23 +16,17 @@ use function substr_compare;
 class TypeParser
 {
 
+	private ParserConfig $config;
+
 	private ConstExprParser $constExprParser;
 
-	private bool $useLinesAttributes;
-
-	private bool $useIndexAttributes;
-
-	/**
-	 * @param array{lines?: bool, indexes?: bool} $usedAttributes
-	 */
 	public function __construct(
-		ConstExprParser $constExprParser,
-		array $usedAttributes = []
+		ParserConfig $config,
+		ConstExprParser $constExprParser
 	)
 	{
+		$this->config = $config;
 		$this->constExprParser = $constExprParser;
-		$this->useLinesAttributes = $usedAttributes['lines'] ?? false;
-		$this->useIndexAttributes = $usedAttributes['indexes'] ?? false;
 	}
 
 	/** @phpstan-impure */
@@ -64,12 +59,12 @@ class TypeParser
 	 */
 	public function enrichWithAttributes(TokenIterator $tokens, Ast\Node $type, int $startLine, int $startIndex): Ast\Node
 	{
-		if ($this->useLinesAttributes) {
+		if ($this->config->useLinesAttributes) {
 			$type->setAttribute(Ast\Attribute::START_LINE, $startLine);
 			$type->setAttribute(Ast\Attribute::END_LINE, $tokens->currentTokenLine());
 		}
 
-		if ($this->useIndexAttributes) {
+		if ($this->config->useIndexAttributes) {
 			$type->setAttribute(Ast\Attribute::START_INDEX, $startIndex);
 			$type->setAttribute(Ast\Attribute::END_INDEX, $tokens->endIndexOfLastRelevantToken());
 		}

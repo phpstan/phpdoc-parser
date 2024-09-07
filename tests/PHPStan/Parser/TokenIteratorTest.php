@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use const PHP_EOL;
 
@@ -46,11 +47,12 @@ class TokenIteratorTest extends TestCase
 	 */
 	public function testGetDetectedNewline(string $phpDoc, ?string $expectedNewline): void
 	{
-		$lexer = new Lexer();
+		$config = new ParserConfig([]);
+		$lexer = new Lexer($config);
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
-		$constExprParser = new ConstExprParser();
-		$typeParser = new TypeParser($constExprParser);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+		$constExprParser = new ConstExprParser($config);
+		$typeParser = new TypeParser($config, $constExprParser);
+		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 		$phpDocParser->parse($tokens);
 		$this->assertSame($expectedNewline, $tokens->getDetectedNewline());
 	}

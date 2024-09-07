@@ -31,6 +31,7 @@ use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPStan\PhpDocParser\Printer\Printer;
 use PHPUnit\Framework\TestCase;
 use function get_class;
@@ -47,8 +48,9 @@ class TypeParserTest extends TestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->lexer = new Lexer();
-		$this->typeParser = new TypeParser(new ConstExprParser());
+		$config = new ParserConfig([]);
+		$this->lexer = new Lexer($config);
+		$this->typeParser = new TypeParser($config, new ConstExprParser($config));
 	}
 
 
@@ -115,8 +117,8 @@ class TypeParserTest extends TestCase
 			$this->expectExceptionMessage($expectedResult->getMessage());
 		}
 
-		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$typeParser = new TypeParser(new ConstExprParser($usedAttributes), $usedAttributes);
+		$config = new ParserConfig(['lines' => true, 'indexes' => true]);
+		$typeParser = new TypeParser($config, new ConstExprParser($config));
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 
 		$visitor = new NodeCollectingVisitor();
@@ -3069,11 +3071,11 @@ class TypeParserTest extends TestCase
 	{
 		$tokensArray = $this->lexer->tokenize($input);
 		$tokens = new TokenIterator($tokensArray);
-		$usedAttributes = [
+		$config = new ParserConfig([
 			'lines' => true,
 			'indexes' => true,
-		];
-		$typeParser = new TypeParser(new ConstExprParser(), $usedAttributes);
+		]);
+		$typeParser = new TypeParser($config, new ConstExprParser($config));
 		$typeNode = $typeParser->parse($tokens);
 
 		foreach ($assertions as [$callable, $expectedContent, $startLine, $endLine, $startIndex, $endIndex]) {

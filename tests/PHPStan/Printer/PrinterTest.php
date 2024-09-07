@@ -47,6 +47,7 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function array_pop;
 use function array_splice;
@@ -65,13 +66,13 @@ class PrinterTest extends TestCase
 
 	protected function setUp(): void
 	{
-		$usedAttributes = ['lines' => true, 'indexes' => true];
-		$constExprParser = new ConstExprParser($usedAttributes);
-		$this->typeParser = new TypeParser($constExprParser, $usedAttributes);
+		$config = new ParserConfig(['lines' => true, 'indexes' => true]);
+		$constExprParser = new ConstExprParser($config);
+		$this->typeParser = new TypeParser($config, $constExprParser);
 		$this->phpDocParser = new PhpDocParser(
+			$config,
 			$this->typeParser,
 			$constExprParser,
-			$usedAttributes,
 		);
 	}
 
@@ -1857,7 +1858,8 @@ class PrinterTest extends TestCase
 	 */
 	public function testPrintFormatPreserving(string $phpDoc, string $expectedResult, NodeVisitor $visitor): void
 	{
-		$lexer = new Lexer();
+		$config = new ParserConfig([]);
+		$lexer = new Lexer($config);
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
 		$phpDocNode = $this->phpDocParser->parse($tokens);
 		$cloningTraverser = new NodeTraverser([new NodeVisitor\CloningVisitor()]);
@@ -2007,7 +2009,8 @@ class PrinterTest extends TestCase
 		$phpDoc = $printer->print($node);
 		$this->assertSame($expectedResult, $phpDoc);
 
-		$lexer = new Lexer();
+		$config = new ParserConfig([]);
+		$lexer = new Lexer($config);
 		$this->assertEquals(
 			$this->unsetAttributes($node),
 			$this->unsetAttributes($this->typeParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
@@ -2043,7 +2046,8 @@ class PrinterTest extends TestCase
 		$phpDoc = $printer->print($node);
 		$this->assertSame($expectedResult, $phpDoc);
 
-		$lexer = new Lexer();
+		$config = new ParserConfig([]);
+		$lexer = new Lexer($config);
 		$this->assertEquals(
 			$this->unsetAttributes($node),
 			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
