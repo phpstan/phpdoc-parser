@@ -2801,11 +2801,9 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@example',
-					new GenericTagValueNode(''),
-				),
-				new PhpDocTextNode(
-					'entity_managers:' . PHP_EOL .
-					'    default:',
+					new GenericTagValueNode(PHP_EOL .
+						'  entity_managers:' . PHP_EOL .
+						'    default:'),
 				),
 			]),
 		];
@@ -2955,12 +2953,12 @@ some text in the middle',
 							new IdentifierTypeNode('Foo'),
 							false,
 							'$foo',
-							'1st multi world description with empty lines',
+							'1st multi world description with empty lines' . PHP_EOL .
+							PHP_EOL .
+							PHP_EOL .
+							'some text in the middle',
 						),
 					),
-					new PhpDocTextNode(''),
-					new PhpDocTextNode(''),
-					new PhpDocTextNode('some text in the middle'),
 					new PhpDocTextNode(''),
 					new PhpDocTextNode(''),
 					new PhpDocTagNode(
@@ -2969,12 +2967,13 @@ some text in the middle',
 							new IdentifierTypeNode('Bar'),
 							false,
 							'$bar',
-							'2nd multi world description with empty lines',
+							'2nd multi world description with empty lines' . PHP_EOL .
+							PHP_EOL .
+							PHP_EOL .
+							'test',
 						),
 					),
-					new PhpDocTextNode(''),
-					new PhpDocTextNode(''),
-					new PhpDocTextNode('test'),
+
 				]),
 			],
 			[
@@ -3803,10 +3802,18 @@ some text in the middle',
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('test'),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('int'),
+						false,
+						'$a',
+						PHP_EOL
+						. PHP_EOL
+						. PHP_EOL
+						. 'test',
+					),
+				),
 			]),
 		];
 	}
@@ -4941,19 +4948,15 @@ time are not reliable as field settings might be missing.'),
 						new IdentifierTypeNode('\Drupal\Core\Field\FieldStorageDefinitionInterface'),
 						false,
 						'$field_definition',
-						'',
+						PHP_EOL . '  The field definition.',
 					),
 				),
-				new PhpDocTextNode('The field definition.'),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@return',
 					new ReturnTagValueNode(
 						new IdentifierTypeNode('array'),
-						'',
-					),
-				),
-				new PhpDocTextNode("An empty array if there is no schema, or an associative array with the
+						PHP_EOL . "  An empty array if there is no schema, or an associative array with the
   following key/value pairs:
   - columns: An array of Schema API column specifications, keyed by column
     name. The columns need to be a subset of the properties defined in
@@ -4975,7 +4978,9 @@ time are not reliable as field settings might be missing.'),
     definitions. Note, however, that the field data is not necessarily
     stored in SQL. Also, the possible usage is limited, as you cannot
     specify another field as related, only existing SQL tables,
-    such as {taxonomy_term_data}."),
+    such as {taxonomy_term_data}.",
+					),
+				),
 			]),
 		];
 
@@ -5693,9 +5698,8 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$a',
-					'',
+					PHP_EOL . '// this is a comment',
 				)),
-				new PhpDocTextNode('// this is a comment'),
 			]),
 		];
 		yield [
@@ -5710,10 +5714,8 @@ Finder::findFiles('*.php')
 					new IdentifierTypeNode('int'),
 					false,
 					'$a',
-					'',
+					PHP_EOL . PHP_EOL . '// this is a comment',
 				)),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('// this is a comment'),
 			]),
 		];
 		yield [
@@ -5918,10 +5920,10 @@ Finder::findFiles('*.php')
 					'@X',
 					new DoctrineTagValueNode(
 						new DoctrineAnnotation('@X', []),
-						'',
+						PHP_EOL .
+						'Content',
 					),
 				),
-				new PhpDocTextNode('Content'),
 			]),
 			[new Doctrine\X()],
 		];
@@ -6075,9 +6077,8 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
 					[],
-				), 'test')),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('test2'),
+				), 'test' . PHP_EOL .
+					PHP_EOL . 'test2')),
 			]),
 			[new Doctrine\X()],
 		];
@@ -6093,9 +6094,8 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@X', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@X',
 					[],
-				), 'test')),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('test2'),
+				), 'test' . PHP_EOL .
+					PHP_EOL . 'test2')),
 				new PhpDocTagNode('@Z', new DoctrineTagValueNode(new DoctrineAnnotation(
 					'@Z',
 					[],
@@ -6134,9 +6134,9 @@ Finder::findFiles('*.php')
 			' * test2' . PHP_EOL .
 			' */',
 			new PhpDocNode([
-				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('test2'),
+				new PhpDocTagNode('@X', new GenericTagValueNode('test' . PHP_EOL .
+					PHP_EOL .
+					'test2')),
 			]),
 			[new Doctrine\X()],
 		];
@@ -6149,9 +6149,9 @@ Finder::findFiles('*.php')
 			' * @Z' . PHP_EOL .
 			' */',
 			new PhpDocNode([
-				new PhpDocTagNode('@X', new GenericTagValueNode('test')),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('test2'),
+				new PhpDocTagNode('@X', new GenericTagValueNode('test' . PHP_EOL .
+					PHP_EOL .
+					'test2')),
 				new PhpDocTagNode('@Z', new GenericTagValueNode('')),
 			]),
 			[new Doctrine\X(), new Doctrine\Z()],
@@ -7309,7 +7309,7 @@ Finder::findFiles('*.php')
 					new DeprecatedTagValueNode('in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
   Drupal 9 there will be no way to set the status and in Drupal 8 this
   ability has been removed because mb_*() functions are supplied using
-  Symfony\'s polyfill.')
+  Symfony\'s polyfill.'),
 				),
 			]),
 		];
@@ -7327,8 +7327,8 @@ Finder::findFiles('*.php')
 						'in Drupal 8.6.0 and will be removed before Drupal 9.0.0. In
   Drupal 9 there will be no way to set the status and in Drupal 8 this
   ability has been removed because mb_*() functions are supplied using
-  Symfony\'s polyfill.'
-					)
+  Symfony\'s polyfill.',
+					),
 				),
 			]),
 		];
@@ -7344,7 +7344,7 @@ Finder::findFiles('*.php')
 	{
 		$constExprParser = new ConstExprParser();
 		$typeParser = new TypeParser($constExprParser);
-		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, [], true);
+		$phpDocParser = new PhpDocParser($typeParser, $constExprParser, []);
 
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$actualPhpDocNode = $phpDocParser->parse($tokens);
