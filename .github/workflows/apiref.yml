@@ -36,7 +36,7 @@ jobs:
         run: "composer install --no-interaction --no-progress"
 
       - name: "Run ApiGen"
-        run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs -- src"
+        run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs/${{ github.ref_name }} -- src"
 
       - name: "Copy favicon"
         run: "cp apigen/favicon.png docs/favicon.png"
