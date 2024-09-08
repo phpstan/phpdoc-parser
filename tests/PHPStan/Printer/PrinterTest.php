@@ -2006,7 +2006,7 @@ class PrinterTest extends TestCase
 					new IdentifierTypeNode('string'),
 				),
 				new ArrayShapeItemNode(
-					new QuoteAwareConstExprStringNode('Full Name', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+					new ConstExprStringNode('Full Name', ConstExprStringNode::SINGLE_QUOTED),
 					false,
 					new IdentifierTypeNode('string'),
 				),
@@ -2021,7 +2021,7 @@ class PrinterTest extends TestCase
 					new IdentifierTypeNode('string'),
 				),
 				new ObjectShapeItemNode(
-					new QuoteAwareConstExprStringNode('Full Name', QuoteAwareConstExprStringNode::SINGLE_QUOTED),
+					new ConstExprStringNode('Full Name', ConstExprStringNode::SINGLE_QUOTED),
 					false,
 					new IdentifierTypeNode('string'),
 				),
