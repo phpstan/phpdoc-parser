@@ -1773,6 +1773,69 @@ class PhpDocParserTest extends TestCase
 				),
 			]),
 		];
+
+		yield [
+			'valid CallableTypeNode without space after "callable"',
+			'/** @return callable(int, string): void */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new CallableTypeNode(new IdentifierTypeNode('callable'), [
+							new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false),
+							new CallableTypeParameterNode(new IdentifierTypeNode('string'), false, false, '', false),
+						], new IdentifierTypeNode('void'), []),
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'valid CallableTypeNode with space after "callable"',
+			'/** @return callable (int, string): void */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new CallableTypeNode(new IdentifierTypeNode('callable'), [
+							new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false),
+							new CallableTypeParameterNode(new IdentifierTypeNode('string'), false, false, '', false),
+						], new IdentifierTypeNode('void'), []),
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'valid IdentifierTypeNode with space after "callable" turns the rest to description',
+			'/** @return callable (int, string) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(new IdentifierTypeNode('callable'), '(int, string)'),
+				),
+			]),
+		];
+
+		yield [
+			'invalid CallableTypeNode without space after "callable"',
+			'/** @return callable(int, string) */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new InvalidTagValueNode('callable(int, string)', new ParserException(
+						'(',
+						4,
+						20,
+						27,
+						null,
+						1,
+					)),
+				),
+			]),
+		];
 	}
 
 
