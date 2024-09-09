@@ -16,9 +16,17 @@ jobs:
     name: "Build API References Pages"
     runs-on: "ubuntu-latest"
 
+    strategy:
+      matrix:
+        branch:
+          - "1.23.x"
+          - "2.0.x"
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
@@ -36,10 +44,28 @@ jobs:
         run: "composer install --no-interaction --no-progress"
 
       - name: "Run ApiGen"
-        run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs/${{ github.ref_name }} -- src"
+        run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs/${{ matrix.branch }} -- src"
 
       - name: "Copy favicon"
         run: "cp apigen/favicon.png docs/favicon.png"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-${{ matrix.branch }}
+          path: docs/*
+
+  merge:
+    name: "Merge docs"
+    needs: build
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: docs-*
+          path: docs
+          merge-multiple: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -47,7 +73,7 @@ jobs:
           path: 'docs'
 
   deploy:
-    needs: build
+    needs: merge
 
     # from https://github.com/actions/deploy-pages
 
