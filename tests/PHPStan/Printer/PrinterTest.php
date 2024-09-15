@@ -339,7 +339,7 @@ class PrinterTest extends TestCase
 			public function enterNode(Node $node)
 			{
 				if ($node instanceof PhpDocNode) {
-					$node->children[0] = new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', ''));
+					$node->children[0] = new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', '', false));
 					return $node;
 				}
 
@@ -379,7 +379,7 @@ class PrinterTest extends TestCase
 			public function enterNode(Node $node)
 			{
 				if ($node instanceof PhpDocNode) {
-					array_unshift($node->children, new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', '')));
+					array_unshift($node->children, new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', '', false)));
 
 					return $node;
 				}
@@ -417,7 +417,7 @@ class PrinterTest extends TestCase
 			{
 				if ($node instanceof PhpDocNode) {
 					array_splice($node->children, 1, 0, [
-						new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', '')),
+						new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', '', false)),
 					]);
 
 					return $node;
@@ -483,7 +483,7 @@ class PrinterTest extends TestCase
 			public function enterNode(Node $node)
 			{
 				if ($node instanceof PhpDocNode) {
-					$node->children[count($node->children) - 1] = new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', ''));
+					$node->children[count($node->children) - 1] = new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('Baz'), false, '$a', '', false));
 					return $node;
 				}
 
@@ -2059,6 +2059,7 @@ class PrinterTest extends TestCase
 					false,
 					'$a',
 					'',
+					false,
 				)),
 			]),
 			'/**

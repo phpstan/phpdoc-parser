@@ -160,6 +160,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'',
+						false,
 					),
 				),
 			]),
@@ -176,6 +177,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'optional description',
+						false,
 					),
 				),
 			]),
@@ -192,6 +194,7 @@ class PhpDocParserTest extends TestCase
 						true,
 						'$foo',
 						'',
+						false,
 					),
 				),
 			]),
@@ -208,6 +211,7 @@ class PhpDocParserTest extends TestCase
 						true,
 						'$foo',
 						'optional description',
+						false,
 					),
 				),
 			]),
@@ -292,6 +296,7 @@ class PhpDocParserTest extends TestCase
 						false,
 						'$foo',
 						'optional description',
+						false,
 					),
 				),
 			]),
@@ -509,6 +514,7 @@ class PhpDocParserTest extends TestCase
 						'$parameters',
 						'{' . PHP_EOL .
 						'    Optional. Parameters for filtering the list of user assignments. Default empty array.',
+						false,
 					),
 				),
 				new PhpDocTextNode(''),
@@ -2966,6 +2972,7 @@ class PhpDocParserTest extends TestCase
 							false,
 							'$foo',
 							'1st multi world description',
+							false,
 						),
 					),
 					new PhpDocTagNode(
@@ -2975,6 +2982,7 @@ class PhpDocParserTest extends TestCase
 							false,
 							'$bar',
 							'2nd multi world description',
+							false,
 						),
 					),
 				]),
@@ -2995,6 +3003,7 @@ class PhpDocParserTest extends TestCase
 							'$foo',
 							'1st multi world description
 some text in the middle',
+							false,
 						),
 					),
 					new PhpDocTagNode(
@@ -3004,6 +3013,7 @@ some text in the middle',
 							false,
 							'$bar',
 							'2nd multi world description',
+							false,
 						),
 					),
 				]),
@@ -3037,6 +3047,7 @@ some text in the middle',
 
 
 some text in the middle',
+							false,
 						),
 					),
 					new PhpDocTextNode(''),
@@ -3051,6 +3062,7 @@ some text in the middle',
 
 
 test',
+							false,
 						),
 					),
 
@@ -3082,6 +3094,7 @@ test',
 							false,
 							'$foo',
 							'@param string $bar',
+							false,
 						),
 					),
 				]),
@@ -3824,6 +3837,7 @@ test',
 							false,
 							'$list',
 							'',
+							false,
 						),
 					),
 					new PhpDocTextNode(''),
@@ -3903,7 +3917,7 @@ test',
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '', false)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
 			]),
@@ -3930,6 +3944,7 @@ test',
 						. PHP_EOL
 						. PHP_EOL
 						. 'test',
+						false,
 					),
 				),
 			]),
@@ -4344,6 +4359,7 @@ test',
 						false,
 						'$test',
 						'',
+						false,
 					),
 				),
 			]),
@@ -4360,6 +4376,7 @@ test',
 						false,
 						'$test',
 						'some description',
+						false,
 					),
 				),
 			]),
@@ -5082,6 +5099,7 @@ time are not reliable as field settings might be missing.'),
 						'$field_definition',
 						'
   The field definition.',
+						false,
 					),
 				),
 				new PhpDocTextNode(''),
@@ -5158,6 +5176,7 @@ time are not reliable as field settings might be missing.'),
 						false,
 						'$request',
 						'- The request object',
+						false,
 					),
 				),
 				new PhpDocTextNode(''),
@@ -5328,6 +5347,7 @@ Finder::findFiles('*.php')
 						false,
 						'$foo',
 						'',
+						false,
 					),
 				),
 			]),
@@ -5356,6 +5376,7 @@ Finder::findFiles('*.php')
 						false,
 						'$foo',
 						'',
+						false,
 					),
 				),
 			]),
@@ -5384,6 +5405,7 @@ Finder::findFiles('*.php')
 						false,
 						'$foo',
 						'',
+						false,
 					),
 				),
 			]),
@@ -5437,6 +5459,7 @@ Finder::findFiles('*.php')
 						false,
 						'$pattern',
 						'',
+						false,
 					),
 				),
 				new PhpDocTagNode(
@@ -5446,6 +5469,7 @@ Finder::findFiles('*.php')
 						false,
 						'$subject',
 						'',
+						false,
 					),
 				),
 				new PhpDocTagNode(
@@ -5455,6 +5479,7 @@ Finder::findFiles('*.php')
 						false,
 						'$matches',
 						'',
+						false,
 					),
 				),
 				new PhpDocTagNode(
@@ -5464,6 +5489,7 @@ Finder::findFiles('*.php')
 						false,
 						'$flags',
 						'',
+						false,
 					),
 				),
 				new PhpDocTagNode(
@@ -5671,6 +5697,7 @@ Finder::findFiles('*.php')
 					false,
 					'$a',
 					'',
+					false,
 				),
 			],
 			[
@@ -5817,6 +5844,7 @@ Finder::findFiles('*.php')
 					false,
 					'$a',
 					'// this is a description',
+					false,
 				)),
 			]),
 		];
@@ -5833,6 +5861,7 @@ Finder::findFiles('*.php')
 					false,
 					'$a',
 					PHP_EOL . '// this is a comment',
+					false,
 				)),
 			]),
 		];
@@ -5849,6 +5878,7 @@ Finder::findFiles('*.php')
 					false,
 					'$a',
 					PHP_EOL . PHP_EOL . '// this is a comment',
+					false,
 				)),
 			]),
 		];
@@ -6720,6 +6750,7 @@ Finder::findFiles('*.php')
 					false,
 					'$z',
 					'@X()',
+					false,
 				)),
 			]),
 		];
@@ -6733,6 +6764,7 @@ Finder::findFiles('*.php')
 					false,
 					'$z',
 					'@\X\Y()',
+					false,
 				)),
 			]),
 		];
@@ -6746,6 +6778,7 @@ Finder::findFiles('*.php')
 					false,
 					'$z',
 					'@X',
+					false,
 				)),
 			]),
 		];
@@ -7198,8 +7231,8 @@ Finder::findFiles('*.php')
 			  ' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . '  paramA description')),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', PHP_EOL . '  paramB description')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . '  paramA description', false)),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', PHP_EOL . '  paramB description', false)),
 			]),
 		];
 
@@ -7212,9 +7245,9 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '', false)),
 				new PhpDocTextNode(''),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '', false)),
 			]),
 		];
 
@@ -7228,7 +7261,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc', false)),
 			]),
 		];
 
@@ -7272,7 +7305,7 @@ Finder::findFiles('*.php')
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
 				new PhpDocTagNode('@ORM\Column', new DoctrineTagValueNode(new DoctrineAnnotation('@ORM\Column', []), 'aaaa' . PHP_EOL . '  bbbb' . PHP_EOL . PHP_EOL . 'ccc')),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$b', '', false)),
 			]),
 		];
 
@@ -7285,7 +7318,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', '', false)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
 			]),
@@ -7301,7 +7334,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . PHP_EOL . PHP_EOL . 'test')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . PHP_EOL . PHP_EOL . 'test', false)),
 			]),
 		];
 
@@ -7313,7 +7346,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'test')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'test', false)),
 				new PhpDocTextNode(''),
 			]),
 		];
@@ -7327,7 +7360,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'test')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', 'test', false)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
 			]),
@@ -7343,7 +7376,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test', false)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
 			]),
@@ -7360,7 +7393,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test', false)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
@@ -7378,7 +7411,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2', false)),
 				new PhpDocTextNode(''),
 			]),
 		];
@@ -7394,7 +7427,7 @@ Finder::findFiles('*.php')
 			' */',
 			new PhpDocNode([
 				new PhpDocTextNode('Real description'),
-				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2')),
+				new PhpDocTagNode('@param', new ParamTagValueNode(new IdentifierTypeNode('int'), false, '$a', PHP_EOL . ' test' . PHP_EOL . PHP_EOL . 'test 2', false)),
 				new PhpDocTextNode(''),
 				new PhpDocTextNode(''),
 			]),

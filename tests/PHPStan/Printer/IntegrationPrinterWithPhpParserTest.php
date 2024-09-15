@@ -43,6 +43,7 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 						false,
 						'$b',
 						'',
+						false,
 					));
 				}
 				return $node;
