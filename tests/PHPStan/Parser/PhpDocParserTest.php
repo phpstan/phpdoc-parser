@@ -3953,6 +3953,46 @@ test',
 				),
 			]),
 		];
+
+		yield [
+			'Real-world test case multiline PHPDoc',
+			'/**' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * MultiLine' . PHP_EOL .
+			' * description' . PHP_EOL .
+			' * @param bool $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @return void' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @throws \Exception' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(
+					'MultiLine' . PHP_EOL .
+					'description',
+				),
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('bool'),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@return', new ReturnTagValueNode(
+					new IdentifierTypeNode('void'),
+					'',
+				)),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@throws', new ThrowsTagValueNode(
+					new IdentifierTypeNode('\Exception'),
+					'',
+				)),
+				new PhpDocTextNode(''),
+			]),
+		];
 	}
 
 	public function provideTemplateTagsData(): Iterator
@@ -7507,6 +7547,45 @@ Finder::findFiles('*.php')
   Symfony\'s polyfill.',
 					),
 				),
+			]),
+		];
+
+		yield [
+			'/**' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * MultiLine' . PHP_EOL .
+			' * description' . PHP_EOL .
+			' * @param bool $a' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @return void' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @throws \Exception' . PHP_EOL .
+			' *' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode(''),
+				new PhpDocTextNode(
+					'MultiLine' . PHP_EOL .
+					'description',
+				),
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('bool'),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@return', new ReturnTagValueNode(
+					new IdentifierTypeNode('void'),
+					'',
+				)),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@throws', new ThrowsTagValueNode(
+					new IdentifierTypeNode('\Exception'),
+					'',
+				)),
+				new PhpDocTextNode(''),
 			]),
 		];
 	}
