@@ -2888,7 +2888,7 @@ class TypeParserTest extends TestCase
 					6,
 				],
 				[
-					static fn (ArrayShapeNode $typeNode): TypeNode => $typeNode->items[0],
+					static fn (ArrayShapeNode $typeNode): Node => $typeNode->items[0],
 					'foo: int',
 					1,
 					1,
@@ -2924,7 +2924,7 @@ class TypeParserTest extends TestCase
 					6,
 				],
 				[
-					static fn (ObjectShapeNode $typeNode): TypeNode => $typeNode->items[0],
+					static fn (ObjectShapeNode $typeNode): Node => $typeNode->items[0],
 					'foo: int',
 					1,
 					1,

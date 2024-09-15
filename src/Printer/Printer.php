@@ -248,6 +248,30 @@ final class Printer
 		if ($node instanceof DoctrineArrayItem) {
 			return (string) $node;
 		}
+		if ($node instanceof ArrayShapeItemNode) {
+			if ($node->keyName !== null) {
+				return sprintf(
+					'%s%s: %s',
+					$this->print($node->keyName),
+					$node->optional ? '?' : '',
+					$this->printType($node->valueType),
+				);
+			}
+
+			return $this->printType($node->valueType);
+		}
+		if ($node instanceof ObjectShapeItemNode) {
+			if ($node->keyName !== null) {
+				return sprintf(
+					'%s%s: %s',
+					$this->print($node->keyName),
+					$node->optional ? '?' : '',
+					$this->printType($node->valueType),
+				);
+			}
+
+			return $this->printType($node->valueType);
+		}
 
 		throw new LogicException(sprintf('Unknown node type %s', get_class($node)));
 	}
@@ -364,25 +388,13 @@ final class Printer
 	private function printType(TypeNode $node): string
 	{
 		if ($node instanceof ArrayShapeNode) {
-			$items = array_map(fn (ArrayShapeItemNode $item): string => $this->printType($item), $node->items);
+			$items = array_map(fn (ArrayShapeItemNode $item): string => $this->print($item), $node->items);
 
 			if (! $node->sealed) {
 				$items[] = '...' . ($node->unsealedType === null ? '' : $this->print($node->unsealedType));
 			}
 
 			return $node->kind . '{' . implode(', ', $items) . '}';
-		}
-		if ($node instanceof ArrayShapeItemNode) {
-			if ($node->keyName !== null) {
-				return sprintf(
-					'%s%s: %s',
-					$this->print($node->keyName),
-					$node->optional ? '?' : '',
-					$this->printType($node->valueType),
-				);
-			}
-
-			return $this->printType($node->valueType);
 		}
 		if ($node instanceof ArrayTypeNode) {
 			return $this->printOffsetAccessType($node->type) . '[]';
@@ -469,21 +481,9 @@ final class Printer
 			return '?' . $this->printType($node->type);
 		}
 		if ($node instanceof ObjectShapeNode) {
-			$items = array_map(fn (ObjectShapeItemNode $item): string => $this->printType($item), $node->items);
+			$items = array_map(fn (ObjectShapeItemNode $item): string => $this->print($item), $node->items);
 
 			return 'object{' . implode(', ', $items) . '}';
-		}
-		if ($node instanceof ObjectShapeItemNode) {
-			if ($node->keyName !== null) {
-				return sprintf(
-					'%s%s: %s',
-					$this->print($node->keyName),
-					$node->optional ? '?' : '',
-					$this->printType($node->valueType),
-				);
-			}
-
-			return $this->printType($node->valueType);
 		}
 		if ($node instanceof OffsetAccessTypeNode) {
 			return $this->printOffsetAccessType($node->type) . '[' . $this->printType($node->offset) . ']';
