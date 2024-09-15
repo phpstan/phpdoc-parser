@@ -114,6 +114,10 @@ Multi-line descriptions between tags were previously represented as separate [Ph
 
 The line with `some text in the middle` in phpdoc-parser 2.0 is now part of the description of the first `@param` tag.
 
+### `ArrayShapeNode` construction changes
+
+`ArrayShapeNode` constructor made private, added public static methods `createSealed()` and `createUnsealed()`.
+
 ### Minor BC breaks
 
 * Constructor parameter `$isEquality` in `AssertTag*ValueNode` made required

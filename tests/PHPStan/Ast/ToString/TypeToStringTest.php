@@ -58,31 +58,31 @@ class TypeToStringTest extends TestCase
 		];
 
 		yield from [
-			['array{}', new ArrayShapeNode([])],
-			['array{...}', new ArrayShapeNode([], false)],
+			['array{}', ArrayShapeNode::createSealed([])],
+			['array{...}', ArrayShapeNode::createUnsealed([], null)],
 			[
 				'array{string, int, ...}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createUnsealed([
 					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
 					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('int')),
-				], false),
+				], null),
 			],
 			[
 				'array{\'foo\': Foo, \'bar\'?: Bar, 1: Baz}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED), false, new IdentifierTypeNode('Foo')),
 					new ArrayShapeItemNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED), true, new IdentifierTypeNode('Bar')),
 					new ArrayShapeItemNode(new ConstExprIntegerNode('1'), false, new IdentifierTypeNode('Baz')),
 				]),
 			],
-			['list{}', new ArrayShapeNode([], true, 'list')],
-			['list{...}', new ArrayShapeNode([], false, 'list')],
+			['list{}', ArrayShapeNode::createSealed([], 'list')],
+			['list{...}', ArrayShapeNode::createUnsealed([], null, 'list')],
 			[
 				'list{string, int, ...}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createUnsealed([
 					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
 					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('int')),
-				], false, 'list'),
+				], null, 'list'),
 			],
 		];
 	}

@@ -379,7 +379,7 @@ class TypeParserTest extends TestCase
 
 			[
 				'array{a: int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -389,7 +389,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a: ?int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -401,7 +401,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a?: ?int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						true,
@@ -413,7 +413,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{0: int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new ConstExprIntegerNode('0'),
 						false,
@@ -423,7 +423,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{0?: int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new ConstExprIntegerNode('0'),
 						true,
@@ -433,7 +433,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{int, int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						null,
 						false,
@@ -448,7 +448,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a: int, b: string}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -463,7 +463,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a?: int, b: string, 0: int, 1?: DateTime, hello: string}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						true,
@@ -493,7 +493,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a: int, b: array{c: callable(): int}}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -502,7 +502,7 @@ class TypeParserTest extends TestCase
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new ArrayShapeNode([
+						ArrayShapeNode::createSealed([
 							new ArrayShapeItemNode(
 								new IdentifierTypeNode('c'),
 								false,
@@ -519,7 +519,7 @@ class TypeParserTest extends TestCase
 			[
 				'?array{a: int}',
 				new NullableTypeNode(
-					new ArrayShapeNode([
+					ArrayShapeNode::createSealed([
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
@@ -548,7 +548,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{"a": int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('a', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
@@ -558,7 +558,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{\'a\': int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('a', ConstExprStringNode::SINGLE_QUOTED),
 						false,
@@ -568,7 +568,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{\'$ref\': int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('$ref', ConstExprStringNode::SINGLE_QUOTED),
 						false,
@@ -578,7 +578,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{"$ref": int}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new ConstExprStringNode('$ref', ConstExprStringNode::DOUBLE_QUOTED),
 						false,
@@ -590,7 +590,7 @@ class TypeParserTest extends TestCase
 				'array{
 				 *	a: int
 				 *}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -602,7 +602,7 @@ class TypeParserTest extends TestCase
 				'array{
 				 	a: int,
 				 }',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -615,7 +615,7 @@ class TypeParserTest extends TestCase
 				 	a: int,
 				 	b: string,
 				 }',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -634,7 +634,7 @@ class TypeParserTest extends TestCase
 				 	, b: string
 				 	, c: string
 				 }',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -657,7 +657,7 @@ class TypeParserTest extends TestCase
 				 	a: int,
 				 	b: string
 				 }',
-				new ArrayShapeNode([
+				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -672,7 +672,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a: int, b: int, ...}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createUnsealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
@@ -683,11 +683,11 @@ class TypeParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('int'),
 					),
-				], false),
+				], null),
 			],
 			[
 				'array{int, string, ...}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createUnsealed([
 					new ArrayShapeItemNode(
 						null,
 						false,
@@ -698,37 +698,37 @@ class TypeParserTest extends TestCase
 						false,
 						new IdentifierTypeNode('string'),
 					),
-				], false),
+				], null),
 			],
 			[
 				'array{...}',
-				new ArrayShapeNode([], false),
+				ArrayShapeNode::createUnsealed([], null),
 			],
 			[
 				'array{
 				 *	a: int,
 				 *	...
 				 *}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createUnsealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
 						new IdentifierTypeNode('int'),
 					),
-				], false),
+				], null),
 			],
 			[
 				'array{
 					a: int,
 					...,
 				}',
-				new ArrayShapeNode([
+				ArrayShapeNode::createUnsealed([
 					new ArrayShapeItemNode(
 						new IdentifierTypeNode('a'),
 						false,
 						new IdentifierTypeNode('int'),
 					),
-				], false),
+				], null),
 			],
 			[
 				'array{int, ..., string}',
@@ -744,7 +744,7 @@ class TypeParserTest extends TestCase
 				 	int,
 				 	string
 				 }',
-				new ArrayShapeNode(
+				ArrayShapeNode::createSealed(
 					[
 						new ArrayShapeItemNode(
 							null,
@@ -757,25 +757,23 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('string'),
 						),
 					],
-					true,
 					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
 				'array{...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_ARRAY,
 				),
 			],
 			[
 				'array{a: int, b?: int, ...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
@@ -788,8 +786,6 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
@@ -798,7 +794,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a:int,b?:int,...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
@@ -811,12 +807,11 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_ARRAY,
 				),
 			],
 			[
@@ -826,7 +821,7 @@ class TypeParserTest extends TestCase
 				. '  >  ' . PHP_EOL
 				. '  ,  ' . PHP_EOL
 				. ' }',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
@@ -839,8 +834,6 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
@@ -849,19 +842,18 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{...<int, string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						new IdentifierTypeNode('int'),
 					),
+					ArrayShapeNode::KIND_ARRAY,
 				),
 			],
 			[
 				'array{a: int, b?: int, ...<int, string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
@@ -874,8 +866,6 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						new IdentifierTypeNode('int'),
@@ -884,7 +874,7 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{a:int,b?:int,...<int,string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
@@ -897,8 +887,6 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						new IdentifierTypeNode('int'),
@@ -914,7 +902,7 @@ class TypeParserTest extends TestCase
 				. '  >  ' . PHP_EOL
 				. '  ,  ' . PHP_EOL
 				. '  }',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
@@ -927,8 +915,6 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_ARRAY,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						new IdentifierTypeNode('int'),
@@ -937,19 +923,18 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'list{...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
 				'list{int, int, ...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							null,
@@ -962,17 +947,16 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
 				'list{int,int,...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							null,
@@ -985,12 +969,11 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
@@ -1000,7 +983,7 @@ class TypeParserTest extends TestCase
 				. '  >  ' . PHP_EOL
 				. '  ,  ' . PHP_EOL
 				. '  }',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							null,
@@ -1013,17 +996,16 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
 				'list{0: int, 1?: int, ...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('0'),
@@ -1036,17 +1018,16 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
 				'list{0:int,1?:int,...<string>}',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('0'),
@@ -1059,12 +1040,11 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
@@ -1074,7 +1054,7 @@ class TypeParserTest extends TestCase
 				. '  >  ' . PHP_EOL
 				. '  ,  ' . PHP_EOL
 				. '  }',
-				new ArrayShapeNode(
+				ArrayShapeNode::createUnsealed(
 					[
 						new ArrayShapeItemNode(
 							new ConstExprIntegerNode('0'),
@@ -1087,12 +1067,11 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					],
-					false,
-					ArrayShapeNode::KIND_LIST,
 					new ArrayShapeUnsealedTypeNode(
 						new IdentifierTypeNode('string'),
 						null,
 					),
+					ArrayShapeNode::KIND_LIST,
 				),
 			],
 			[
@@ -1273,7 +1252,7 @@ class TypeParserTest extends TestCase
 				new CallableTypeNode(
 					new IdentifierTypeNode('callable'),
 					[],
-					new ArrayShapeNode([
+					ArrayShapeNode::createSealed([
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('a'),
 							false,
@@ -1389,7 +1368,7 @@ class TypeParserTest extends TestCase
 							false,
 						),
 					],
-					new ArrayShapeNode([
+					ArrayShapeNode::createSealed([
 						new ArrayShapeItemNode(
 							null,
 							false,
@@ -1516,7 +1495,7 @@ class TypeParserTest extends TestCase
 			[
 				'array{foo: int}[]',
 				new ArrayTypeNode(
-					new ArrayShapeNode([
+					ArrayShapeNode::createSealed([
 						new ArrayShapeItemNode(
 							new IdentifierTypeNode('foo'),
 							false,
@@ -1530,7 +1509,7 @@ class TypeParserTest extends TestCase
 				new UnionTypeNode([
 					new IdentifierTypeNode('int'),
 					new ArrayTypeNode(
-						new ArrayShapeNode([
+						ArrayShapeNode::createSealed([
 							new ArrayShapeItemNode(
 								new IdentifierTypeNode('foo'),
 								false,
@@ -1799,15 +1778,15 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array{}',
-				new ArrayShapeNode([]),
+				ArrayShapeNode::createSealed([]),
 			],
 			[
 				'array{}|int',
-				new UnionTypeNode([new ArrayShapeNode([]), new IdentifierTypeNode('int')]),
+				new UnionTypeNode([ArrayShapeNode::createSealed([]), new IdentifierTypeNode('int')]),
 			],
 			[
 				'int|array{}',
-				new UnionTypeNode([new IdentifierTypeNode('int'), new ArrayShapeNode([])]),
+				new UnionTypeNode([new IdentifierTypeNode('int'), ArrayShapeNode::createSealed([])]),
 			],
 			[
 				'callable(' . PHP_EOL .
@@ -2236,7 +2215,7 @@ class TypeParserTest extends TestCase
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('b'),
 						false,
-						new ArrayShapeNode([
+						ArrayShapeNode::createSealed([
 							new ArrayShapeItemNode(
 								new IdentifierTypeNode('c'),
 								false,

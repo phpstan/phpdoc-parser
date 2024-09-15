@@ -818,7 +818,7 @@ class TypeParser
 			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
-				return new Ast\Type\ArrayShapeNode($items, true, $kind);
+				return Ast\Type\ArrayShapeNode::createSealed($items, $kind);
 			}
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC)) {
@@ -846,7 +846,11 @@ class TypeParser
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
-		return new Ast\Type\ArrayShapeNode($items, $sealed, $kind, $unsealedType);
+		if ($sealed) {
+			return Ast\Type\ArrayShapeNode::createSealed($items, $kind);
+		}
+
+		return Ast\Type\ArrayShapeNode::createUnsealed($items, $unsealedType, $kind);
 	}
 
 

@@ -1999,7 +1999,7 @@ class PrinterTest extends TestCase
 			'self::TYPES[int]',
 		];
 		yield [
-			new ArrayShapeNode([
+			ArrayShapeNode::createSealed([
 				new ArrayShapeItemNode(
 					new IdentifierTypeNode('name'),
 					false,

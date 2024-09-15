@@ -4507,7 +4507,7 @@ test',
 					'@phpstan-type',
 					new TypeAliasTagValueNode(
 						'Foo',
-						new ArrayShapeNode([]),
+						ArrayShapeNode::createSealed([]),
 					),
 				),
 				new PhpDocTagNode(
@@ -4539,7 +4539,7 @@ test',
 					'@phpstan-type',
 					new TypeAliasTagValueNode(
 						'Foo',
-						new ArrayShapeNode([]),
+						ArrayShapeNode::createSealed([]),
 					),
 				),
 				new PhpDocTagNode(
@@ -4560,7 +4560,7 @@ test',
 					'@phpstan-type',
 					new TypeAliasTagValueNode(
 						'Bar',
-						new ArrayShapeNode([]),
+						ArrayShapeNode::createSealed([]),
 					),
 				),
 			]),
@@ -5505,7 +5505,7 @@ Finder::findFiles('*.php')
 								[
 									new IdentifierTypeNode('array-key'),
 									new UnionTypeNode([
-										new ArrayShapeNode([
+										ArrayShapeNode::createSealed([
 											new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
 											new ArrayShapeItemNode(
 												null,
@@ -5516,7 +5516,7 @@ Finder::findFiles('*.php')
 												]),
 											),
 										]),
-										new ArrayShapeNode([
+										ArrayShapeNode::createSealed([
 											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprStringNode('', ConstExprStringNode::SINGLE_QUOTED))),
 											new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
 										]),
@@ -5552,7 +5552,7 @@ Finder::findFiles('*.php')
 										[
 											new IdentifierTypeNode('array-key'),
 											new UnionTypeNode([
-												new ArrayShapeNode([
+												ArrayShapeNode::createSealed([
 													new ArrayShapeItemNode(null, false, new IdentifierTypeNode('string')),
 													new ArrayShapeItemNode(
 														null,
@@ -5563,7 +5563,7 @@ Finder::findFiles('*.php')
 														]),
 													),
 												]),
-												new ArrayShapeNode([
+												ArrayShapeNode::createSealed([
 													new ArrayShapeItemNode(null, false, new IdentifierTypeNode('null')),
 													new ArrayShapeItemNode(null, false, new ConstTypeNode(new ConstExprIntegerNode('-1'))),
 												]),
