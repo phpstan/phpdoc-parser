@@ -76,7 +76,7 @@ If these parts are supposed to be PHPDoc descriptions, you need to put whitespac
 /** @return array{foo: int} } */
 ```
 
-## Type aliases with invalid types are preserved
+### Type aliases with invalid types are preserved
 
 In phpdoc-parser 1.x, invalid type alias syntax was represented as [`InvalidTagValueNode`](https://phpstan.github.io/phpdoc-parser/2.0.x/PHPStan.PhpDocParser.Ast.PhpDoc.InvalidTagValueNode.html), losing information about a type alias being present.
 
@@ -88,19 +88,19 @@ In phpdoc-parser 1.x, invalid type alias syntax was represented as [`InvalidTagV
 
 This `@phpstan-type` is missing the actual type to alias. In phpdoc-parser 2.0 this is now represented as [`TypeAliasTagValueNode`](https://phpstan.github.io/phpdoc-parser/2.0.x/PHPStan.PhpDocParser.Ast.PhpDoc.TypeAliasTagValueNode.html) (instead of `InvalidTagValueNode`) with [`InvalidTypeNode`](https://phpstan.github.io/phpdoc-parser/2.0.x/PHPStan.PhpDocParser.Ast.Type.InvalidTypeNode.html) in place of the type.
 
-## Removal of QuoteAwareConstExprStringNode
+### Removal of QuoteAwareConstExprStringNode
 
 The class [QuoteAwareConstExprStringNode](https://phpstan.github.io/phpdoc-parser/1.23.x/PHPStan.PhpDocParser.Ast.ConstExpr.QuoteAwareConstExprStringNode.html) has been removed.
 
 Instead, [ConstExprStringNode](https://phpstan.github.io/phpdoc-parser/2.0.x/PHPStan.PhpDocParser.Ast.ConstExpr.ConstExprStringNode.html) gained information about the kind of quotes being used.
 
-## Removed 2nd parameter of `ConstExprParser::parse()` (`$trimStrings`)
+### Removed 2nd parameter of `ConstExprParser::parse()` (`$trimStrings`)
 
 `ConstExprStringNode::$value` now contains unescaped values without surrounding `''` or `""` quotes.
 
 Use `ConstExprStringNode::__toString()` or [`Printer`](https://phpstan.github.io/phpdoc-parser/2.0.x/PHPStan.PhpDocParser.Printer.Printer.html) to get the escaped value along with surrounding quotes.
 
-## Text between tags always belongs to description
+### Text between tags always belongs to description
 
 Multi-line descriptions between tags were previously represented as separate [PhpDocTextNode](https://phpstan.github.io/phpdoc-parser/2.0.x/PHPStan.PhpDocParser.Ast.PhpDoc.PhpDocTextNode.html):
 
@@ -113,3 +113,7 @@ Multi-line descriptions between tags were previously represented as separate [Ph
 ```
 
 The line with `some text in the middle` in phpdoc-parser 2.0 is now part of the description of the first `@param` tag.
+
+### Minor BC breaks
+
+* Constructor parameter `$isEquality` in `AssertTag*ValueNode` made required
