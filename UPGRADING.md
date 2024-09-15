@@ -124,3 +124,4 @@ The line with `some text in the middle` in phpdoc-parser 2.0 is now part of the 
 * Constructor parameter `$templateTypes` in `MethodTagValueNode` made required
 * Constructor parameter `$isReference` in `ParamTagValueNode` made required
 * Constructor parameter `$isReference` in `TypelessParamTagValueNode` made required
+* Constructor parameter `$templateTypes` in `CallableTypeNode` made required

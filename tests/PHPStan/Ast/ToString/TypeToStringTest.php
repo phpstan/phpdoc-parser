@@ -92,34 +92,34 @@ class TypeToStringTest extends TestCase
 		yield from [
 			[
 				'\\Closure(): string',
-				new CallableTypeNode(new IdentifierTypeNode('\Closure'), [], new IdentifierTypeNode('string')),
+				new CallableTypeNode(new IdentifierTypeNode('\Closure'), [], new IdentifierTypeNode('string'), []),
 			],
 			[
 				'callable(int, int $foo): void',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', false),
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '$foo', false),
-				], new IdentifierTypeNode('void')),
+				], new IdentifierTypeNode('void'), []),
 			],
 			[
 				'callable(int=, int $foo=): void',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '', true),
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), false, false, '$foo', true),
-				], new IdentifierTypeNode('void')),
+				], new IdentifierTypeNode('void'), []),
 			],
 			[
 				'callable(int &, int &$foo): void',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), true, false, '', false),
 					new CallableTypeParameterNode(new IdentifierTypeNode('int'), true, false, '$foo', false),
-				], new IdentifierTypeNode('void')),
+				], new IdentifierTypeNode('void'), []),
 			],
 			[
 				'callable(string ...$foo): void',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('string'), false, true, '$foo', false),
-				], new IdentifierTypeNode('void')),
+				], new IdentifierTypeNode('void'), []),
 			],
 		];
 	}

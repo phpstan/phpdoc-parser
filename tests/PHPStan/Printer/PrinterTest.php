@@ -1940,17 +1940,17 @@ class PrinterTest extends TestCase
 			new CallableTypeNode(new IdentifierTypeNode('callable'), [], new UnionTypeNode([
 				new IdentifierTypeNode('int'),
 				new IdentifierTypeNode('string'),
-			])),
+			]), []),
 			'callable(): (int|string)',
 		];
 		yield [
-			new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int'))))),
+			new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int')))), []),
 			'callable(): int[][][]',
 		];
 		yield [
 			new ArrayTypeNode(
 				new ArrayTypeNode(
-					new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int'))),
+					new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int')), []),
 				),
 			),
 			'(callable(): int[])[][]',

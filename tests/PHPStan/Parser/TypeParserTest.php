@@ -510,6 +510,7 @@ class TypeParserTest extends TestCase
 									new IdentifierTypeNode('callable'),
 									[],
 									new IdentifierTypeNode('int'),
+									[],
 								),
 							),
 						]),
@@ -1143,6 +1144,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('callable'),
 					[],
 					new IdentifierTypeNode('Foo'),
+					[],
 				),
 			],
 			[
@@ -1151,6 +1153,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('pure-callable'),
 					[],
 					new IdentifierTypeNode('Foo'),
+					[],
 				),
 			],
 			[
@@ -1159,6 +1162,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('pure-Closure'),
 					[],
 					new IdentifierTypeNode('Foo'),
+					[],
 				),
 			],
 			[
@@ -1169,6 +1173,7 @@ class TypeParserTest extends TestCase
 					new NullableTypeNode(
 						new IdentifierTypeNode('Foo'),
 					),
+					[],
 				),
 			],
 			[
@@ -1185,6 +1190,7 @@ class TypeParserTest extends TestCase
 							GenericTypeNode::VARIANCE_INVARIANT,
 						],
 					),
+					[],
 				),
 			],
 			[
@@ -1201,6 +1207,7 @@ class TypeParserTest extends TestCase
 							GenericTypeNode::VARIANCE_INVARIANT,
 						],
 					)),
+					[],
 				),
 			],
 			[
@@ -1210,6 +1217,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('callable'),
 						[],
 						new IdentifierTypeNode('Foo'),
+						[],
 					),
 					new IdentifierTypeNode('Bar'),
 				]),
@@ -1221,6 +1229,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('callable'),
 						[],
 						new IdentifierTypeNode('Foo'),
+						[],
 					),
 					new IdentifierTypeNode('Bar'),
 				]),
@@ -1234,6 +1243,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
 					]),
+					[],
 				),
 			],
 			[
@@ -1245,6 +1255,7 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						new IdentifierTypeNode('Bar'),
 					]),
+					[],
 				),
 			],
 			[
@@ -1259,6 +1270,7 @@ class TypeParserTest extends TestCase
 							new IdentifierTypeNode('int'),
 						),
 					]),
+					[],
 				),
 			],
 			[
@@ -1289,6 +1301,7 @@ class TypeParserTest extends TestCase
 						),
 					],
 					new IdentifierTypeNode('Foo'),
+					[],
 				),
 			],
 			[
@@ -1542,6 +1555,7 @@ class TypeParserTest extends TestCase
 					new ArrayTypeNode(
 						new IdentifierTypeNode('int'),
 					),
+					[],
 				),
 			],
 			[
@@ -1556,7 +1570,7 @@ class TypeParserTest extends TestCase
 				'callable(mixed...): TReturn',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [
 					new CallableTypeParameterNode(new IdentifierTypeNode('mixed'), false, true, '', false),
-				], new IdentifierTypeNode('TReturn')),
+				], new IdentifierTypeNode('TReturn'), []),
 			],
 			[
 				"'foo'|'bar'",
@@ -1798,6 +1812,7 @@ class TypeParserTest extends TestCase
 						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
 					],
 					new IdentifierTypeNode('void'),
+					[],
 				),
 			],
 			[
@@ -1812,6 +1827,7 @@ class TypeParserTest extends TestCase
 						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 					],
 					new IdentifierTypeNode('void'),
+					[],
 				),
 			],
 			[
@@ -1825,6 +1841,7 @@ class TypeParserTest extends TestCase
 						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 					],
 					new IdentifierTypeNode('void'),
+					[],
 				),
 			],
 			[
@@ -1845,6 +1862,7 @@ class TypeParserTest extends TestCase
 									new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 								],
 								new IdentifierTypeNode('void'),
+								[],
 							),
 							false,
 							false,
@@ -1853,6 +1871,7 @@ class TypeParserTest extends TestCase
 						),
 					],
 					new IdentifierTypeNode('void'),
+					[],
 				),
 			],
 			[
@@ -1873,6 +1892,7 @@ class TypeParserTest extends TestCase
 									new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '', false),
 								],
 								new IdentifierTypeNode('void'),
+								[],
 							),
 							false,
 							false,
@@ -1881,6 +1901,7 @@ class TypeParserTest extends TestCase
 						),
 					],
 					new IdentifierTypeNode('void'),
+					[],
 				),
 			],
 			[
@@ -2223,6 +2244,7 @@ class TypeParserTest extends TestCase
 									new IdentifierTypeNode('callable'),
 									[],
 									new IdentifierTypeNode('int'),
+									[],
 								),
 							),
 						]),
@@ -2248,6 +2270,7 @@ class TypeParserTest extends TestCase
 									new IdentifierTypeNode('callable'),
 									[],
 									new IdentifierTypeNode('int'),
+									[],
 								),
 							),
 						]),
@@ -2502,18 +2525,20 @@ class TypeParserTest extends TestCase
 							new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '', false),
 						],
 						new IdentifierTypeNode('Bar'),
+						[],
 					),
+					[],
 				),
 			],
 			[
 				'callable(): ?int',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('int'))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('int')), []),
 			],
 			[
 				'callable(): object{foo: int}',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ObjectShapeNode([
 					new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
-				])),
+				]), []),
 			],
 			[
 				'callable(): object{foo: int}[]',
@@ -2525,31 +2550,32 @@ class TypeParserTest extends TestCase
 							new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
 						]),
 					),
+					[],
 				),
 			],
 			[
 				'callable(): int[][][]',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int'))))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int')))), []),
 			],
 			[
 				'callable(): (int[][][])',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int'))))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ArrayTypeNode(new ArrayTypeNode(new IdentifierTypeNode('int')))), []),
 			],
 			[
 				'(callable(): int[])[][]',
 				new ArrayTypeNode(
 					new ArrayTypeNode(
-						new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int'))),
+						new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('int')), []),
 					),
 				),
 			],
 			[
 				'callable(): $this',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ThisTypeNode()),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ThisTypeNode(), []),
 			],
 			[
 				'callable(): $this[]',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ThisTypeNode())),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new ThisTypeNode()), []),
 			],
 			[
 				'2.5|3',
@@ -2560,29 +2586,29 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'callable(): 3.5',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstExprFloatNode('3.5'))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstExprFloatNode('3.5')), []),
 			],
 			[
 				'callable(): 3.5[]',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(
 					new ConstTypeNode(new ConstExprFloatNode('3.5')),
-				)),
+				), []),
 			],
 			[
 				'callable(): Foo',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new IdentifierTypeNode('Foo')),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new IdentifierTypeNode('Foo'), []),
 			],
 			[
 				'callable(): (Foo)[]',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('Foo'))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayTypeNode(new IdentifierTypeNode('Foo')), []),
 			],
 			[
 				'callable(): Foo::BAR',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', 'BAR'))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', 'BAR')), []),
 			],
 			[
 				'callable(): Foo::*',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', '*'))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', '*')), []),
 			],
 			[
 				'?Foo[]',
@@ -2590,11 +2616,11 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'callable(): ?Foo',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('Foo'))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new IdentifierTypeNode('Foo')), []),
 			],
 			[
 				'callable(): ?Foo[]',
-				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo')))),
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new NullableTypeNode(new ArrayTypeNode(new IdentifierTypeNode('Foo'))), []),
 			],
 			[
 				'?(Foo|Bar)',
@@ -2663,7 +2689,7 @@ class TypeParserTest extends TestCase
 					new IdentifierTypeNode('TService'),
 					new IdentifierTypeNode('mixed'),
 					false,
-				)),
+				), []),
 			],
 			[
 				'MongoCollection <p>Returns a collection object representing the new collection.</p>',
