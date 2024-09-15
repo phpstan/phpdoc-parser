@@ -536,6 +536,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_END,
 					6,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -545,6 +547,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_OTHER,
 					8,
 					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -738,6 +742,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_IDENTIFIER,
 					16,
 					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -1082,6 +1088,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					10,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -1091,6 +1099,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					14,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -1100,6 +1110,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_COMMA,
 					21,
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -1109,6 +1121,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_COMMA,
 					21,
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -1118,6 +1132,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					9,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -1127,6 +1143,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_COMMA,
 					12,
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -1136,6 +1154,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_COMMA,
 					12,
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -1330,6 +1350,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_END,
 					9,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -2089,6 +2111,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_IDENTIFIER,
 					14,
 					Lexer::TOKEN_COLON,
+					null,
+					null,
 				),
 			],
 			[
@@ -2114,6 +2138,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_VARIABLE,
 					15,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -2151,6 +2177,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					13,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -2160,6 +2188,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_IDENTIFIER,
 					16,
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
@@ -2296,6 +2326,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_END,
 					7,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -2305,6 +2337,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_OTHER,
 					9,
 					Lexer::TOKEN_COLON,
+					null,
+					null,
 				),
 			],
 			[
@@ -2314,6 +2348,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_CLOSE_CURLY_BRACKET,
 					10,
 					Lexer::TOKEN_COLON,
+					null,
+					null,
 				),
 			],
 			[
@@ -2323,6 +2359,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_END,
 					7,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[
@@ -2332,6 +2370,8 @@ class TypeParserTest extends TestCase
 					Lexer::TOKEN_END,
 					7,
 					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
 				),
 			],
 			[

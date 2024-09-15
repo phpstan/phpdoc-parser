@@ -22,17 +22,17 @@ class ParserException extends Exception
 
 	private int $expectedTokenType;
 
-	private ?string $expectedTokenValue = null;
+	private ?string $expectedTokenValue;
 
-	private ?int $currentTokenLine = null;
+	private ?int $currentTokenLine;
 
 	public function __construct(
 		string $currentTokenValue,
 		int $currentTokenType,
 		int $currentOffset,
 		int $expectedTokenType,
-		?string $expectedTokenValue = null,
-		?int $currentTokenLine = null
+		?string $expectedTokenValue,
+		?int $currentTokenLine
 	)
 	{
 		$this->currentTokenValue = $currentTokenValue;

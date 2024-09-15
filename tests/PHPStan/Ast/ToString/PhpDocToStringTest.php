@@ -137,7 +137,7 @@ class PhpDocToStringTest extends TestCase
 			'#desc',
 			new InvalidTagValueNode(
 				'#desc',
-				new ParserException('#desc', Lexer::TOKEN_OTHER, 11, Lexer::TOKEN_IDENTIFIER),
+				new ParserException('#desc', Lexer::TOKEN_OTHER, 11, Lexer::TOKEN_IDENTIFIER, null, null),
 			),
 		];
 
