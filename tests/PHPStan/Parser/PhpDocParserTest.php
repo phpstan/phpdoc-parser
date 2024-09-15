@@ -3968,8 +3968,8 @@ test',
 			' *' . PHP_EOL .
 			' */',
 			new PhpDocNode([
-				new PhpDocTextNode(''),
 				new PhpDocTextNode(
+					PHP_EOL .
 					'MultiLine' . PHP_EOL .
 					'description',
 				),
@@ -5073,13 +5073,13 @@ test',
 			'OK class line',
 			$sample,
 			new PhpDocNode([
-				new PhpDocTextNode('Returns the schema for the field.'),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('This method is static because the field schema information is needed on
+				new PhpDocTextNode('Returns the schema for the field.
+
+This method is static because the field schema information is needed on
 creation of the field. FieldItemInterface objects instantiated at that
-time are not reliable as field settings might be missing.'),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('Computed fields having no schema should return an empty array.'),
+time are not reliable as field settings might be missing.
+
+Computed fields having no schema should return an empty array.'),
 			]),
 		];
 	}
@@ -5127,13 +5127,13 @@ time are not reliable as field settings might be missing.'),
 			'OK FieldItemInterface::schema',
 			$sample,
 			new PhpDocNode([
-				new PhpDocTextNode('Returns the schema for the field.'),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('This method is static because the field schema information is needed on
+				new PhpDocTextNode('Returns the schema for the field.
+
+This method is static because the field schema information is needed on
 creation of the field. FieldItemInterface objects instantiated at that
-time are not reliable as field settings might be missing.'),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('Computed fields having no schema should return an empty array.'),
+time are not reliable as field settings might be missing.
+
+Computed fields having no schema should return an empty array.'),
 				new PhpDocTextNode(''),
 				new PhpDocTagNode(
 					'@param',
@@ -5201,9 +5201,9 @@ time are not reliable as field settings might be missing.'),
 			'OK AbstractChunkedController::parseChunkedRequest',
 			$sample,
 			new PhpDocNode([
-				new PhpDocTextNode('Parses a chunked request and return relevant information.'),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode('This function must return an array containing the following
+				new PhpDocTextNode('Parses a chunked request and return relevant information.
+
+ This function must return an array containing the following
  keys and their corresponding values:
    - last: Wheter this is the last chunk of the uploaded file
    - uuid: A unique id which distinguishes two uploaded files
@@ -5247,9 +5247,9 @@ time are not reliable as field settings might be missing.'),
 			  * </code>
 			  */",
 			new PhpDocNode([
-				new PhpDocTextNode('Finder allows searching through directory trees using iterator.'),
-				new PhpDocTextNode(''),
-				new PhpDocTextNode("<code>
+				new PhpDocTextNode("Finder allows searching through directory trees using iterator.
+
+<code>
 Finder::findFiles('*.php')
     ->size('> 10kB')
     ->from('.')
@@ -7563,8 +7563,8 @@ Finder::findFiles('*.php')
 			' *' . PHP_EOL .
 			' */',
 			new PhpDocNode([
-				new PhpDocTextNode(''),
 				new PhpDocTextNode(
+					PHP_EOL .
 					'MultiLine' . PHP_EOL .
 					'description',
 				),
