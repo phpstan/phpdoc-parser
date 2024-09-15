@@ -463,7 +463,7 @@ class PhpDocParser
 				case '@psalm-template-contravariant':
 					$tagValue = $this->typeParser->parseTemplateTagValue(
 						$tokens,
-						fn ($tokens) => $this->parseOptionalDescription($tokens),
+						fn ($tokens) => $this->parseOptionalDescription($tokens, true),
 					);
 					break;
 
@@ -536,7 +536,7 @@ class PhpDocParser
 
 		} catch (ParserException $e) {
 			$tokens->rollback();
-			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens), $e);
+			$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens, false), $e);
 		}
 
 		return $this->enrichWithAttributes($tokens, $tagValue, $startLine, $startIndex);
@@ -865,7 +865,7 @@ class PhpDocParser
 		$isReference = $tokens->tryConsumeTokenType(Lexer::TOKEN_REFERENCE);
 		$isVariadic = $tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC);
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 
 		if ($type !== null) {
 			return new Ast\PhpDoc\ParamTagValueNode($type, $isVariadic, $parameterName, $description, $isReference);
@@ -878,7 +878,7 @@ class PhpDocParser
 	private function parseParamImmediatelyInvokedCallableTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode
 	{
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 
 		return new Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode($parameterName, $description);
 	}
@@ -887,7 +887,7 @@ class PhpDocParser
 	private function parseParamLaterInvokedCallableTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode
 	{
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 
 		return new Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode($parameterName, $description);
 	}
@@ -897,7 +897,7 @@ class PhpDocParser
 	{
 		$type = $this->typeParser->parse($tokens);
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 
 		return new Ast\PhpDoc\ParamClosureThisTagValueNode($type, $parameterName, $description);
 	}
@@ -950,7 +950,7 @@ class PhpDocParser
 
 	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode
 	{
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 		return new Ast\PhpDoc\DeprecatedTagValueNode($description);
 	}
 
@@ -959,7 +959,7 @@ class PhpDocParser
 	{
 		$type = $this->typeParser->parse($tokens);
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 		return new Ast\PhpDoc\PropertyTagValueNode($type, $parameterName, $description);
 	}
 
@@ -1018,7 +1018,7 @@ class PhpDocParser
 		}
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 		return new Ast\PhpDoc\MethodTagValueNode($isStatic, $returnType, $methodName, $parameters, $description, $templateTypes);
 	}
 
@@ -1071,7 +1071,7 @@ class PhpDocParser
 			$this->typeParser->enrichWithAttributes($tokens, $baseType, $startLine, $startIndex),
 		);
 
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
 
 		switch ($tagName) {
 			case '@extends':
@@ -1112,7 +1112,7 @@ class PhpDocParser
 
 			return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
 		} catch (ParserException $e) {
-			$this->parseOptionalDescription($tokens);
+			$this->parseOptionalDescription($tokens, false);
 			return new Ast\PhpDoc\TypeAliasTagValueNode(
 				$alias,
 				$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex),
@@ -1156,7 +1156,7 @@ class PhpDocParser
 		$isEquality = $tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
 		$type = $this->typeParser->parse($tokens);
 		$parameter = $this->parseAssertParameter($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 
 		if (array_key_exists('method', $parameter)) {
 			return new Ast\PhpDoc\AssertTagMethodValueNode($type, $parameter['parameter'], $parameter['method'], $isNegated, $description, $isEquality);
@@ -1201,7 +1201,7 @@ class PhpDocParser
 	private function parseSelfOutTagValue(TokenIterator $tokens): Ast\PhpDoc\SelfOutTagValueNode
 	{
 		$type = $this->typeParser->parse($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, true);
 
 		return new Ast\PhpDoc\SelfOutTagValueNode($type, $description);
 	}
@@ -1210,7 +1210,7 @@ class PhpDocParser
 	{
 		$type = $this->typeParser->parse($tokens);
 		$parameterName = $this->parseRequiredVariableName($tokens);
-		$description = $this->parseOptionalDescription($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
 
 		return new Ast\PhpDoc\ParamOutTagValueNode($type, $parameterName, $description);
 	}
@@ -1240,7 +1240,10 @@ class PhpDocParser
 		return $parameterName;
 	}
 
-	private function parseOptionalDescription(TokenIterator $tokens, bool $limitStartToken = false): string
+	/**
+	 * @param bool $limitStartToken true should be used when the description immediately follows a parsed type
+	 */
+	private function parseOptionalDescription(TokenIterator $tokens, bool $limitStartToken): string
 	{
 		if ($limitStartToken) {
 			foreach (self::DISALLOWED_DESCRIPTION_START_TOKENS as $disallowedStartToken) {
