@@ -17,7 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - "7.3"
           - "7.4"
           - "8.0"
           - "8.1"
@@ -34,7 +33,7 @@ jobs:
         with:
           repository: slevomat/coding-standard
           path: slevomat-cs
-          ref: ad4eab6f2cf9aa099c8853e4e3a250a9ae5fb4bd
+          ref: phpdoc-parser-2
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
