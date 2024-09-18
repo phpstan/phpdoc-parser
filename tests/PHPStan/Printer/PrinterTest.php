@@ -23,6 +23,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
@@ -1774,6 +1775,24 @@ class PrinterTest extends TestCase
 						$node->type = new IdentifierTypeNode('Bar');
 						$node->parameterName = '$taste';
 						$node->description = 'hehe';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @pure-unless-callable-is-impure $foo test */',
+			'/** @pure-unless-callable-is-impure $bar foo */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof PureUnlessCallableIsImpureTagValueNode) {
+						$node->parameterName = '$bar';
+						$node->description = 'foo';
 					}
 
 					return $node;
