@@ -31,6 +31,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
@@ -321,6 +322,9 @@ final class Printer
 		}
 		if ($node instanceof ParamClosureThisTagValueNode) {
 			return trim("{$node->type} {$node->parameterName} {$node->description}");
+		}
+		if ($node instanceof PureUnlessCallableIsImpureTagValueNode) {
+			return trim("{$node->parameterName} {$node->description}");
 		}
 		if ($node instanceof PropertyTagValueNode) {
 			$type = $this->printType($node->type);

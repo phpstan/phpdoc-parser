@@ -38,6 +38,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
@@ -104,6 +105,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideParamLaterInvokedCallableTagsData
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideParamClosureThisTagsData
+	 * @dataProvider providePureUnlessCallableIsImpureTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
@@ -730,6 +732,37 @@ class PhpDocParserTest extends TestCase
 						new IdentifierTypeNode('Foo'),
 						'$a',
 						'test'
+					)
+				),
+			]),
+		];
+	}
+
+	public function providePureUnlessCallableIsImpureTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @pure-unless-callable-is-impure $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@pure-unless-callable-is-impure',
+					new PureUnlessCallableIsImpureTagValueNode(
+						'$foo',
+						''
+					)
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @pure-unless-callable-is-impure $foo test two three */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@pure-unless-callable-is-impure',
+					new PureUnlessCallableIsImpureTagValueNode(
+						'$foo',
+						'test two three'
 					)
 				),
 			]),
