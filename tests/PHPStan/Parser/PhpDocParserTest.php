@@ -3986,7 +3986,7 @@ some text in the middle'
 		];
 
 		yield [
-			'OK with bound and description',
+			'OK with upper bound and description',
 			'/** @template T of DateTime the value type */',
 			new PhpDocNode([
 				new PhpDocTagNode(
@@ -4001,22 +4001,41 @@ some text in the middle'
 		];
 
 		yield [
-			'OK with bound and description',
-			'/** @template T as DateTime the value type */',
+			'OK with lower bound and description',
+			'/** @template T super DateTimeImmutable the value type */',
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@template',
 					new TemplateTagValueNode(
 						'T',
-						new IdentifierTypeNode('DateTime'),
-						'the value type'
+						null,
+						'the value type',
+						null,
+						new IdentifierTypeNode('DateTimeImmutable')
 					)
 				),
 			]),
 		];
 
 		yield [
-			'invalid without bound and description',
+			'OK with both bounds and description',
+			'/** @template T of DateTimeInterface super DateTimeImmutable the value type */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@template',
+					new TemplateTagValueNode(
+						'T',
+						new IdentifierTypeNode('DateTimeInterface'),
+						'the value type',
+						null,
+						new IdentifierTypeNode('DateTimeImmutable')
+					)
+				),
+			]),
+		];
+
+		yield [
+			'invalid without bounds and description',
 			'/** @template */',
 			new PhpDocNode([
 				new PhpDocTagNode(

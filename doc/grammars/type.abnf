@@ -41,7 +41,7 @@ CallableTemplate
 	= TokenAngleBracketOpen CallableTemplateArgument *(TokenComma CallableTemplateArgument) TokenAngleBracketClose
 
 CallableTemplateArgument
-    = TokenIdentifier [1*ByteHorizontalWs TokenOf Type]
+    = TokenIdentifier [1*ByteHorizontalWs TokenOf Type] [1*ByteHorizontalWs TokenSuper Type] ["=" Type]
 
 CallableParameters
 	= CallableParameter *(TokenComma CallableParameter)
@@ -200,6 +200,9 @@ TokenNot
 
 TokenOf
 	= %s"of" 1*ByteHorizontalWs
+
+TokenSuper
+	= %s"super" 1*ByteHorizontalWs
 
 TokenContravariant
     = %s"contravariant" 1*ByteHorizontalWs

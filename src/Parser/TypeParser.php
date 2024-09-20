@@ -491,11 +491,14 @@ class TypeParser
 		$name = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
-		if ($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as')) {
-			$bound = $this->parse($tokens);
+		$upperBound = $lowerBound = null;
 
-		} else {
-			$bound = null;
+		if ($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as')) {
+			$upperBound = $this->parse($tokens);
+		}
+
+		if ($tokens->tryConsumeTokenValue('super')) {
+			$lowerBound = $this->parse($tokens);
 		}
 
 		if ($tokens->tryConsumeTokenValue('=')) {
@@ -514,7 +517,7 @@ class TypeParser
 			throw new LogicException('Template tag name cannot be empty.');
 		}
 
-		return new Ast\PhpDoc\TemplateTagValueNode($name, $bound, $description, $default);
+		return new Ast\PhpDoc\TemplateTagValueNode($name, $upperBound, $description, $default, $lowerBound);
 	}
 
 
