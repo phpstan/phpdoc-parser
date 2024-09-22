@@ -943,6 +943,12 @@ class PrinterTest extends TestCase
 			$addTemplateTagBound,
 		];
 
+		yield [
+			'/** @template T super string */',
+			'/** @template T of int super string */',
+			$addTemplateTagBound,
+		];
+
 		$removeTemplateTagBound = new class extends AbstractNodeVisitor {
 
 			public function enterNode(Node $node)
@@ -960,6 +966,56 @@ class PrinterTest extends TestCase
 			'/** @template T of int */',
 			'/** @template T */',
 			$removeTemplateTagBound,
+		];
+
+		$addTemplateTagLowerBound = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof TemplateTagValueNode) {
+					$node->lowerBound = new IdentifierTypeNode('int');
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @template T */',
+			'/** @template T super int */',
+			$addTemplateTagLowerBound,
+		];
+
+		yield [
+			'/** @template T super string */',
+			'/** @template T super int */',
+			$addTemplateTagLowerBound,
+		];
+
+		yield [
+			'/** @template T of string */',
+			'/** @template T of string super int */',
+			$addTemplateTagLowerBound,
+		];
+
+		$removeTemplateTagLowerBound = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof TemplateTagValueNode) {
+					$node->lowerBound = null;
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @template T super int */',
+			'/** @template T */',
+			$removeTemplateTagLowerBound,
 		];
 
 		$addKeyNameToArrayShapeItemNode = new class extends AbstractNodeVisitor {

@@ -155,12 +155,15 @@ class PhpDocToStringTest extends TestCase
 		$baz = new IdentifierTypeNode('Foo\\Baz');
 
 		yield from [
-			['TValue', new TemplateTagValueNode('TValue', null, '', null)],
-			['TValue of Foo\\Bar', new TemplateTagValueNode('TValue', $bar, '', null)],
+			['TValue', new TemplateTagValueNode('TValue', null, '')],
+			['TValue of Foo\\Bar', new TemplateTagValueNode('TValue', $bar, '')],
+			['TValue super Foo\\Bar', new TemplateTagValueNode('TValue', null, '', null, $bar)],
 			['TValue = Foo\\Bar', new TemplateTagValueNode('TValue', null, '', $bar)],
 			['TValue of Foo\\Bar = Foo\\Baz', new TemplateTagValueNode('TValue', $bar, '', $baz)],
-			['TValue Description.', new TemplateTagValueNode('TValue', null, 'Description.', null)],
+			['TValue Description.', new TemplateTagValueNode('TValue', null, 'Description.')],
 			['TValue of Foo\\Bar = Foo\\Baz Description.', new TemplateTagValueNode('TValue', $bar, 'Description.', $baz)],
+			['TValue super Foo\\Bar = Foo\\Baz Description.', new TemplateTagValueNode('TValue', null, 'Description.', $baz, $bar)],
+			['TValue of Foo\\Bar super Foo\\Baz Description.', new TemplateTagValueNode('TValue', $bar, 'Description.', null, $baz)],
 		];
 	}
 
