@@ -2,6 +2,7 @@
 
 namespace PHPStan\PhpDocParser\Printer;
 
+use LogicException;
 use PhpParser\Comment\Doc;
 use PhpParser\Node as PhpNode;
 use PhpParser\NodeTraverser as PhpParserNodeTraverser;
@@ -78,8 +79,10 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 			$this->fail('Could not read ' . $file);
 		}
 
-		/** @var PhpNode[] $oldStmts */
 		$oldStmts = $phpParser->parse($fileContents);
+		if ($oldStmts === null) {
+			throw new LogicException();
+		}
 		$oldTokens = $phpParser->getTokens();
 
 		$phpTraverser2 = new PhpParserNodeTraverser();

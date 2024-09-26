@@ -11,3 +11,6 @@ parameters:
 	level: 8
 	ignoreErrors:
 		- '#^Dynamic call to static method PHPUnit\\Framework\\Assert#'
+		-
+			identifier: return.unusedType
+			path: tests/*

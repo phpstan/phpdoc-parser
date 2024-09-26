@@ -13,7 +13,6 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPStan\ShouldNotHappenException;
 use function array_key_exists;
-use function array_values;
 use function count;
 use function rtrim;
 use function str_replace;
@@ -120,7 +119,7 @@ class PhpDocParser
 			return $this->enrichWithAttributes($tokens, new Ast\PhpDoc\PhpDocNode([$this->enrichWithAttributes($tokens, $tag, $startLine, $startIndex)]), 1, 0);
 		}
 
-		return $this->enrichWithAttributes($tokens, new Ast\PhpDoc\PhpDocNode(array_values($children)), 1, 0);
+		return $this->enrichWithAttributes($tokens, new Ast\PhpDoc\PhpDocNode($children), 1, 0);
 	}
 
 

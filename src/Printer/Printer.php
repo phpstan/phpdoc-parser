@@ -554,7 +554,11 @@ final class Printer
 				if (!$newNode instanceof Node || !$originalNode instanceof Node) {
 					return null;
 				}
+
+				/** @var int $itemStartPos */
 				$itemStartPos = $originalNode->getAttribute(Attribute::START_INDEX);
+
+				/** @var int $itemEndPos */
 				$itemEndPos = $originalNode->getAttribute(Attribute::END_INDEX);
 				if ($itemStartPos < 0 || $itemEndPos < 0 || $itemStartPos < $tokenIndex) {
 					throw new LogicException();
@@ -617,6 +621,7 @@ final class Printer
 					continue;
 				}
 
+				/** @var int $itemEndPos */
 				$itemEndPos = $tokenIndex - 1;
 				if ($insertNewline) {
 					$result .= $insertStr . sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
@@ -642,7 +647,10 @@ final class Printer
 					return null;
 				}
 
+				/** @var int $itemStartPos */
 				$itemStartPos = $originalNode->getAttribute(Attribute::START_INDEX);
+
+				/** @var int $itemEndPos */
 				$itemEndPos = $originalNode->getAttribute(Attribute::END_INDEX);
 				if ($itemStartPos < 0 || $itemEndPos < 0) {
 					throw new LogicException();
@@ -702,7 +710,7 @@ final class Printer
 	}
 
 	/**
-	 * @param Node[] $nodes
+	 * @param array<Node|null> $nodes
 	 * @return array{bool, string, string}
 	 */
 	private function isMultiline(int $initialIndex, array $nodes, TokenIterator $originalTokens): array
