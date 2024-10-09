@@ -5,6 +5,7 @@ namespace PHPStan\PhpDocParser\Printer;
 use PhpParser\Internal\TokenStream;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use function count;
 use function preg_match;
@@ -71,7 +72,7 @@ class PhpPrinterIndentationDetectorVisitor extends NodeVisitorAbstract
 			$this->indentCharacter = $char;
 			$this->indentSize = $size;
 
-			return NodeTraverser::STOP_TRAVERSAL;
+			return NodeVisitor::STOP_TRAVERSAL;
 		}
 
 		return null;
