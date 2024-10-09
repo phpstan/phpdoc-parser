@@ -4,7 +4,6 @@ namespace PHPStan\PhpDocParser\Printer;
 
 use PhpParser\Internal\TokenStream;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use function count;
