@@ -4,11 +4,13 @@ namespace PHPStan\PhpDocParser\Printer;
 
 use LogicException;
 use PhpParser\Comment\Doc;
+use PhpParser\Internal\TokenStream;
 use PhpParser\Node as PhpNode;
 use PhpParser\NodeTraverser as PhpParserNodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor as PhpParserCloningVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
 use PHPStan\PhpDocParser\Ast\AbstractNodeVisitor;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
@@ -25,9 +27,12 @@ use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function file_get_contents;
+use function str_repeat;
 
 class IntegrationPrinterWithPhpParserTest extends TestCase
 {
+
+	private const TAB_WIDTH = 4;
 
 	/**
 	 * @return iterable<array{string, string, NodeVisitor}>
@@ -73,7 +78,6 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 		$phpTraverser = new PhpParserNodeTraverser();
 		$phpTraverser->addVisitor(new PhpParserCloningVisitor());
 
-		$printer = new PhpPrinter();
 		$fileContents = file_get_contents($file);
 		if ($fileContents === false) {
 			$this->fail('Could not read ' . $file);
@@ -84,6 +88,11 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 			throw new LogicException();
 		}
 		$oldTokens = $phpParser->getTokens();
+
+		$phpTraverserIndent = new PhpParserNodeTraverser();
+		$indentDetector = new PhpPrinterIndentationDetectorVisitor(new TokenStream($oldTokens, self::TAB_WIDTH));
+		$phpTraverserIndent->addVisitor($indentDetector);
+		$phpTraverserIndent->traverse($oldStmts);
 
 		$phpTraverser2 = new PhpParserNodeTraverser();
 		$phpTraverser2->addVisitor(new class ($visitor) extends NodeVisitorAbstract {
@@ -134,6 +143,7 @@ class IntegrationPrinterWithPhpParserTest extends TestCase
 		$newStmts = $phpTraverser->traverse($oldStmts);
 		$newStmts = $phpTraverser2->traverse($newStmts);
 
+		$printer = new Standard(['indent' => str_repeat($indentDetector->indentCharacter, $indentDetector->indentSize)]);
 		$newCode = $printer->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
 		$this->assertStringEqualsFile($expectedFile, $newCode);
 	}
