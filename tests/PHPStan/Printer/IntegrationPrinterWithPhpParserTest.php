@@ -27,9 +27,11 @@ use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function file_get_contents;
+use function str_repeat;
 
 class IntegrationPrinterWithPhpParserTest extends TestCase
 {
+
 	private const TAB_WIDTH = 4;
 
 	/**
