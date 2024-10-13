@@ -49,11 +49,13 @@ class Lexer
 	public const TOKEN_CLOSE_CURLY_BRACKET = 34;
 	public const TOKEN_NEGATED = 35;
 	public const TOKEN_ARROW = 36;
+	public const TOKEN_SUBTRACTION = 37;
 
 	public const TOKEN_LABELS = [
 		self::TOKEN_REFERENCE => '\'&\'',
 		self::TOKEN_UNION => '\'|\'',
 		self::TOKEN_INTERSECTION => '\'&\'',
+		self::TOKEN_SUBTRACTION => '\'~\'',
 		self::TOKEN_NULLABLE => '\'?\'',
 		self::TOKEN_NEGATED => '\'!\'',
 		self::TOKEN_OPEN_PARENTHESES => '\'(\'',
@@ -147,6 +149,7 @@ class Lexer
 			self::TOKEN_REFERENCE => '&(?=\\s*+(?:[.,=)]|(?:\\$(?!this(?![0-9a-z_\\x80-\\xFF])))))',
 			self::TOKEN_UNION => '\\|',
 			self::TOKEN_INTERSECTION => '&',
+			self::TOKEN_SUBTRACTION => '\\~',
 			self::TOKEN_NULLABLE => '\\?',
 			self::TOKEN_NEGATED => '!',
 

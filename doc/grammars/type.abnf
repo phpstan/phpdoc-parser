@@ -16,6 +16,9 @@ Union
 Intersection
 	= 1*(TokenIntersection Atomic)
 
+Subtraction
+    = TokenSubtraction Atomic
+
 Conditional
     = 1*ByteHorizontalWs TokenIs [TokenNot] Atomic TokenNullable Type TokenColon ParenthesizedType
 
@@ -140,6 +143,9 @@ TokenUnion
 
 TokenIntersection
 	= "&" *ByteHorizontalWs
+
+TokenSubtraction
+    = "~" *ByteHorizontalWs
 
 TokenNullable
 	= "?" *ByteHorizontalWs

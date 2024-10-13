@@ -41,6 +41,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\SubtractionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -1478,6 +1479,46 @@ class PrinterTest extends TestCase
 				{
 					if ($node instanceof IdentifierTypeNode && $node->name === 'integer') {
 						$node->name = 'int';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param Foo~Bar $a */',
+			'/** @param Foo~(Lorem|Ipsum) $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof SubtractionTypeNode) {
+						$node->subtractedType = new UnionTypeNode([
+							new IdentifierTypeNode('Lorem'),
+							new IdentifierTypeNode('Ipsum'),
+						]);
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param Foo~Bar $a */',
+			'/** @param (Lorem|Ipsum)~Bar $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof SubtractionTypeNode) {
+						$node->type = new UnionTypeNode([
+							new IdentifierTypeNode('Lorem'),
+							new IdentifierTypeNode('Ipsum'),
+						]);
 					}
 
 					return $node;

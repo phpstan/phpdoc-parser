@@ -59,6 +59,9 @@ class TypeParser
 
 			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
 				$type = $this->parseIntersection($tokens, $type);
+
+			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SUBTRACTION)) {
+				$type = $this->parseSubtraction($tokens, $type);
 			}
 		}
 
@@ -111,6 +114,9 @@ class TypeParser
 
 				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
 					$type = $this->subParseIntersection($tokens, $type);
+
+				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SUBTRACTION)) {
+					$type = $this->subParseSubtraction($tokens, $type);
 				}
 			}
 		}
@@ -315,6 +321,31 @@ class TypeParser
 		}
 
 		return new Ast\Type\IntersectionTypeNode($types);
+	}
+
+
+	/** @phpstan-impure */
+	private function parseSubtraction(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_SUBTRACTION);
+
+		$subtractedType = $this->parseAtomic($tokens);
+
+		return new Ast\Type\SubtractionTypeNode($type, $subtractedType);
+	}
+
+
+	/** @phpstan-impure */
+	private function subParseSubtraction(TokenIterator $tokens, Ast\Type\TypeNode $type): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenType(Lexer::TOKEN_SUBTRACTION);
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+		$subtractedType = $this->parseAtomic($tokens);
+
+		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+
+		return new Ast\Type\SubtractionTypeNode($type, $subtractedType);
 	}
 
 
