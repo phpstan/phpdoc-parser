@@ -762,6 +762,88 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'non-empty-array{
+				 	int,
+				 	string
+				 }',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('string')
+						),
+					],
+					true,
+					ArrayShapeNode::KIND_NON_EMPTY_ARRAY
+				),
+			],
+			[
+				'callable(): non-empty-array{int, string}',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('string')
+						),
+					],
+					true,
+					ArrayShapeNode::KIND_NON_EMPTY_ARRAY
+				)),
+			],
+			[
+				'callable(): non-empty-list{int, string}',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('string')
+						),
+					],
+					true,
+					ArrayShapeNode::KIND_NON_EMPTY_LIST
+				)),
+			],
+			[
+				'non-empty-list{
+				 	int,
+				 	string
+				 }',
+				new ArrayShapeNode(
+					[
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('int')
+						),
+						new ArrayShapeItemNode(
+							null,
+							false,
+							new IdentifierTypeNode('string')
+						),
+					],
+					true,
+					ArrayShapeNode::KIND_NON_EMPTY_LIST
+				),
+			],
+			[
 				'array{...<string>}',
 				new ArrayShapeNode(
 					[],

@@ -180,7 +180,13 @@ class TypeParser
 				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 					$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
 
-				} elseif (in_array($type->name, ['array', 'list', 'object'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
+				} elseif (in_array($type->name, [
+					Ast\Type\ArrayShapeNode::KIND_ARRAY,
+					Ast\Type\ArrayShapeNode::KIND_LIST,
+					Ast\Type\ArrayShapeNode::KIND_NON_EMPTY_ARRAY,
+					Ast\Type\ArrayShapeNode::KIND_NON_EMPTY_LIST,
+					'object',
+				], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
 					if ($type->name === 'object') {
 						$type = $this->parseObjectShape($tokens);
 					} else {
@@ -690,7 +696,13 @@ class TypeParser
 							$startIndex
 						));
 
-					} elseif (in_array($type->name, ['array', 'list', 'object'], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
+					} elseif (in_array($type->name, [
+						Ast\Type\ArrayShapeNode::KIND_ARRAY,
+						Ast\Type\ArrayShapeNode::KIND_LIST,
+						Ast\Type\ArrayShapeNode::KIND_NON_EMPTY_ARRAY,
+						Ast\Type\ArrayShapeNode::KIND_NON_EMPTY_LIST,
+						'object',
+					], true) && $tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_CURLY_BRACKET) && !$tokens->isPrecededByHorizontalWhitespace()) {
 						if ($type->name === 'object') {
 							$type = $this->parseObjectShape($tokens);
 						} else {
