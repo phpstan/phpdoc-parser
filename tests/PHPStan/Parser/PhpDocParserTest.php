@@ -39,6 +39,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PropertyTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessParameterIsPassedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
@@ -750,6 +751,37 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@pure-unless-callable-is-impure',
 					new PureUnlessCallableIsImpureTagValueNode(
+						'$foo',
+						'test two three',
+					),
+				),
+			]),
+		];
+	}
+
+	public function providePureUnlessParameterIsPassedTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @pure-unless-parameter-passed $foo */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@pure-unless-parameter-passed',
+					new PureUnlessParameterIsPassedTagValueNode(
+						'$foo',
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @pure-unless-parameter-passed $foo test two three */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@pure-unless-parameter-passed',
+					new PureUnlessParameterIsPassedTagValueNode(
 						'$foo',
 						'test two three',
 					),
