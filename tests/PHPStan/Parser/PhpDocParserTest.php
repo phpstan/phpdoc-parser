@@ -122,6 +122,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideDoctrineData
 	 * @dataProvider provideDoctrineWithoutDoctrineCheckData
 	 * @dataProvider provideCommentLikeDescriptions
+	 * @dataProvider provideInlineTags
 	 */
 	public function testParse(
 		string $label,
@@ -6020,6 +6021,27 @@ Finder::findFiles('*.php')
 					new DoctrineAnnotation('@\ORM\Entity', []),
 					'// this is a description',
 				)),
+			]),
+		];
+	}
+
+	public function provideInlineTags(): Iterator
+	{
+		yield [
+			'Inline @link tag in @copyright',
+			'/**' . PHP_EOL .
+			' * Unit tests for stored_progress_bar_cleanup' . PHP_EOL .
+			' *' . PHP_EOL .
+			' * @package   core' . PHP_EOL .
+			' * @copyright 2024 onwards Catalyst IT EU {@link https://catalyst-eu.net}' . PHP_EOL .
+			' * @\ORM\Entity() 2024 onwards Catalyst IT EU {@link https://catalyst-eu.net}' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTextNode('Unit tests for stored_progress_bar_cleanup'),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@package', new GenericTagValueNode('core')),
+				new PhpDocTagNode('@copyright', new GenericTagValueNode('2024 onwards Catalyst IT EU {@link https://catalyst-eu.net}')),
+				new PhpDocTagNode('@\ORM\Entity', new DoctrineTagValueNode(new DoctrineAnnotation('@\ORM\Entity', []), '2024 onwards Catalyst IT EU {@link https://catalyst-eu.net}')),
 			]),
 		];
 	}
