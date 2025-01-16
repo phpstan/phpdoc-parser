@@ -6989,6 +6989,23 @@ Finder::findFiles('*.php')
 	}
 
 	/**
+	 * @dataProvider provideLexerData
+	 */
+	public function testClosingBraceInlineTag(
+		string $input,
+		array $expectedTokens,
+	): void {
+		$tokens = new TokenIterator($this->lexer->tokenize($input));
+		$this->assertEquals($expectedTokens, array_map(
+			fn ($token) => [
+				$token[Lexer::TYPE_OFFSET],
+				$token[Lexer::VALUE_OFFSET],
+			],
+			$tokens->getTokens(),
+		));
+	}
+
+	/**
 	 * @return array<mixed>
 	 */
 	public function dataLinesAndIndexes(): iterable
@@ -7662,6 +7679,32 @@ Finder::findFiles('*.php')
 				new PhpDocTextNode(''),
 			]),
 		];
+	}
+
+	public function provideLexerData(): Iterator
+	{
+		yield ['{@link https://example.com}', [
+			[Lexer::TOKEN_OPEN_CURLY_BRACKET, '{'],
+			[Lexer::TOKEN_PHPDOC_TAG, '@link'],
+			[Lexer::TOKEN_HORIZONTAL_WS, ' '],
+			[Lexer::TOKEN_IDENTIFIER, 'https'],
+			[Lexer::TOKEN_COLON, ':'],
+			[Lexer::TOKEN_OTHER, '//example.com'],
+			[Lexer::TOKEN_CLOSE_CURLY_BRACKET, '}'],
+			[Lexer::TOKEN_END, ''],
+		]];
+
+		yield ['{@link https://example.com }', [
+			[Lexer::TOKEN_OPEN_CURLY_BRACKET, '{'],
+			[Lexer::TOKEN_PHPDOC_TAG, '@link'],
+			[Lexer::TOKEN_HORIZONTAL_WS, ' '],
+			[Lexer::TOKEN_IDENTIFIER, 'https'],
+			[Lexer::TOKEN_COLON, ':'],
+			[Lexer::TOKEN_OTHER, '//example.com'],
+			[Lexer::TOKEN_HORIZONTAL_WS, ' '],
+			[Lexer::TOKEN_CLOSE_CURLY_BRACKET, '}'],
+			[Lexer::TOKEN_END, ''],
+		]];
 	}
 
 	/**
