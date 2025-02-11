@@ -62,6 +62,8 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\InvalidTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -4025,6 +4027,225 @@ test',
 					'',
 				)),
 				new PhpDocTextNode(''),
+			]),
+		];
+
+		yield [
+			'Multiline PHPDoc with new line across generic type declaration',
+			'/**' . PHP_EOL .
+			' * @param array<string, array{' . PHP_EOL .
+			' *     foo: int,' . PHP_EOL .
+			' *     bar?: array<string,' . PHP_EOL .
+			' *         array{foo1: int, bar1?: true}' . PHP_EOL .
+			' *         | array{foo1: int, foo2: true, bar1?: true}' . PHP_EOL .
+			' *     >,' . PHP_EOL .
+			' * }> $a' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							ArrayShapeNode::createSealed([
+								new ArrayShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+								new ArrayShapeItemNode(new IdentifierTypeNode('bar'), true, new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('string'),
+										ArrayShapeNode::createSealed([
+											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+										]),
+										ArrayShapeNode::createSealed([
+											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+											new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
+											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+										]),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
+									],
+								)),
+							]),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+			]),
+		];
+
+		yield [
+			'Multiline PHPDoc with new line within type declaration',
+			'/**' . PHP_EOL .
+			' * @param array<string, array{' . PHP_EOL .
+			' *     foo: int,' . PHP_EOL .
+			' * ' . PHP_EOL .
+			' * ' . PHP_EOL .
+			' *     bar?: array<string,' . PHP_EOL .
+			' * ' . PHP_EOL .
+			' *         array{foo1: int, bar1?: true}' . PHP_EOL .
+			' * ' . PHP_EOL .
+			' *         | array{foo1: int, foo2: true, bar1?: true}' . PHP_EOL .
+			' *     >,' . PHP_EOL .
+			' * }> $a' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							ArrayShapeNode::createSealed([
+								new ArrayShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+								new ArrayShapeItemNode(new IdentifierTypeNode('bar'), true, new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('string'),
+										ArrayShapeNode::createSealed([
+											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+										]),
+										ArrayShapeNode::createSealed([
+											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+											new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
+											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+										]),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
+									],
+								)),
+							]),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+			]),
+		];
+
+		yield [
+			'Multiline PHPDoc with new line within type declaration including usage of braces',
+			'/**' . PHP_EOL .
+			' * @phpstan-type FactoriesConfigurationType = array<' . PHP_EOL .
+			' *      string,' . PHP_EOL .
+			' *      (class-string<Factory\FactoryInterface>|Factory\FactoryInterface)' . PHP_EOL .
+			' *      |callable(ContainerInterface,?string,array<mixed>|null):object' . PHP_EOL .
+			' * >' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@phpstan-type', new TypeAliasTagValueNode(
+					'FactoriesConfigurationType',
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							new UnionTypeNode([
+								new GenericTypeNode(
+									new IdentifierTypeNode('class-string'),
+									[new IdentifierTypeNode('Factory\\FactoryInterface')],
+									[GenericTypeNode::VARIANCE_INVARIANT],
+								),
+								new IdentifierTypeNode('Factory\\FactoryInterface'),
+							]),
+							new CallableTypeNode(
+								new IdentifierTypeNode('callable'),
+								[
+									new CallableTypeParameterNode(new IdentifierTypeNode('ContainerInterface'), false, false, '', false),
+									new CallableTypeParameterNode(
+										new NullableTypeNode(
+											new IdentifierTypeNode('string'),
+										),
+										false,
+										false,
+										'',
+										false,
+									),
+									new CallableTypeParameterNode(
+										new UnionTypeNode([
+											new GenericTypeNode(
+												new IdentifierTypeNode('array'),
+												[new IdentifierTypeNode('mixed')],
+												[GenericTypeNode::VARIANCE_INVARIANT],
+											),
+											new IdentifierTypeNode('null'),
+										]),
+										false,
+										false,
+										'',
+										false,
+									),
+								],
+								new IdentifierTypeNode('object'),
+								[],
+							),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+				)),
+			]),
+		];
+
+		/**
+		 * @return object{
+		 *   a: int,
+		 *
+		 *   b: int,
+		 * }
+		 */
+
+		yield [
+			'Multiline PHPDoc with new line within object type declaration',
+			'/**' . PHP_EOL .
+			' * @return object{' . PHP_EOL .
+			' *   a: int,' . PHP_EOL .
+			' *' . PHP_EOL .
+			' *   b: int,' . PHP_EOL .
+			' * }' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new ObjectShapeNode(
+							[
+								new ObjectShapeItemNode(
+									new IdentifierTypeNode('a'),
+									false,
+									new IdentifierTypeNode('int'),
+								),
+								new ObjectShapeItemNode(
+									new IdentifierTypeNode('b'),
+									false,
+									new IdentifierTypeNode('int'),
+								),
+							],
+						),
+						'',
+					),
+				),
 			]),
 		];
 	}
