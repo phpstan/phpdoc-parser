@@ -4053,18 +4053,19 @@ test',
 									new IdentifierTypeNode('array'),
 									[
 										new IdentifierTypeNode('string'),
-										ArrayShapeNode::createSealed([
-											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
-											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
-										]),
-										ArrayShapeNode::createSealed([
-											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
-											new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
-											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+										new UnionTypeNode([
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
 										]),
 									],
 									[
-										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
 									],
@@ -4111,18 +4112,19 @@ test',
 									new IdentifierTypeNode('array'),
 									[
 										new IdentifierTypeNode('string'),
-										ArrayShapeNode::createSealed([
-											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
-											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
-										]),
-										ArrayShapeNode::createSealed([
-											new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
-											new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
-											new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+										new UnionTypeNode([
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
 										]),
 									],
 									[
-										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
 										GenericTypeNode::VARIANCE_INVARIANT,
 									],
@@ -4159,47 +4161,48 @@ test',
 						[
 							new IdentifierTypeNode('string'),
 							new UnionTypeNode([
-								new GenericTypeNode(
-									new IdentifierTypeNode('class-string'),
-									[new IdentifierTypeNode('Factory\\FactoryInterface')],
-									[GenericTypeNode::VARIANCE_INVARIANT],
-								),
-								new IdentifierTypeNode('Factory\\FactoryInterface'),
-							]),
-							new CallableTypeNode(
-								new IdentifierTypeNode('callable'),
-								[
-									new CallableTypeParameterNode(new IdentifierTypeNode('ContainerInterface'), false, false, '', false),
-									new CallableTypeParameterNode(
-										new NullableTypeNode(
-											new IdentifierTypeNode('string'),
-										),
-										false,
-										false,
-										'',
-										false,
+								new UnionTypeNode([
+									new GenericTypeNode(
+										new IdentifierTypeNode('class-string'),
+										[new IdentifierTypeNode('Factory\\FactoryInterface')],
+										[GenericTypeNode::VARIANCE_INVARIANT],
 									),
-									new CallableTypeParameterNode(
-										new UnionTypeNode([
-											new GenericTypeNode(
-												new IdentifierTypeNode('array'),
-												[new IdentifierTypeNode('mixed')],
-												[GenericTypeNode::VARIANCE_INVARIANT],
+									new IdentifierTypeNode('Factory\\FactoryInterface'),
+								]),
+								new CallableTypeNode(
+									new IdentifierTypeNode('callable'),
+									[
+										new CallableTypeParameterNode(new IdentifierTypeNode('ContainerInterface'), false, false, '', false),
+										new CallableTypeParameterNode(
+											new NullableTypeNode(
+												new IdentifierTypeNode('string'),
 											),
-											new IdentifierTypeNode('null'),
-										]),
-										false,
-										false,
-										'',
-										false,
-									),
-								],
-								new IdentifierTypeNode('object'),
-								[],
-							),
+											false,
+											false,
+											'',
+											false,
+										),
+										new CallableTypeParameterNode(
+											new UnionTypeNode([
+												new GenericTypeNode(
+													new IdentifierTypeNode('array'),
+													[new IdentifierTypeNode('mixed')],
+													[GenericTypeNode::VARIANCE_INVARIANT],
+												),
+												new IdentifierTypeNode('null'),
+											]),
+											false,
+											false,
+											'',
+											false,
+										),
+									],
+									new IdentifierTypeNode('object'),
+									[],
+								),
+							]),
 						],
 						[
-							GenericTypeNode::VARIANCE_INVARIANT,
 							GenericTypeNode::VARIANCE_INVARIANT,
 							GenericTypeNode::VARIANCE_INVARIANT,
 						],

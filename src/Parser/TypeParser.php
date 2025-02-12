@@ -40,15 +40,42 @@ class TypeParser
 		} else {
 			$type = $this->parseAtomic($tokens);
 
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
-				$type = $this->parseUnion($tokens, $type);
+			$tokens->pushSavePoint();
+			$tokens->skipNewLineTokens();
 
-			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
-				$type = $this->parseIntersection($tokens, $type);
+			try {
+				$enrichedType = $this->enrichTypeOnUnionOrIntersection($tokens, $type);
+
+			} catch (ParserException $parserException) {
+				$enrichedType = null;
+			}
+
+			if ($enrichedType !== null) {
+				$type = $enrichedType;
+				$tokens->dropSavePoint();
+
+			} else {
+				$tokens->rollback();
+				$type = $this->enrichTypeOnUnionOrIntersection($tokens, $type) ?? $type;
 			}
 		}
 
 		return $this->enrichWithAttributes($tokens, $type, $startLine, $startIndex);
+	}
+
+	/** @phpstan-impure */
+	private function enrichTypeOnUnionOrIntersection(TokenIterator $tokens, Ast\Type\TypeNode $type): ?Ast\Type\TypeNode
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+			return $this->parseUnion($tokens, $type);
+
+		}
+
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+			return $this->parseIntersection($tokens, $type);
+		}
+
+		return null;
 	}
 
 	/**
@@ -412,8 +439,6 @@ class TypeParser
 		while (
 			$isFirst
 			|| $tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)
-			|| $tokens->tryConsumeTokenType(Lexer::TOKEN_UNION)
-			|| $tokens->tryConsumeTokenType(Lexer::TOKEN_INTERSECTION)
 		) {
 			$tokens->skipNewLineTokens();
 
