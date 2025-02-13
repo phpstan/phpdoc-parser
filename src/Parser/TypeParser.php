@@ -40,15 +40,42 @@ class TypeParser
 		} else {
 			$type = $this->parseAtomic($tokens);
 
-			if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
-				$type = $this->parseUnion($tokens, $type);
+			$tokens->pushSavePoint();
+			$tokens->skipNewLineTokens();
 
-			} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
-				$type = $this->parseIntersection($tokens, $type);
+			try {
+				$enrichedType = $this->enrichTypeOnUnionOrIntersection($tokens, $type);
+
+			} catch (ParserException $parserException) {
+				$enrichedType = null;
+			}
+
+			if ($enrichedType !== null) {
+				$type = $enrichedType;
+				$tokens->dropSavePoint();
+
+			} else {
+				$tokens->rollback();
+				$type = $this->enrichTypeOnUnionOrIntersection($tokens, $type) ?? $type;
 			}
 		}
 
 		return $this->enrichWithAttributes($tokens, $type, $startLine, $startIndex);
+	}
+
+	/** @phpstan-impure */
+	private function enrichTypeOnUnionOrIntersection(TokenIterator $tokens, Ast\Type\TypeNode $type): ?Ast\Type\TypeNode
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+			return $this->parseUnion($tokens, $type);
+
+		}
+
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+			return $this->parseIntersection($tokens, $type);
+		}
+
+		return null;
 	}
 
 	/**
@@ -90,7 +117,7 @@ class TypeParser
 			if ($tokens->isCurrentTokenValue('is')) {
 				$type = $this->parseConditional($tokens, $type);
 			} else {
-				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				$tokens->skipNewLineTokens();
 
 				if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
 					$type = $this->subParseUnion($tokens, $type);
@@ -112,9 +139,9 @@ class TypeParser
 		$startIndex = $tokens->currentTokenIndex();
 
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 			$type = $this->subParse($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_PARENTHESES);
 
@@ -256,9 +283,9 @@ class TypeParser
 		$types = [$type];
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_UNION)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 			$types[] = $this->parseAtomic($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		}
 
 		return new Ast\Type\UnionTypeNode($types);
@@ -284,9 +311,9 @@ class TypeParser
 		$types = [$type];
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_INTERSECTION)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 			$types[] = $this->parseAtomic($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		}
 
 		return new Ast\Type\IntersectionTypeNode($types);
@@ -306,15 +333,15 @@ class TypeParser
 
 		$targetType = $this->parse($tokens);
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$ifType = $this->parse($tokens);
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$elseType = $this->subParse($tokens);
 
@@ -335,15 +362,15 @@ class TypeParser
 
 		$targetType = $this->parse($tokens);
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$ifType = $this->parse($tokens);
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$elseType = $this->subParse($tokens);
 
@@ -409,8 +436,11 @@ class TypeParser
 		$variances = [];
 
 		$isFirst = true;
-		while ($isFirst || $tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		while (
+			$isFirst
+			|| $tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)
+		) {
+			$tokens->skipNewLineTokens();
 
 			// trailing comma case
 			if (!$isFirst && $tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
@@ -419,7 +449,7 @@ class TypeParser
 			$isFirst = false;
 
 			[$genericTypes[], $variances[]] = $this->parseGenericTypeArgument($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		}
 
 		$type = new Ast\Type\GenericTypeNode($baseType, $genericTypes, $variances);
@@ -510,19 +540,19 @@ class TypeParser
 			: [];
 
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_PARENTHESES);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$parameters = [];
 		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
 			$parameters[] = $this->parseCallableParameter($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 			while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
-				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				$tokens->skipNewLineTokens();
 				if ($tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_PARENTHESES)) {
 					break;
 				}
 				$parameters[] = $this->parseCallableParameter($tokens);
-				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				$tokens->skipNewLineTokens();
 			}
 		}
 
@@ -550,7 +580,7 @@ class TypeParser
 
 		$isFirst = true;
 		while ($isFirst || $tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 
 			// trailing comma case
 			if (!$isFirst && $tokens->isCurrentTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET)) {
@@ -559,7 +589,7 @@ class TypeParser
 			$isFirst = false;
 
 			$templates[] = $this->parseCallableTemplateArgument($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		}
 
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
@@ -830,7 +860,7 @@ class TypeParser
 		$unsealedType = null;
 
 		do {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
 				return Ast\Type\ArrayShapeNode::createSealed($items, $kind);
@@ -839,14 +869,14 @@ class TypeParser
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC)) {
 				$sealed = false;
 
-				$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+				$tokens->skipNewLineTokens();
 				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 					if ($kind === Ast\Type\ArrayShapeNode::KIND_ARRAY) {
 						$unsealedType = $this->parseArrayShapeUnsealedType($tokens);
 					} else {
 						$unsealedType = $this->parseListShapeUnsealedType($tokens);
 					}
-					$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+					$tokens->skipNewLineTokens();
 				}
 
 				$tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA);
@@ -855,10 +885,10 @@ class TypeParser
 
 			$items[] = $this->parseArrayShapeItem($tokens);
 
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
 		if ($sealed) {
@@ -945,18 +975,18 @@ class TypeParser
 		$startIndex = $tokens->currentTokenIndex();
 
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$valueType = $this->parse($tokens);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$keyType = null;
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 
 			$keyType = $valueType;
 			$valueType = $this->parse($tokens);
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		}
 
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
@@ -978,10 +1008,10 @@ class TypeParser
 		$startIndex = $tokens->currentTokenIndex();
 
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$valueType = $this->parse($tokens);
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 
@@ -1003,7 +1033,7 @@ class TypeParser
 		$items = [];
 
 		do {
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
 				return new Ast\Type\ObjectShapeNode($items);
@@ -1011,10 +1041,10 @@ class TypeParser
 
 			$items[] = $this->parseObjectShapeItem($tokens);
 
-			$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+			$tokens->skipNewLineTokens();
 		} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
 
-		$tokens->tryConsumeTokenType(Lexer::TOKEN_PHPDOC_EOL);
+		$tokens->skipNewLineTokens();
 		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET);
 
 		return new Ast\Type\ObjectShapeNode($items);
