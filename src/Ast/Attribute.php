@@ -13,4 +13,6 @@ final class Attribute
 
 	public const ORIGINAL_NODE = 'originalNode';
 
+	public const COMMENTS = 'comments';
+
 }

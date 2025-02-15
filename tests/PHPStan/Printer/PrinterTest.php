@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Printer;
 
 use PHPStan\PhpDocParser\Ast\AbstractNodeVisitor;
 use PHPStan\PhpDocParser\Ast\Attribute;
+use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayItemNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
@@ -76,7 +77,7 @@ class PrinterTest extends TestCase
 
 	protected function setUp(): void
 	{
-		$config = new ParserConfig(['lines' => true, 'indexes' => true]);
+		$config = new ParserConfig(['lines' => true, 'indexes' => true, 'comments' => true]);
 		$constExprParser = new ConstExprParser($config);
 		$this->typeParser = new TypeParser($config, $constExprParser);
 		$this->phpDocParser = new PhpDocParser(
@@ -949,6 +950,219 @@ class PrinterTest extends TestCase
 			 * @return object{bar: string, foo: int}
 			 */'),
 			$addItemsToObjectShape,
+		];
+
+		$addItemsWithCommentsToMultilineArrayShape = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ArrayShapeNode) {
+					$commentedNode = new ArrayShapeItemNode(new IdentifierTypeNode('b'), false, new IdentifierTypeNode('int'));
+					$commentedNode->setAttribute(Attribute::COMMENTS, [new Comment('// bar')]);
+					array_splice($node->items, 1, 0, [
+						$commentedNode,
+					]);
+					$commentedNode = new ArrayShapeItemNode(new IdentifierTypeNode('d'), false, new IdentifierTypeNode('string'));
+					$commentedNode->setAttribute(Attribute::COMMENTS, [new Comment(
+						PrinterTest::nowdoc('
+						// first comment'),
+					)]);
+					$node->items[] = $commentedNode;
+
+					$commentedNode = new ArrayShapeItemNode(new IdentifierTypeNode('e'), false, new IdentifierTypeNode('string'));
+					$commentedNode->setAttribute(Attribute::COMMENTS, [new Comment(
+						PrinterTest::nowdoc('
+						// second comment'),
+					)]);
+					$node->items[] = $commentedNode;
+
+					$commentedNode = new ArrayShapeItemNode(new IdentifierTypeNode('f'), false, new IdentifierTypeNode('string'));
+					$commentedNode->setAttribute(Attribute::COMMENTS, [
+						new Comment('// third comment'),
+						new Comment('// fourth comment'),
+					]);
+					$node->items[] = $commentedNode;
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  // foo
+			 *	a: int,
+			 *	c: string
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  // foo
+			 *	a: int,
+			 *  // bar
+			 *  b: int,
+			 *	c: string,
+			 *  // first comment
+			 *  d: string,
+			 *  // second comment
+			 *  e: string,
+			 *  // third comment
+			 *  // fourth comment
+			 *  f: string
+			 * }
+			 */'),
+			$addItemsWithCommentsToMultilineArrayShape,
+		];
+
+		$prependItemsWithCommentsToMultilineArrayShape = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ArrayShapeNode) {
+					$commentedNode = new ArrayShapeItemNode(new IdentifierTypeNode('a'), false, new IdentifierTypeNode('int'));
+					$commentedNode->setAttribute(Attribute::COMMENTS, [new Comment('// first item')]);
+					array_splice($node->items, 0, 0, [
+						$commentedNode,
+					]);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  b: int,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  // first item
+			 *  a: int,
+			 *  b: int,
+			 * }
+			 */'),
+			$prependItemsWithCommentsToMultilineArrayShape,
+		];
+
+		$changeCommentOnArrayShapeItem = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ArrayShapeItemNode) {
+					$node->setAttribute(Attribute::COMMENTS, [new Comment('// puppies')]);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   a: int,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   // puppies
+			 *   a: int,
+			 * }
+			 */'),
+			$changeCommentOnArrayShapeItem,
+		];
+
+		$addItemsWithCommentsToObjectShape = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ObjectShapeNode) {
+					$item = new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int'));
+					$item->setAttribute(Attribute::COMMENTS, [new Comment('// favorite foo')]);
+					$node->items[] = $item;
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @return object{
+				 *   // your favorite bar
+				 *   bar: string
+				 * }
+				 */'),
+			self::nowdoc('
+				/**
+				 * @return object{
+				 *   // your favorite bar
+				 *   bar: string,
+				 *	 // favorite foo
+				 *	 foo: int
+				 * }
+				 */'),
+			$addItemsWithCommentsToObjectShape,
+		];
+
+		$removeItemWithComment = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if (!$node instanceof ArrayShapeNode) {
+					return null;
+				}
+
+				foreach ($node->items as $i => $item) {
+					if ($item->keyName === null) {
+						continue;
+					}
+
+					$comments = $item->keyName->getAttribute(Attribute::COMMENTS);
+					if ($comments === null) {
+						continue;
+					}
+					if ($comments === []) {
+						continue;
+					}
+
+					unset($node->items[$i]);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  a: string,
+			 *  // b comment
+			 *  b: int,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  a: string,
+			 * }
+			 */'),
+			$removeItemWithComment,
 		];
 
 		$addItemsToConstExprArray = new class extends AbstractNodeVisitor {
@@ -2039,6 +2253,377 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		$singleCommentLineAddFront = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ArrayShapeNode) {
+					array_unshift($node->items, PrinterTest::withComment(
+						new ArrayShapeItemNode(null, false, new IdentifierTypeNode('float')),
+						'// A fractional number',
+					));
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{float} $foo
+				 */'),
+			$singleCommentLineAddFront,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{string} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{// A fractional number
+				 *  float,
+				 *  string} $foo
+				 */'),
+			$singleCommentLineAddFront,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   string,int} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   // A fractional number
+				 *   float,
+				 *   string,int} $foo
+				 */'),
+			$singleCommentLineAddFront,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   string,
+				 *	 int
+				 * } $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   // A fractional number
+				 *   float,
+				 *   string,
+				 *   int
+				 * } $foo
+				 */'),
+			$singleCommentLineAddFront,
+		];
+
+		$singleCommentLineAddMiddle = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				$newItem = PrinterTest::withComment(
+					new ArrayShapeItemNode(null, false, new IdentifierTypeNode('float')),
+					'// A fractional number',
+				);
+
+				if ($node instanceof ArrayShapeNode) {
+					if (count($node->items) === 0) {
+						$node->items[] = $newItem;
+					} else {
+						array_splice($node->items, 1, 0, [$newItem]);
+					}
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{float} $foo
+				 */'),
+			$singleCommentLineAddMiddle,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{string} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{string,
+				 *  // A fractional number
+				 *  float} $foo
+				 */'),
+			$singleCommentLineAddMiddle,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   string,int} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   string,
+				 *   // A fractional number
+				 *   float,int} $foo
+				 */'),
+			$singleCommentLineAddMiddle,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   string,
+				 *	 int
+				 * } $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param array{
+				 *   string,
+				 *   // A fractional number
+				 *   float,
+				 *   int
+				 * } $foo
+				 */'),
+			$singleCommentLineAddMiddle,
+		];
+
+		$addCommentToCallableParamsFront = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof CallableTypeNode) {
+					array_unshift($node->parameters, PrinterTest::withComment(
+						new CallableTypeParameterNode(new IdentifierTypeNode('Foo'), false, false, '$foo', false),
+						'// never pet a burning dog',
+					));
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param callable(Bar $bar): int $a
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param callable(// never pet a burning dog
+				 *  Foo $foo,
+				 *  Bar $bar): int $a
+				 */'),
+			$addCommentToCallableParamsFront,
+		];
+
+		$addCommentToCallableParamsMiddle = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof CallableTypeNode) {
+					$node->parameters[] = PrinterTest::withComment(
+						new CallableTypeParameterNode(new IdentifierTypeNode('Bar'), false, false, '$bar', false),
+						'// never pet a burning dog',
+					);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param callable(Foo $foo): int $a
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param callable(Foo $foo,
+				 *  // never pet a burning dog
+				 *  Bar $bar): int $a
+				 */'),
+			$addCommentToCallableParamsMiddle,
+		];
+
+		$addCommentToObjectShapeItemFront = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ObjectShapeNode) {
+					array_unshift($node->items, PrinterTest::withComment(
+						new ObjectShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('float')),
+						'// A fractional number',
+					));
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{bar: string} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{// A fractional number
+				 *  foo: float,
+				 *  bar: string} $foo
+				 */'),
+			$addCommentToObjectShapeItemFront,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   bar:string,naz:int} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   // A fractional number
+				 *   foo: float,
+				 *   bar:string,naz:int} $foo
+				 */'),
+			$addCommentToObjectShapeItemFront,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   bar:string,
+				 *	 naz:int
+				 * } $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   // A fractional number
+				 *   foo: float,
+				 *   bar:string,
+				 *   naz:int
+				 * } $foo
+				 */'),
+			$addCommentToObjectShapeItemFront,
+		];
+
+		$addCommentToObjectShapeItemMiddle = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ObjectShapeNode) {
+					$newItem = PrinterTest::withComment(
+						new ObjectShapeItemNode(new IdentifierTypeNode('bar'), false, new IdentifierTypeNode('float')),
+						'// A fractional number',
+					);
+					if (count($node->items) === 0) {
+						$node->items[] = $newItem;
+					} else {
+						array_splice($node->items, 1, 0, [$newItem]);
+					}
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{bar: float} $foo
+				 */'),
+			$addCommentToObjectShapeItemMiddle,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{foo:string} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{foo:string,
+				 *  // A fractional number
+				 *  bar: float} $foo
+				 */'),
+			$addCommentToObjectShapeItemMiddle,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   foo:string,naz:int} $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   foo:string,
+				 *   // A fractional number
+				 *   bar: float,naz:int} $foo
+				 */'),
+			$addCommentToObjectShapeItemMiddle,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   foo:string,
+				 *	 naz:int
+				 * } $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param object{
+				 *   foo:string,
+				 *   // A fractional number
+				 *   bar: float,
+				 *   naz:int
+				 * } $foo
+				 */'),
+			$addCommentToObjectShapeItemMiddle,
+		];
 	}
 
 	/**
@@ -2046,7 +2631,7 @@ class PrinterTest extends TestCase
 	 */
 	public function testPrintFormatPreserving(string $phpDoc, string $expectedResult, NodeVisitor $visitor): void
 	{
-		$config = new ParserConfig([]);
+		$config = new ParserConfig(['lines' => true, 'indexes' => true, 'comments' => true]);
 		$lexer = new Lexer($config);
 		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
 		$phpDocNode = $this->phpDocParser->parse($tokens);
@@ -2079,6 +2664,7 @@ class PrinterTest extends TestCase
 				$node->setAttribute(Attribute::START_INDEX, null);
 				$node->setAttribute(Attribute::END_INDEX, null);
 				$node->setAttribute(Attribute::ORIGINAL_NODE, null);
+				$node->setAttribute(Attribute::COMMENTS, null);
 
 				return $node;
 			}
@@ -2271,6 +2857,17 @@ class PrinterTest extends TestCase
 			$this->unsetAttributes($node),
 			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
 		);
+	}
+
+	/**
+	 * @template TNode of Node
+	 * @param TNode $node
+	 * @return TNode
+	 */
+	public static function withComment(Node $node, string $comment): Node
+	{
+		$node->setAttribute(Attribute::COMMENTS, [new Comment($comment)]);
+		return $node;
 	}
 
 	public static function nowdoc(string $str): string

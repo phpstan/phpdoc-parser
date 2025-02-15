@@ -6346,6 +6346,49 @@ Finder::findFiles('*.php')
 		];
 
 		yield [
+			'Comment after @param with https://',
+			'/** @param int $a https://phpstan.org/ */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					'https://phpstan.org/',
+					false,
+				)),
+			]),
+		];
+
+		yield [
+			'Comment after @param with https:// in // comment',
+			'/** @param int $a // comment https://phpstan.org/ */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					'// comment https://phpstan.org/',
+					false,
+				)),
+			]),
+		];
+
+		yield [
+			'Comment in PHPDoc tag outside of type',
+			'/** @param // comment */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new InvalidTagValueNode('// comment', new ParserException(
+					'// comment ',
+					37,
+					11,
+					24,
+					null,
+					1,
+				))),
+			]),
+		];
+
+		yield [
 			'Comment on a separate line',
 			'/**' . PHP_EOL .
 			' * @param int $a' . PHP_EOL .
