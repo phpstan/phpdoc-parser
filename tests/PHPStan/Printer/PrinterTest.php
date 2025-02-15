@@ -50,12 +50,21 @@ use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
+use function array_map;
 use function array_pop;
+use function array_slice;
 use function array_splice;
 use function array_unshift;
 use function array_values;
 use function assert;
 use function count;
+use function implode;
+use function preg_match;
+use function preg_replace_callback;
+use function preg_split;
+use function str_repeat;
+use function str_replace;
+use function strlen;
 use const PHP_EOL;
 
 class PrinterTest extends TestCase
@@ -96,12 +105,14 @@ class PrinterTest extends TestCase
 			$noopVisitor,
 		];
 		yield [
-			'/**
- * @param Foo $foo
- */',
-			'/**
- * @param Foo $foo
- */',
+			self::nowdoc('
+				/**
+				 * @param Foo $foo
+				 */'),
+			self::nowdoc('
+				/**
+				 * @param Foo $foo
+				 */'),
 			$noopVisitor,
 		];
 
@@ -143,33 +154,39 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
- * @param Foo $foo
- */',
-			'/**
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 */'),
 			$removeFirst,
 		];
 
 		yield [
-			'/**
- * @param Foo $foo
- * @param Bar $bar
- */',
-			'/**
- * @param Bar $bar
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Bar $bar
+			 */'),
 			$removeFirst,
 		];
 
 		yield [
-			'/**
-     * @param Foo $foo
-     * @param Bar $bar
-     */',
-			'/**
-     * @param Bar $bar
-     */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Bar $bar
+			 */'),
 			$removeFirst,
 		];
 
@@ -189,13 +206,15 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo $foo
- * @param Bar $bar
- */',
-			'/**
- * @param Foo $foo
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
 			$removeLast,
 		];
 
@@ -216,39 +235,45 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo $foo
- * @param Bar $bar
- */',
-			'/**
- * @param Foo $foo
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
 			$removeSecond,
 		];
 
 		yield [
-			'/**
- * @param Foo $foo
- * @param Bar $bar
- * @param Baz $baz
- */',
-			'/**
- * @param Foo $foo
- * @param Baz $baz
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 * @param Baz $baz
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $baz
+			 */'),
 			$removeSecond,
 		];
 
 		yield [
-			'/**
-     * @param Foo $foo
-     * @param Bar $bar
-     * @param Baz $baz
-     */',
-			'/**
-     * @param Foo $foo
-     * @param Baz $baz
-     */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 * @param Baz $baz
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $baz
+			 */'),
 			$removeSecond,
 		];
 
@@ -280,58 +305,66 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
-* @return Foo
-* @param Foo $foo
-* @param Bar $bar
-*/',
-			'/**
-* @return Bar
-* @param Foo $foo
-* @param Bar $bar
-*/',
+			self::nowdoc('
+			/**
+			 * @return Foo
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return Bar
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
 			$changeReturnType,
 		];
 
 		yield [
-			'/**
-* @param Foo $foo
-* @return Foo
-* @param Bar $bar
-*/',
-			'/**
-* @param Foo $foo
-* @return Bar
-* @param Bar $bar
-*/',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @return Foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @return Bar
+			 * @param Bar $bar
+			 */'),
 			$changeReturnType,
 		];
 
 		yield [
-			'/**
-* @return Foo
-* @param Foo $foo
-* @param Bar $bar
-*/',
-			'/**
-* @return Bar
-* @param Foo $foo
-* @param Bar $bar
-*/',
+			self::nowdoc('
+			/**
+			 * @return Foo
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return Bar
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
 			$changeReturnType,
 		];
 
 		yield [
-			'/**
-* @param Foo $foo Foo description
-* @return Foo Foo return description
-* @param Bar $bar Bar description
-*/',
-			'/**
-* @param Foo $foo Foo description
-* @return Bar Foo return description
-* @param Bar $bar Bar description
-*/',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo Foo description
+			 * @return Foo Foo return description
+			 * @param Bar $bar Bar description
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo Foo description
+			 * @return Bar Foo return description
+			 * @param Bar $bar Bar description
+			 */'),
 			$changeReturnType,
 		];
 
@@ -356,22 +389,26 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
- * @param Foo $foo
- */',
-			'/**
- * @param Baz $a
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Baz $a
+			 */'),
 			$replaceFirst,
 		];
 
 		yield [
-			'/**
-     * @param Foo $foo
-     */',
-			'/**
-     * @param Baz $a
-     */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Baz $a
+			 */'),
 			$replaceFirst,
 		];
 
@@ -391,24 +428,28 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo $foo
- */',
-			'/**
- * @param Baz $a
- * @param Foo $foo
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Baz $a
+			 * @param Foo $foo
+			 */'),
 			$insertFirst,
 		];
 
 		yield [
-			'/**
-     * @param Foo $foo
-     */',
-			'/**
-     * @param Baz $a
-     * @param Foo $foo
-     */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Baz $a
+			 * @param Foo $foo
+			 */'),
 			$insertFirst,
 		];
 
@@ -430,52 +471,60 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo $foo
- */',
-			'/**
- * @param Foo $foo
- * @param Baz $a
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $a
+			 */'),
 			$insertSecond,
 		];
 
 		yield [
-			'/**
- * @param Foo $foo
- * @param Bar $bar
- */',
-			'/**
- * @param Foo $foo
- * @param Baz $a
- * @param Bar $bar
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $a
+			 * @param Bar $bar
+			 */'),
 			$insertSecond,
 		];
 
 		yield [
-			'/**
-     * @param Foo $foo
-     * @param Bar $bar
-     */',
-			'/**
-     * @param Foo $foo
-     * @param Baz $a
-     * @param Bar $bar
-     */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $a
+			 * @param Bar $bar
+			 */'),
 			$insertSecond,
 		];
 
 		yield [
-			'/**
-	 * @param Foo $foo
-	 * @param Bar $bar
-	 */',
-			'/**
-	 * @param Foo $foo
-	 * @param Baz $a
-	 * @param Bar $bar
-	 */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $a
+			 * @param Bar $bar
+			 */'),
 			$insertSecond,
 		];
 
@@ -494,24 +543,28 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo $foo
- */',
-			'/**
- * @param Baz $a
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Baz $a
+			 */'),
 			$replaceLast,
 		];
 
 		yield [
-			'/**
- * @param Foo $foo
- * @param Bar $bar
- */',
-			'/**
- * @param Foo $foo
- * @param Baz $a
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $a
+			 */'),
 			$replaceLast,
 		];
 
@@ -529,24 +582,28 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Bar|Baz $foo
- */',
-			'/**
- * @param Foo|Bar|Baz $foo
- */',
+			self::nowdoc('
+			/**
+			 * @param Bar|Baz $foo
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo|Bar|Baz $foo
+			 */'),
 			$insertFirstTypeInUnionType,
 		];
 
 		yield [
-			'/**
- * @param Bar|Baz $foo
- * @param Foo $bar
- */',
-			'/**
- * @param Foo|Bar|Baz $foo
- * @param Foo $bar
- */',
+			self::nowdoc('
+			/**
+			 * @param Bar|Baz $foo
+			 * @param Foo $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo|Bar|Baz $foo
+			 * @param Foo $bar
+			 */'),
 			$insertFirstTypeInUnionType,
 		];
 
@@ -567,12 +624,14 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo|Bar $bar
- */',
-			'/**
- * @param Lorem|Ipsum $bar
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo|Bar $bar
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Lorem|Ipsum $bar
+			 */'),
 			$replaceTypesInUnionType,
 		];
 
@@ -622,12 +681,14 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
- * @param callable(): void $cb
- */',
-			'/**
- * @param callable(Foo $foo, Bar $bar): void $cb
- */',
+			self::nowdoc('
+			/**
+			 * @param callable(): void $cb
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param callable(Foo $foo, Bar $bar): void $cb
+			 */'),
 			$replaceParametersInCallableType,
 		];
 
@@ -645,12 +706,14 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param callable(Foo $foo, Bar $bar): void $cb
- */',
-			'/**
- * @param callable(): void $cb
- */',
+			self::nowdoc('
+			/**
+			 * @param callable(Foo $foo, Bar $bar): void $cb
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param callable(): void $cb
+			 */'),
 			$removeParametersInCallableType,
 		];
 
@@ -668,14 +731,16 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param callable(Foo $foo, Bar $bar): void $cb
- * @param callable(): void $cb2
- */',
-			'/**
- * @param Closure(Foo $foo, Bar $bar): void $cb
- * @param Closure(): void $cb2
- */',
+			self::nowdoc('
+			/**
+			 * @param callable(Foo $foo, Bar $bar): void $cb
+			 * @param callable(): void $cb2
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Closure(Foo $foo, Bar $bar): void $cb
+			 * @param Closure(): void $cb2
+			 */'),
 			$changeCallableTypeIdentifier,
 		];
 
@@ -706,120 +771,134 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
- * @return array{float, Foo}
- */',
-			'/**
- * @return array{float, int, Foo, string}
- */',
+			self::nowdoc('
+			/**
+			 * @return array{float, Foo}
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{float, int, Foo, string}
+			 */'),
 			$addItemsToArrayShape,
 		];
 
 		yield [
-			'/**
- * @return array{
- *   float,
- *   Foo,
- * }
- */',
-			'/**
- * @return array{
- *   float,
- *   int,
- *   Foo,
- *   string,
- * }
- */',
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   Foo,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   int,
+			 *   Foo,
+			 *   string,
+			 * }
+			 */'),
 			$addItemsToArrayShape,
 		];
 
 		yield [
-			'/**
- * @return array{
- *   float,
- *   Foo
- * }
- */',
-			'/**
- * @return array{
- *   float,
- *   int,
- *   Foo,
- *   string
- * }
- */',
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   Foo
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   int,
+			 *   Foo,
+			 *   string
+			 * }
+			 */'),
 			$addItemsToArrayShape,
 		];
 
 		yield [
-			'/**
- * @return array{
- *     float,
- *     Foo
- * }
- */',
-			'/**
- * @return array{
- *     float,
- *     int,
- *     Foo,
- *     string
- * }
- */',
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *     float,
+			 *     Foo
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *     float,
+			 *     int,
+			 *     Foo,
+			 *     string
+			 * }
+			 */'),
 			$addItemsToArrayShape,
 		];
 
 		yield [
-			'/**
-	 * @return array{
-	 *   float,
-	 *   Foo,
-	 * }
-	 */',
-			'/**
-	 * @return array{
-	 *   float,
-	 *   int,
-	 *   Foo,
-	 *   string,
-	 * }
-	 */',
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   Foo,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   int,
+			 *   Foo,
+			 *   string,
+			 * }
+			 */'),
 			$addItemsToArrayShape,
 		];
 
 		yield [
-			'/**
-     * @return array{
-     *   float,
-     *   Foo
-     * }
-     */',
-			'/**
-     * @return array{
-     *   float,
-     *   int,
-     *   Foo,
-     *   string
-     * }
-     */',
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   Foo
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *   float,
+			 *   int,
+			 *   Foo,
+			 *   string
+			 * }
+			 */'),
 			$addItemsToArrayShape,
 		];
 
 		yield [
-			'/**
-	 * @return array{
-	 *     float,
-	 *     Foo
-	 * }
-	 */',
-			'/**
-	 * @return array{
-	 *     float,
-	 *     int,
-	 *     Foo,
-	 *     string
-	 * }
-	 */',
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *     float,
+			 *     Foo
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *     float,
+			 *     int,
+			 *     Foo,
+			 *     string
+			 * }
+			 */'),
 			$addItemsToArrayShape,
 		];
 
@@ -837,22 +916,38 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @return object{}
- */',
-			'/**
- * @return object{foo: int}
- */',
+			self::nowdoc('
+				/**
+				 * @return object{}
+				 */'),
+			self::nowdoc('
+				/**
+				 * @return object{foo: int}
+				 */'),
 			$addItemsToObjectShape,
 		];
 
 		yield [
-			'/**
- * @return object{bar: string}
- */',
-			'/**
- * @return object{bar: string, foo: int}
- */',
+			self::nowdoc('
+				/**
+				 * @return object{bar: string}
+				 */'),
+			self::nowdoc('
+				/**
+				 * @return object{bar: string, foo: int}
+				 */'),
+			$addItemsToObjectShape,
+		];
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return object{bar: string}
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return object{bar: string, foo: int}
+			 */'),
 			$addItemsToObjectShape,
 		];
 
@@ -1096,36 +1191,42 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
- * @param int $a
- */',
-			'/**
- * @param int $bz
- */',
+			self::nowdoc('
+			/**
+			 * @param int $a
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param int $bz
+			 */'),
 			$changeParameterName,
 		];
 
 		yield [
-			'/**
- * @param int $a
- * @return string
- */',
-			'/**
- * @param int $bz
- * @return string
- */',
+			self::nowdoc('
+			/**
+			 * @param int $a
+			 * @return string
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param int $bz
+			 * @return string
+			 */'),
 			$changeParameterName,
 		];
 
 		yield [
-			'/**
- * @param int $a haha description
- * @return string
- */',
-			'/**
- * @param int $bz haha description
- * @return string
- */',
+			self::nowdoc('
+			/**
+			 * @param int $a haha description
+			 * @return string
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param int $bz haha description
+			 * @return string
+			 */'),
 			$changeParameterName,
 		];
 
@@ -1161,12 +1262,14 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/**
- * @param int $a haha
- */',
-			'/**
- * @param int $a hehe
- */',
+			self::nowdoc('
+			/**
+			 * @param int $a haha
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param int $a hehe
+			 */'),
 			$changeParameterDescription,
 		];
 
@@ -1184,12 +1287,14 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @param Foo[awesome] $a haha
- */',
-			'/**
- * @param Foo[baz] $a haha
- */',
+			self::nowdoc('
+			/**
+			 * @param Foo[awesome] $a haha
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo[baz] $a haha
+			 */'),
 			$changeOffsetAccess,
 		];
 
@@ -1207,12 +1312,14 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @phpstan-import-type TypeAlias from AnotherClass as DifferentAlias
- */',
-			'/**
- * @phpstan-import-type TypeAlias from AnotherClass as Ciao
- */',
+			self::nowdoc('
+			/**
+			 * @phpstan-import-type TypeAlias from AnotherClass as DifferentAlias
+			 */'),
+			self::nowdoc('
+			/**
+			 * @phpstan-import-type TypeAlias from AnotherClass as Ciao
+			 */'),
 			$changeTypeAliasImportAs,
 		];
 
@@ -1230,12 +1337,14 @@ class PrinterTest extends TestCase
 		};
 
 		yield [
-			'/**
- * @phpstan-import-type TypeAlias from AnotherClass as DifferentAlias
- */',
-			'/**
- * @phpstan-import-type TypeAlias from AnotherClass
- */',
+			self::nowdoc('
+			/**
+			 * @phpstan-import-type TypeAlias from AnotherClass as DifferentAlias
+			 */'),
+			self::nowdoc('
+			/**
+			 * @phpstan-import-type TypeAlias from AnotherClass
+			 */'),
 			$removeImportAs,
 		];
 
@@ -1638,15 +1747,19 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
-			'/** @Foo(
-			  *     1,
-			  *     2,
-			  *  ) */',
-			'/** @Foo(
-			  *     1,
-			  *     2,
-			  *     3,
-			  *  ) */',
+			self::nowdoc('
+			/** @Foo(
+			 *     1,
+			 *     2,
+			 *  )
+			 */'),
+			self::nowdoc('
+			/** @Foo(
+			 *     1,
+			 *     2,
+			 *     3,
+			 *  )
+			 */'),
 			new class extends AbstractNodeVisitor {
 
 				public function enterNode(Node $node)
@@ -2158,6 +2271,42 @@ class PrinterTest extends TestCase
 			$this->unsetAttributes($node),
 			$this->unsetAttributes($this->phpDocParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
 		);
+	}
+
+	public static function nowdoc(string $str): string
+	{
+		$lines = preg_split('/\\n/', $str);
+
+		if ($lines === false) {
+			return '';
+		}
+
+		if (count($lines) < 2) {
+			return '';
+		}
+
+		// Toss out the first line
+		$lines = array_slice($lines, 1, count($lines) - 1);
+
+		// normalize any tabs to spaces
+		$lines = array_map(static fn ($line) => preg_replace_callback('/(\t+)/m', static function ($matches) {
+			$fixed = str_repeat('  ', strlen($matches[1]));
+			return $fixed;
+		}, $line), $lines);
+
+		// take the ws from the first line and subtract them from all lines
+		$matches = [];
+
+		if (preg_match('/(^[ \t]+)/', $lines[0] ?? '', $matches) !== 1) {
+			return '';
+		}
+
+		$numLines = count($lines);
+		for ($i = 0; $i < $numLines; ++$i) {
+			$lines[$i] = str_replace($matches[0], '', $lines[$i] ?? '');
+		}
+
+		return implode("\n", $lines);
 	}
 
 }
