@@ -83,7 +83,7 @@ use PHPStan\PhpDocParser\Printer\Printer;
 
 // basic setup with enabled required lexer attributes
 
-$config = new ParserConfig(usedAttributes: ['lines' => true, 'indexes' => true]);
+$config = new ParserConfig(usedAttributes: ['lines' => true, 'indexes' => true, 'comments' => true]);
 $lexer = new Lexer($config);
 $constExprParser = new ConstExprParser($config);
 $typeParser = new TypeParser($config, $constExprParser);

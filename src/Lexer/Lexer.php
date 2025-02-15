@@ -51,6 +51,8 @@ class Lexer
 	public const TOKEN_NEGATED = 35;
 	public const TOKEN_ARROW = 36;
 
+	public const TOKEN_COMMENT = 37;
+
 	public const TOKEN_LABELS = [
 		self::TOKEN_REFERENCE => '\'&\'',
 		self::TOKEN_UNION => '\'|\'',
@@ -66,6 +68,7 @@ class Lexer
 		self::TOKEN_OPEN_CURLY_BRACKET => '\'{\'',
 		self::TOKEN_CLOSE_CURLY_BRACKET => '\'}\'',
 		self::TOKEN_COMMA => '\',\'',
+		self::TOKEN_COMMENT => '\'//\'',
 		self::TOKEN_COLON => '\':\'',
 		self::TOKEN_VARIADIC => '\'...\'',
 		self::TOKEN_DOUBLE_COLON => '\'::\'',
@@ -160,6 +163,7 @@ class Lexer
 			self::TOKEN_CLOSE_CURLY_BRACKET => '\\}',
 
 			self::TOKEN_COMMA => ',',
+			self::TOKEN_COMMENT => '\/\/[^\\r\\n]*(?=\n|\r|\*/)',
 			self::TOKEN_VARIADIC => '\\.\\.\\.',
 			self::TOKEN_DOUBLE_COLON => '::',
 			self::TOKEN_DOUBLE_ARROW => '=>',

@@ -4,6 +4,7 @@ namespace PHPStan\PhpDocParser\Printer;
 
 use LogicException;
 use PHPStan\PhpDocParser\Ast\Attribute;
+use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
 use PHPStan\PhpDocParser\Ast\Node;
@@ -66,6 +67,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use function array_keys;
 use function array_map;
+use function assert;
 use function count;
 use function get_class;
 use function get_object_vars;
@@ -74,6 +76,7 @@ use function in_array;
 use function is_array;
 use function preg_match_all;
 use function sprintf;
+use function str_replace;
 use function strlen;
 use function strpos;
 use function trim;
@@ -547,22 +550,29 @@ final class Printer
 
 		foreach ($diff as $i => $diffElem) {
 			$diffType = $diffElem->type;
-			$newNode = $diffElem->new;
-			$originalNode = $diffElem->old;
+			$arrItem = $diffElem->new;
+			$origArrayItem = $diffElem->old;
 			if ($diffType === DiffElem::TYPE_KEEP || $diffType === DiffElem::TYPE_REPLACE) {
 				$beforeFirstKeepOrReplace = false;
-				if (!$newNode instanceof Node || !$originalNode instanceof Node) {
+				if (!$arrItem instanceof Node || !$origArrayItem instanceof Node) {
 					return null;
 				}
 
 				/** @var int $itemStartPos */
-				$itemStartPos = $originalNode->getAttribute(Attribute::START_INDEX);
+				$itemStartPos = $origArrayItem->getAttribute(Attribute::START_INDEX);
 
 				/** @var int $itemEndPos */
-				$itemEndPos = $originalNode->getAttribute(Attribute::END_INDEX);
+				$itemEndPos = $origArrayItem->getAttribute(Attribute::END_INDEX);
+
 				if ($itemStartPos < 0 || $itemEndPos < 0 || $itemStartPos < $tokenIndex) {
 					throw new LogicException();
 				}
+
+				$comments = $arrItem->getAttribute(Attribute::COMMENTS) ?? [];
+				$origComments = $origArrayItem->getAttribute(Attribute::COMMENTS) ?? [];
+
+				$commentStartPos = count($origComments) > 0 ? $origComments[0]->startIndex : $itemStartPos;
+				assert($commentStartPos >= 0);
 
 				$result .= $originalTokens->getContentBetween($tokenIndex, $itemStartPos);
 
@@ -573,6 +583,15 @@ final class Printer
 						if ($parenthesesNeeded) {
 							$result .= '(';
 						}
+
+						if ($insertNewline) {
+							$delayedAddComments = $delayedAddNode->getAttribute(Attribute::COMMENTS) ?? [];
+							if (count($delayedAddComments) > 0) {
+								$result .= $this->printComments($delayedAddComments, $beforeAsteriskIndent, $afterAsteriskIndent);
+								$result .= sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
+							}
+						}
+
 						$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens);
 						if ($parenthesesNeeded) {
 							$result .= ')';
@@ -589,14 +608,21 @@ final class Printer
 				}
 
 				$parenthesesNeeded = isset($this->parenthesesListMap[$mapKey])
-					&& in_array(get_class($newNode), $this->parenthesesListMap[$mapKey], true)
-					&& !in_array(get_class($originalNode), $this->parenthesesListMap[$mapKey], true);
+					&& in_array(get_class($arrItem), $this->parenthesesListMap[$mapKey], true)
+					&& !in_array(get_class($origArrayItem), $this->parenthesesListMap[$mapKey], true);
 				$addParentheses = $parenthesesNeeded && !$originalTokens->hasParentheses($itemStartPos, $itemEndPos);
 				if ($addParentheses) {
 					$result .= '(';
 				}
 
-				$result .= $this->printNodeFormatPreserving($newNode, $originalTokens);
+				if ($comments !== $origComments) {
+					if (count($comments) > 0) {
+						$result .= $this->printComments($comments, $beforeAsteriskIndent, $afterAsteriskIndent);
+						$result .= sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
+					}
+				}
+
+				$result .= $this->printNodeFormatPreserving($arrItem, $originalTokens);
 				if ($addParentheses) {
 					$result .= ')';
 				}
@@ -606,36 +632,42 @@ final class Printer
 				if ($insertStr === null) {
 					return null;
 				}
-				if (!$newNode instanceof Node) {
+				if (!$arrItem instanceof Node) {
 					return null;
 				}
 
-				if ($insertStr === ', ' && $isMultiline) {
+				if ($insertStr === ', ' && $isMultiline || count($arrItem->getAttribute(Attribute::COMMENTS) ?? []) > 0) {
 					$insertStr = ',';
 					$insertNewline = true;
 				}
 
 				if ($beforeFirstKeepOrReplace) {
 					// Will be inserted at the next "replace" or "keep" element
-					$delayedAdd[] = $newNode;
+					$delayedAdd[] = $arrItem;
 					continue;
 				}
 
 				/** @var int $itemEndPos */
 				$itemEndPos = $tokenIndex - 1;
 				if ($insertNewline) {
-					$result .= $insertStr . sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
+					$comments = $arrItem->getAttribute(Attribute::COMMENTS) ?? [];
+					$result .= $insertStr;
+					if (count($comments) > 0) {
+						$result .= sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
+						$result .= $this->printComments($comments, $beforeAsteriskIndent, $afterAsteriskIndent);
+					}
+					$result .= sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
 				} else {
 					$result .= $insertStr;
 				}
 
 				$parenthesesNeeded = isset($this->parenthesesListMap[$mapKey])
-					&& in_array(get_class($newNode), $this->parenthesesListMap[$mapKey], true);
+					&& in_array(get_class($arrItem), $this->parenthesesListMap[$mapKey], true);
 				if ($parenthesesNeeded) {
 					$result .= '(';
 				}
 
-				$result .= $this->printNodeFormatPreserving($newNode, $originalTokens);
+				$result .= $this->printNodeFormatPreserving($arrItem, $originalTokens);
 				if ($parenthesesNeeded) {
 					$result .= ')';
 				}
@@ -643,15 +675,15 @@ final class Printer
 				$tokenIndex = $itemEndPos + 1;
 
 			} elseif ($diffType === DiffElem::TYPE_REMOVE) {
-				if (!$originalNode instanceof Node) {
+				if (!$origArrayItem instanceof Node) {
 					return null;
 				}
 
 				/** @var int $itemStartPos */
-				$itemStartPos = $originalNode->getAttribute(Attribute::START_INDEX);
+				$itemStartPos = $origArrayItem->getAttribute(Attribute::START_INDEX);
 
 				/** @var int $itemEndPos */
-				$itemEndPos = $originalNode->getAttribute(Attribute::END_INDEX);
+				$itemEndPos = $origArrayItem->getAttribute(Attribute::END_INDEX);
 				if ($itemStartPos < 0 || $itemEndPos < 0) {
 					throw new LogicException();
 				}
@@ -710,6 +742,20 @@ final class Printer
 	}
 
 	/**
+	 * @param list<Comment> $comments
+	 */
+	private function printComments(array $comments, string $beforeAsteriskIndent, string $afterAsteriskIndent): string
+	{
+		$formattedComments = [];
+
+		foreach ($comments as $comment) {
+			$formattedComments[] = str_replace("\n", "\n" . $beforeAsteriskIndent . '*' . $afterAsteriskIndent, $comment->getReformattedText());
+		}
+
+		return implode("\n$beforeAsteriskIndent*$afterAsteriskIndent", $formattedComments);
+	}
+
+	/**
 	 * @param array<Node|null> $nodes
 	 * @return array{bool, string, string}
 	 */
@@ -738,7 +784,7 @@ final class Printer
 
 		$c = preg_match_all('~\n(?<before>[\\x09\\x20]*)\*(?<after>\\x20*)~', $allText, $matches, PREG_SET_ORDER);
 		if ($c === 0) {
-			return [$isMultiline, '', ''];
+			return [$isMultiline, ' ', '  '];
 		}
 
 		$before = '';
@@ -753,6 +799,9 @@ final class Printer
 
 			$after = $match['after'];
 		}
+
+		$before = strlen($before) === 0 ? ' ' : $before;
+		$after = strlen($after) === 0 ? '  ' : $after;
 
 		return [$isMultiline, $before, $after];
 	}

@@ -3,13 +3,17 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use Exception;
+use PHPStan\PhpDocParser\Ast\AbstractNodeVisitor;
 use PHPStan\PhpDocParser\Ast\Attribute;
+use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
+use PHPStan\PhpDocParser\Ast\NodeVisitor\CloningVisitor;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
@@ -67,10 +71,11 @@ class TypeParserTest extends TestCase
 
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 		$typeNode = $this->typeParser->parse($tokens);
+		$this->assertInstanceOf(TypeNode::class, $expectedResult);
 
 		$this->assertSame((string) $expectedResult, (string) $typeNode);
 		$this->assertInstanceOf(get_class($expectedResult), $typeNode);
-		$this->assertEquals($expectedResult, $typeNode);
+		$this->assertEquals($this->unsetAllAttributes($expectedResult), $this->unsetAllAttributes($typeNode));
 		$this->assertSame($nextTokenType, $tokens->currentTokenType(), Lexer::TOKEN_LABELS[$nextTokenType]);
 
 		if (strpos((string) $expectedResult, '$ref') !== false) {
@@ -117,13 +122,16 @@ class TypeParserTest extends TestCase
 			$this->expectExceptionMessage($expectedResult->getMessage());
 		}
 
-		$config = new ParserConfig(['lines' => true, 'indexes' => true]);
+		$config = new ParserConfig(['lines' => true, 'indexes' => true, 'comments' => true]);
 		$typeParser = new TypeParser($config, new ConstExprParser($config));
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
 
+		$typeNode = $typeParser->parse($tokens);
+		$this->assertInstanceOf(TypeNode::class, $expectedResult);
+
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
-		$traverser->traverse([$typeParser->parse($tokens)]);
+		$traverser->traverse([$typeNode]);
 
 		foreach ($visitor->nodes as $node) {
 			$this->assertNotNull($node->getAttribute(Attribute::START_LINE), (string) $node);
@@ -131,6 +139,84 @@ class TypeParserTest extends TestCase
 			$this->assertNotNull($node->getAttribute(Attribute::START_INDEX), (string) $node);
 			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), (string) $node);
 		}
+
+		$this->assertEquals(
+			$this->unsetAllAttributesButComments($expectedResult),
+			$this->unsetAllAttributesButComments($typeNode),
+		);
+	}
+
+
+	private function unsetAllAttributes(Node $node): Node
+	{
+		$visitor = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				$node->setAttribute(Attribute::START_LINE, null);
+				$node->setAttribute(Attribute::END_LINE, null);
+				$node->setAttribute(Attribute::START_INDEX, null);
+				$node->setAttribute(Attribute::END_INDEX, null);
+				$node->setAttribute(Attribute::ORIGINAL_NODE, null);
+				$node->setAttribute(Attribute::COMMENTS, null);
+
+				return $node;
+			}
+
+		};
+
+		$cloningTraverser = new NodeTraverser([new CloningVisitor()]);
+		$newNodes = $cloningTraverser->traverse([$node]);
+
+		$traverser = new NodeTraverser([$visitor]);
+
+		/** @var PhpDocNode */
+		return $traverser->traverse($newNodes)[0];
+	}
+
+
+	private function unsetAllAttributesButComments(Node $node): Node
+	{
+		$visitor = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				$node->setAttribute(Attribute::START_LINE, null);
+				$node->setAttribute(Attribute::END_LINE, null);
+				$node->setAttribute(Attribute::START_INDEX, null);
+				$node->setAttribute(Attribute::END_INDEX, null);
+				$node->setAttribute(Attribute::ORIGINAL_NODE, null);
+
+				if ($node->getAttribute(Attribute::COMMENTS) === []) {
+					$node->setAttribute(Attribute::COMMENTS, null);
+				}
+
+				return $node;
+			}
+
+		};
+
+		$cloningTraverser = new NodeTraverser([new CloningVisitor()]);
+		$newNodes = $cloningTraverser->traverse([$node]);
+
+		$traverser = new NodeTraverser([$visitor]);
+
+		/** @var PhpDocNode */
+		return $traverser->traverse($newNodes)[0];
+	}
+
+
+	/**
+	 * @template TNode of Node
+	 * @param TNode $node
+	 * @return TNode
+	 */
+	public static function withComment(Node $node, string $comment, int $startLine, int $startIndex): Node
+	{
+		$comments = $node->getAttribute(Attribute::COMMENTS) ?? [];
+		$comments[] = new Comment($comment, $startLine, $startIndex);
+		$node->setAttribute(Attribute::COMMENTS, $comments);
+		return $node;
 	}
 
 
@@ -140,6 +226,100 @@ class TypeParserTest extends TestCase
 	public function provideParseData(): array
 	{
 		return [
+			[
+				'array{
+					// a is for apple
+					a: int,
+				}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
+			[
+				'array{
+					// a is for // apple
+					a: int,
+				}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						self::withComment(new IdentifierTypeNode('a'), '// a is for // apple', 2, 3),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
+			[
+				'array{
+					// a is for * apple
+					a: int,
+				}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						self::withComment(new IdentifierTypeNode('a'), '// a is for * apple', 2, 3),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
+			[
+				'array{
+					// a is for http://www.apple.com/
+					a: int,
+				}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						self::withComment(new IdentifierTypeNode('a'), '// a is for http://www.apple.com/', 2, 3),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
+			[
+				'array{
+					// a is for apple
+					// a is also for awesome
+					a: int,
+				}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						self::withComment(self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3), '// a is also for awesome', 3, 5),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
+			[
+				'string',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				'  string  ',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				' ( string ) ',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				'( ( string ) )',
+				new IdentifierTypeNode('string'),
+			],
+			[
+				'\\Foo\Bar\\Baz',
+				new IdentifierTypeNode('\\Foo\Bar\\Baz'),
+			],
+			[
+				'  \\Foo\Bar\\Baz  ',
+				new IdentifierTypeNode('\\Foo\Bar\\Baz'),
+			],
+			[
+				' ( \\Foo\Bar\\Baz ) ',
+				new IdentifierTypeNode('\\Foo\Bar\\Baz'),
+			],
 			[
 				'string',
 				new IdentifierTypeNode('string'),
@@ -359,6 +539,24 @@ class TypeParserTest extends TestCase
 			],
 			[
 				'array<int, Foo\\Bar>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('array'),
+					[
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('Foo\\Bar'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'array<
+					// index with an int
+					int,
+					Foo\\Bar
+				>',
 				new GenericTypeNode(
 					new IdentifierTypeNode('array'),
 					[
@@ -2015,6 +2213,22 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'(
+					Foo is Bar
+					?
+					// never, I say
+					never
+					:
+					int)',
+				new ConditionalTypeNode(
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+					new IdentifierTypeNode('never'),
+					new IdentifierTypeNode('int'),
+					false,
+				),
+			],
+			[
 				'(Foo is not Bar ? never : int)',
 				new ConditionalTypeNode(
 					new IdentifierTypeNode('Foo'),
@@ -2511,6 +2725,19 @@ class TypeParserTest extends TestCase
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
 						new IdentifierTypeNode('a'),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
+			[
+				'object{
+					// a is for apple
+				 	a: int,
+				 }',
+				new ObjectShapeNode([
+					new ObjectShapeItemNode(
+						self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3),
 						false,
 						new IdentifierTypeNode('int'),
 					),
