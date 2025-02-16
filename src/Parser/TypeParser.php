@@ -271,6 +271,14 @@ class TypeParser
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_UNION)) {
 			$types[] = $this->parseAtomic($tokens);
+			$tokens->pushSavePoint();
+			$tokens->skipNewLineTokens();
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+				$tokens->rollback();
+				break;
+			}
+
+			$tokens->dropSavePoint();
 		}
 
 		return new Ast\Type\UnionTypeNode($types);
@@ -299,6 +307,14 @@ class TypeParser
 
 		while ($tokens->tryConsumeTokenType(Lexer::TOKEN_INTERSECTION)) {
 			$types[] = $this->parseAtomic($tokens);
+			$tokens->pushSavePoint();
+			$tokens->skipNewLineTokens();
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+				$tokens->rollback();
+				break;
+			}
+
+			$tokens->dropSavePoint();
 		}
 
 		return new Ast\Type\IntersectionTypeNode($types);

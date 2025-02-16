@@ -60,6 +60,7 @@ use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\InvalidTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
@@ -71,6 +72,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function count;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 use const PHP_EOL;
 
 class PhpDocParserTest extends TestCase
@@ -4206,6 +4208,176 @@ test',
 							GenericTypeNode::VARIANCE_INVARIANT,
 							GenericTypeNode::VARIANCE_INVARIANT,
 						],
+					),
+				)),
+			]),
+		];
+
+		yield [
+			'Multiline PHPDoc with multiple new line within union type declaration',
+			'/**' . PHP_EOL .
+			' * @param array<string, array{' . PHP_EOL .
+			' *     foo: int,' . PHP_EOL .
+			' *     bar?: array<string,' . PHP_EOL .
+			' *         array{foo1: int, bar1?: true}' . PHP_EOL .
+			' *         | array{foo1: int, foo2: true, bar1?: true}' . PHP_EOL .
+			' *         | array{foo2: int, foo3: bool, bar2?: true}' . PHP_EOL .
+			' *         | array{foo1: int, foo3: true, bar3?: false}' . PHP_EOL .
+			' *     >,' . PHP_EOL .
+			' * }> $a' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							ArrayShapeNode::createSealed([
+								new ArrayShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+								new ArrayShapeItemNode(new IdentifierTypeNode('bar'), true, new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('string'),
+										new UnionTypeNode([
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo3'), false, new IdentifierTypeNode('bool')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar2'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo3'), false, new IdentifierTypeNode('true')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar3'), true, new IdentifierTypeNode('false')),
+											]),
+										]),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
+									],
+								)),
+							]),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+			]),
+		];
+
+		yield [
+			'Multiline PHPDoc with multiple new line within intersection type declaration',
+			'/**' . PHP_EOL .
+			' * @param array<string, array{' . PHP_EOL .
+			' *     foo: int,' . PHP_EOL .
+			' *     bar?: array<string,' . PHP_EOL .
+			' *         array{foo1: int, bar1?: true}' . PHP_EOL .
+			' *         & array{foo1: int, foo2: true, bar1?: true}' . PHP_EOL .
+			' *         & array{foo2: int, foo3: bool, bar2?: true}' . PHP_EOL .
+			' *         & array{foo1: int, foo3: true, bar3?: false}' . PHP_EOL .
+			' *     >,' . PHP_EOL .
+			' * }> $a' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							ArrayShapeNode::createSealed([
+								new ArrayShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('int')),
+								new ArrayShapeItemNode(new IdentifierTypeNode('bar'), true, new GenericTypeNode(
+									new IdentifierTypeNode('array'),
+									[
+										new IdentifierTypeNode('string'),
+										new IntersectionTypeNode([
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('true')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar1'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo2'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo3'), false, new IdentifierTypeNode('bool')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar2'), true, new IdentifierTypeNode('true')),
+											]),
+											ArrayShapeNode::createSealed([
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo1'), false, new IdentifierTypeNode('int')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('foo3'), false, new IdentifierTypeNode('true')),
+												new ArrayShapeItemNode(new IdentifierTypeNode('bar3'), true, new IdentifierTypeNode('false')),
+											]),
+										]),
+									],
+									[
+										GenericTypeNode::VARIANCE_INVARIANT,
+										GenericTypeNode::VARIANCE_INVARIANT,
+									],
+								)),
+							]),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+			]),
+		];
+
+		yield [
+			'Multiline PHPDoc with multiple new line being invalid due to union and intersection type declaration',
+			'/**' . PHP_EOL .
+			' * @param array<string, array{' . PHP_EOL .
+			' *     foo: int,' . PHP_EOL .
+			' *     bar?: array<string,' . PHP_EOL .
+			' *         array{foo1: int, bar1?: true}' . PHP_EOL .
+			' *         & array{foo1: int, foo2: true, bar1?: true}' . PHP_EOL .
+			' *         | array{foo2: int, foo3: bool, bar2?: true}' . PHP_EOL .
+			' *         & array{foo1: int, foo3: true, bar3?: false}' . PHP_EOL .
+			' *     >,' . PHP_EOL .
+			' * }> $a' . PHP_EOL .
+			' */',
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new InvalidTagValueNode(
+					'array<string, array{' . PHP_EOL .
+					'    foo: int,' . PHP_EOL .
+					'    bar?: array<string,' . PHP_EOL .
+					'        array{foo1: int, bar1?: true}' . PHP_EOL .
+					'        & array{foo1: int, foo2: true, bar1?: true}' . PHP_EOL .
+					'        | array{foo2: int, foo3: bool, bar2?: true}' . PHP_EOL .
+					'        & array{foo1: int, foo3: true, bar3?: false}' . PHP_EOL .
+					'    >,' . PHP_EOL .
+					'}> $a',
+					new ParserException(
+						'?',
+						Lexer::TOKEN_NULLABLE,
+						DIRECTORY_SEPARATOR === '\\' ? 65 : 62,
+						Lexer::TOKEN_CLOSE_CURLY_BRACKET,
+						null,
+						4,
 					),
 				)),
 			]),
