@@ -884,7 +884,7 @@ class TypeParser
 		$done = false;
 
 		do {
-			$tokens->skipNewLineTokensAndConsumeComments();
+			$tokens->skipNewLineTokens();
 
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_CLOSE_CURLY_BRACKET)) {
 				return Ast\Type\ArrayShapeNode::createSealed($items, $kind);
@@ -893,7 +893,6 @@ class TypeParser
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_VARIADIC)) {
 				$sealed = false;
 
-				$tokens->skipNewLineTokensAndConsumeComments();
 				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 					if ($kind === Ast\Type\ArrayShapeNode::KIND_ARRAY) {
 						$unsealedType = $this->parseArrayShapeUnsealedType($tokens);
@@ -937,9 +936,6 @@ class TypeParser
 		$startLine = $tokens->currentTokenLine();
 		$startIndex = $tokens->currentTokenIndex();
 
-		// parse any comments above the item
-		$tokens->skipNewLineTokensAndConsumeComments();
-
 		try {
 			$tokens->pushSavePoint();
 			$key = $this->parseArrayShapeKey($tokens);
@@ -976,6 +972,8 @@ class TypeParser
 	{
 		$startIndex = $tokens->currentTokenIndex();
 		$startLine = $tokens->currentTokenLine();
+
+		$tokens->skipNewLineTokensAndConsumeComments();
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
 			$key = new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $tokens->currentTokenValue()));
