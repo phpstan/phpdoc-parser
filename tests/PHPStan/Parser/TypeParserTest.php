@@ -211,10 +211,16 @@ class TypeParserTest extends TestCase
 	 * @param TNode $node
 	 * @return TNode
 	 */
-	public static function withComment(Node $node, string $comment, int $startLine, int $startIndex): Node
+	public static function withComment(Node $node, string $comment, int $startLine, int $startIndex, int $endLine, int $endIndex): Node
 	{
 		$comments = $node->getAttribute(Attribute::COMMENTS) ?? [];
-		$comments[] = new Comment($comment, $startLine, $startIndex);
+
+		$c = new Comment($comment);
+		$c->setAttribute(Attribute::START_LINE, $startLine);
+		$c->setAttribute(Attribute::START_INDEX, $startIndex);
+		$c->setAttribute(Attribute::END_LINE, $endLine);
+		$c->setAttribute(Attribute::END_INDEX, $endIndex);
+		$comments[] = $c;
 		$node->setAttribute(Attribute::COMMENTS, $comments);
 		return $node;
 	}
@@ -233,7 +239,7 @@ class TypeParserTest extends TestCase
 				}',
 				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
-						self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3),
+						self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3, 2, 4),
 						false,
 						new IdentifierTypeNode('int'),
 					),
@@ -246,7 +252,7 @@ class TypeParserTest extends TestCase
 				}',
 				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
-						self::withComment(new IdentifierTypeNode('a'), '// a is for // apple', 2, 3),
+						self::withComment(new IdentifierTypeNode('a'), '// a is for // apple', 2, 3, 2, 4),
 						false,
 						new IdentifierTypeNode('int'),
 					),
@@ -259,7 +265,7 @@ class TypeParserTest extends TestCase
 				}',
 				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
-						self::withComment(new IdentifierTypeNode('a'), '// a is for * apple', 2, 3),
+						self::withComment(new IdentifierTypeNode('a'), '// a is for * apple', 2, 3, 2, 4),
 						false,
 						new IdentifierTypeNode('int'),
 					),
@@ -272,7 +278,7 @@ class TypeParserTest extends TestCase
 				}',
 				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
-						self::withComment(new IdentifierTypeNode('a'), '// a is for http://www.apple.com/', 2, 3),
+						self::withComment(new IdentifierTypeNode('a'), '// a is for http://www.apple.com/', 2, 3, 2, 4),
 						false,
 						new IdentifierTypeNode('int'),
 					),
@@ -286,7 +292,7 @@ class TypeParserTest extends TestCase
 				}',
 				ArrayShapeNode::createSealed([
 					new ArrayShapeItemNode(
-						self::withComment(self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3), '// a is also for awesome', 3, 5),
+						self::withComment(self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3, 2, 4), '// a is also for awesome', 3, 5, 3, 6),
 						false,
 						new IdentifierTypeNode('int'),
 					),
@@ -2737,7 +2743,7 @@ class TypeParserTest extends TestCase
 				 }',
 				new ObjectShapeNode([
 					new ObjectShapeItemNode(
-						self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3),
+						self::withComment(new IdentifierTypeNode('a'), '// a is for apple', 2, 3, 2, 4),
 						false,
 						new IdentifierTypeNode('int'),
 					),

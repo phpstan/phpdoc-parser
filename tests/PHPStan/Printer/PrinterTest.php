@@ -2277,7 +2277,8 @@ class PrinterTest extends TestCase
 				 */'),
 			self::nowdoc('
 				/**
-				 * @param array{float} $foo
+				 * @param array{// A fractional number
+				 *  float} $foo
 				 */'),
 			$singleCommentLineAddFront,
 		];
@@ -2361,7 +2362,8 @@ class PrinterTest extends TestCase
 				 */'),
 			self::nowdoc('
 				/**
-				 * @param array{float} $foo
+				 * @param array{// A fractional number
+				 *  float} $foo
 				 */'),
 			$singleCommentLineAddMiddle,
 		];
@@ -2570,7 +2572,8 @@ class PrinterTest extends TestCase
 				 */'),
 			self::nowdoc('
 				/**
-				 * @param object{bar: float} $foo
+				 * @param object{// A fractional number
+				 *  bar: float} $foo
 				 */'),
 			$addCommentToObjectShapeItemMiddle,
 		];
@@ -2838,6 +2841,24 @@ class PrinterTest extends TestCase
 			]),
 			'/**
  * @param int $a
+ */',
+		];
+
+		yield [
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					ArrayShapeNode::createSealed([
+						self::withComment(new ArrayShapeItemNode(null, false, new IdentifierTypeNode('int')), '// this is a test'),
+					]),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+			]),
+			'/**
+ * @param array{// this is a test
+ * int} $a
  */',
 		];
 	}

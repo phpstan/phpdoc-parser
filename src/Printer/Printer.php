@@ -67,7 +67,6 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use function array_keys;
 use function array_map;
-use function assert;
 use function count;
 use function get_class;
 use function get_object_vars;
@@ -113,6 +112,7 @@ final class Printer
 		MethodTagValueNode::class . '->parameters' => ', ',
 		DoctrineArray::class . '->items' => ', ',
 		DoctrineAnnotation::class . '->arguments' => ', ',
+		Comment::class . '->commentsAttribute' => "\n * ",
 	];
 
 	/**
@@ -196,7 +196,7 @@ final class Printer
 			return "/**\n *" . implode("\n *", array_map(
 				function (PhpDocChildNode $child): string {
 					$s = $this->print($child);
-					return $s === '' ? '' : ' ' . $s;
+					return $s === '' ? '' : ' ' . str_replace("\n", "\n * ", $s);
 				},
 				$node->children,
 			)) . "\n */";
@@ -214,31 +214,38 @@ final class Printer
 		if ($node instanceof PhpDocTagValueNode) {
 			return $this->printTagValue($node);
 		}
+
+		$comments = $node->getAttribute(Attribute::COMMENTS) ?? [];
+		$printedComments = '';
+		if ($comments !== []) {
+			$printedComments = implode("\n", array_map(static fn (Comment $comment) => $comment->getReformattedText(), $comments)) . "\n";
+		}
+
 		if ($node instanceof TypeNode) {
-			return $this->printType($node);
+			return $printedComments . $this->printType($node);
 		}
 		if ($node instanceof ConstExprNode) {
-			return $this->printConstExpr($node);
+			return $printedComments . $this->printConstExpr($node);
 		}
 		if ($node instanceof MethodTagValueParameterNode) {
 			$type = $node->type !== null ? $this->print($node->type) . ' ' : '';
 			$isReference = $node->isReference ? '&' : '';
 			$isVariadic = $node->isVariadic ? '...' : '';
 			$default = $node->defaultValue !== null ? ' = ' . $this->print($node->defaultValue) : '';
-			return "{$type}{$isReference}{$isVariadic}{$node->parameterName}{$default}";
+			return $printedComments . "{$type}{$isReference}{$isVariadic}{$node->parameterName}{$default}";
 		}
 		if ($node instanceof CallableTypeParameterNode) {
 			$type = $this->print($node->type) . ' ';
 			$isReference = $node->isReference ? '&' : '';
 			$isVariadic = $node->isVariadic ? '...' : '';
 			$isOptional = $node->isOptional ? '=' : '';
-			return trim("{$type}{$isReference}{$isVariadic}{$node->parameterName}") . $isOptional;
+			return $printedComments . trim("{$type}{$isReference}{$isVariadic}{$node->parameterName}") . $isOptional;
 		}
 		if ($node instanceof ArrayShapeUnsealedTypeNode) {
 			if ($node->keyType !== null) {
-				return sprintf('<%s, %s>', $this->print($node->keyType), $this->print($node->valueType));
+				return $printedComments . sprintf('<%s, %s>', $this->print($node->keyType), $this->print($node->valueType));
 			}
-			return sprintf('<%s>', $this->print($node->valueType));
+			return $printedComments . sprintf('<%s>', $this->print($node->valueType));
 		}
 		if ($node instanceof DoctrineAnnotation) {
 			return (string) $node;
@@ -254,7 +261,7 @@ final class Printer
 		}
 		if ($node instanceof ArrayShapeItemNode) {
 			if ($node->keyName !== null) {
-				return sprintf(
+				return $printedComments . sprintf(
 					'%s%s: %s',
 					$this->print($node->keyName),
 					$node->optional ? '?' : '',
@@ -262,11 +269,11 @@ final class Printer
 				);
 			}
 
-			return $this->print($node->valueType);
+			return $printedComments . $this->print($node->valueType);
 		}
 		if ($node instanceof ObjectShapeItemNode) {
 			if ($node->keyName !== null) {
-				return sprintf(
+				return $printedComments . sprintf(
 					'%s%s: %s',
 					$this->print($node->keyName),
 					$node->optional ? '?' : '',
@@ -274,7 +281,11 @@ final class Printer
 				);
 			}
 
-			return $this->print($node->valueType);
+			return $printedComments . $this->print($node->valueType);
+		}
+
+		if ($node instanceof Comment) {
+			return $node->getReformattedText();
 		}
 
 		throw new LogicException(sprintf('Unknown node type %s', get_class($node)));
@@ -576,7 +587,7 @@ final class Printer
 						if ($parenthesesNeeded) {
 							$result .= '(';
 						}
-						$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens);
+						$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens, $beforeAsteriskIndent, $afterAsteriskIndent);
 						if ($parenthesesNeeded) {
 							$result .= ')';
 						}
@@ -599,7 +610,7 @@ final class Printer
 					$result .= '(';
 				}
 
-				$result .= $this->printNodeFormatPreserving($newNode, $originalTokens);
+				$result .= $this->printNodeFormatPreserving($newNode, $originalTokens, $beforeAsteriskIndent, $afterAsteriskIndent);
 				if ($addParentheses) {
 					$result .= ')';
 				}
@@ -638,7 +649,7 @@ final class Printer
 					$result .= '(';
 				}
 
-				$result .= $this->printNodeFormatPreserving($newNode, $originalTokens);
+				$result .= $this->printNodeFormatPreserving($newNode, $originalTokens, $beforeAsteriskIndent, $afterAsteriskIndent);
 				if ($parenthesesNeeded) {
 					$result .= ')';
 				}
@@ -703,7 +714,7 @@ final class Printer
 					}
 				}
 
-				$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens);
+				$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens, $beforeAsteriskIndent, $afterAsteriskIndent);
 				$first = false;
 			}
 			$result .= $extraRight;
@@ -712,18 +723,9 @@ final class Printer
 		return $result;
 	}
 
-	/**
-	 * @param list<Comment> $comments
-	 */
-	private function printComments(array $comments, string $beforeAsteriskIndent, string $afterAsteriskIndent): string
+	private function fixMultiline(string $s, string $beforeAsteriskIndent, string $afterAsteriskIndent): string
 	{
-		$formattedComments = [];
-
-		foreach ($comments as $comment) {
-			$formattedComments[] = str_replace("\n", "\n" . $beforeAsteriskIndent . '*' . $afterAsteriskIndent, $comment->getReformattedText());
-		}
-
-		return implode("\n$beforeAsteriskIndent*$afterAsteriskIndent", $formattedComments);
+		return str_replace("\n", "\n" . $beforeAsteriskIndent . '*' . $afterAsteriskIndent, $s);
 	}
 
 	/**
@@ -777,12 +779,12 @@ final class Printer
 		return [$isMultiline, $before, $after];
 	}
 
-	private function printNodeFormatPreserving(Node $node, TokenIterator $originalTokens): string
+	private function printNodeFormatPreserving(Node $node, TokenIterator $originalTokens, string $beforeAsteriskIndent, string $afterAsteriskIndent): string
 	{
 		/** @var Node|null $originalNode */
 		$originalNode = $node->getAttribute(Attribute::ORIGINAL_NODE);
 		if ($originalNode === null) {
-			return $this->print($node);
+			return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
 		}
 
 		$class = get_class($node);
@@ -797,6 +799,28 @@ final class Printer
 		}
 
 		$result = '';
+
+		/** @var list<Comment> $comments */
+		$comments = $node->getAttribute(Attribute::COMMENTS) ?? [];
+
+		/** @var list<Comment> $originalComments */
+		$originalComments = $originalNode->getAttribute(Attribute::COMMENTS) ?? [];
+
+		$startPos = count($originalComments) > 0 ? $originalComments[0]->getAttribute(Attribute::START_INDEX) : $startPos;
+		$commentsResult = $this->printArrayFormatPreserving(
+			$comments,
+			$originalComments,
+			$originalTokens,
+			$startPos,
+			Comment::class,
+			'commentsAttribute',
+		);
+		if ($commentsResult === null) {
+			return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
+		}
+
+		$result .= $commentsResult;
+
 		$pos = $startPos;
 		$subNodeNames = array_keys(get_object_vars($node));
 		foreach ($subNodeNames as $subNodeName) {
@@ -824,14 +848,14 @@ final class Printer
 					);
 
 					if ($listResult === null) {
-						return $this->print($node);
+						return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
 					}
 
 					$result .= $listResult;
 					continue;
 				}
 
-				return $this->print($node);
+				return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
 			}
 
 			if ($origSubNode === null) {
@@ -840,7 +864,7 @@ final class Printer
 					continue;
 				}
 
-				return $this->print($node);
+				return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
 			}
 
 			$subStartPos = $origSubNode->getAttribute(Attribute::START_INDEX);
@@ -850,11 +874,11 @@ final class Printer
 			}
 
 			if ($subEndPos < $subStartPos) {
-				return $this->print($node);
+				return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
 			}
 
 			if ($subNode === null) {
-				return $this->print($node);
+				return $this->fixMultiline($this->print($node), $beforeAsteriskIndent, $afterAsteriskIndent);
 			}
 
 			$result .= $originalTokens->getContentBetween($pos, $subStartPos);
@@ -872,7 +896,7 @@ final class Printer
 				$result .= '(';
 			}
 
-			$result .= $this->printNodeFormatPreserving($subNode, $originalTokens);
+			$result .= $this->printNodeFormatPreserving($subNode, $originalTokens, $beforeAsteriskIndent, $afterAsteriskIndent);
 			if ($addParentheses) {
 				$result .= ')';
 			}

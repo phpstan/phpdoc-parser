@@ -4,25 +4,26 @@ namespace PHPStan\PhpDocParser\Ast;
 
 use function trim;
 
-class Comment
+class Comment implements Node
 {
+
+	use NodeAttributes;
 
 	public string $text;
 
-	public int $startLine;
-
-	public int $startIndex;
-
-	public function __construct(string $text, int $startLine = -1, int $startIndex = -1)
+	public function __construct(string $text)
 	{
 		$this->text = $text;
-		$this->startLine = $startLine;
-		$this->startIndex = $startIndex;
 	}
 
 	public function getReformattedText(): string
 	{
 		return trim($this->text);
+	}
+
+	public function __toString(): string
+	{
+		return $this->getReformattedText();
 	}
 
 }
