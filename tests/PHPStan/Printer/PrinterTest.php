@@ -1118,6 +1118,39 @@ class PrinterTest extends TestCase
 			$addItemsWithCommentsToObjectShape,
 		];
 
+		$removeComment = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				$comments = $node->getAttribute(Attribute::COMMENTS);
+				if ($comments === null || $comments === []) {
+					return null;
+				}
+
+				$node->setAttribute(Attribute::COMMENTS, []);
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  // b comment
+			 *  b: int,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  b: int,
+			 * }
+			 */'),
+			$removeComment,
+		];
+
 		$removeItemWithComment = new class extends AbstractNodeVisitor {
 
 			public function enterNode(Node $node)
