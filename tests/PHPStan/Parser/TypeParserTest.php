@@ -140,10 +140,37 @@ class TypeParserTest extends TestCase
 			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), (string) $node);
 		}
 
+		$this->verifyNodeIndexes($node);
+
 		$this->assertEquals(
 			$this->unsetAllAttributesButComments($expectedResult),
 			$this->unsetAllAttributesButComments($typeNode),
 		);
+	}
+
+
+	private function verifyNodeIndexes(Node $node): void
+	{
+		$subNodeNames = array_keys(get_object_vars($node));
+		foreach ($subNodeNames as $subNodeName) {
+			$subNode = $node->$subNodeName;
+			if (is_array($subNode)) {
+				$lastEndIndex = null;
+				foreach ($subNode as $subSubNode) {
+					$startIndex = $subSubNode->getAttribute(Attribute::START_INDEX);
+					$endIndex = $subSubNode->getAttribute(Attribute::END_INDEX);
+					if ($lastEndIndex !== null) {
+						$this->assertGreaterThan($startIndex, $lastEndIndex, (string) $subSubNode);
+					}
+
+					$lastEndIndex = $endIndex;
+
+					$this->verifyNodeIndexes($subSubNode);
+				}
+			} elseif ($subNode instanceof Node) {
+				$this->verifyNodeIndexes($subNode);
+			}
+		}
 	}
 
 
