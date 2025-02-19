@@ -140,7 +140,7 @@ class TypeParserTest extends TestCase
 			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), (string) $node);
 		}
 
-		$this->verifyNodeIndexes($node);
+		$this->verifyNodeIndexes($typeNode);
 
 		$this->assertEquals(
 			$this->unsetAllAttributesButComments($expectedResult),
@@ -151,19 +151,30 @@ class TypeParserTest extends TestCase
 
 	private function verifyNodeIndexes(Node $node): void
 	{
+		$startIndex = $node->getAttribute(Attribute::START_INDEX);
+		$endIndex = $node->getAttribute(Attribute::END_INDEX);
+		$comments = $node->getAttribute(Attribute::COMMENTS) ?? [];
+		foreach ($comments as $comment) {
+			$this->assertGreaterThanOrEqual($startIndex, $comment->getAttribute(Attribute::START_INDEX));
+			$this->assertLessThanOrEqual($endIndex, $comment->getAttribute(Attribute::END_INDEX));
+		}
+
 		$subNodeNames = array_keys(get_object_vars($node));
 		foreach ($subNodeNames as $subNodeName) {
 			$subNode = $node->$subNodeName;
 			if (is_array($subNode)) {
 				$lastEndIndex = null;
 				foreach ($subNode as $subSubNode) {
-					$startIndex = $subSubNode->getAttribute(Attribute::START_INDEX);
-					$endIndex = $subSubNode->getAttribute(Attribute::END_INDEX);
-					if ($lastEndIndex !== null) {
-						$this->assertGreaterThan($startIndex, $lastEndIndex, (string) $subSubNode);
+					if (!$subSubNode instanceof Node) {
+						continue;
 					}
 
-					$lastEndIndex = $endIndex;
+					$subStartIndex = $subSubNode->getAttribute(Attribute::START_INDEX);
+					if ($lastEndIndex !== null) {
+						$this->assertGreaterThan($lastEndIndex, $subStartIndex, (string) $subSubNode);
+					}
+
+					$lastEndIndex = $subSubNode->getAttribute(Attribute::END_INDEX);
 
 					$this->verifyNodeIndexes($subSubNode);
 				}
