@@ -404,8 +404,8 @@ class PhpDocParser
 					break;
 
 				case '@psalm-inheritors':
-				case '@phpstan-inheritors':
-					$tagValue = $this->parseInheritorsTagValue($tokens);
+				case '@phpstan-sealed':
+					$tagValue = $this->parseSealedTagValue($tokens);
 					break;
 
 				case '@deprecated':
@@ -938,11 +938,11 @@ class PhpDocParser
 		return new Ast\PhpDoc\RequireImplementsTagValueNode($type, $description);
 	}
 
-	private function parseInheritorsTagValue(TokenIterator $tokens): Ast\PhpDoc\InheritorsTagValueNode
+	private function parseSealedTagValue(TokenIterator $tokens): Ast\PhpDoc\SealedTagValueNode
 	{
 		$type = $this->typeParser->parse($tokens);
 		$description = $this->parseOptionalDescription($tokens, true);
-		return new Ast\PhpDoc\InheritorsTagValueNode($type, $description);
+		return new Ast\PhpDoc\SealedTagValueNode($type, $description);
 	}
 
 	private function parseDeprecatedTagValue(TokenIterator $tokens): Ast\PhpDoc\DeprecatedTagValueNode

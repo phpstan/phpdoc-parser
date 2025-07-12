@@ -232,13 +232,13 @@ class PhpDocNode implements Node
 	}
 
 	/**
-	 * @return InheritorsTagValueNode[]
+	 * @return SealedTagValueNode[]
 	 */
-	public function getInheritorsTagValues(string $tagName = '@phpstan-inheritors'): array
+	public function getSealedTagValues(string $tagName = '@phpstan-sealed'): array
 	{
 		return array_filter(
 			array_column($this->getTagsByName($tagName), 'value'),
-			static fn (PhpDocTagValueNode $value): bool => $value instanceof InheritorsTagValueNode,
+			static fn (PhpDocTagValueNode $value): bool => $value instanceof SealedTagValueNode,
 		);
 	}
 

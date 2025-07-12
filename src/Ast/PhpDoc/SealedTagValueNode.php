@@ -6,7 +6,7 @@ use PHPStan\PhpDocParser\Ast\NodeAttributes;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use function trim;
 
-class InheritorsTagValueNode implements PhpDocTagValueNode
+class SealedTagValueNode implements PhpDocTagValueNode
 {
 
 	use NodeAttributes;

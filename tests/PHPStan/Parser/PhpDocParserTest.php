@@ -25,7 +25,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\InheritorsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\SealedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
@@ -109,7 +109,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideMixinTagsData
 	 * @dataProvider provideRequireExtendsTagsData
 	 * @dataProvider provideRequireImplementsTagsData
-	 * @dataProvider provideInheritorsTagsData
+	 * @dataProvider provideSealedTagsData
 	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
@@ -2212,15 +2212,15 @@ class PhpDocParserTest extends TestCase
 		];
 	}
 
-	public function provideInheritorsTagsData(): Iterator
+	public function provideSealedTagsData(): Iterator
 	{
 		yield [
 			'OK without description',
-			'/** @phpstan-inheritors Foo|Bar */',
+			'/** @phpstan-sealed Foo|Bar */',
 			new PhpDocNode([
 				new PhpDocTagNode(
-					'@phpstan-inheritors',
-					new InheritorsTagValueNode(
+					'@phpstan-sealed',
+					new SealedTagValueNode(
 						new IdentifierTypeNode('Foo|Bar'),
 						'',
 					),
@@ -2230,11 +2230,11 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'OK with description',
-			'/** @phpstan-inheritors Foo|Bar optional description */',
+			'/** @phpstan-sealed Foo|Bar optional description */',
 			new PhpDocNode([
 				new PhpDocTagNode(
-					'@phpstan-inheritors',
-					new InheritorsTagValueNode(
+					'@phpstan-sealed',
+					new SealedTagValueNode(
 						new IdentifierTypeNode('Foo|Bar'),
 						'optional description',
 					),
@@ -2248,7 +2248,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@psalm-inheritors',
-					new InheritorsTagValueNode(
+					new SealedTagValueNode(
 						new IdentifierTypeNode('Foo|Bar'),
 						'optional description',
 					),
@@ -2258,16 +2258,16 @@ class PhpDocParserTest extends TestCase
 
 		yield [
 			'invalid without type and description',
-			'/** @phpstan-inheritors */',
+			'/** @phpstan-sealed */',
 			new PhpDocNode([
 				new PhpDocTagNode(
-					'@phpstan-inheritors',
+					'@phpstan-sealed',
 					new InvalidTagValueNode(
 						'',
 						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
-							24,
+							20,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
 							1,
