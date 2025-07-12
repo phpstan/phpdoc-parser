@@ -25,7 +25,6 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\SealedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
@@ -43,6 +42,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\SealedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
@@ -2221,7 +2221,10 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@phpstan-sealed',
 					new SealedTagValueNode(
-						new IdentifierTypeNode('Foo|Bar'),
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
 						'',
 					),
 				),
@@ -2235,7 +2238,10 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@phpstan-sealed',
 					new SealedTagValueNode(
-						new IdentifierTypeNode('Foo|Bar'),
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
 						'optional description',
 					),
 				),
@@ -2249,7 +2255,10 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@psalm-inheritors',
 					new SealedTagValueNode(
-						new IdentifierTypeNode('Foo|Bar'),
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
 						'optional description',
 					),
 				),
