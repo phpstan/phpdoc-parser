@@ -18,6 +18,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\InheritorsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
@@ -324,6 +325,10 @@ final class Printer
 			return trim("{$type} {$node->description}");
 		}
 		if ($node instanceof RequireImplementsTagValueNode) {
+			$type = $this->printType($node->type);
+			return trim("{$type} {$node->description}");
+		}
+		if ($node instanceof InheritorsTagValueNode) {
 			$type = $this->printType($node->type);
 			return trim("{$type} {$node->description}");
 		}

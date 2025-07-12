@@ -108,6 +108,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideMixinTagsData
 	 * @dataProvider provideRequireExtendsTagsData
 	 * @dataProvider provideRequireImplementsTagsData
+	 * @dataProvider provideInheritorsTagsData
 	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
@@ -2194,6 +2195,72 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-require-implements',
+					new InvalidTagValueNode(
+						'',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							32,
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1,
+						),
+					),
+				),
+			]),
+		];
+	}
+
+	public function provideInheritorsTagsData(): Iterator
+	{
+		yield [
+			'OK without description',
+			'/** @phpstan-inheritors Foo|Bar */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-inheritors',
+					new RequireImplementsTagValueNode(
+						new IdentifierTypeNode('Foo|Bar'),
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-inheritors Foo|Bar optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-inheritors',
+					new RequireImplementsTagValueNode(
+						new IdentifierTypeNode('Foo|Bar'),
+						'optional description',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with psalm-prefix description',
+			'/** @psalm-inheritors Foo|Bar optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-inheritors',
+					new RequireImplementsTagValueNode(
+						new IdentifierTypeNode('Foo|Bar'),
+						'optional description',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @phpstan-inheritors */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-inheritors',
 					new InvalidTagValueNode(
 						'',
 						new ParserException(

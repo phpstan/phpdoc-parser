@@ -232,6 +232,17 @@ class PhpDocNode implements Node
 	}
 
 	/**
+	 * @return InheritorsTagValueNode[]
+	 */
+	public function getInheritorsTagValues(string $tagName = '@phpstan-inheritors'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static fn (PhpDocTagValueNode $value): bool => $value instanceof InheritorsTagValueNode,
+		);
+	}
+
+	/**
 	 * @return DeprecatedTagValueNode[]
 	 */
 	public function getDeprecatedTagValues(): array
