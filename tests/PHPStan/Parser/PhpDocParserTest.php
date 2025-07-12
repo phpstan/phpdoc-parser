@@ -25,6 +25,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\GenericTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\InheritorsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
@@ -2219,7 +2220,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-inheritors',
-					new RequireImplementsTagValueNode(
+					new InheritorsTagValueNode(
 						new IdentifierTypeNode('Foo|Bar'),
 						'',
 					),
@@ -2233,7 +2234,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@phpstan-inheritors',
-					new RequireImplementsTagValueNode(
+					new InheritorsTagValueNode(
 						new IdentifierTypeNode('Foo|Bar'),
 						'optional description',
 					),
@@ -2247,7 +2248,7 @@ class PhpDocParserTest extends TestCase
 			new PhpDocNode([
 				new PhpDocTagNode(
 					'@psalm-inheritors',
-					new RequireImplementsTagValueNode(
+					new InheritorsTagValueNode(
 						new IdentifierTypeNode('Foo|Bar'),
 						'optional description',
 					),
@@ -2266,7 +2267,7 @@ class PhpDocParserTest extends TestCase
 						new ParserException(
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
-							32,
+							24,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
 							1,
