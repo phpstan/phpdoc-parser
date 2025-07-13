@@ -42,6 +42,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\RequireImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\SealedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\SelfOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
@@ -108,6 +109,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideMixinTagsData
 	 * @dataProvider provideRequireExtendsTagsData
 	 * @dataProvider provideRequireImplementsTagsData
+	 * @dataProvider provideSealedTagsData
 	 * @dataProvider provideDeprecatedTagsData
 	 * @dataProvider providePropertyTagsData
 	 * @dataProvider provideMethodTagsData
@@ -2200,6 +2202,81 @@ class PhpDocParserTest extends TestCase
 							'*/',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							32,
+							Lexer::TOKEN_IDENTIFIER,
+							null,
+							1,
+						),
+					),
+				),
+			]),
+		];
+	}
+
+	public function provideSealedTagsData(): Iterator
+	{
+		yield [
+			'OK without description',
+			'/** @phpstan-sealed Foo|Bar */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-sealed',
+					new SealedTagValueNode(
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-sealed Foo|Bar optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-sealed',
+					new SealedTagValueNode(
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
+						'optional description',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with psalm-prefix description',
+			'/** @psalm-inheritors Foo|Bar optional description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@psalm-inheritors',
+					new SealedTagValueNode(
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
+						'optional description',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'invalid without type and description',
+			'/** @phpstan-sealed */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-sealed',
+					new InvalidTagValueNode(
+						'',
+						new ParserException(
+							'*/',
+							Lexer::TOKEN_CLOSE_PHPDOC,
+							20,
 							Lexer::TOKEN_IDENTIFIER,
 							null,
 							1,
