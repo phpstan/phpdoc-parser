@@ -22,6 +22,7 @@ jobs:
           - "1.23.x"
           - "2.0.x"
           - "2.1.x"
+          - "2.2.x"
 
     steps:
       - name: "Checkout"
