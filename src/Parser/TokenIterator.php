@@ -3,6 +3,7 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use LogicException;
+use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use function array_pop;
@@ -232,8 +233,18 @@ class TokenIterator
 	public function skipNewLineTokensAndConsumeComments(): void
 	{
 		if ($this->currentTokenType() === Lexer::TOKEN_COMMENT) {
-			$this->comments[] = new Comment($this->currentTokenValue(), $this->currentTokenLine(), $this->currentTokenIndex());
+			$startLine = $this->currentTokenLine();
+			$startIndex = $this->currentTokenIndex();
+			$text = $this->currentTokenValue();
+
 			$this->next();
+
+			$c = new Comment($text);
+			$c->setAttribute(Attribute::START_LINE, $startLine);
+			$c->setAttribute(Attribute::START_INDEX, $startIndex);
+			$c->setAttribute(Attribute::END_LINE, $this->currentTokenLine());
+			$c->setAttribute(Attribute::END_INDEX, $this->currentTokenIndex());
+			$this->comments[] = $c;
 		}
 
 		if (!$this->isCurrentTokenType(Lexer::TOKEN_PHPDOC_EOL)) {
@@ -246,8 +257,18 @@ class TokenIterator
 				continue;
 			}
 
-			$this->comments[] = new Comment($this->currentTokenValue(), $this->currentTokenLine(), $this->currentTokenIndex());
+			$startLine = $this->currentTokenLine();
+			$startIndex = $this->currentTokenIndex();
+			$text = $this->currentTokenValue();
+
 			$this->next();
+
+			$c = new Comment($text);
+			$c->setAttribute(Attribute::START_LINE, $startLine);
+			$c->setAttribute(Attribute::START_INDEX, $startIndex);
+			$c->setAttribute(Attribute::END_LINE, $this->currentTokenLine());
+			$c->setAttribute(Attribute::END_INDEX, $this->currentTokenIndex());
+			$this->comments[] = $c;
 		} while ($foundNewLine === true);
 	}
 

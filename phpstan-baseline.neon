@@ -29,3 +29,9 @@ parameters:
 			identifier: property.dynamicName
 			count: 2
 			path: src/Printer/Printer.php
+
+		-
+			message: '#^Variable property access on PHPStan\\PhpDocParser\\Ast\\Node\.$#'
+			identifier: property.dynamicName
+			count: 1
+			path: tests/PHPStan/Parser/TypeParserTest.php

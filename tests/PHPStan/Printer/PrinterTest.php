@@ -1118,6 +1118,39 @@ class PrinterTest extends TestCase
 			$addItemsWithCommentsToObjectShape,
 		];
 
+		$removeComment = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				$comments = $node->getAttribute(Attribute::COMMENTS);
+				if ($comments === null || $comments === []) {
+					return null;
+				}
+
+				$node->setAttribute(Attribute::COMMENTS, []);
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  // b comment
+			 *  b: int,
+			 * }
+			 */'),
+			self::nowdoc('
+			/**
+			 * @return array{
+			 *  b: int,
+			 * }
+			 */'),
+			$removeComment,
+		];
+
 		$removeItemWithComment = new class extends AbstractNodeVisitor {
 
 			public function enterNode(Node $node)
@@ -2277,7 +2310,8 @@ class PrinterTest extends TestCase
 				 */'),
 			self::nowdoc('
 				/**
-				 * @param array{float} $foo
+				 * @param array{// A fractional number
+				 *  float} $foo
 				 */'),
 			$singleCommentLineAddFront,
 		];
@@ -2361,7 +2395,8 @@ class PrinterTest extends TestCase
 				 */'),
 			self::nowdoc('
 				/**
-				 * @param array{float} $foo
+				 * @param array{// A fractional number
+				 *  float} $foo
 				 */'),
 			$singleCommentLineAddMiddle,
 		];
@@ -2570,7 +2605,8 @@ class PrinterTest extends TestCase
 				 */'),
 			self::nowdoc('
 				/**
-				 * @param object{bar: float} $foo
+				 * @param object{// A fractional number
+				 *  bar: float} $foo
 				 */'),
 			$addCommentToObjectShapeItemMiddle,
 		];
@@ -2838,6 +2874,24 @@ class PrinterTest extends TestCase
 			]),
 			'/**
  * @param int $a
+ */',
+		];
+
+		yield [
+			new PhpDocNode([
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					ArrayShapeNode::createSealed([
+						self::withComment(new ArrayShapeItemNode(null, false, new IdentifierTypeNode('int')), '// this is a test'),
+					]),
+					false,
+					'$a',
+					'',
+					false,
+				)),
+			]),
+			'/**
+ * @param array{// this is a test
+ * int} $a
  */',
 		];
 	}
