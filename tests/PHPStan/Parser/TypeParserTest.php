@@ -3041,6 +3041,16 @@ class TypeParserTest extends TestCase
 				new IdentifierTypeNode('MongoCollection'),
 				Lexer::TOKEN_OPEN_ANGLE_BRACKET,
 			],
+			[
+				'array{Foo::BAR: int}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						new ConstFetchNode('Foo', 'BAR'),
+						false,
+						new IdentifierTypeNode('int'),
+					),
+				]),
+			],
 		];
 	}
 
