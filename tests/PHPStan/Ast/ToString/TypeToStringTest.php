@@ -6,6 +6,7 @@ use Generator;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNullNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
@@ -73,6 +74,13 @@ class TypeToStringTest extends TestCase
 					new ArrayShapeItemNode(new ConstExprStringNode('foo', ConstExprStringNode::SINGLE_QUOTED), false, new IdentifierTypeNode('Foo')),
 					new ArrayShapeItemNode(new ConstExprStringNode('bar', ConstExprStringNode::SINGLE_QUOTED), true, new IdentifierTypeNode('Bar')),
 					new ArrayShapeItemNode(new ConstExprIntegerNode('1'), false, new IdentifierTypeNode('Baz')),
+				]),
+			],
+			[
+				'array{Foo::BAR: Foo, Bar::FOO?: Bar}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(new ConstFetchNode('Foo', 'BAR'), false, new IdentifierTypeNode('Foo')),
+					new ArrayShapeItemNode(new ConstFetchNode('Bar', 'FOO'), true, new IdentifierTypeNode('Bar')),
 				]),
 			],
 			['list{}', ArrayShapeNode::createSealed([], 'list')],
