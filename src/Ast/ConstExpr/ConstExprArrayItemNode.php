@@ -20,7 +20,6 @@ class ConstExprArrayItemNode implements ConstExprNode
 		$this->value = $value;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->key !== null) {

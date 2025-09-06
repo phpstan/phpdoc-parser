@@ -26,7 +26,6 @@ class VarTagValueNode implements PhpDocTagValueNode
 		$this->description = $description;
 	}
 
-
 	public function __toString(): string
 	{
 		return trim("$this->type " . trim("{$this->variableName} {$this->description}"));

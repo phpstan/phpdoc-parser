@@ -21,7 +21,6 @@ class TypeAliasTagValueNode implements PhpDocTagValueNode
 		$this->type = $type;
 	}
 
-
 	public function __toString(): string
 	{
 		return trim("{$this->alias} {$this->type}");

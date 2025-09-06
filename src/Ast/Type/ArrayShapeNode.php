@@ -42,7 +42,6 @@ class ArrayShapeNode implements TypeNode
 		$this->kind = $kind;
 	}
 
-
 	/**
 	 * @param ArrayShapeItemNode[] $items
 	 * @param self::KIND_* $kind
@@ -60,7 +59,6 @@ class ArrayShapeNode implements TypeNode
 	{
 		return new self($items, false, $unsealedType, $kind);
 	}
-
 
 	public function __toString(): string
 	{

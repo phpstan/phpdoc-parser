@@ -34,7 +34,6 @@ class ConstExprParserTest extends TestCase
 		$this->constExprParser = new ConstExprParser($config);
 	}
 
-
 	/**
 	 * @dataProvider provideTrueNodeParseData
 	 * @dataProvider provideFalseNodeParseData
@@ -54,7 +53,6 @@ class ConstExprParserTest extends TestCase
 		$this->assertEquals($expectedExpr, $exprNode);
 		$this->assertSame($nextTokenType, $tokens->currentTokenType());
 	}
-
 
 	/**
 	 * @dataProvider provideTrueNodeParseData
@@ -86,7 +84,6 @@ class ConstExprParserTest extends TestCase
 		}
 	}
 
-
 	public function provideTrueNodeParseData(): Iterator
 	{
 		yield [
@@ -104,7 +101,6 @@ class ConstExprParserTest extends TestCase
 			new ConstExprTrueNode(),
 		];
 	}
-
 
 	public function provideFalseNodeParseData(): Iterator
 	{
@@ -124,7 +120,6 @@ class ConstExprParserTest extends TestCase
 		];
 	}
 
-
 	public function provideNullNodeParseData(): Iterator
 	{
 		yield [
@@ -142,7 +137,6 @@ class ConstExprParserTest extends TestCase
 			new ConstExprNullNode(),
 		];
 	}
-
 
 	public function provideIntegerNodeParseData(): Iterator
 	{
@@ -206,7 +200,6 @@ class ConstExprParserTest extends TestCase
 			new ConstExprIntegerNode('18446744073709551616'),
 		];
 	}
-
 
 	public function provideFloatNodeParseData(): Iterator
 	{
@@ -306,7 +299,6 @@ class ConstExprParserTest extends TestCase
 		];
 	}
 
-
 	public function provideStringNodeParseData(): Iterator
 	{
 		yield [
@@ -339,7 +331,6 @@ class ConstExprParserTest extends TestCase
 			new ConstExprStringNode("\u{fffd}", ConstExprStringNode::DOUBLE_QUOTED),
 		];
 	}
-
 
 	public function provideArrayNodeParseData(): Iterator
 	{
@@ -441,7 +432,6 @@ class ConstExprParserTest extends TestCase
 			]),
 		];
 	}
-
 
 	public function provideFetchNodeParseData(): Iterator
 	{

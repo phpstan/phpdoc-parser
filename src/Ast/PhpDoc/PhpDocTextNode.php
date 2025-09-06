@@ -16,7 +16,6 @@ class PhpDocTextNode implements PhpDocChildNode
 		$this->text = $text;
 	}
 
-
 	public function __toString(): string
 	{
 		return $this->text;

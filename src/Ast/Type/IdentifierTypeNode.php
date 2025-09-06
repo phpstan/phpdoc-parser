@@ -16,7 +16,6 @@ class IdentifierTypeNode implements TypeNode
 		$this->name = $name;
 	}
 
-
 	public function __toString(): string
 	{
 		return $this->name;

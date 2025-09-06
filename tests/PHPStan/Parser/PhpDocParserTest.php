@@ -93,7 +93,6 @@ class PhpDocParserTest extends TestCase
 		$this->phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 	}
 
-
 	/**
 	 * @dataProvider provideTagsWithNumbers
 	 * @dataProvider provideSpecializedTags
@@ -144,7 +143,6 @@ class PhpDocParserTest extends TestCase
 		);
 	}
 
-
 	private function executeTestParse(PhpDocParser $phpDocParser, string $label, string $input, PhpDocNode $expectedPhpDocNode): void
 	{
 		$tokens = new TokenIterator($this->lexer->tokenize($input));
@@ -154,7 +152,6 @@ class PhpDocParserTest extends TestCase
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode, $label);
 		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType(), $label);
 	}
-
 
 	public function provideParamTagsData(): Iterator
 	{
@@ -1154,7 +1151,6 @@ class PhpDocParserTest extends TestCase
 		];
 	}
 
-
 	public function providePropertyTagsData(): Iterator
 	{
 		yield [
@@ -1355,7 +1351,6 @@ class PhpDocParserTest extends TestCase
 			]),
 		];
 	}
-
 
 	public function provideReturnTagsData(): Iterator
 	{
@@ -1886,7 +1881,6 @@ class PhpDocParserTest extends TestCase
 			]),
 		];
 	}
-
 
 	public function provideThrowsTagsData(): Iterator
 	{
@@ -2905,7 +2899,6 @@ class PhpDocParserTest extends TestCase
 			]),
 		];
 	}
-
 
 	public function provideSingleLinePhpDocData(): Iterator
 	{
@@ -7627,7 +7620,6 @@ Finder::findFiles('*.php')
 		}
 	}
 
-
 	/**
 	 * @return iterable<array{string, list<array{int, int, int, int}>}>
 	 */
@@ -7684,7 +7676,6 @@ Finder::findFiles('*.php')
 			],
 		];
 	}
-
 
 	/**
 	 * @dataProvider dataDeepNodesLinesAndIndexes

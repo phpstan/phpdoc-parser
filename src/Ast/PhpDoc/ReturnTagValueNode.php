@@ -22,7 +22,6 @@ class ReturnTagValueNode implements PhpDocTagValueNode
 		$this->description = $description;
 	}
 
-
 	public function __toString(): string
 	{
 		return trim("{$this->type} {$this->description}");

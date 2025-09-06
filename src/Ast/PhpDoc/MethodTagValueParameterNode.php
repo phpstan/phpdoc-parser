@@ -31,7 +31,6 @@ class MethodTagValueParameterNode implements Node
 		$this->defaultValue = $defaultValue;
 	}
 
-
 	public function __toString(): string
 	{
 		$type = $this->type !== null ? "{$this->type} " : '';

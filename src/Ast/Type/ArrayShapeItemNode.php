@@ -31,7 +31,6 @@ class ArrayShapeItemNode implements Node
 		$this->valueType = $valueType;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->keyName !== null) {

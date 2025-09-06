@@ -34,7 +34,6 @@ class DoctrineArrayItem implements Node
 		$this->value = $value;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->key === null) {

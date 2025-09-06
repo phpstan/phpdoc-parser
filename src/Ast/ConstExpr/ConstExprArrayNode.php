@@ -21,7 +21,6 @@ class ConstExprArrayNode implements ConstExprNode
 		$this->items = $items;
 	}
 
-
 	public function __toString(): string
 	{
 		return '[' . implode(', ', $this->items) . ']';

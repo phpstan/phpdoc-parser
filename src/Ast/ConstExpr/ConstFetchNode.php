@@ -20,7 +20,6 @@ class ConstFetchNode implements ConstExprNode
 		$this->name = $name;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->className === '') {

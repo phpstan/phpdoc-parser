@@ -41,7 +41,6 @@ class MethodTagValueNode implements PhpDocTagValueNode
 		$this->templateTypes = $templateTypes;
 	}
 
-
 	public function __toString(): string
 	{
 		$static = $this->isStatic ? 'static ' : '';

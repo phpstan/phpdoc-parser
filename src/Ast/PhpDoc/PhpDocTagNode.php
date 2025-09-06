@@ -21,7 +21,6 @@ class PhpDocTagNode implements PhpDocChildNode
 		$this->value = $value;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->value instanceof DoctrineTagValueNode) {

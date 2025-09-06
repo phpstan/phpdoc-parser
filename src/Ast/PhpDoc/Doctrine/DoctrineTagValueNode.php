@@ -16,7 +16,6 @@ class DoctrineTagValueNode implements PhpDocTagValueNode
 	/** @var string (may be empty) */
 	public string $description;
 
-
 	public function __construct(
 		DoctrineAnnotation $annotation,
 		string $description
@@ -25,7 +24,6 @@ class DoctrineTagValueNode implements PhpDocTagValueNode
 		$this->annotation = $annotation;
 		$this->description = $description;
 	}
-
 
 	public function __toString(): string
 	{

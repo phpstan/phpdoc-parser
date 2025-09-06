@@ -31,7 +31,6 @@ class ParamTagValueNode implements PhpDocTagValueNode
 		$this->description = $description;
 	}
 
-
 	public function __toString(): string
 	{
 		$reference = $this->isReference ? '&' : '';

@@ -31,7 +31,6 @@ class CallableTypeParameterNode implements Node
 		$this->isOptional = $isOptional;
 	}
 
-
 	public function __toString(): string
 	{
 		$type = "{$this->type} ";

@@ -33,7 +33,6 @@ class CallableTypeNode implements TypeNode
 		$this->templateTypes = $templateTypes;
 	}
 
-
 	public function __toString(): string
 	{
 		$returnType = $this->returnType;

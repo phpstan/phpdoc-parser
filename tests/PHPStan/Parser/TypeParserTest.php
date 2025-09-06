@@ -57,7 +57,6 @@ class TypeParserTest extends TestCase
 		$this->typeParser = new TypeParser($config, new ConstExprParser($config));
 	}
 
-
 	/**
 	 * @dataProvider provideParseData
 	 * @param TypeNode|Exception $expectedResult
@@ -87,19 +86,16 @@ class TypeParserTest extends TestCase
 		$this->assertPrintedNodeViaPrinter($typeNode);
 	}
 
-
 	private function assertPrintedNodeViaToString(TypeNode $typeNode): void
 	{
 		$this->assertPrintedNode($typeNode, (string) $typeNode);
 	}
-
 
 	private function assertPrintedNodeViaPrinter(TypeNode $typeNode): void
 	{
 		$printer = new Printer();
 		$this->assertPrintedNode($typeNode, $printer->print($typeNode));
 	}
-
 
 	private function assertPrintedNode(TypeNode $typeNode, string $typeNodeString): void
 	{
@@ -109,7 +105,6 @@ class TypeParserTest extends TestCase
 		$this->assertInstanceOf(get_class($typeNode), $parsedAgainTypeNode);
 		$this->assertEquals($typeNode, $parsedAgainTypeNode);
 	}
-
 
 	/**
 	 * @dataProvider provideParseData
@@ -146,7 +141,6 @@ class TypeParserTest extends TestCase
 		);
 	}
 
-
 	private function unsetAllAttributes(Node $node): Node
 	{
 		$visitor = new class extends AbstractNodeVisitor {
@@ -173,7 +167,6 @@ class TypeParserTest extends TestCase
 		/** @var PhpDocNode */
 		return $traverser->traverse($newNodes)[0];
 	}
-
 
 	private function unsetAllAttributesButComments(Node $node): Node
 	{
@@ -205,7 +198,6 @@ class TypeParserTest extends TestCase
 		return $traverser->traverse($newNodes)[0];
 	}
 
-
 	/**
 	 * @template TNode of Node
 	 * @param TNode $node
@@ -218,7 +210,6 @@ class TypeParserTest extends TestCase
 		$node->setAttribute(Attribute::COMMENTS, $comments);
 		return $node;
 	}
-
 
 	/**
 	 * @return array<mixed>

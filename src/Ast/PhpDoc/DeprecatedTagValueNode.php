@@ -18,7 +18,6 @@ class DeprecatedTagValueNode implements PhpDocTagValueNode
 		$this->description = $description;
 	}
 
-
 	public function __toString(): string
 	{
 		return trim($this->description);

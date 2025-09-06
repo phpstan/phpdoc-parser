@@ -107,7 +107,6 @@ class Lexer
 		$this->config = $config;
 	}
 
-
 	/**
 	 * @return list<array{string, int, int}>
 	 */
@@ -135,7 +134,6 @@ class Lexer
 
 		return $tokens;
 	}
-
 
 	private function generateRegexp(): string
 	{

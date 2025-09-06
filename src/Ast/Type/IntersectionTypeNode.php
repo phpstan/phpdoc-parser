@@ -22,7 +22,6 @@ class IntersectionTypeNode implements TypeNode
 		$this->types = $types;
 	}
 
-
 	public function __toString(): string
 	{
 		return '(' . implode(' & ', array_map(static function (TypeNode $type): string {

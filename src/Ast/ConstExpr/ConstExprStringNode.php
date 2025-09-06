@@ -35,7 +35,6 @@ class ConstExprStringNode implements ConstExprNode
 		$this->quoteType = $quoteType;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->quoteType === self::SINGLE_QUOTED) {

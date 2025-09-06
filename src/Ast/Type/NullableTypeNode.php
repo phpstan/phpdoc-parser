@@ -16,7 +16,6 @@ class NullableTypeNode implements TypeNode
 		$this->type = $type;
 	}
 
-
 	public function __toString(): string
 	{
 		return '?' . $this->type;

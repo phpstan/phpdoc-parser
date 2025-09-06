@@ -34,7 +34,6 @@ class AssertTagPropertyValueNode implements PhpDocTagValueNode
 		$this->description = $description;
 	}
 
-
 	public function __toString(): string
 	{
 		$isNegated = $this->isNegated ? '!' : '';
