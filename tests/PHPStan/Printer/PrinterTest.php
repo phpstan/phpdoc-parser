@@ -13,6 +13,8 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\NodeVisitor;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AllMethodsImpureTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AllMethodsPureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineAnnotation;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
@@ -2106,6 +2108,40 @@ class PrinterTest extends TestCase
 				{
 					if ($node instanceof PureUnlessCallableIsImpureTagValueNode) {
 						$node->parameterName = '$bar';
+						$node->description = 'foo';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @phpstan-all-methods-impure test */',
+			'/** @phpstan-all-methods-impure foo */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof AllMethodsImpureTagValueNode) {
+						$node->description = 'foo';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @phpstan-all-methods-pure test */',
+			'/** @phpstan-all-methods-pure foo */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof AllMethodsPureTagValueNode) {
 						$node->description = 'foo';
 					}
 

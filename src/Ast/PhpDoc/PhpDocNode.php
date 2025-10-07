@@ -119,6 +119,28 @@ class PhpDocNode implements Node
 	}
 
 	/**
+	 * @return AllMethodsImpureTagValueNode[]
+	 */
+	public function getAllMethodsImpureTagValues(string $tagName = '@phpstan-all-methods-impure'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static fn (PhpDocTagValueNode $value): bool => $value instanceof AllMethodsImpureTagValueNode,
+		);
+	}
+
+	/**
+	 * @return AllMethodsPureTagValueNode[]
+	 */
+	public function getAllMethodsPureTagValues(string $tagName = '@phpstan-all-methods-pure'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static fn (PhpDocTagValueNode $value): bool => $value instanceof AllMethodsPureTagValueNode,
+		);
+	}
+
+	/**
 	 * @return TemplateTagValueNode[]
 	 */
 	public function getTemplateTagValues(string $tagName = '@template'): array

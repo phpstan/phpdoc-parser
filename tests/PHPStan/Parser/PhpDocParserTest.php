@@ -13,6 +13,8 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\DoctrineConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AllMethodsImpureTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AllMethodsPureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagPropertyValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
@@ -102,6 +104,8 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideParamClosureThisTagsData
 	 * @dataProvider providePureUnlessCallableIsImpureTagsData
+	 * @dataProvider provideAllMethodsImpureTagsData
+	 * @dataProvider provideAllMethodsPureTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
@@ -750,6 +754,64 @@ class PhpDocParserTest extends TestCase
 					'@pure-unless-callable-is-impure',
 					new PureUnlessCallableIsImpureTagValueNode(
 						'$foo',
+						'test two three',
+					),
+				),
+			]),
+		];
+	}
+
+	public function provideAllMethodsImpureTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @phpstan-all-methods-impure */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-all-methods-impure',
+					new AllMethodsImpureTagValueNode(
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-all-methods-impure test two three */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-all-methods-impure',
+					new AllMethodsImpureTagValueNode(
+						'test two three',
+					),
+				),
+			]),
+		];
+	}
+
+	public function provideAllMethodsPureTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @phpstan-all-methods-pure */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-all-methods-pure',
+					new AllMethodsPureTagValueNode(
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @phpstan-all-methods-pure test two three */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-all-methods-pure',
+					new AllMethodsPureTagValueNode(
 						'test two three',
 					),
 				),

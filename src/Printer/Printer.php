@@ -8,6 +8,8 @@ use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AllMethodsImpureTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\AllMethodsPureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagMethodValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagPropertyValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\AssertTagValueNode;
@@ -353,6 +355,12 @@ final class Printer
 		}
 		if ($node instanceof PureUnlessCallableIsImpureTagValueNode) {
 			return trim("{$node->parameterName} {$node->description}");
+		}
+		if ($node instanceof AllMethodsImpureTagValueNode) {
+			return trim($node->description);
+		}
+		if ($node instanceof AllMethodsPureTagValueNode) {
+			return trim($node->description);
 		}
 		if ($node instanceof PropertyTagValueNode) {
 			$type = $this->printType($node->type);

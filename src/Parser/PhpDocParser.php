@@ -362,6 +362,14 @@ class PhpDocParser
 					$tagValue = $this->parsePureUnlessCallableIsImpureTagValue($tokens);
 					break;
 
+				case '@phpstan-all-methods-impure':
+					$tagValue = $this->parseAllMethodsImpureTagValue($tokens);
+					break;
+
+				case '@phpstan-all-methods-pure':
+					$tagValue = $this->parseAllMethodsPureTagValue($tokens);
+					break;
+
 				case '@var':
 				case '@phpstan-var':
 				case '@psalm-var':
@@ -875,6 +883,20 @@ class PhpDocParser
 		$description = $this->parseOptionalDescription($tokens, false);
 
 		return new Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode($parameterName, $description);
+	}
+
+	private function parseAllMethodsImpureTagValue(TokenIterator $tokens): Ast\PhpDoc\AllMethodsImpureTagValueNode
+	{
+		$description = $this->parseOptionalDescription($tokens, false);
+
+		return new Ast\PhpDoc\AllMethodsImpureTagValueNode($description);
+	}
+
+	private function parseAllMethodsPureTagValue(TokenIterator $tokens): Ast\PhpDoc\AllMethodsPureTagValueNode
+	{
+		$description = $this->parseOptionalDescription($tokens, false);
+
+		return new Ast\PhpDoc\AllMethodsPureTagValueNode($description);
 	}
 
 	private function parseVarTagValue(TokenIterator $tokens): Ast\PhpDoc\VarTagValueNode
