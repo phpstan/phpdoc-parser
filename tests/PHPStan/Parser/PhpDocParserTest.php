@@ -73,6 +73,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function count;
 use function sprintf;
+use function var_export;
 use const DIRECTORY_SEPARATOR;
 use const PHP_EOL;
 
@@ -151,6 +152,10 @@ class PhpDocParserTest extends TestCase
 		$this->assertEquals($expectedPhpDocNode, $actualPhpDocNode, $label);
 		$this->assertSame((string) $expectedPhpDocNode, (string) $actualPhpDocNode, $label);
 		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType(), $label);
+
+		$serialized = var_export($actualPhpDocNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($actualPhpDocNode, $readData);
 	}
 
 	public function provideParamTagsData(): Iterator
