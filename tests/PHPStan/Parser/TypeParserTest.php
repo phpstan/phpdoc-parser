@@ -40,6 +40,7 @@ use PHPStan\PhpDocParser\Printer\Printer;
 use PHPUnit\Framework\TestCase;
 use function get_class;
 use function strpos;
+use function var_export;
 use const PHP_EOL;
 
 class TypeParserTest extends TestCase
@@ -84,6 +85,10 @@ class TypeParserTest extends TestCase
 
 		$this->assertPrintedNodeViaToString($typeNode);
 		$this->assertPrintedNodeViaPrinter($typeNode);
+
+		$serialized = var_export($typeNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($typeNode, $readData);
 	}
 
 	private function assertPrintedNodeViaToString(TypeNode $typeNode): void
@@ -139,6 +144,10 @@ class TypeParserTest extends TestCase
 			$this->unsetAllAttributesButComments($expectedResult),
 			$this->unsetAllAttributesButComments($typeNode),
 		);
+
+		$serialized = var_export($typeNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($typeNode, $readData);
 	}
 
 	private function unsetAllAttributes(Node $node): Node
@@ -3443,6 +3452,10 @@ class TypeParserTest extends TestCase
 			}
 			$this->assertSame($expectedContent, $content);
 		}
+
+		$serialized = var_export($typeNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($typeNode, $readData);
 	}
 
 }

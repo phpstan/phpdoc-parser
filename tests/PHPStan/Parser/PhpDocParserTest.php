@@ -7623,6 +7623,14 @@ Finder::findFiles('*.php')
 			$this->assertSame($childrenLines[$i][2], $child->getAttribute(Attribute::START_INDEX));
 			$this->assertSame($childrenLines[$i][3], $child->getAttribute(Attribute::END_INDEX));
 		}
+
+		$serialized = var_export($phpDocNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($phpDocNode, $readData);
+
+		$serialized = var_export($phpDocNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($phpDocNode, $readData);
 	}
 
 	/**
@@ -7823,7 +7831,9 @@ Finder::findFiles('*.php')
 
 		$visitor = new NodeCollectingVisitor();
 		$traverser = new NodeTraverser([$visitor]);
-		$traverser->traverse([$phpDocParser->parse($tokens)]);
+
+		$phpDocNode = $phpDocParser->parse($tokens);
+		$traverser->traverse([$phpDocNode]);
 
 		foreach ($visitor->nodes as $node) {
 			$this->assertNotNull($node->getAttribute(Attribute::START_LINE), sprintf('%s: %s', $label, $node));
@@ -7831,6 +7841,10 @@ Finder::findFiles('*.php')
 			$this->assertNotNull($node->getAttribute(Attribute::START_INDEX), sprintf('%s: %s', $label, $node));
 			$this->assertNotNull($node->getAttribute(Attribute::END_INDEX), sprintf('%s: %s', $label, $node));
 		}
+
+		$serialized = var_export($phpDocNode, true);
+		$readData = eval('return ' . $serialized . ';');
+		$this->assertEquals($phpDocNode, $readData);
 	}
 
 	/**
@@ -7846,7 +7860,9 @@ Finder::findFiles('*.php')
 	{
 		$parser = new DocParser();
 		$parser->addNamespace('PHPStan\PhpDocParser\Parser\Doctrine');
-		$this->assertEquals($expectedAnnotations, $parser->parse($input, $label), $label);
+
+		$phpDocNode = $parser->parse($input, $label);
+		$this->assertEquals($expectedAnnotations, $phpDocNode, $label);
 	}
 
 	/**
