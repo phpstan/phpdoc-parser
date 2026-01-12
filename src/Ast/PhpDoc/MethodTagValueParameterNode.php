@@ -40,4 +40,18 @@ class MethodTagValueParameterNode implements Node
 		return "{$type}{$isReference}{$isVariadic}{$this->parameterName}{$default}";
 	}
 
+	/**
+	 * @param array<string, mixed> $properties
+	 */
+	public static function __set_state(array $properties): self
+	{
+		$instance = new self($properties['type'], $properties['isReference'], $properties['isVariadic'], $properties['parameterName'], $properties['defaultValue']);
+		if (isset($properties['attributes'])) {
+			foreach ($properties['attributes'] as $key => $value) {
+				$instance->setAttribute($key, $value);
+			}
+		}
+		return $instance;
+	}
+
 }
