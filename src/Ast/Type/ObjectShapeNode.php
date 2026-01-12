@@ -28,4 +28,18 @@ class ObjectShapeNode implements TypeNode
 		return 'object{' . implode(', ', $items) . '}';
 	}
 
+	/**
+	 * @param array<string, mixed> $properties
+	 */
+	public static function __set_state(array $properties): self
+	{
+		$instance = new self($properties['items']);
+		if (isset($properties['attributes'])) {
+			foreach ($properties['attributes'] as $key => $value) {
+				$instance->setAttribute($key, $value);
+			}
+		}
+		return $instance;
+	}
+
 }
