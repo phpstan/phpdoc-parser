@@ -4,18 +4,24 @@ This file contains important instructions for working on the phpdoc-parser proje
 
 ## Project Overview
 
-**phpstan/phpdoc-parser** is a library that represents PHPDocs with an Abstract Syntax Tree (AST). It supports parsing and modifying PHPDocs, and is primarily used by PHPStan for static analysis.
+**phpstan/phpdoc-parser** is a library that represents PHPDocs with an AST (Abstract Syntax Tree). It supports parsing and modifying PHPDocs, and is primarily used by PHPStan for static analysis.
+
+* [PHPDoc Basics](https://phpstan.org/writing-php-code/phpdocs-basics) (list of PHPDoc tags)
+* [PHPDoc Types](https://phpstan.org/writing-php-code/phpdoc-types) (list of PHPDoc types)
+* [phpdoc-parser API Reference](https://phpstan.github.io/phpdoc-parser/2.3.x/namespace-PHPStan.PhpDocParser.html) with all the AST node types
 
 ### Key Features
 - Parses PHPDoc comments into an AST representation
-- Supports all PHPDoc tags and types (see [PHPStan documentation](https://phpstan.org/writing-php-code/phpdocs-basics))
-- Format-preserving printer for modifying and printing AST nodes
+- Supports all PHPDoc tags and types
+- Format-preserving printer for modifying and printing AST nodes (inspired by [nikic/PHP-Parser](https://github.com/nikic/PHP-Parser))
 - Support for Doctrine Annotations parsing
 - Nullable, intersection, generic, and conditional types support
 
 ### Requirements
 - PHP ^7.4 || ^8.0
-- Platform target: PHP 7.4.6
+- Platform target: PHP 7.4.6 (set in composer.json config)
+
+Note: While phpstan-src is on PHP 8.1+ thanks to PHAR build downgrade, this repository still supports PHP 7.4+.
 
 ## Project Structure
 
@@ -24,32 +30,37 @@ This file contains important instructions for working on the phpdoc-parser proje
 The source code is organized into the following main components:
 
 1. **Lexer** (`src/Lexer/`)
-   - `Lexer.php` - Tokenizes PHPDoc strings
+   - `Lexer.php` - Tokenizes PHPDoc strings into tokens
 
 2. **Parser** (`src/Parser/`)
    - `PhpDocParser.php` - Main PHPDoc parser (parses tags and structure)
    - `TypeParser.php` - Parses PHPDoc type expressions
    - `ConstExprParser.php` - Parses constant expressions
-   - `TokenIterator.php` - Iterator for tokens
+   - `TokenIterator.php` - Iterator for consuming tokens
    - `StringUnescaper.php` - Handles string unescaping
-   - `ParserException.php` - Exception handling
+   - `ParserException.php` - Exception handling for parse errors
 
 3. **AST** (`src/Ast/`)
    - `Node.php` - Base AST node interface
-   - `NodeTraverser.php` - Traverses and transforms AST
-   - `NodeVisitor.php` - Visitor pattern for AST traversal
-   - `Type/` - Type nodes (GenericTypeNode, ArrayTypeNode, UnionTypeNode, etc.)
-   - `PhpDoc/` - PHPDoc tag nodes (ParamTagValueNode, ReturnTagValueNode, etc.)
-   - `ConstExpr/` - Constant expression nodes
-   - `NodeVisitor/` - Built-in visitors (CloningVisitor, etc.)
+   - `NodeAttributes.php` - Trait for node attributes (lines, indexes, comments)
+   - `NodeTraverser.php` - Traverses and transforms AST trees
+   - `NodeVisitor.php` - Visitor interface for AST traversal
+   - `AbstractNodeVisitor.php` - Abstract base class for node visitors
+   - `Attribute.php` - Attribute constants (START_LINE, END_LINE, START_INDEX, END_INDEX, ORIGINAL_NODE, COMMENTS)
+   - `Comment.php` - Represents a comment within a PHPDoc
+   - `Type/` - Type nodes (GenericTypeNode, ArrayTypeNode, UnionTypeNode, IntersectionTypeNode, CallableTypeNode, ConditionalTypeNode, ArrayShapeNode, ObjectShapeNode, OffsetAccessTypeNode, etc.)
+   - `PhpDoc/` - PHPDoc tag nodes (ParamTagValueNode, ReturnTagValueNode, VarTagValueNode, ThrowsTagValueNode, MethodTagValueNode, PropertyTagValueNode, TemplateTagValueNode, ExtendsTagValueNode, ImplementsTagValueNode, AssertTagValueNode, TypeAliasTagValueNode, SealedTagValueNode, etc.)
+   - `PhpDoc/Doctrine/` - Doctrine annotation AST nodes (DoctrineAnnotation, DoctrineArgument, DoctrineArray, DoctrineArrayItem, DoctrineTagValueNode)
+   - `ConstExpr/` - Constant expression nodes (ConstExprIntegerNode, ConstExprStringNode, ConstExprArrayNode, ConstFetchNode, etc.)
+   - `NodeVisitor/` - Built-in visitors (CloningVisitor)
 
 4. **Printer** (`src/Printer/`)
-   - `Printer.php` - Prints AST back to PHPDoc format
-   - `Differ.php` - Computes differences between AST nodes
-   - `DiffElem.php` - Represents diff elements
+   - `Printer.php` - Prints AST back to PHPDoc format (supports format-preserving printing)
+   - `Differ.php` - Computes differences between AST node lists
+   - `DiffElem.php` - Represents diff elements (keep, remove, add, replace)
 
 5. **Configuration**
-   - `ParserConfig.php` - Parser configuration (attributes to use)
+   - `ParserConfig.php` - Parser configuration (used attributes: lines, indexes, comments)
 
 ### Tests (`tests/PHPStan/`)
 
@@ -59,24 +70,27 @@ Tests mirror the source structure and include:
    - `TypeParserTest.php` - Type parsing tests
    - `PhpDocParserTest.php` - PHPDoc parsing tests
    - `ConstExprParserTest.php` - Constant expression parsing tests
+   - `TokenIteratorTest.php` - Token iterator tests
    - `FuzzyTest.php` - Fuzzy testing
    - `Doctrine/` - Doctrine annotation test fixtures
 
 2. **AST Tests** (`tests/PHPStan/Ast/`)
    - `NodeTraverserTest.php` - Node traversal tests
-   - `Attributes/AttributesTest.php` - AST attribute tests
+   - `Attributes/` - AST attribute tests
    - `ToString/` - Tests for converting AST to string
    - `NodeVisitor/` - Visitor pattern tests
 
 3. **Printer Tests** (`tests/PHPStan/Printer/`)
-   - Tests for format-preserving printing functionality
+   - `PrinterTest.php` - Printer unit tests
+   - `DifferTest.php` - Differ algorithm tests
+   - `IntegrationPrinterWithPhpParserTest.php` - Integration tests with nikic/php-parser
 
 ### Configuration Files
 
 - `phpunit.xml` - PHPUnit test configuration
-- `phpstan.neon` - PHPStan static analysis configuration
+- `phpstan.neon` - PHPStan static analysis configuration (level 8)
 - `phpstan-baseline.neon` - PHPStan baseline (known issues)
-- `phpcs.xml` - PHP CodeSniffer configuration
+- `phpcs.xml` - PHP CodeSniffer configuration (references `build-cs/phpcs.xml`)
 - `composer.json` - Dependencies and autoloading
 
 ## How the Parser Works
@@ -107,6 +121,28 @@ For format-preserving printing (used when modifying existing PHPDocs), enable th
 - `lines` - Preserve line information
 - `indexes` - Preserve token indexes
 - `comments` - Preserve comments
+
+```php
+$config = new ParserConfig(usedAttributes: ['lines' => true, 'indexes' => true, 'comments' => true]);
+// ... setup lexer, parsers as above ...
+
+$cloningTraverser = new NodeTraverser([new CloningVisitor()]);
+[$newPhpDocNode] = $cloningTraverser->traverse([$phpDocNode]);
+
+// modify $newPhpDocNode...
+
+$printer = new Printer();
+$newPhpDoc = $printer->printFormatPreserving($newPhpDocNode, $phpDocNode, $tokens);
+```
+
+## Initial Setup
+
+```bash
+composer install
+make cs-install
+```
+
+The `make cs-install` step clones the [phpstan/build-cs](https://github.com/phpstan/build-cs) repository and installs its dependencies. This is required before running code style checks (`make cs` or `make cs-fix`).
 
 ## Common Development Tasks
 
@@ -164,13 +200,13 @@ make check
 
 This runs:
 - `lint` - PHP syntax checking with parallel-lint
-- `cs` - Code style checking with phpcs
+- `cs` - Code style checking with phpcs (requires `make cs-install` first)
 - `tests` - PHPUnit test suite
 - `phpstan` - Static analysis
 
 ## CRITICAL RULES
 
-### ⚠️ MANDATORY: Run After Every Change
+### MANDATORY: Run After Every Change
 
 **You MUST run both tests and PHPStan after every code change:**
 
@@ -185,7 +221,7 @@ make check
 
 **DO NOT** commit or consider work complete until both tests and PHPStan pass successfully.
 
-### ⚠️ NEVER Delete Tests
+### NEVER Delete Tests
 
 **NEVER delete any tests.** Tests are critical to the project's quality and regression prevention. If tests are failing:
 - Fix the implementation to make tests pass
@@ -194,6 +230,7 @@ make check
 
 ## Other Available Commands
 
+- `make cs-install` - Clone and install phpstan/build-cs (required before `make cs` or `make cs-fix`)
 - `make cs-fix` - Automatically fix code style issues
 - `make lint` - Check PHP syntax only
 - `make cs` - Check code style only
@@ -201,25 +238,26 @@ make check
 
 ## Workflow Summary
 
-1. Make code changes
-2. Run `make tests` - ensure all tests pass
-3. Run `make phpstan` - ensure static analysis passes
-4. Fix any issues found
-5. Commit only when both pass
-6. Repeat as needed
+1. Run `composer install` (initial setup)
+2. Run `make cs-install` (initial setup, required for code style checks)
+3. Make code changes
+4. Run `make tests` - ensure all tests pass
+5. Run `make phpstan` - ensure static analysis passes
+6. Fix any issues found
+7. Commit only when both pass
 
 **Remember: Tests and PHPStan MUST pass before any commit.**
 
 ## Coding Standards and Best Practices
 
 ### Code Style
-- Follow PSR-12 coding standards (enforced by phpcs)
-- Use tabs for indentation (project convention)
+- Code style is enforced by phpcs using rules from [phpstan/build-cs](https://github.com/phpstan/build-cs)
+- Uses tabs for indentation (tab-width 4)
 - Run `make cs-fix` to automatically fix code style issues
 - Always run `make cs` to verify code style before committing
 
 ### PHPStan Rules
-- Project uses strict PHPStan rules (level max)
+- Project uses PHPStan level 8
 - All code must pass static analysis
 - Avoid adding to phpstan-baseline.neon unless absolutely necessary
 - Type hints are required for all public APIs
@@ -235,7 +273,6 @@ make check
 - All AST nodes implement the `Node` interface
 - Nodes should be immutable where possible
 - Use `__toString()` for debugging output
-- Implement proper equality checks if needed
 - Follow the visitor pattern for AST traversal
 
 ### Parser Patterns
@@ -258,9 +295,3 @@ make check
 - Avoid unnecessary object allocations
 - Be careful with regex patterns
 - Consider memory usage in loops
-
-### Documentation
-- Public APIs should have PHPDoc comments
-- Complex logic should include inline comments
-- Update README.md when adding major features
-- Reference PHPStan documentation for PHPDoc tag specifications
