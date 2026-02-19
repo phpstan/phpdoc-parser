@@ -23,6 +23,7 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
 
     steps:
       - name: "Checkout"
@@ -64,11 +65,11 @@ jobs:
         run: "bin/phpunit --no-coverage"
 
       - name: "PHPStan"
-        if: matrix.php-version == '8.0' || matrix.php-version == '8.1' || matrix.php-version == '8.2'
+        if: matrix.php-version == '8.5'
         working-directory: slevomat-cs
         run: "bin/phpstan analyse -c build/PHPStan/phpstan.neon"
 
       - name: "PHPStan in tests"
-        if: matrix.php-version == '8.0' || matrix.php-version == '8.1' || matrix.php-version == '8.2'
+        if: matrix.php-version == '8.5'
         working-directory: slevomat-cs
         run: "bin/phpstan analyse -c build/PHPStan/phpstan.tests.neon"
