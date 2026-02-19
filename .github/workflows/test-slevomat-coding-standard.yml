@@ -33,7 +33,6 @@ jobs:
         with:
           repository: slevomat/coding-standard
           path: slevomat-cs
-          ref: 88602f9ae5450a933133108d052eeb2edee0a4b7
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
