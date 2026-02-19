@@ -4,7 +4,7 @@
 .github export-ignore
 apigen export-ignore
 phpcs.xml export-ignore
-doc/grammars export-ignore
+doc export-ignore
 tests export-ignore
 tmp export-ignore
 .editorconfig export-ignore
