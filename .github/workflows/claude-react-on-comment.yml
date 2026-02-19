@@ -3,6 +3,8 @@ name: "Claude React on comment"
 on:
   issue_comment:
     types: [created]
+  issues:
+    types: [opened]
   pull_request_review:
     types: [submitted]
   pull_request_review_comment:
@@ -29,7 +31,7 @@ jobs:
       - name: "Check for trigger phrase"
         id: check
         env:
-          COMMENT_BODY: ${{ github.event.comment.body || github.event.review.body || '' }}
+          COMMENT_BODY: ${{ github.event.comment.body || github.event.review.body || github.event.issue.body || '' }}
         run: |
           if echo "$COMMENT_BODY" | grep -qF "@phpstan-bot"; then
             echo "triggered=true" >> "$GITHUB_OUTPUT"
