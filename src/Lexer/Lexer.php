@@ -140,7 +140,7 @@ class Lexer
 		$patterns = [
 			self::TOKEN_HORIZONTAL_WS => '[\\x09\\x20]++',
 
-			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x80-\\xFF][0-9a-z_\\x80-\\xFF-]*+)++',
+			self::TOKEN_IDENTIFIER => '(?:[\\\\]?+[a-z_\\x80-\\xFF](?:[0-9a-z_\\x80-\\xFF]|(?!->)-)*+)++',
 			self::TOKEN_THIS_VARIABLE => '\\$this(?![0-9a-z_\\x80-\\xFF])',
 			self::TOKEN_VARIABLE => '\\$[a-z_\\x80-\\xFF][0-9a-z_\\x80-\\xFF]*+',
 

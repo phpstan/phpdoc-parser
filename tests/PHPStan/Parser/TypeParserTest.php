@@ -22,6 +22,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForPropertyNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
@@ -31,6 +32,8 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\PropertyAccessNode;
+use PHPStan\PhpDocParser\Ast\Type\PropertyAccessPathItem;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -3050,6 +3053,205 @@ class TypeParserTest extends TestCase
 						new IdentifierTypeNode('int'),
 					),
 				]),
+			],
+			[
+				'($this is array ? int : string)',
+				new ConditionalTypeNode(
+					new ThisTypeNode(),
+					new IdentifierTypeNode('array'),
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string'),
+					false,
+				),
+			],
+			[
+				'($this->data is array ? int : string)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						false,
+						null,
+						[new PropertyAccessPathItem('data')],
+					),
+					new IdentifierTypeNode('array'),
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string'),
+					false,
+				),
+			],
+			[
+				'($this->data is array<string, mixed> ? array<string, mixed> : null)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						false,
+						null,
+						[new PropertyAccessPathItem('data')],
+					),
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							new IdentifierTypeNode('mixed'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+					new GenericTypeNode(
+						new IdentifierTypeNode('array'),
+						[
+							new IdentifierTypeNode('string'),
+							new IdentifierTypeNode('mixed'),
+						],
+						[
+							GenericTypeNode::VARIANCE_INVARIANT,
+							GenericTypeNode::VARIANCE_INVARIANT,
+						],
+					),
+					new IdentifierTypeNode('null'),
+					false,
+				),
+			],
+			[
+				'($this->config->database is null ? void : never)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						false,
+						null,
+						[
+							new PropertyAccessPathItem('config'),
+							new PropertyAccessPathItem('database'),
+						],
+					),
+					new IdentifierTypeNode('null'),
+					new IdentifierTypeNode('void'),
+					new IdentifierTypeNode('never'),
+					false,
+				),
+			],
+			[
+				'(self::$config is null ? void : never)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						true,
+						PropertyAccessNode::HOLDER_SELF,
+						[new PropertyAccessPathItem('config')],
+					),
+					new IdentifierTypeNode('null'),
+					new IdentifierTypeNode('void'),
+					new IdentifierTypeNode('never'),
+					false,
+				),
+			],
+			[
+				'(parent::$value is int ? int : string)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						true,
+						PropertyAccessNode::HOLDER_PARENT,
+						[new PropertyAccessPathItem('value')],
+					),
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string'),
+					false,
+				),
+			],
+			[
+				'(static::$instance is null ? void : never)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						true,
+						PropertyAccessNode::HOLDER_STATIC,
+						[new PropertyAccessPathItem('instance')],
+					),
+					new IdentifierTypeNode('null'),
+					new IdentifierTypeNode('void'),
+					new IdentifierTypeNode('never'),
+					false,
+				),
+			],
+			[
+				'($this->prop is not array ? int : string)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						false,
+						null,
+						[new PropertyAccessPathItem('prop')],
+					),
+					new IdentifierTypeNode('array'),
+					new IdentifierTypeNode('int'),
+					new IdentifierTypeNode('string'),
+					true,
+				),
+			],
+			[
+				'(($this->data is array ? int : string)|null)',
+				new UnionTypeNode([
+					new ConditionalTypeForPropertyNode(
+						new PropertyAccessNode(
+							false,
+							null,
+							[new PropertyAccessPathItem('data')],
+						),
+						new IdentifierTypeNode('array'),
+						new IdentifierTypeNode('int'),
+						new IdentifierTypeNode('string'),
+						false,
+					),
+					new IdentifierTypeNode('null'),
+				]),
+			],
+			[
+				'($this->a->b->c is Type ? Foo : Bar)',
+				new ConditionalTypeForPropertyNode(
+					new PropertyAccessNode(
+						false,
+						null,
+						[
+							new PropertyAccessPathItem('a'),
+							new PropertyAccessPathItem('b'),
+							new PropertyAccessPathItem('c'),
+						],
+					),
+					new IdentifierTypeNode('Type'),
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+					false,
+				),
+			],
+			[
+				'($this->data array ? int : string)',
+				new ParserException(
+					'?',
+					Lexer::TOKEN_NULLABLE,
+					19,
+					Lexer::TOKEN_CLOSE_PARENTHESES,
+					null,
+					null,
+				),
+			],
+			[
+				'($this->config-> is null ? void : never)',
+				new ParserException(
+					'?',
+					Lexer::TOKEN_NULLABLE,
+					25,
+					Lexer::TOKEN_CLOSE_PARENTHESES,
+					null,
+					null,
+				),
+			],
+			[
+				'(self::$prop)',
+				new ParserException(
+					')',
+					Lexer::TOKEN_CLOSE_PARENTHESES,
+					12,
+					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
+				),
 			],
 		];
 	}

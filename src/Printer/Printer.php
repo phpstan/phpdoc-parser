@@ -51,6 +51,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForPropertyNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
@@ -428,6 +429,16 @@ final class Printer
 			return sprintf(
 				'(%s %s %s ? %s : %s)',
 				$node->parameterName,
+				$node->negated ? 'is not' : 'is',
+				$this->printType($node->targetType),
+				$this->printType($node->if),
+				$this->printType($node->else),
+			);
+		}
+		if ($node instanceof ConditionalTypeForPropertyNode) {
+			return sprintf(
+				'(%s %s %s ? %s : %s)',
+				(string) $node->subject,
 				$node->negated ? 'is not' : 'is',
 				$this->printType($node->targetType),
 				$this->printType($node->if),
