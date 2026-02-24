@@ -13,18 +13,23 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e # v2.14.2
+        with:
+          egress-policy: audit
+
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Generate changelog
         id: changelog
-        uses: metcalfc/changelog-generator@v4.6.2
+        uses: metcalfc/changelog-generator@3f82cef08fe5dcf57c591fe165e70e1d5032e15a # v4.6.2
         with:
           myToken: ${{ secrets.PHPSTAN_BOT_TOKEN }}
 
       - name: "Create release"
         id: create-release
-        uses: actions/create-release@v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.PHPSTAN_BOT_TOKEN }}
         with:
