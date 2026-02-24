@@ -42,4 +42,4 @@ jobs:
         run: "composer global require --dev roave/backward-compatibility-check"
 
       - name: "Check"
-        run: "$(composer global config bin-dir --absolute)/roave-backward-compatibility-check"
+        run: '"$(composer global config bin-dir --absolute)/roave-backward-compatibility-check"'
