@@ -49,14 +49,11 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
 
       - name: "React to feedback"
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          github_token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
           trigger_phrase: "@phpstan-bot"
           claude_args: "--model claude-opus-4-6"
           bot_name: "phpstan-bot"
