@@ -5145,89 +5145,89 @@ test',
 							Lexer::TOKEN_CLOSE_PHPDOC,
 							18,
 							Lexer::TOKEN_IDENTIFIER,
-						null,
-						1,
+							null,
+							1,
+						),
 					),
 				),
-			),
-		]),
-	];
+			]),
+		];
 
-	yield [
-		'OK with one template type',
-		'/** @phpstan-type Wrapper<T> T */',
-		new PhpDocNode([
-			new PhpDocTagNode(
-				'@phpstan-type',
-				new TypeAliasTagValueNode(
-					'Wrapper',
-					new IdentifierTypeNode('T'),
-					[
-						new TemplateTagValueNode('T', null, ''),
-					],
-				),
-			),
-		]),
-	];
-
-	yield [
-		'OK with two template types',
-		'/** @phpstan-type Pair<TFirst, TSecond> TFirst */',
-		new PhpDocNode([
-			new PhpDocTagNode(
-				'@phpstan-type',
-				new TypeAliasTagValueNode(
-					'Pair',
-					new IdentifierTypeNode('TFirst'),
-					[
-						new TemplateTagValueNode('TFirst', null, ''),
-						new TemplateTagValueNode('TSecond', null, ''),
-					],
-				),
-			),
-		]),
-	];
-
-	yield [
-		'OK with bounded template type',
-		'/** @phpstan-type Collection<T of object> list<T> */',
-		new PhpDocNode([
-			new PhpDocTagNode(
-				'@phpstan-type',
-				new TypeAliasTagValueNode(
-					'Collection',
-					new GenericTypeNode(
-						new IdentifierTypeNode('list'),
-						[new IdentifierTypeNode('T')],
-						[GenericTypeNode::VARIANCE_INVARIANT],
+		yield [
+			'OK with one template type',
+			'/** @phpstan-type Wrapper<T> T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Wrapper',
+						new IdentifierTypeNode('T'),
+						[
+							new TemplateTagValueNode('T', null, ''),
+						],
 					),
-					[
-						new TemplateTagValueNode('T', new IdentifierTypeNode('object'), ''),
-					],
 				),
-			),
-		]),
-	];
+			]),
+		];
 
-	yield [
-		'OK with default template type',
-		'/** @phpstan-type WithDefault<T = string> T */',
-		new PhpDocNode([
-			new PhpDocTagNode(
-				'@phpstan-type',
-				new TypeAliasTagValueNode(
-					'WithDefault',
-					new IdentifierTypeNode('T'),
-					[
-						new TemplateTagValueNode('T', null, '', new IdentifierTypeNode('string')),
-					],
+		yield [
+			'OK with two template types',
+			'/** @phpstan-type Pair<TFirst, TSecond> TFirst */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Pair',
+						new IdentifierTypeNode('TFirst'),
+						[
+							new TemplateTagValueNode('TFirst', null, ''),
+							new TemplateTagValueNode('TSecond', null, ''),
+						],
+					),
 				),
-			),
-		]),
-	];
-}
+			]),
+		];
 
-public function provideTypeAliasImportTagsData(): Iterator
+		yield [
+			'OK with bounded template type',
+			'/** @phpstan-type Collection<T of object> list<T> */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Collection',
+						new GenericTypeNode(
+							new IdentifierTypeNode('list'),
+							[new IdentifierTypeNode('T')],
+							[GenericTypeNode::VARIANCE_INVARIANT],
+						),
+						[
+							new TemplateTagValueNode('T', new IdentifierTypeNode('object'), ''),
+						],
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with default template type',
+			'/** @phpstan-type WithDefault<T = string> T */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'WithDefault',
+						new IdentifierTypeNode('T'),
+						[
+							new TemplateTagValueNode('T', null, '', new IdentifierTypeNode('string')),
+						],
+					),
+				),
+			]),
+		];
+	}
+
+	public function provideTypeAliasImportTagsData(): Iterator
 	{
 		yield [
 			'OK',
