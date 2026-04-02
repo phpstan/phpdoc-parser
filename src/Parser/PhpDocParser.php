@@ -1067,6 +1067,21 @@ class PhpDocParser
 		$alias = $tokens->currentTokenValue();
 		$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
 
+		$templateTypes = [];
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+			do {
+				$startLine = $tokens->currentTokenLine();
+				$startIndex = $tokens->currentTokenIndex();
+				$templateTypes[] = $this->enrichWithAttributes(
+					$tokens,
+					$this->typeParser->parseTemplateTagValue($tokens),
+					$startLine,
+					$startIndex,
+				);
+			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
+			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
+		}
+
 		// support phan-type/psalm-type syntax
 		$tokens->tryConsumeTokenType(Lexer::TOKEN_EQUAL);
 
@@ -1087,12 +1102,13 @@ class PhpDocParser
 				}
 			}
 
-			return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type);
+			return new Ast\PhpDoc\TypeAliasTagValueNode($alias, $type, $templateTypes);
 		} catch (ParserException $e) {
 			$this->parseOptionalDescription($tokens, false);
 			return new Ast\PhpDoc\TypeAliasTagValueNode(
 				$alias,
 				$this->enrichWithAttributes($tokens, new Ast\Type\InvalidTypeNode($e), $startLine, $startIndex),
+				$templateTypes,
 			);
 		}
 	}

@@ -383,8 +383,11 @@ final class Printer
 			);
 		}
 		if ($node instanceof TypeAliasTagValueNode) {
+			$templateTypes = $node->templateTypes !== []
+				? '<' . implode(', ', array_map(fn (TemplateTagValueNode $templateNode): string => $this->print($templateNode), $node->templateTypes)) . '>'
+				: '';
 			$type = $this->printType($node->type);
-			return trim("{$node->alias} {$type}");
+			return trim("{$node->alias}{$templateTypes} {$type}");
 		}
 		if ($node instanceof UsesTagValueNode) {
 			$type = $this->printType($node->type);
