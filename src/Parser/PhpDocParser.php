@@ -1069,6 +1069,11 @@ class PhpDocParser
 
 		$templateTypes = [];
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
+			// Skip whitespace and newlines after opening bracket
+			while ($tokens->isCurrentTokenType(Lexer::TOKEN_HORIZONTAL_WS, Lexer::TOKEN_PHPDOC_EOL)) {
+				$tokens->next();
+			}
+
 			do {
 				$startLine = $tokens->currentTokenLine();
 				$startIndex = $tokens->currentTokenIndex();
@@ -1078,7 +1083,21 @@ class PhpDocParser
 					$startLine,
 					$startIndex,
 				);
-			} while ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA));
+
+				// Skip whitespace and newlines after template type
+				while ($tokens->isCurrentTokenType(Lexer::TOKEN_HORIZONTAL_WS, Lexer::TOKEN_PHPDOC_EOL)) {
+					$tokens->next();
+				}
+
+				if (!$tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+					break;
+				}
+
+				// Skip whitespace and newlines after comma
+				while ($tokens->isCurrentTokenType(Lexer::TOKEN_HORIZONTAL_WS, Lexer::TOKEN_PHPDOC_EOL)) {
+					$tokens->next();
+				}
+			} while (true);
 			$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
 		}
 

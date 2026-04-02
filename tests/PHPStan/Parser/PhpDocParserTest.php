@@ -5225,6 +5225,57 @@ test',
 				),
 			]),
 		];
+
+		yield [
+			'OK multiline with two template types',
+			'/**
+ * @phpstan-type Widget<
+ *     TFoo,
+ *     TBar
+ * > array{foo: TFoo, bar: TBar}
+ */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Widget',
+						ArrayShapeNode::createSealed([
+							new ArrayShapeItemNode(new IdentifierTypeNode('foo'), false, new IdentifierTypeNode('TFoo')),
+							new ArrayShapeItemNode(new IdentifierTypeNode('bar'), false, new IdentifierTypeNode('TBar')),
+						]),
+						[
+							new TemplateTagValueNode('TFoo', null, ''),
+							new TemplateTagValueNode('TBar', null, ''),
+						],
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK multiline with bounded template',
+			'/**
+ * @phpstan-type Collection<
+ *     T of object
+ * > list<T>
+ */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-type',
+					new TypeAliasTagValueNode(
+						'Collection',
+						new GenericTypeNode(
+							new IdentifierTypeNode('list'),
+							[new IdentifierTypeNode('T')],
+							[GenericTypeNode::VARIANCE_INVARIANT],
+						),
+						[
+							new TemplateTagValueNode('T', new IdentifierTypeNode('object'), ''),
+						],
+					),
+				),
+			]),
+		];
 	}
 
 	public function provideTypeAliasImportTagsData(): Iterator
