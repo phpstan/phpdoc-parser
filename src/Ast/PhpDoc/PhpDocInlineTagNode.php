@@ -2,30 +2,31 @@
 
 namespace PHPStan\PhpDocParser\Ast\PhpDoc;
 
+use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
 
-class PhpDocTextNode implements PhpDocChildNode
+class PhpDocInlineTagNode implements Node
 {
 
 	use NodeAttributes;
 
-	public string $text;
+	public string $name;
 
-	/** @var list<PhpDocInlineTagNode> */
-	public array $inlineTags;
+	public string $value;
 
-	/**
-	 * @param list<PhpDocInlineTagNode> $inlineTags
-	 */
-	public function __construct(string $text, array $inlineTags = [])
+	public function __construct(string $name, string $value)
 	{
-		$this->text = $text;
-		$this->inlineTags = $inlineTags;
+		$this->name = $name;
+		$this->value = $value;
 	}
 
 	public function __toString(): string
 	{
-		return $this->text;
+		if ($this->value === '') {
+			return '{' . $this->name . '}';
+		}
+
+		return '{' . $this->name . ' ' . $this->value . '}';
 	}
 
 	/**
@@ -33,7 +34,7 @@ class PhpDocTextNode implements PhpDocChildNode
 	 */
 	public static function __set_state(array $properties): self
 	{
-		$instance = new self($properties['text'], $properties['inlineTags'] ?? []);
+		$instance = new self($properties['name'], $properties['value']);
 		if (isset($properties['attributes'])) {
 			foreach ($properties['attributes'] as $key => $value) {
 				$instance->setAttribute($key, $value);
