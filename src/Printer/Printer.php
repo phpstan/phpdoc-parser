@@ -27,6 +27,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocChildNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocInlineTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
@@ -204,6 +205,9 @@ final class Printer
 		}
 		if ($node instanceof PhpDocTextNode) {
 			return $node->text;
+		}
+		if ($node instanceof PhpDocInlineTagNode) {
+			return (string) $node;
 		}
 		if ($node instanceof PhpDocTagNode) {
 			if ($node->value instanceof DoctrineTagValueNode) {
@@ -830,6 +834,11 @@ final class Printer
 			throw new LogicException();
 		}
 
+		if ($node instanceof PhpDocTextNode) {
+			assert($originalNode instanceof PhpDocTextNode);
+			return $this->printPhpDocTextNodeFormatPreserving($node, $originalNode, $originalTokens, $startPos, $endPos);
+		}
+
 		$result = '';
 		$pos = $startPos;
 		$subNodeNames = array_keys(get_object_vars($node));
@@ -915,6 +924,55 @@ final class Printer
 		}
 
 		return $result . $originalTokens->getContentBetween($pos, $endPos + 1);
+	}
+
+	private function printPhpDocTextNodeFormatPreserving(
+		PhpDocTextNode $node,
+		PhpDocTextNode $originalNode,
+		TokenIterator $originalTokens,
+		int $startPos,
+		int $endPos
+	): string
+	{
+		if (count($node->inlineTags) !== count($originalNode->inlineTags)) {
+			return $this->print($node);
+		}
+
+		$anyInlineTagModified = false;
+		foreach ($node->inlineTags as $i => $inlineTag) {
+			$original = $inlineTag->getAttribute(Attribute::ORIGINAL_NODE);
+			if (!$original instanceof PhpDocInlineTagNode || $original !== $originalNode->inlineTags[$i]) {
+				$anyInlineTagModified = true;
+				break;
+			}
+			if ($inlineTag->name !== $original->name || $inlineTag->value !== $original->value) {
+				$anyInlineTagModified = true;
+				break;
+			}
+		}
+
+		if (!$anyInlineTagModified) {
+			if ($node->text === $originalNode->text) {
+				return $originalTokens->getContentBetween($startPos, $endPos + 1);
+			}
+			return $this->print($node);
+		}
+
+		$pos = $startPos;
+		$listResult = $this->printArrayFormatPreserving(
+			$node->inlineTags,
+			$originalNode->inlineTags,
+			$originalTokens,
+			$pos,
+			PhpDocTextNode::class,
+			'inlineTags',
+		);
+
+		if ($listResult === null) {
+			return $this->print($node);
+		}
+
+		return $listResult . $originalTokens->getContentBetween($pos, $endPos + 1);
 	}
 
 }
