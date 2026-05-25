@@ -28,11 +28,9 @@ jobs:
           myToken: ${{ secrets.PHPSTAN_BOT_TOKEN }}
 
       - name: "Create release"
-        id: create-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           body: ${{ steps.changelog.outputs.changelog }}
