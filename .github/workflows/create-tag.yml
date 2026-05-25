@@ -39,7 +39,7 @@ jobs:
 
       - name: 'Get next versions'
         id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@d079934efaf011a4cf8912d4637097fe35d32b93" # v1
+        uses: "WyriHaximus/github-action-next-semvers@18aa9ed4152808ab99b88d71f5481e41f8d89930" # v1.2.1
         with:
           version: ${{ steps.previoustag.outputs.tag }}
 
