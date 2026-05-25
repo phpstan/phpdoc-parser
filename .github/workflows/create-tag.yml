@@ -26,14 +26,14 @@ jobs:
           egress-policy: audit
 
       - name: "Checkout"
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
           token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
 
       - name: 'Get Previous tag'
         id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@04e8485ecb6487243907e330d522ff60f02283ce" # v1.4.0
+        uses: "WyriHaximus/github-action-get-previous-tag@61819f33034117e6c686e6a31dba995a85afc9de" # v2.0.0
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
