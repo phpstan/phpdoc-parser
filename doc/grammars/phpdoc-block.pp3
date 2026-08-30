@@ -1,0 +1,691 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  The PHPDoc Itself
+ * -----------------------------------------------------------------------------
+ *
+ *  Everything "PHPStan\PhpDocParser\Parser\PhpDocParser" reads: the shape of a
+ *  PHPDoc, the tags it is written of and the free-form text between them.
+ *
+ *  What this grammar describes is a PHPDoc that is written correctly. The
+ *  parser reads a broken one as well, by turning whatever it cannot read into
+ *  an "InvalidTagValueNode" carrying the very error it has raised, and a
+ *  grammar has no way of writing that error down. So what a broken PHPDoc means
+ *  is left to the parser, and everything written here is something the parser
+ *  has to read in full.
+ */
+
+/**
+ * A PHPDoc, like:
+ *  - / ** @param Foo $a The first one * /
+ *
+ *  The children are separated by line breaks, except after a tag nothing reads
+ *  the value of: whatever follows such a tag has already been read as its
+ *  description, up to the line break the description stops at.
+ */
+PhpDoc
+  : <T_OPEN_PHPDOC> <T_PHPDOC_EOL>? ( !<T_CLOSE_PHPDOC> PhpDocChildren() )? <T_CLOSE_PHPDOC>
+  ;
+
+PhpDocChildren
+  : UnreadTagChild() <T_PHPDOC_EOL>? MorePhpDocChildren()?
+  | PhpDocChild() ( <T_PHPDOC_EOL> MorePhpDocChildren()? )?
+  ;
+
+MorePhpDocChildren
+  : !<T_CLOSE_PHPDOC> PhpDocChildren()
+  ;
+
+/**
+ * A tag whose value nothing reads, which is what makes the line break after it
+ * optional: its description has already been read up to wherever it ends.
+ */
+UnreadTagChild
+  : GenericTag()
+  | DoctrineTag()
+  ;
+
+/**
+ * A child of a PHPDoc that is not a tag nothing reads the value of.
+ *
+ * Free-form text is only read where no tag is written: a tag whose value cannot
+ * be read is an error rather than a line of text that happens to begin with an
+ * "@", which is what the predicate says.
+ */
+PhpDocChild
+  : KnownTag()
+  | !TagToken() TextChild()
+  ;
+
+/**
+ * The free-form text between the tags of a PHPDoc.
+ */
+TextChild
+  : Text()
+  ;
+
+/**
+ * A tag named by nothing this grammar knows, like:
+ *  - @author John Doe
+ *
+ *  Its value is whatever is written after it, read as a description that stops
+ *  at the first tag rather than reading it as part of the text.
+ */
+GenericTag
+  : GenericTagToken() !ParenthesesOpen() DoctrineDescription()
+  ;
+
+GenericTagToken
+  : <T_PHPDOC_TAG>
+  | <T_PHPDOC_TAG_WS>
+  ;
+
+DoctrineTagToken
+  : <T_DOCTRINE_TAG>
+  | <T_DOCTRINE_TAG_WS>
+  ;
+
+// -----------------------------------------------------------------------------
+//  The tags whose value is read
+// -----------------------------------------------------------------------------
+
+/**
+ * Every tag this grammar knows the value of.
+ *
+ * The value of each of them is read by a rule of its own and the tag itself
+ * says which: which alternative is worth entering is decided by the very first
+ * token, so nothing is ever read twice.
+ */
+KnownTag
+  : <T_TAG_PARAM> ParamTagValue()
+  | <T_TAG_VAR> VarTagValue()
+  | <T_TAG_RETURN> TypeAndDescription()
+  | <T_TAG_THROWS> TypeAndDescription()
+  | <T_TAG_MIXIN> TypeAndDescription()
+  | <T_TAG_REQUIRE_EXTENDS> TypeAndDescription()
+  | <T_TAG_REQUIRE_IMPLEMENTS> TypeAndDescription()
+  | <T_TAG_SEALED> TypeAndDescription()
+  | <T_TAG_SELF_OUT> TypeAndDescription()
+  | <T_TAG_PROPERTY> TypeAndVariableName()
+  | <T_TAG_PARAM_OUT> TypeAndVariableName()
+  | <T_TAG_PARAM_CLOSURE_THIS> TypeAndVariableName()
+  | <T_TAG_PARAM_IMMEDIATELY_INVOKED_CALLABLE> VariableNameAndDescription()
+  | <T_TAG_PARAM_LATER_INVOKED_CALLABLE> VariableNameAndDescription()
+  | <T_TAG_PURE_UNLESS_CALLABLE_IS_IMPURE> VariableNameAndDescription()
+  | <T_TAG_PURE_UNLESS_PARAMETER_PASSED> VariableNameAndDescription()
+  | <T_TAG_DEPRECATED> Description()
+  | <T_TAG_METHOD> MethodTagValue()
+  | <T_TAG_TEMPLATE> TemplateTagValue()
+  | <T_TAG_EXTENDS> ExtendsTagValue()
+  | <T_TAG_IMPLEMENTS> ExtendsTagValue()
+  | <T_TAG_USE> ExtendsTagValue()
+  | <T_TAG_TYPE_ALIAS> TypeAliasTagValue()
+  | <T_TAG_TYPE_ALIAS_IMPORT> TypeAliasImportTagValue()
+  | <T_TAG_ASSERT> AssertTagValue()
+  ;
+
+/**
+ * A type followed by a description, which is what most of the tags are written
+ * of: @return, @throws, @mixin and the rest of them.
+ */
+TypeAndDescription
+  : Type() DescriptionAfterType()
+  ;
+
+/**
+ * A type, the name of what it belongs to and a description, like:
+ *  - @property Foo $bar The one that matters
+ */
+TypeAndVariableName
+  : Type() <T_VARIABLE> Description()
+  ;
+
+VariableNameAndDescription
+  : <T_VARIABLE> Description()
+  ;
+
+/**
+ * A parameter, which may be written with no type at all, like:
+ *  - @param Foo $a
+ *  - @param &...$a
+ */
+ParamTagValue
+  : &ParameterNameStart() <T_REFERENCE>? <T_VARIADIC>? <T_VARIABLE> Description()
+  | Type() <T_REFERENCE>? <T_VARIADIC>? <T_VARIABLE> Description()
+  ;
+
+ParameterNameStart
+  : <T_REFERENCE>
+  | <T_VARIADIC>
+  | <T_VARIABLE>
+  ;
+
+/**
+ * A type and the variable it belongs to, of which the variable may be left out.
+ *
+ * A description written with no variable before it has to be written after a
+ * space, which is what tells "@var Foo the one" from "@var Foo|the one".
+ */
+VarTagValue
+  : Type() VariableName() Description()
+  | Type() DescriptionAfterType()
+  ;
+
+VariableName
+  : <T_VARIABLE>
+  | <T_THIS_VARIABLE>
+  ;
+
+// -----------------------------------------------------------------------------
+//  @method
+// -----------------------------------------------------------------------------
+
+/**
+ * A method, like:
+ *  - @method static Foo bar(int $a = 1)
+ *  - @method bar()
+ *
+ *  The name of a method is read as a type first and is only told from a return
+ *  type by what follows it, which is why a type is written where a name is
+ *  meant.
+ */
+MethodTagValue
+  : StaticType() Type() Identifier() MethodTagValueTail()
+  | StaticType() Type() MethodTagValueTail()
+  | Type() Identifier() MethodTagValueTail()
+  | Type() MethodTagValueTail()
+  ;
+
+/**
+ * The word "static" written as a whole type of its own, which is what tells
+ * "@method static Foo bar()" from "@method static[] bar()".
+ */
+StaticType
+  : <T_KEYWORD_STATIC> !StaticTypeContinues()
+  ;
+
+StaticTypeContinues
+  : Trivia() ( <T_UNION> | <T_INTERSECTION> )
+  | <T_DOUBLE_COLON>
+  | <T_OPEN_ANGLE_BRACKET>
+  | ParenthesesOpen()
+  | SquareBracketOpen()
+  ;
+
+MethodTagValueTail
+  : ( MethodTemplates() | !AngleBracketOpen() )
+    ParenthesesOpen() MethodParameters()? <T_CLOSE_PARENTHESES> Description()
+  ;
+
+MethodTemplates
+  : AngleBracketOpen() CallableTemplateArgument() ( <T_COMMA> CallableTemplateArgument() )* <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+MethodParameters
+  : MethodParameter() ( <T_COMMA> MethodParameter() )*
+  ;
+
+MethodParameter
+  : &MethodParameterTypeStart() Type() <T_REFERENCE>? <T_VARIADIC>? <T_VARIABLE> MethodParameterDefault()
+  | <T_REFERENCE>? <T_VARIADIC>? <T_VARIABLE> MethodParameterDefault()
+  ;
+
+/**
+ * A parameter is only read with a type when one of these is written first,
+ * which is what keeps "&$a" from being read as a type.
+ */
+MethodParameterTypeStart
+  : Identifier()
+  | ParenthesesOpen()
+  | <T_NULLABLE>
+  ;
+
+MethodParameterDefault
+  : <T_EQUAL> ConstantExpr()
+  | !<T_EQUAL>
+  ;
+
+// -----------------------------------------------------------------------------
+//  @template, @extends, @phpstan-type and friends
+// -----------------------------------------------------------------------------
+
+TemplateTagValue
+  : Identifier() TemplateUpperBound() TemplateLowerBound() TemplateDefault() DescriptionAfterType()
+  ;
+
+/**
+ * What a class extends, implements or uses, which is always a generic type:
+ *  - @extends Collection<int, Foo>
+ */
+ExtendsTagValue
+  : Identifier() GenericInReturnType() DescriptionAfterType()
+  ;
+
+/**
+ * A type written under a name of its own, like:
+ *  - @phpstan-type Foo = int|string
+ *
+ *  Nothing may be written after the type but the end of its line, so that a
+ *  description is never read as part of the type it follows.
+ */
+TypeAliasTagValue
+  : Identifier() <T_EQUAL>? Type() &EndOfLine()
+  ;
+
+/**
+ * A type read out of another PHPDoc, like:
+ *  - @phpstan-import-type Foo from Bar as Baz
+ */
+TypeAliasImportTagValue
+  : Identifier() <T_KEYWORD_FROM> Identifier() ( <T_KEYWORD_AS> Identifier() | !<T_KEYWORD_AS> )
+  ;
+
+/**
+ * What a method says about its arguments once it gives back, like:
+ *  - @phpstan-assert !Foo $a
+ *  - @phpstan-assert Foo $a->bar
+ *  - @phpstan-assert Foo $a->bar()
+ */
+AssertTagValue
+  : <T_NEGATED>? <T_EQUAL>? Type() AssertParameter() Description()
+  ;
+
+AssertParameter
+  : AssertParameterName() ( <T_ARROW> Identifier() AssertMethodParentheses() | !<T_ARROW> )
+  ;
+
+AssertMethodParentheses
+  : ParenthesesOpen() <T_CLOSE_PARENTHESES>
+  | !ParenthesesOpen()
+  ;
+
+AssertParameterName
+  : <T_THIS_VARIABLE>
+  | <T_VARIABLE>
+  ;
+
+// -----------------------------------------------------------------------------
+//  Descriptions
+// -----------------------------------------------------------------------------
+
+/**
+ * Whatever is written after the value of a tag.
+ */
+Description
+  : Text()
+  ;
+
+/**
+ * The same, written right after a type.
+ *
+ * Such a description may not begin with a "|" or a "&", so that "@return
+ * Foo|null" is one type rather than a type followed by something else, and
+ * "@return A & B | C" is an error rather than the type "A & B" followed by the
+ * description "| C".
+ *
+ * It has to begin after a space as well, which is what makes "@return
+ * callable(int)" an error rather than the type "callable" followed by the
+ * description "(int)". Whether a space is written between two tokens is not
+ * something this grammar can say, so that half of the rule is left out and the
+ * few tags it turns down are read by the hand-written parser alone.
+ */
+DescriptionAfterType
+  : !<T_UNION> !<T_INTERSECTION> !<T_OPEN_PARENTHESES> Text()
+  ;
+
+/**
+ * The description of a tag nothing reads the value of.
+ *
+ * It stops at the first tag rather than reading it as text, so that
+ * "@author John\n@since 1.0" is two tags. A tag written in the middle of a line
+ * is read by looking at what the tag turns out to mean, which a grammar cannot
+ * do, so a description that would stop at one is left out of this grammar.
+ */
+DoctrineDescription
+  : DoctrineText()
+  ;
+
+/**
+ * The text of a description or of a PHPDoc, read the way
+ * PhpDocParser::parseText() reads it.
+ *
+ * The reading goes past a line break as long as something is written on the
+ * next line, and stops before the line break that follows the last line with
+ * anything on it: a blank line written in the middle of a description belongs
+ * to it, while one written after it does not.
+ */
+Text
+  : TextLine() TextTail()?
+  ;
+
+TextTail
+  : <T_PHPDOC_EOL> !TextStop() TextLineWithSomethingOnIt() TextTail()?
+  | <T_PHPDOC_EOL> !TextStop() TextTail()
+  ;
+
+TextLine
+  : TextToken()*
+  ;
+
+TextLineWithSomethingOnIt
+  : TextToken()+
+  ;
+
+/**
+ * Where the reading of a description stops for good: another tag, or the end of
+ * the PHPDoc.
+ */
+TextStop
+  : TagToken()
+  | <T_CLOSE_PHPDOC>
+  ;
+
+EndOfLine
+  : <T_PHPDOC_EOL>
+  | <T_CLOSE_PHPDOC>
+  ;
+
+/**
+ * A tag whose value a rule of its own reads.
+ */
+KnownTagToken
+  : <T_TAG_PARAM>
+  | <T_TAG_PARAM_IMMEDIATELY_INVOKED_CALLABLE>
+  | <T_TAG_PARAM_LATER_INVOKED_CALLABLE>
+  | <T_TAG_PARAM_CLOSURE_THIS>
+  | <T_TAG_PURE_UNLESS_CALLABLE_IS_IMPURE>
+  | <T_TAG_PURE_UNLESS_PARAMETER_PASSED>
+  | <T_TAG_VAR>
+  | <T_TAG_RETURN>
+  | <T_TAG_THROWS>
+  | <T_TAG_MIXIN>
+  | <T_TAG_REQUIRE_EXTENDS>
+  | <T_TAG_REQUIRE_IMPLEMENTS>
+  | <T_TAG_SEALED>
+  | <T_TAG_DEPRECATED>
+  | <T_TAG_PROPERTY>
+  | <T_TAG_METHOD>
+  | <T_TAG_TEMPLATE>
+  | <T_TAG_EXTENDS>
+  | <T_TAG_IMPLEMENTS>
+  | <T_TAG_USE>
+  | <T_TAG_TYPE_ALIAS>
+  | <T_TAG_TYPE_ALIAS_IMPORT>
+  | <T_TAG_ASSERT>
+  | <T_TAG_SELF_OUT>
+  | <T_TAG_PARAM_OUT>
+  ;
+
+DoctrineText
+  : DoctrineTextLine() DoctrineTextRest()
+  ;
+
+/**
+ * Whatever a description of this kind goes on with once its first line has been
+ * read.
+ *
+ * It ends at the end of the line, and at a tag nothing reads the value of. A
+ * tag written with no space before it is no tag at all here, and neither is one
+ * whose value something does read, so the description goes on reading them the
+ * way any other text is read.
+ */
+/**
+ * Whatever the description goes on with once a line of it has been read.
+ *
+ * A description ends at the end of its line and at a tag a space is written
+ * before. The second of the two is where the parser reads part of the PHPDoc
+ * twice: the line the tag is written on belongs to the description and is then
+ * read again as whatever comes next. A grammar describes each token once, so a
+ * description that would end that way is left out of this one.
+ */
+DoctrineTextRest
+  : &EndOfLine() DoctrineTextMoreLines()
+  | &TagToken() !SpacedTag() !AmbiguousTagEnd() Text()
+  | &SpacedTag()
+  ;
+
+/**
+ * A tag a space is written before, which is what ends a description of this
+ * kind.
+ */
+SpacedTag
+  : <T_PHPDOC_TAG_WS>
+  | <T_DOCTRINE_TAG_WS>
+  ;
+
+/**
+ * Whatever the description goes on with once the line it is on has ended.
+ *
+ * A description that ends at a tag written in the middle of a line is read
+ * twice by the hand-written parser: the line the tag is on belongs to the
+ * description, and is then read again as whatever comes next. Nothing a grammar
+ * builds can be read twice, so a description that would end that way is turned
+ * down and the PHPDoc is read by that parser instead.
+ */
+DoctrineTextMoreLines
+  : DoctrineTextTail()
+  | !MoreTextToRead()
+  ;
+
+/**
+ * Whether anything worth reading is written on the lines that follow.
+ *
+ * A description runs on past the blank lines written inside it and ends at the
+ * first line that begins with a tag, so this says the same thing the other way
+ * round: a description that ends while there is still something to read has
+ * ended somewhere this grammar does not describe.
+ */
+MoreTextToRead
+  : <T_PHPDOC_EOL> !TextStop() MoreTextToRead()
+  | <T_PHPDOC_EOL> !TextStop() TextToken()
+  ;
+
+/**
+ * A tag whose value something reads, written with a parenthesis after it.
+ *
+ * Whether such a tag ends the description depends on whether its value can be
+ * read at all, which is decided by reading it and looking at what it turns out
+ * to be. A grammar cannot do that, so a description that would stop at one is
+ * left out of this grammar.
+ */
+AmbiguousTagEnd
+  : KnownTagToken() ParenthesesOpen()
+  ;
+
+DoctrineTextTail
+  : <T_PHPDOC_EOL> !TextStop() DoctrineTextLineWithSomethingOnIt() DoctrineTextRest()
+  | <T_PHPDOC_EOL> !TextStop() DoctrineTextTail()
+  ;
+
+DoctrineTextLine
+  : NonTagTextToken()*
+  ;
+
+DoctrineTextLineWithSomethingOnIt
+  : NonTagTextToken()+
+  ;
+
+/**
+ * Anything a line of a description may be written of, which is anything at all
+ * apart from what ends the line.
+ */
+TextToken
+  : NonTagTextToken()
+  | TagToken()
+  ;
+
+TagToken
+  : GenericTagToken()
+  | DoctrineTagToken()
+  | KnownTagToken()
+  ;
+
+NonTagTextToken
+  : Identifier()
+  | <T_FLOAT>
+  | <T_INTEGER>
+  | <T_SINGLE_QUOTED_STRING>
+  | <T_DOUBLE_QUOTED_STRING>
+  | <T_DOCTRINE_ANNOTATION_STRING>
+  | <T_THIS_VARIABLE>
+  | <T_VARIABLE>
+  | <T_REFERENCE>
+  | <T_UNION>
+  | <T_INTERSECTION>
+  | <T_NULLABLE>
+  | <T_NEGATED>
+  | ParenthesesOpen()
+  | <T_CLOSE_PARENTHESES>
+  | <T_OPEN_ANGLE_BRACKET>
+  | <T_OPEN_ANGLE_BRACKET_HTML>
+  | <T_CLOSE_ANGLE_BRACKET>
+  | <T_OPEN_SQUARE_BRACKET>
+  | <T_OPEN_SQUARE_BRACKET_WS>
+  | <T_CLOSE_SQUARE_BRACKET>
+  | <T_OPEN_CURLY_BRACKET>
+  | <T_OPEN_CURLY_BRACKET_WS>
+  | <T_CLOSE_CURLY_BRACKET>
+  | <T_COMMA>
+  | <T_COMMENT>
+  | <T_VARIADIC>
+  | <T_DOUBLE_COLON>
+  | <T_DOUBLE_ARROW>
+  | <T_ARROW>
+  | <T_EQUAL>
+  | <T_COLON>
+  | <T_WILDCARD>
+  | <T_WILDCARD_WS>
+  | <T_OPEN_PHPDOC>
+  | <T_OTHER>
+  ;
+
+// -----------------------------------------------------------------------------
+//  Doctrine annotations
+// -----------------------------------------------------------------------------
+
+/**
+ * An annotation of the kind Doctrine reads, like:
+ *  - @ORM\Entity(repositoryClass="FooRepository")
+ *  - @Assert\NotBlank
+ *
+ *  A tag written with a name no ordinary tag may be written with is always one
+ *  of these; any other tag is one as soon as a parenthesis follows it.
+ *
+ *  The line breaks written inside the arguments are walked over the way the
+ *  whitespace is, which is why they may be written between any two things there.
+ *
+ *  A parenthesis written after the tag is always the one its arguments open,
+ *  never the first thing of a description: "@\Foo(" that is never closed is an
+ *  error rather than a tag with no arguments at all, which is what the
+ *  predicate says.
+ */
+DoctrineTag
+  : DoctrineTagToken() DoctrineArguments() DoctrineDescription()
+  | DoctrineTagToken() !ParenthesesOpen() DoctrineDescription()
+  | GenericTagToken() DoctrineArguments() DoctrineDescription()
+  ;
+
+DoctrineArguments
+  : ParenthesesOpen() Eols() DoctrineArgumentList()? <T_CLOSE_PARENTHESES>
+  ;
+
+DoctrineArgumentList
+  : DoctrineArgument() Eols() ( <T_COMMA> Eols() ( &<T_CLOSE_PARENTHESES> | DoctrineArgument() Eols() ) )*
+  ;
+
+DoctrineArgument
+  : Identifier() Eols() <T_EQUAL> Eols() DoctrineValue()
+  | DoctrineValue()
+  ;
+
+/**
+ * What an argument of an annotation may be written as.
+ *
+ * A name written with no "::" after it is a type rather than a constant, which
+ * is what makes "@Foo(bar=true)" say the name "true" instead of saying yes.
+ */
+DoctrineValue
+  : DoctrineNestedAnnotation()
+  | DoctrineArray()
+  | DoctrineIdentifier()
+  | DoctrineConstantFetch()
+  | DoctrineFloat()
+  | DoctrineInteger()
+  | DoctrineString()
+  ;
+
+DoctrineNestedAnnotation
+  : TagToken() DoctrineArguments()?
+  ;
+
+DoctrineArray
+  : CurlyBracketOpen() Eols() DoctrineArrayItemList()? <T_CLOSE_CURLY_BRACKET>
+  ;
+
+DoctrineArrayItemList
+  : DoctrineArrayItem() Eols() ( <T_COMMA> Eols() ( &<T_CLOSE_CURLY_BRACKET> | DoctrineArrayItem() Eols() ) )*
+  ;
+
+DoctrineArrayItem
+  : DoctrineArrayKey() Eols() ( <T_EQUAL> | <T_COLON> ) Eols() DoctrineValue()
+  | DoctrineValue()
+  ;
+
+DoctrineArrayKey
+  : <T_INTEGER>
+  | <T_SINGLE_QUOTED_STRING>
+  | DoctrineString()
+  | DoctrineConstantFetch()
+  | Identifier() !<T_DOUBLE_COLON>
+  ;
+
+DoctrineIdentifier
+  : Identifier() !<T_DOUBLE_COLON>
+  ;
+
+/**
+ * A constant of a class, like:
+ *  - Foo::BAR
+ *
+ *  A word that already means something to a constant expression is none of
+ *  these: "null::BAR" says "null" and leaves the rest of it unread, which is an
+ *  error rather than the name of a constant.
+ */
+DoctrineConstantFetch
+  : !DoctrineConstantWord() Identifier() <T_DOUBLE_COLON> ClassConstantName()
+  ;
+
+DoctrineConstantWord
+  : <T_KEYWORD_TRUE>
+  | <T_KEYWORD_FALSE>
+  | <T_KEYWORD_NULL>
+  | ArrayKeyword()
+  ;
+
+DoctrineFloat
+  : <T_FLOAT>
+  ;
+
+DoctrineInteger
+  : <T_INTEGER>
+  ;
+
+/**
+ * A string of a Doctrine annotation, which is written with doubled quotes
+ * instead of escapes.
+ *
+ * A string written across several lines is read as several tokens, because a
+ * quote written inside it opens one string and closes another as far as the
+ * lexer is concerned, so whatever follows one is read as part of it.
+ */
+DoctrineString
+  : <T_DOUBLE_QUOTED_STRING> ( <T_DOUBLE_QUOTED_STRING> | <T_DOCTRINE_ANNOTATION_STRING> )*
+  | <T_DOCTRINE_ANNOTATION_STRING>
+  ;
+
+/**
+ * The line breaks written inside the arguments of an annotation, which the
+ * reading walks over the way it walks over the whitespace.
+ */
+Eols
+  : <T_PHPDOC_EOL>*
+  ;

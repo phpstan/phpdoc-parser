@@ -1,0 +1,16 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  The PHPDoc Type Language
+ * -----------------------------------------------------------------------------
+ *
+ *  The entry point describing what "PHPStan\PhpDocParser\Parser\TypeParser"
+ *  reads. See "types.pp3" for the rules and "lexemes.pp3" for the tokens they
+ *  are written in terms of.
+ */
+
+%include lexemes
+%include common
+%include const-expr
+%include types
+
+%pragma root Type

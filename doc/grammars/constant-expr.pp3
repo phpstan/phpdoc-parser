@@ -1,0 +1,14 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  Constant Expressions
+ * -----------------------------------------------------------------------------
+ *
+ *  The entry point describing what
+ *  "PHPStan\PhpDocParser\Parser\ConstExprParser" reads.
+ */
+
+%include lexemes
+%include common
+%include const-expr
+
+%pragma root ConstantExpr

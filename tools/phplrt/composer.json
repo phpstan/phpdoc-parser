@@ -1,0 +1,14 @@
+{
+	"description": "Dev-only toolchain for compiling the phplrt grammars in doc/grammars into generated parsers.",
+	"require": {
+		"phplrt/phplrt": "4.0.0-rc1"
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"config": {
+		"platform": {
+			"php": "8.4.0"
+		},
+		"sort-packages": true
+	}
+}

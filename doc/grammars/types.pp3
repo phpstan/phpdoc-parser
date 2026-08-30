@@ -1,0 +1,474 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  The PHPDoc Type Language
+ * -----------------------------------------------------------------------------
+ *
+ *  Every type "PHPStan\PhpDocParser\Parser\TypeParser" reads, written as the
+ *  grammar it reads them by.
+ *
+ *  The rules are named after the methods of that parser and are written in the
+ *  order those methods try things in, so that the two can be read side by side.
+ *  Two things follow from wanting them to agree on every input rather than on
+ *  most of them:
+ *
+ *   - a place the parser raises an error at is written as something the grammar
+ *     cannot recognize, most often as a "!" predicate forbidding what the error
+ *     would have been raised on, so that everything this grammar describes is
+ *     something the parser reads in full;
+ *
+ *   - a rule reads exactly the tokens its method reads, down to the line breaks
+ *     around it, because the tokens a rule has read are what the start and the
+ *     end of a node are counted from.
+ */
+
+/**
+ * A type, which is what a PHPDoc tag is written of.
+ *
+ * A union or an intersection may be written across several lines, and the
+ * reading only goes past a line break when the next line goes on with the type:
+ * "int\n|string" is one type while "int\nstring" is a type followed by a
+ * description. Whichever of the two is written, a "|" or a "&" left unread is
+ * an error rather than the end of the type, which is what the predicates say.
+ */
+Type
+  : Nullable()
+  | Atomic() ( TypeTail() | !<T_UNION> !<T_INTERSECTION> )
+  ;
+
+TypeTail
+  : Trivia() ( Union() | Intersection() )
+  ;
+
+Union
+  : ( <T_UNION> Atomic() ( Trivia() &<T_UNION> )? )+ !<T_UNION>
+  ;
+
+Intersection
+  : ( <T_INTERSECTION> Atomic() ( Trivia() &<T_INTERSECTION> )? )+ !<T_INTERSECTION>
+  ;
+
+Nullable
+  : <T_NULLABLE> Atomic()
+  ;
+
+/**
+ * A type written inside parentheses, which is the only place a conditional type
+ * may be written and the only place a line break needs no "|" after it.
+ */
+SubType
+  : Nullable()
+  | <T_VARIABLE> ConditionalForParameter()
+  | Atomic() ( Conditional() | SubTypeTail() )
+  ;
+
+SubTypeTail
+  : Trivia() ( SubUnion() | SubIntersection() )?
+  ;
+
+SubUnion
+  : ( <T_UNION> Trivia() Atomic() Trivia() )+ !<T_UNION>
+  ;
+
+SubIntersection
+  : ( <T_INTERSECTION> Trivia() Atomic() Trivia() )+ !<T_INTERSECTION>
+  ;
+
+/**
+ * A type chosen by what another type is, like:
+ *  - ($value is int ? positive-int : string)
+ */
+Conditional
+  : <T_KEYWORD_IS> <T_KEYWORD_NOT>? Type()
+    Trivia() <T_NULLABLE> Trivia() Type()
+    Trivia() <T_COLON> Trivia() SubType()
+  ;
+
+ConditionalForParameter
+  : <T_KEYWORD_IS> <T_KEYWORD_NOT>? Type()
+    Trivia() <T_NULLABLE> Trivia() Type()
+    Trivia() <T_COLON> Trivia() SubType()
+  ;
+
+// -----------------------------------------------------------------------------
+//  Atomic types
+// -----------------------------------------------------------------------------
+
+Atomic
+  : ParenthesizedAtomic()
+  | ThisAtomic()
+  | IdentifierAtomic()
+  | !PlainName() ConstantAtomic()
+  ;
+
+/**
+ * A name standing for a type rather than for the class of a constant.
+ *
+ * A name is only ever read as a constant expression when a "::" follows it, so
+ * a name written without one is a type and stays a type: whatever the reading
+ * fails at after it is an error rather than a reason to read the name again as
+ * something else.
+ */
+PlainName
+  : Identifier() !<T_DOUBLE_COLON>
+  ;
+
+ParenthesizedAtomic
+  : ParenthesesOpen() Trivia() SubType() Trivia() <T_CLOSE_PARENTHESES> ArrayOrOffsetAccess()?
+  ;
+
+ThisAtomic
+  : <T_THIS_VARIABLE> ArrayOrOffsetAccess()?
+  ;
+
+/**
+ * A named type, along with whatever may be written right after the name.
+ *
+ * A shape is only read when the name is one of the words that names a shape and
+ * the brace follows the name with no space in between, which is what tells
+ * "array{a: int}" from the type "array" followed by a "{a: int}" the type says
+ * nothing about.
+ */
+IdentifierAtomic
+  : <T_KEYWORD_ARRAY> !<T_DOUBLE_COLON> ArrayShape() ArrayOrOffsetAccess()?
+  | ListShapeIdentifier() !<T_DOUBLE_COLON> ListShape() ArrayOrOffsetAccess()?
+  | <T_KEYWORD_OBJECT> !<T_DOUBLE_COLON> ObjectShape() ArrayOrOffsetAccess()?
+  | ShapeIdentifier() !<T_DOUBLE_COLON> !<T_OPEN_CURLY_BRACKET> IdentifierTail()
+  | PlainIdentifier() !<T_DOUBLE_COLON> IdentifierTail()
+  ;
+
+/**
+ * A name that names no shape, told apart from one that does so that a name the
+ * parser reads every day is read without ever asking whether a shape follows
+ * it: which of the alternatives above is worth entering is then decided by the
+ * very first token, and only one of them ever is.
+ */
+PlainIdentifier
+  : <T_IDENTIFIER>
+  | <T_KEYWORD_IS>
+  | <T_KEYWORD_NOT>
+  | <T_KEYWORD_STATIC>
+  | <T_KEYWORD_FROM>
+  | <T_KEYWORD_OF>
+  | <T_KEYWORD_AS>
+  | <T_KEYWORD_SUPER>
+  | <T_KEYWORD_COVARIANT>
+  | <T_KEYWORD_CONTRAVARIANT>
+  | <T_KEYWORD_ARRAY_ANY_CASE>
+  | <T_KEYWORD_TRUE>
+  | <T_KEYWORD_FALSE>
+  | <T_KEYWORD_NULL>
+  ;
+
+/**
+ * The words naming a shape that is written with no key type after the "...".
+ *
+ * Only "array" is written with one, so "array{...<int, string>}" says what the
+ * keys are while "non-empty-array{...<int, string>}" says nothing at all: it is
+ * an error.
+ */
+ListShapeIdentifier
+  : <T_KEYWORD_LIST>
+  | <T_KEYWORD_NON_EMPTY_ARRAY>
+  | <T_KEYWORD_NON_EMPTY_LIST>
+  ;
+
+ArrayShapeIdentifier
+  : <T_KEYWORD_ARRAY>
+  | ListShapeIdentifier()
+  ;
+
+/**
+ * A word naming a shape. Once one is written right before a brace the shape has
+ * to be read, because "array{" is an error rather than the type "array"
+ * followed by a brace.
+ */
+ShapeIdentifier
+  : ArrayShapeIdentifier()
+  | <T_KEYWORD_OBJECT>
+  ;
+
+/**
+ * What may be written after a name, along with the one thing that may not: a
+ * "<" the reading stops in front of, which is an error rather than the end of
+ * the name.
+ */
+IdentifierTail
+  : IdentifierSuffix()
+  | !<T_OPEN_ANGLE_BRACKET>
+  ;
+
+/**
+ * A "<" after a name opens either the templates of a callable or the arguments
+ * of a generic type, and one of the two has to be written: a name the reading
+ * stops in the middle of is an error rather than a name of its own.
+ */
+IdentifierSuffix
+  : &<T_OPEN_ANGLE_BRACKET> ( CallableWithTemplates() | Generic() ArrayOrOffsetAccess()? )
+  | Callable()
+  | ArrayOrOffsetAccess()
+  ;
+
+/**
+ * A constant expression standing for a type, like:
+ *  - Foo::BAR
+ *  - 1.0
+ *  - 'foo'
+ *
+ *  An array is a constant expression but never a type, which is what the
+ *  predicate forbids: "[1, 2]" is an error rather than a type.
+ */
+ConstantAtomic
+  : !ArrayLiteral() ConstantExpr() ArrayOrOffsetAccess()?
+  ;
+
+ArrayLiteral
+  : SquareBracketOpen()
+  | ArrayKeyword() ParenthesesOpen()
+  ;
+
+// -----------------------------------------------------------------------------
+//  Arrays and offsets
+// -----------------------------------------------------------------------------
+
+/**
+ * The brackets a type may be written with after it, like:
+ *  - int[]
+ *  - Foo[Bar]
+ *
+ *  An offset is only read when the bracket follows the type with no space in
+ *  between, so "int [0]" is the type "int" followed by something else.
+ */
+ArrayOrOffsetAccess
+  : ArrayOrOffsetAccessItem()+
+  ;
+
+ArrayOrOffsetAccessItem
+  : <T_OPEN_SQUARE_BRACKET> !<T_CLOSE_SQUARE_BRACKET> Type() <T_CLOSE_SQUARE_BRACKET>
+  | SquareBracketOpen() <T_CLOSE_SQUARE_BRACKET>
+  ;
+
+// -----------------------------------------------------------------------------
+//  Generic types
+// -----------------------------------------------------------------------------
+
+Generic
+  : <T_OPEN_ANGLE_BRACKET> Trivia() GenericArgument() Trivia() GenericArgumentTail()* <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+/**
+ * The very same rule, written for the one place a "<" opening what looks like
+ * an HTML tag still opens a generic type: the return type of a callable, which
+ * the hand-written parser never asks the question about.
+ */
+GenericInReturnType
+  : AngleBracketOpen() Trivia() GenericArgument() Trivia() GenericArgumentTail()* <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+/**
+ * A trailing comma is allowed, so a comma may be followed by the closing
+ * bracket instead of by another argument.
+ */
+GenericArgumentTail
+  : <T_COMMA> Trivia() ( &<T_CLOSE_ANGLE_BRACKET> | GenericArgument() Trivia() )
+  ;
+
+GenericArgument
+  : Wildcard()
+  | Variance() Type()
+  | !Variance() Type()
+  ;
+
+Variance
+  : <T_KEYWORD_COVARIANT>
+  | <T_KEYWORD_CONTRAVARIANT>
+  ;
+
+// -----------------------------------------------------------------------------
+//  Callable types
+// -----------------------------------------------------------------------------
+
+Callable
+  : ParenthesesOpen() Trivia() CallableParameters()? <T_CLOSE_PARENTHESES>
+    <T_COLON> CallableReturnType()
+  ;
+
+CallableWithTemplates
+  : CallableTemplates()
+    ParenthesesOpen() Trivia() CallableParameters()? <T_CLOSE_PARENTHESES>
+    <T_COLON> CallableReturnType()
+  ;
+
+CallableTemplates
+  : <T_OPEN_ANGLE_BRACKET> Trivia() CallableTemplateArgument() Trivia()
+    CallableTemplateArgumentTail()* <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+CallableTemplateArgumentTail
+  : <T_COMMA> Trivia() ( &<T_CLOSE_ANGLE_BRACKET> | CallableTemplateArgument() Trivia() )
+  ;
+
+CallableTemplateArgument
+  : Identifier() TemplateUpperBound() TemplateLowerBound() TemplateDefault()
+  ;
+
+/**
+ * What a template may be bound by and what it stands for where nothing is
+ * written for it.
+ *
+ * Each of them is read as soon as the word opening it is written, and once it
+ * is written a type has to follow: "T of" is an error rather than a template
+ * named "T" followed by the description "of".
+ */
+TemplateUpperBound
+  : <T_KEYWORD_OF> Type()
+  | <T_KEYWORD_AS> Type()
+  | !<T_KEYWORD_OF> !<T_KEYWORD_AS>
+  ;
+
+TemplateLowerBound
+  : <T_KEYWORD_SUPER> Type()
+  | !<T_KEYWORD_SUPER>
+  ;
+
+TemplateDefault
+  : <T_EQUAL> Type()
+  | !<T_EQUAL>
+  ;
+
+CallableParameters
+  : CallableParameter() Trivia() CallableParameterTail()*
+  ;
+
+CallableParameterTail
+  : <T_COMMA> Trivia() ( &<T_CLOSE_PARENTHESES> | CallableParameter() Trivia() )
+  ;
+
+CallableParameter
+  : Type() <T_REFERENCE>? <T_VARIADIC>? <T_VARIABLE>? <T_EQUAL>?
+  ;
+
+/**
+ * What a callable gives back, which is read without ever looking for a callable
+ * inside it and without ever asking whether a "<" opens an HTML tag.
+ */
+CallableReturnType
+  : Nullable()
+  | ParenthesesOpen() SubType() <T_CLOSE_PARENTHESES> ArrayOrOffsetAccess()?
+  | <T_THIS_VARIABLE> ArrayOrOffsetAccess()?
+  | <T_KEYWORD_ARRAY> !<T_DOUBLE_COLON> ArrayShape() ArrayOrOffsetAccess()?
+  | ListShapeIdentifier() !<T_DOUBLE_COLON> ListShape() ArrayOrOffsetAccess()?
+  | <T_KEYWORD_OBJECT> !<T_DOUBLE_COLON> ObjectShape() ArrayOrOffsetAccess()?
+  | ShapeIdentifier() !<T_DOUBLE_COLON> !<T_OPEN_CURLY_BRACKET> CallableReturnTypeTail()
+  | PlainIdentifier() !<T_DOUBLE_COLON> CallableReturnTypeTail()
+  | !PlainName() ConstantAtomic()
+  ;
+
+CallableReturnTypeTail
+  : GenericInReturnType() ArrayOrOffsetAccess()?
+  | ArrayOrOffsetAccess()
+  | !AngleBracketOpen()
+  ;
+
+// -----------------------------------------------------------------------------
+//  Array shapes
+// -----------------------------------------------------------------------------
+
+/**
+ * The items an array is written to be made of, like:
+ *  - array{a: int, b?: string}
+ *  - array{int, ...<string>}
+ */
+ArrayShape
+  : <T_OPEN_CURLY_BRACKET> Trivia() ArrayShapeRest()? Trivia() <T_CLOSE_CURLY_BRACKET>
+  ;
+
+ArrayShapeRest
+  : ArrayShapeUnsealed()
+  | ArrayShapeItem() Trivia() ArrayShapeItemTail()?
+  ;
+
+/**
+ * A comment written right after the separating comma is read and thrown away,
+ * which is the one place a comment ends up on no node at all.
+ */
+ArrayShapeItemTail
+  : <T_COMMA> DiscardedComment()? Trivia() ArrayShapeRest()?
+  ;
+
+DiscardedComment
+  : <T_COMMENT>
+  ;
+
+ArrayShapeUnsealed
+  : <T_VARIADIC> Trivia() ( ArrayShapeUnsealedType() Trivia() | !AngleBracketOpen() ) <T_COMMA>?
+  ;
+
+/**
+ * What the keys and the values of whatever is left over are written as.
+ */
+ArrayShapeUnsealedType
+  : AngleBracketOpen() Trivia() Type() Trivia()
+    ( <T_COMMA> Trivia() Type() Trivia() )? <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+/**
+ * A shape of every other kind, which is written exactly like an array shape
+ * save for the one thing above: what is left over is written with a value type
+ * and nothing else.
+ */
+ListShape
+  : <T_OPEN_CURLY_BRACKET> Trivia() ListShapeRest()? Trivia() <T_CLOSE_CURLY_BRACKET>
+  ;
+
+ListShapeRest
+  : ListShapeUnsealed()
+  | ArrayShapeItem() Trivia() ListShapeItemTail()?
+  ;
+
+ListShapeItemTail
+  : <T_COMMA> DiscardedComment()? Trivia() ListShapeRest()?
+  ;
+
+ListShapeUnsealed
+  : <T_VARIADIC> Trivia() ( ListShapeUnsealedType() Trivia() | !AngleBracketOpen() ) <T_COMMA>?
+  ;
+
+ListShapeUnsealedType
+  : AngleBracketOpen() Trivia() Type() Trivia() <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+ArrayShapeItem
+  : ArrayShapeKey() <T_NULLABLE>? <T_COLON> Type()
+  | Type()
+  ;
+
+ArrayShapeKey
+  : <T_INTEGER>
+  | <T_SINGLE_QUOTED_STRING>
+  | <T_DOUBLE_QUOTED_STRING>
+  | Identifier() ( <T_DOUBLE_COLON> Identifier() )?
+  ;
+
+// -----------------------------------------------------------------------------
+//  Object shapes
+// -----------------------------------------------------------------------------
+
+ObjectShape
+  : <T_OPEN_CURLY_BRACKET> Trivia()
+    ( ObjectShapeItem() Trivia() ObjectShapeItemTail()* )?
+    <T_CLOSE_CURLY_BRACKET>
+  ;
+
+ObjectShapeItemTail
+  : <T_COMMA> Trivia() ( &<T_CLOSE_CURLY_BRACKET> | ObjectShapeItem() Trivia() )
+  ;
+
+ObjectShapeItem
+  : ObjectShapeKey() <T_NULLABLE>? <T_COLON> Type()
+  ;
+
+ObjectShapeKey
+  : <T_SINGLE_QUOTED_STRING>
+  | <T_DOUBLE_QUOTED_STRING>
+  | Identifier()
+  ;

@@ -1,0 +1,106 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  What Both Grammars Are Written Of
+ * -----------------------------------------------------------------------------
+ */
+
+/**
+ * A name, which every keyword is as well.
+ *
+ * The lexer reads all of them as T_IDENTIFIER and they are only told apart in
+ * the stream so that the rules asking for a particular word can be written
+ * without a semantic predicate. A word is therefore still a perfectly ordinary
+ * name wherever a name is what is being read.
+ */
+Identifier
+  : <T_IDENTIFIER>
+  | <T_KEYWORD_IS>
+  | <T_KEYWORD_NOT>
+  | <T_KEYWORD_STATIC>
+  | <T_KEYWORD_FROM>
+  | <T_KEYWORD_OF>
+  | <T_KEYWORD_AS>
+  | <T_KEYWORD_SUPER>
+  | <T_KEYWORD_COVARIANT>
+  | <T_KEYWORD_CONTRAVARIANT>
+  | <T_KEYWORD_ARRAY>
+  | <T_KEYWORD_ARRAY_ANY_CASE>
+  | <T_KEYWORD_LIST>
+  | <T_KEYWORD_NON_EMPTY_ARRAY>
+  | <T_KEYWORD_NON_EMPTY_LIST>
+  | <T_KEYWORD_OBJECT>
+  | <T_KEYWORD_TRUE>
+  | <T_KEYWORD_FALSE>
+  | <T_KEYWORD_NULL>
+  ;
+
+/**
+ * The word "array" written in any case at all.
+ */
+ArrayKeyword
+  : <T_KEYWORD_ARRAY>
+  | <T_KEYWORD_ARRAY_ANY_CASE>
+  ;
+
+/**
+ * An asterisk, whether or not whitespace follows it.
+ */
+Wildcard
+  : <T_WILDCARD>
+  | <T_WILDCARD_WS>
+  ;
+
+/**
+ * A "(" whether or not whitespace precedes it.
+ */
+ParenthesesOpen
+  : <T_OPEN_PARENTHESES>
+  | <T_OPEN_PARENTHESES_WS>
+  ;
+
+/**
+ * A "[" whether or not whitespace precedes it.
+ */
+SquareBracketOpen
+  : <T_OPEN_SQUARE_BRACKET>
+  | <T_OPEN_SQUARE_BRACKET_WS>
+  ;
+
+/**
+ * A "{" whether or not whitespace precedes it.
+ */
+CurlyBracketOpen
+  : <T_OPEN_CURLY_BRACKET>
+  | <T_OPEN_CURLY_BRACKET_WS>
+  ;
+
+/**
+ * A "<" whether or not it opens what looks like an HTML tag.
+ */
+AngleBracketOpen
+  : <T_OPEN_ANGLE_BRACKET>
+  | <T_OPEN_ANGLE_BRACKET_HTML>
+  ;
+
+/**
+ * The line breaks and the line comments a type may be written across, which is
+ * what "TokenIterator::skipNewLineTokensAndConsumeComments()" walks over.
+ *
+ * That method reads "T_COMMENT? (T_PHPDOC_EOL T_COMMENT?)*", and this reads the
+ * very same thing written the shorter way: a comment runs to the end of its
+ * line, so the lexer never puts two of them next to each other and never puts
+ * one anywhere but at the end of a line. Writing it as one repetition rather
+ * than as three nested rules is what makes it cheap enough to be written in as
+ * many places as it is.
+ *
+ * The comments are kept rather than thrown away: each of them ends up on the
+ * node the reading reaches first after it, the way the hand-written parser
+ * flushes them.
+ *
+ * This recognizes an empty input as well, so a rule written with it says
+ * "a line break may be written here" rather than "a line break is written
+ * here".
+ */
+Trivia
+  : ( <T_PHPDOC_EOL> | <T_COMMENT> )*
+  ;
