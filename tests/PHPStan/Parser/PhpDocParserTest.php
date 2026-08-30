@@ -104,6 +104,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideParamClosureThisTagsData
 	 * @dataProvider providePureUnlessCallableIsImpureTagsData
+	 * @dataProvider providePureUnlessParameterIsPassedTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData
