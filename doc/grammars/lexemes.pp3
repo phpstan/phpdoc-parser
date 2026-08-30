@@ -1,0 +1,219 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  The Lexemes Of The PHPDoc Language
+ * -----------------------------------------------------------------------------
+ *
+ *  Every token the PHPDoc language is read into, written the way
+ *  "PHPStan\PhpDocParser\Lexer\Lexer" reads it.
+ *
+ *  A grammar of this directory is not read by the lexer it declares: it is read
+ *  by the very tokens "Lexer" produces, handed over by
+ *  "tools/phplrt/Fuzzer/TokenStream.php". The declarations below therefore
+ *  serve three purposes:
+ *
+ *   - they name the tokens the rules are written in terms of;
+ *   - they document the language down to its lexical level;
+ *   - they are what the grammar-driven fuzzer writes its inputs from.
+ *
+ *  A block of tokens marked "classified" is not read as a token of its own by
+ *  the lexer. Such a token is a T_IDENTIFIER (or a bracket, or an asterisk)
+ *  whose surroundings or whose very value the hand-written parser asks about,
+ *  and telling those apart in the token stream is what lets a grammar written
+ *  without semantic predicates say the same thing.
+ */
+
+%pragma lexer.pcre.disable u
+%pragma lexer.pcre.flag    i
+
+// -----------------------------------------------------------------------------
+//  Trivia
+// -----------------------------------------------------------------------------
+
+/**
+ * The whitespace "TokenIterator" walks over without ever reporting it.
+ *
+ * A place that cares whether it is there asks about it through one of the
+ * classified tokens below rather than through the token itself.
+ */
+%skip  T_HORIZONTAL_WS               [\x09\x20]++
+
+// -----------------------------------------------------------------------------
+//  Classified identifiers
+// -----------------------------------------------------------------------------
+
+/**
+ * The words the hand-written parser compares a T_IDENTIFIER against by value.
+ *
+ * Every one of them is a perfectly ordinary type name as well, so each is
+ * listed among the alternatives of "Identifier" and means a keyword only where
+ * a rule asks for it by name.
+ */
+%token T_KEYWORD_CONTRAVARIANT       contravariant(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_COVARIANT           covariant(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_NON_EMPTY_ARRAY     non-empty-array(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_NON_EMPTY_LIST      non-empty-list(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_SUPER               super(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_OBJECT              object(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_ARRAY               array(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_LIST                list(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_STATIC              static(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_FROM                from(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_NOT                 not(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_IS                  is(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_OF                  of(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_AS                  as(?![0-9a-z_\x80-\xFF-])
+
+/**
+ * The words the constant expression parser compares against case-insensitively,
+ * which is why they are told apart from the ones above.
+ *
+ * "array" is spelled by both: a shape is only a shape when the word is written
+ * exactly as "array", while "ARRAY(1,2)" is still an array literal.
+ */
+%token T_KEYWORD_FALSE               false(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_TRUE                true(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_NULL                null(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_ARRAY_ANY_CASE      (?!array)[aA][rR][rR][aA][yY](?![0-9a-z_\x80-\xFF-])
+
+// -----------------------------------------------------------------------------
+//  Literals and names
+// -----------------------------------------------------------------------------
+
+%token T_FLOAT                       [+\-]?(?:(?:[0-9]++(_[0-9]++)*\.[0-9]*+(_[0-9]++)*(?:e[+\-]?[0-9]++(_[0-9]++)*)?)|(?:[0-9]*+(_[0-9]++)*\.[0-9]++(_[0-9]++)*(?:e[+\-]?[0-9]++(_[0-9]++)*)?)|(?:[0-9]++(_[0-9]++)*e[+\-]?[0-9]++(_[0-9]++)*))
+%token T_INTEGER                     [+\-]?(?:(?:0b[0-1]++(_[0-1]++)*)|(?:0o[0-7]++(_[0-7]++)*)|(?:0x[0-9a-f]++(_[0-9a-f]++)*)|(?:[0-9]++(_[0-9]++)*))
+%token T_SINGLE_QUOTED_STRING        '(?:\\[^\r\n]|[^'\r\n\\])*+'
+%token T_DOUBLE_QUOTED_STRING        "(?:\\[^\r\n]|[^"\r\n\\])*+"
+%token T_DOCTRINE_ANNOTATION_STRING  "(?:""|[^"])*+"
+
+%token T_IDENTIFIER                  (?:[\\]?+[a-z_\x80-\xFF][0-9a-z_\x80-\xFF-]*+)++
+%token T_THIS_VARIABLE               \$this(?![0-9a-z_\x80-\xFF])
+%token T_VARIABLE                    \$[a-z_\x80-\xFF][0-9a-z_\x80-\xFF]*+
+
+// -----------------------------------------------------------------------------
+//  Punctuation
+// -----------------------------------------------------------------------------
+
+/**
+ * An "&" standing before a variable, a variadic, a default value or a closing
+ * parenthesis is a by-reference marker rather than an intersection.
+ */
+%token T_REFERENCE                   &(?=\s*+(?:[,=)]|\.\.\.|(?:\$(?!this(?![0-9a-z_\x80-\xFF])))))
+%token T_UNION                       \|
+%token T_INTERSECTION                &
+%token T_NULLABLE                    \?
+%token T_NEGATED                     !
+
+%token T_OPEN_PARENTHESES            \(
+%token T_CLOSE_PARENTHESES           \)
+%token T_OPEN_ANGLE_BRACKET          <
+%token T_CLOSE_ANGLE_BRACKET         >
+%token T_OPEN_SQUARE_BRACKET         \[
+%token T_CLOSE_SQUARE_BRACKET        \]
+%token T_OPEN_CURLY_BRACKET          \{
+%token T_CLOSE_CURLY_BRACKET         \}
+
+%token T_COMMA                       ,
+%token T_COMMENT                     //[^\r\n]*(?=\n|\r|\*/)
+%token T_VARIADIC                    \.\.\.
+%token T_DOUBLE_COLON                ::
+%token T_DOUBLE_ARROW                =>
+%token T_ARROW                       ->
+%token T_EQUAL                       =
+%token T_COLON                       :
+%token T_WILDCARD                    \*
+
+// -----------------------------------------------------------------------------
+//  PHPDoc structure
+// -----------------------------------------------------------------------------
+
+%token T_OPEN_PHPDOC                 /\*\*(?=\s)\x20?+
+%token T_CLOSE_PHPDOC                \*/
+
+/**
+ * The tags whose value is read by a rule of its own, told apart from one
+ * another so that a rule can ask for the one it reads.
+ *
+ * The lexer reads every one of them as T_PHPDOC_TAG and they are only told
+ * apart in the stream, the way a keyword is: a tag is compared by its whole
+ * name and by the case it is written in, so "@Param" names no tag at all and is
+ * read as any other unknown one.
+ */
+%token T_TAG_PARAM_IMMEDIATELY_INVOKED_CALLABLE  @(?:phpstan-)?param-immediately-invoked-callable(?![a-z0-9-])
+%token T_TAG_PURE_UNLESS_CALLABLE_IS_IMPURE      @(?:phpstan-)?pure-unless-callable-is-impure(?![a-z0-9-])
+%token T_TAG_PURE_UNLESS_PARAMETER_PASSED        @(?:phpstan-)?pure-unless-parameter-passed(?![a-z0-9-])
+%token T_TAG_PARAM_LATER_INVOKED_CALLABLE        @(?:phpstan-)?param-later-invoked-callable(?![a-z0-9-])
+%token T_TAG_PARAM_CLOSURE_THIS                  @(?:phpstan-)?param-closure-this(?![a-z0-9-])
+%token T_TAG_REQUIRE_IMPLEMENTS                  @(?:psalm|phpstan)-require-implements(?![a-z0-9-])
+%token T_TAG_REQUIRE_EXTENDS                     @(?:psalm|phpstan)-require-extends(?![a-z0-9-])
+%token T_TAG_TYPE_ALIAS_IMPORT                   @(?:phpstan|psalm)-import-type(?![a-z0-9-])
+%token T_TAG_ASSERT                              @(?:phpstan|psalm|phan)-assert(?:-if-(?:true|false))?(?![a-z0-9-])
+%token T_TAG_SELF_OUT                            @(?:phpstan|psalm)-(?:this|self)-out(?![a-z0-9-])
+%token T_TAG_SEALED                              @(?:psalm-inheritors|phpstan-sealed)(?![a-z0-9-])
+%token T_TAG_TEMPLATE                            @(?:(?:phpstan|psalm|phan)-)?template(?:-(?:co|contra)variant)?(?![a-z0-9-])
+%token T_TAG_PROPERTY                            @(?:(?:phpstan|psalm|phan)-)?property(?:-(?:read|write))?(?![a-z0-9-])
+%token T_TAG_IMPLEMENTS                          @(?:phpstan-|template-)?implements(?![a-z0-9-])
+%token T_TAG_DEPRECATED                          @deprecated(?![a-z0-9-])
+%token T_TAG_TYPE_ALIAS                          @(?:phpstan|psalm|phan)-type(?![a-z0-9-])
+%token T_TAG_PARAM_OUT                           @(?:(?:phpstan|psalm)-)?param-out(?![a-z0-9-])
+%token T_TAG_EXTENDS                             @(?:(?:phpstan|phan|template)-)?(?:extends|inherits)(?![a-z0-9-])
+%token T_TAG_METHOD                              @(?:(?:phpstan|psalm|phan)-)?method(?![a-z0-9-])
+%token T_TAG_RETURN                              @(?:(?:phpstan|psalm|phan|phan-real)-)?return(?![a-z0-9-])
+%token T_TAG_THROWS                              @(?:phpstan-)?throws(?![a-z0-9-])
+%token T_TAG_PARAM                               @(?:(?:phpstan|psalm|phan)-)?param(?![a-z0-9-])
+%token T_TAG_MIXIN                               @(?:phan-)?mixin(?![a-z0-9-])
+%token T_TAG_USE                                 @(?:phpstan-|template-)?use(?![a-z0-9-])
+%token T_TAG_VAR                                 @(?:(?:phpstan|psalm|phan)-)?var(?![a-z0-9-])
+
+/**
+ * A tag whose value nothing reads: whatever is written after it is a
+ * description, or the arguments of a Doctrine annotation.
+ *
+ * Whether whitespace is written before such a tag is what says whether it is a
+ * tag at all: a description only ever ends at one that a space stands before,
+ * so that the "@baz" of "@author Foo <foo@baz.com>" belongs to the description
+ * it is written in.
+ */
+%token T_PHPDOC_TAG_WS               (?<=[\x09\x20])@(?:[a-z][a-z0-9-\\]+:)?[a-z][a-z0-9-\\]*+
+%token T_PHPDOC_TAG                  @(?:[a-z][a-z0-9-\\]+:)?[a-z][a-z0-9-\\]*+
+%token T_DOCTRINE_TAG_WS             (?<=[\x09\x20])@[a-z_\\][a-z0-9_:\\]*[a-z_][a-z0-9_]*
+%token T_DOCTRINE_TAG                @[a-z_\\][a-z0-9_:\\]*[a-z_][a-z0-9_]*
+%token T_PHPDOC_EOL                  \r?+\n[\x09\x20]*+(?:\*(?!/)\x20?+)?
+
+/**
+ * Whatever is neither whitespace nor the end of a PHPDoc, which is what the
+ * free-form text of a PHPDoc is read as.
+ */
+%token T_OTHER                       (?:(?!\*/)[^\s])++
+
+// -----------------------------------------------------------------------------
+//  Classified punctuation
+// -----------------------------------------------------------------------------
+
+/**
+ * The brackets and the asterisk whose neighbouring whitespace decides what they
+ * mean, told apart in the stream so that a rule can ask for one of them alone.
+ *
+ *  - "array{a: int}" is a shape while "array {a: int}" is the type "array"
+ *    followed by something the type says nothing about;
+ *  - "Foo[0]" reads an offset while "Foo [0]" does not;
+ *  - "Foo::BAR*" goes on reading the name of the constant while "Foo::BAR* "
+ *    ends it.
+ */
+%token T_OPEN_PARENTHESES_WS         (?<=[\x09\x20])\(
+%token T_OPEN_CURLY_BRACKET_WS       (?<=[\x09\x20])\{
+%token T_OPEN_SQUARE_BRACKET_WS      (?<=[\x09\x20])\[
+%token T_WILDCARD_WS                 \*(?=[\x09\x20])
+
+/**
+ * A "<" opening what the hand-written parser recognizes as an HTML tag, that is
+ * a "<name>" with a matching "</name>" somewhere after it. A generic type is
+ * never read out of one, so that "@return Foo<br>see below</br>" keeps meaning
+ * the type "Foo" followed by a description.
+ */
+%token T_OPEN_ANGLE_BRACKET_HTML     <(?=[a-z][a-z0-9-]*+>)
+
+/**
+ * The end of the input is not declared here: a lexer of the phplrt runtime
+ * reports one of its own, which is what a stream ends with no matter who has
+ * written it.
+ */

@@ -1,0 +1,16 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  PHPDoc
+ * -----------------------------------------------------------------------------
+ *
+ *  The entry point describing what "PHPStan\PhpDocParser\Parser\PhpDocParser"
+ *  reads. See "phpdoc-block.pp3" for the rules.
+ */
+
+%include lexemes
+%include common
+%include const-expr
+%include types
+%include phpdoc-block
+
+%pragma root PhpDoc

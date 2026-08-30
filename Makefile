@@ -34,3 +34,14 @@ phpstan:
 .PHONY: phpstan-generate-baseline
 phpstan-generate-baseline:
 	php vendor/bin/phpstan --generate-baseline
+
+# ---------------------------------------------------------------------------
+#  The grammars
+# ---------------------------------------------------------------------------
+
+# The tool writing a corpus out of doc/grammars is a development dependency of
+# its own, because the grammar compiler asks for a PHP this library still runs
+# without.
+.PHONY: grammars-install
+grammars-install:
+	composer install --no-interaction --working-dir tools/phplrt

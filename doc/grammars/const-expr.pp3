@@ -1,0 +1,118 @@
+/**
+ * -----------------------------------------------------------------------------
+ *  Constant Expressions
+ * -----------------------------------------------------------------------------
+ *
+ *  The literals a PHPDoc may be written of, read the way
+ *  "PHPStan\PhpDocParser\Parser\ConstExprParser" reads them.
+ *
+ *  The alternatives are written in the order that parser tries them in, and the
+ *  places it would raise an error at are written as a rule that cannot be
+ *  recognized, so that the two agree on what is a constant expression and what
+ *  is not.
+ */
+
+ConstantExpr
+  : ConstantFloat()
+  | ConstantInteger()
+  | ConstantString()
+  | ConstantTrue()
+  | ConstantFalse()
+  | ConstantNull()
+  | ConstantArrayLiteral()
+  | ConstantFetch()
+  | ConstantArrayShorthand()
+  ;
+
+ConstantFloat
+  : <T_FLOAT>
+  ;
+
+ConstantInteger
+  : <T_INTEGER>
+  ;
+
+ConstantString
+  : <T_SINGLE_QUOTED_STRING>
+  | <T_DOUBLE_QUOTED_STRING>
+  ;
+
+ConstantTrue
+  : <T_KEYWORD_TRUE>
+  ;
+
+ConstantFalse
+  : <T_KEYWORD_FALSE>
+  ;
+
+ConstantNull
+  : <T_KEYWORD_NULL>
+  ;
+
+/**
+ * An array written the long way, like:
+ *  - array(1, 2)
+ *
+ *  The word is compared without regard to case, so "ARRAY(1, 2)" is one as
+ *  well. A word that is not followed by a parenthesis is an error rather than a
+ *  constant of that name, which is what keeps it out of "ConstantFetch".
+ */
+ConstantArrayLiteral
+  : ArrayKeyword() ParenthesesOpen() ConstantArrayItems()? <T_CLOSE_PARENTHESES>
+  ;
+
+/**
+ * An array written the short way, like:
+ *  - [1, 2]
+ */
+ConstantArrayShorthand
+  : SquareBracketOpen() ConstantArrayItems()? <T_CLOSE_SQUARE_BRACKET>
+  ;
+
+/**
+ * A trailing comma is written by the very rule the separating ones are, so an
+ * array of a single item may still end with one.
+ */
+ConstantArrayItems
+  : ConstantArrayItem() ( <T_COMMA> ConstantArrayItem() )* <T_COMMA>?
+  ;
+
+ConstantArrayItem
+  : ConstantExpr() ( <T_DOUBLE_ARROW> ConstantExpr() | !<T_DOUBLE_ARROW> )
+  ;
+
+/**
+ * A constant, either of a class or of none, like:
+ *  - Foo::BAR
+ *  - Foo::BAR_*
+ *  - BAR
+ */
+ConstantFetch
+  : !ArrayKeyword() Identifier() <T_DOUBLE_COLON> ClassConstantName()
+  | !ArrayKeyword() Identifier()
+  ;
+
+/**
+ * The name of a class constant, which may be written with asterisks standing
+ * for any part of it, like:
+ *  - BAR
+ *  - BAR_*
+ *  - *_BAR_*
+ *
+ *  A name is written of names and asterisks one after another, never two of a
+ *  kind in a row, and it ends at the first asterisk that whitespace follows.
+ */
+ClassConstantName
+  : <T_WILDCARD_WS>
+  | <T_WILDCARD> ClassConstantNameAfterWildcard()?
+  | Identifier() ClassConstantNameAfterIdentifier()?
+  ;
+
+ClassConstantNameAfterWildcard
+  : Identifier() ClassConstantNameAfterIdentifier()?
+  ;
+
+ClassConstantNameAfterIdentifier
+  : <T_WILDCARD_WS>
+  | <T_WILDCARD> ClassConstantNameAfterWildcard()?
+  ;
