@@ -2381,6 +2381,74 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'?(?Foo)',
+				new NullableTypeNode(
+					new NullableTypeNode(
+						new IdentifierTypeNode('Foo'),
+					),
+				),
+			],
+			[
+				'?(?(Foo|Bar))',
+				new NullableTypeNode(
+					new NullableTypeNode(
+						new UnionTypeNode([
+							new IdentifierTypeNode('Foo'),
+							new IdentifierTypeNode('Bar'),
+						]),
+					),
+				),
+			],
+			[
+				'Foo[?(?Bar)]',
+				new OffsetAccessTypeNode(
+					new IdentifierTypeNode('Foo'),
+					new NullableTypeNode(
+						new NullableTypeNode(
+							new IdentifierTypeNode('Bar'),
+						),
+					),
+				),
+			],
+			[
+				'((?Foo) is Bar ? true : false)',
+				new ConditionalTypeNode(
+					new NullableTypeNode(
+						new IdentifierTypeNode('Foo'),
+					),
+					new IdentifierTypeNode('Bar'),
+					new IdentifierTypeNode('true'),
+					new IdentifierTypeNode('false'),
+					false,
+				),
+			],
+			[
+				'((Foo | Bar) is Baz ? true : false)',
+				new ConditionalTypeNode(
+					new UnionTypeNode([
+						new IdentifierTypeNode('Foo'),
+						new IdentifierTypeNode('Bar'),
+					]),
+					new IdentifierTypeNode('Baz'),
+					new IdentifierTypeNode('true'),
+					new IdentifierTypeNode('false'),
+					false,
+				),
+			],
+			[
+				'((Foo & Bar) is Baz ? true : false)',
+				new ConditionalTypeNode(
+					new IntersectionTypeNode([
+						new IdentifierTypeNode('Foo'),
+						new IdentifierTypeNode('Bar'),
+					]),
+					new IdentifierTypeNode('Baz'),
+					new IdentifierTypeNode('true'),
+					new IdentifierTypeNode('false'),
+					false,
+				),
+			],
+			[
 				'(T is Foo ? true : T is Bar ? false : null)',
 				new ConditionalTypeNode(
 					new IdentifierTypeNode('T'),

@@ -33,7 +33,12 @@ class ConditionalTypeNode implements TypeNode
 	{
 		return sprintf(
 			'(%s %s %s ? %s : %s)',
-			$this->subjectType,
+			// "?Foo is Bar ? ... : ..." reads as a nullable type followed by
+			// something else, so the subject keeps the parentheses it was read
+			// with
+			$this->subjectType instanceof NullableTypeNode
+				? '(' . $this->subjectType . ')'
+				: $this->subjectType,
 			$this->negated ? 'is not' : 'is',
 			$this->targetType,
 			$this->if,

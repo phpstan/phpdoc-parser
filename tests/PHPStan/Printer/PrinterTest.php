@@ -35,6 +35,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
@@ -298,6 +299,52 @@ class PrinterTest extends TestCase
 			'/** @return Foo */',
 			'/** @return Bar */',
 			$changeReturnType,
+		];
+
+		$wrapNullableTypeInAnotherOne = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if (
+					$node instanceof NullableTypeNode
+					&& $node->type instanceof IdentifierTypeNode
+					&& $node->type->name === 'Foo'
+				) {
+					$node->type = new NullableTypeNode(new IdentifierTypeNode('Bar'));
+
+					return $node;
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @return ?Foo */',
+			'/** @return ?(?Bar) */',
+			$wrapNullableTypeInAnotherOne,
+		];
+
+		$changeConditionalSubjectType = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof ConditionalTypeNode && $node->subjectType instanceof IdentifierTypeNode) {
+					$node->subjectType = new NullableTypeNode(new IdentifierTypeNode('Bar'));
+
+					return $node;
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @return (Foo is Bar ? true : false) */',
+			'/** @return ((?Bar) is Bar ? true : false) */',
+			$changeConditionalSubjectType,
 		];
 
 		yield [
@@ -2772,6 +2819,53 @@ class PrinterTest extends TestCase
 		yield [
 			new ArrayTypeNode(new NullableTypeNode(new IdentifierTypeNode('Foo'))),
 			'(?Foo)[]',
+		];
+		yield [
+			new NullableTypeNode(new NullableTypeNode(new IdentifierTypeNode('Foo'))),
+			'?(?Foo)',
+		];
+		yield [
+			new OffsetAccessTypeNode(
+				new IdentifierTypeNode('Foo'),
+				new NullableTypeNode(new NullableTypeNode(new IdentifierTypeNode('Bar'))),
+			),
+			'Foo[?(?Bar)]',
+		];
+		yield [
+			new ConditionalTypeNode(
+				new NullableTypeNode(new IdentifierTypeNode('Foo')),
+				new IdentifierTypeNode('Bar'),
+				new IdentifierTypeNode('true'),
+				new IdentifierTypeNode('false'),
+				false,
+			),
+			'((?Foo) is Bar ? true : false)',
+		];
+		yield [
+			new ConditionalTypeNode(
+				new UnionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+				]),
+				new IdentifierTypeNode('Baz'),
+				new IdentifierTypeNode('true'),
+				new IdentifierTypeNode('false'),
+				false,
+			),
+			'((Foo|Bar) is Baz ? true : false)',
+		];
+		yield [
+			new ConditionalTypeNode(
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('Foo'),
+					new IdentifierTypeNode('Bar'),
+				]),
+				new IdentifierTypeNode('Baz'),
+				new IdentifierTypeNode('true'),
+				new IdentifierTypeNode('false'),
+				false,
+			),
+			'((Foo&Bar) is Baz ? true : false)',
 		];
 		yield [
 			new UnionTypeNode([
