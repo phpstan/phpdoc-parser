@@ -8245,4 +8245,39 @@ Finder::findFiles('*.php')
 		$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
 	}
 
+	/**
+	 * @return iterable<array{string}>
+	 */
+	public function dataCommentInsideGenericType(): iterable
+	{
+		yield ['/**' . PHP_EOL . ' * @use Foo<int // a comment' . PHP_EOL . ' * >' . PHP_EOL . ' */'];
+		yield ['/**' . PHP_EOL . ' * @var Foo<int, // a comment' . PHP_EOL . ' *     string>' . PHP_EOL . ' */'];
+		yield ['/**' . PHP_EOL . ' * @extends Foo<*, // a comment' . PHP_EOL . ' *     string>' . PHP_EOL . ' */'];
+		yield ['/**' . PHP_EOL . ' * @implements Foo<int // a comment' . PHP_EOL . ' * > description' . PHP_EOL . ' */'];
+	}
+
+	/**
+	 * A comment written inside a generic type is read and given to the node the
+	 * reading reaches first after it. Where no attributes are asked for there is
+	 * no node to give it to, and it used to be left waiting for one until the
+	 * whole PHPDoc had been read, which is where the reading gave up.
+	 *
+	 * @dataProvider dataCommentInsideGenericType
+	 */
+	public function testCommentInsideGenericTypeIsAlwaysFlushed(string $input): void
+	{
+		foreach ([[], ['lines' => true, 'indexes' => true, 'comments' => true]] as $usedAttributes) {
+			$config = new ParserConfig($usedAttributes);
+			$constExprParser = new ConstExprParser($config);
+			$typeParser = new TypeParser($config, $constExprParser);
+			$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
+
+			$tokens = new TokenIterator($this->lexer->tokenize($input));
+			$phpDocNode = $phpDocParser->parse($tokens);
+
+			$this->assertCount(1, $phpDocNode->children);
+			$this->assertSame(Lexer::TOKEN_END, $tokens->currentTokenType());
+		}
+	}
+
 }
