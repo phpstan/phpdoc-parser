@@ -422,6 +422,29 @@ class TypeParserTest extends TestCase
 				]),
 			],
 			[
+				// "&" only means a reference where a variadic really follows it
+				'string & .5',
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('string'),
+					new ConstTypeNode(new ConstExprFloatNode('.5')),
+				]),
+			],
+			[
+				'string&.5',
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('string'),
+					new ConstTypeNode(new ConstExprFloatNode('.5')),
+				]),
+			],
+			[
+				'string & .5 & int',
+				new IntersectionTypeNode([
+					new IdentifierTypeNode('string'),
+					new ConstTypeNode(new ConstExprFloatNode('.5')),
+					new IdentifierTypeNode('int'),
+				]),
+			],
+			[
 				'string & (int | float)',
 				new IntersectionTypeNode([
 					new IdentifierTypeNode('string'),
