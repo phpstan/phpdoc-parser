@@ -5,7 +5,6 @@ namespace PHPStan\PhpDocParser\Lexer;
 use PHPStan\PhpDocParser\ParserConfig;
 use function implode;
 use function preg_match_all;
-use const PREG_SET_ORDER;
 
 /**
  * Implementation based on Nette Tokenizer (New BSD License; https://github.com/nette/tokenizer)
@@ -116,13 +115,24 @@ class Lexer
 			$this->regexp = $this->generateRegexp();
 		}
 
-		preg_match_all($this->regexp, $s, $matches, PREG_SET_ORDER);
+		// PREG_PATTERN_ORDER, not PREG_SET_ORDER: it collects the whole PHPDoc
+		// into two arrays instead of allocating one array per token. This only
+		// pays off while the token patterns have no capturing groups, because
+		// every group would get an array of its own, one entry per token.
+		preg_match_all($this->regexp, $s, $matches);
+
+		$values = $matches[0];
+		if ($values === []) {
+			return [['', self::TOKEN_END, 1]];
+		}
+
+		$marks = $matches['MARK'];
 
 		$tokens = [];
 		$line = 1;
-		foreach ($matches as $match) {
-			$type = (int) $match['MARK'];
-			$tokens[] = [$match[0], $type, $line];
+		foreach ($values as $i => $value) {
+			$type = (int) $marks[$i];
+			$tokens[] = [$value, $type, $line];
 			if ($type !== self::TOKEN_PHPDOC_EOL) {
 				continue;
 			}
@@ -137,6 +147,7 @@ class Lexer
 
 	private function generateRegexp(): string
 	{
+		// every group in here must be non-capturing, see tokenize()
 		$patterns = [
 			self::TOKEN_HORIZONTAL_WS => '[\\x09\\x20]++',
 
