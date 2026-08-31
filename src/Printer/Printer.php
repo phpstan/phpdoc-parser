@@ -735,12 +735,12 @@ final class Printer
 				if ($i === 0) {
 					// If we're removing from the start, keep the tokens before the node and drop those after it,
 					// instead of the other way around.
-					$originalTokensArray = $originalTokens->getTokens();
+					$originalTokensList = $originalTokens->getTokens();
 					for ($j = $tokenIndex; $j < $itemStartPos; $j++) {
-						if ($originalTokensArray[$j][Lexer::TYPE_OFFSET] === Lexer::TOKEN_PHPDOC_EOL) {
+						if ($originalTokensList->types[$j] === Lexer::TOKEN_PHPDOC_EOL) {
 							break;
 						}
-						$result .= $originalTokensArray[$j][Lexer::VALUE_OFFSET];
+						$result .= $originalTokensList->values[$j];
 					}
 				}
 
@@ -755,10 +755,10 @@ final class Printer
 
 			[$findToken, $extraLeft, $extraRight] = $this->emptyListInsertionMap[$mapKey];
 			if ($findToken !== null) {
-				$originalTokensArray = $originalTokens->getTokens();
-				for (; $tokenIndex < count($originalTokensArray); $tokenIndex++) {
-					$result .= $originalTokensArray[$tokenIndex][Lexer::VALUE_OFFSET];
-					if ($originalTokensArray[$tokenIndex][Lexer::VALUE_OFFSET] !== $findToken) {
+				$originalTokensList = $originalTokens->getTokens();
+				for (; $tokenIndex < $originalTokensList->count; $tokenIndex++) {
+					$result .= $originalTokensList->values[$tokenIndex];
+					if ($originalTokensList->values[$tokenIndex] !== $findToken) {
 						continue;
 					}
 

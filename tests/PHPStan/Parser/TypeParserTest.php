@@ -3539,7 +3539,7 @@ class TypeParserTest extends TestCase
 
 			$content = '';
 			for ($i = $startIndex; $i <= $endIndex; $i++) {
-				$content .= $tokensArray[$i][Lexer::VALUE_OFFSET];
+				$content .= $tokensArray->values[$i];
 			}
 			$this->assertSame($expectedContent, $content);
 		}

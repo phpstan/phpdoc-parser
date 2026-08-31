@@ -22,6 +22,7 @@ declare(strict_types=1);
 namespace PHPStan\PhpDocParser\Tools\Fuzzer;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\Lexer\TokenList;
 use Phplrt\Contracts\Lexer\Channel;
 use Phplrt\Contracts\Lexer\ChannelInterface;
 use Phplrt\Contracts\Lexer\LexerInterface;
@@ -280,17 +281,16 @@ final class TokenStream
     }
 
     /**
-     * @param list<array{string, int, int}> $tokens
      * @return list<Token>
      */
-    public function create(array $tokens): array
+    public function create(TokenList $tokens): array
     {
         $result = [];
         $offset = 0;
+        $types = $tokens->types;
 
-        foreach ($tokens as $index => $token) {
-            $type = $token[Lexer::TYPE_OFFSET];
-            $value = $token[Lexer::VALUE_OFFSET];
+        foreach ($tokens->values as $index => $value) {
+            $type = $types[$index];
 
             if ($type === Lexer::TOKEN_HORIZONTAL_WS) {
                 $offset += \strlen($value);
@@ -312,10 +312,7 @@ final class TokenStream
         return $result;
     }
 
-    /**
-     * @param list<array{string, int, int}> $tokens
-     */
-    private function identify(array $tokens, int $index, int $type, string $value): int
+    private function identify(TokenList $tokens, int $index, int $type, string $value): int
     {
         switch ($type) {
             case Lexer::TOKEN_IDENTIFIER:
@@ -338,22 +335,22 @@ final class TokenStream
                     return $this->id($tag);
                 }
 
-                return $this->id(self::isPrecededByWhitespace($tokens, $index) ? 'T_PHPDOC_TAG_WS' : 'T_PHPDOC_TAG');
+                return $this->id(self::isPrecededByWhitespace($tokens->types, $index) ? 'T_PHPDOC_TAG_WS' : 'T_PHPDOC_TAG');
 
             case Lexer::TOKEN_DOCTRINE_TAG:
-                return $this->id(self::isPrecededByWhitespace($tokens, $index) ? 'T_DOCTRINE_TAG_WS' : 'T_DOCTRINE_TAG');
+                return $this->id(self::isPrecededByWhitespace($tokens->types, $index) ? 'T_DOCTRINE_TAG_WS' : 'T_DOCTRINE_TAG');
 
             case Lexer::TOKEN_OPEN_CURLY_BRACKET:
-                return $this->id(self::isPrecededByWhitespace($tokens, $index) ? 'T_OPEN_CURLY_BRACKET_WS' : 'T_OPEN_CURLY_BRACKET');
+                return $this->id(self::isPrecededByWhitespace($tokens->types, $index) ? 'T_OPEN_CURLY_BRACKET_WS' : 'T_OPEN_CURLY_BRACKET');
 
             case Lexer::TOKEN_OPEN_PARENTHESES:
-                return $this->id(self::isPrecededByWhitespace($tokens, $index) ? 'T_OPEN_PARENTHESES_WS' : 'T_OPEN_PARENTHESES');
+                return $this->id(self::isPrecededByWhitespace($tokens->types, $index) ? 'T_OPEN_PARENTHESES_WS' : 'T_OPEN_PARENTHESES');
 
             case Lexer::TOKEN_OPEN_SQUARE_BRACKET:
-                return $this->id(self::isPrecededByWhitespace($tokens, $index) ? 'T_OPEN_SQUARE_BRACKET_WS' : 'T_OPEN_SQUARE_BRACKET');
+                return $this->id(self::isPrecededByWhitespace($tokens->types, $index) ? 'T_OPEN_SQUARE_BRACKET_WS' : 'T_OPEN_SQUARE_BRACKET');
 
             case Lexer::TOKEN_WILDCARD:
-                return $this->id(self::isFollowedByWhitespace($tokens, $index) ? 'T_WILDCARD_WS' : 'T_WILDCARD');
+                return $this->id(self::isFollowedByWhitespace($tokens->types, $index) ? 'T_WILDCARD_WS' : 'T_WILDCARD');
 
             case Lexer::TOKEN_OPEN_ANGLE_BRACKET:
                 return $this->id(self::isHtml($tokens, $index) ? 'T_OPEN_ANGLE_BRACKET_HTML' : 'T_OPEN_ANGLE_BRACKET');
@@ -364,78 +361,77 @@ final class TokenStream
     }
 
     /**
-     * @param list<array{string, int, int}> $tokens
+     * @param list<int> $types
      */
-    private static function isPrecededByWhitespace(array $tokens, int $index): bool
+    private static function isPrecededByWhitespace(array $types, int $index): bool
     {
-        return ($tokens[$index - 1][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
+        return ($types[$index - 1] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
     }
 
     /**
-     * @param list<array{string, int, int}> $tokens
+     * @param list<int> $types
      */
-    private static function isFollowedByWhitespace(array $tokens, int $index): bool
+    private static function isFollowedByWhitespace(array $types, int $index): bool
     {
-        return ($tokens[$index + 1][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
+        return ($types[$index + 1] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
     }
 
     /**
      * Whether the "<" at the given position opens what
      * PHPStan\PhpDocParser\Parser\TypeParser::isHtml() recognizes as an HTML
      * tag, read the very same way it reads it.
-     *
-     * @param list<array{string, int, int}> $tokens
      */
-    private static function isHtml(array $tokens, int $index): bool
+    private static function isHtml(TokenList $tokens, int $index): bool
     {
-        $count = \count($tokens);
+        $count = $tokens->count;
+        $types = $tokens->types;
 
-        $index = self::skipWhitespace($tokens, $index + 1, $count);
-        if ($index >= $count || $tokens[$index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_IDENTIFIER) {
+        $index = self::skipWhitespace($types, $index + 1, $count);
+        if ($index >= $count || $types[$index] !== Lexer::TOKEN_IDENTIFIER) {
             return false;
         }
 
-        $name = $tokens[$index][Lexer::VALUE_OFFSET];
+        $name = $tokens->values[$index];
 
-        $index = self::skipWhitespace($tokens, $index + 1, $count);
-        if ($index >= $count || $tokens[$index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_CLOSE_ANGLE_BRACKET) {
+        $index = self::skipWhitespace($types, $index + 1, $count);
+        if ($index >= $count || $types[$index] !== Lexer::TOKEN_CLOSE_ANGLE_BRACKET) {
             return false;
         }
 
-        $index = self::skipWhitespace($tokens, $index + 1, $count);
+        $index = self::skipWhitespace($types, $index + 1, $count);
 
         $endTag = '</' . $name . '>';
         $length = \strlen($endTag);
 
-        while ($index < $count && $tokens[$index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_END) {
-            if ($tokens[$index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
-                $index = self::skipWhitespace($tokens, $index + 1, $count);
+        while ($index < $count && $types[$index] !== Lexer::TOKEN_END) {
+            if ($types[$index] === Lexer::TOKEN_OPEN_ANGLE_BRACKET) {
+                $index = self::skipWhitespace($types, $index + 1, $count);
 
-                if ($index < $count && \strpos($tokens[$index][Lexer::VALUE_OFFSET], '/' . $name . '>') !== false) {
+                if ($index < $count && \strpos($tokens->values[$index], '/' . $name . '>') !== false) {
                     return true;
                 }
             }
 
             if ($index < $count) {
-                $value = $tokens[$index][Lexer::VALUE_OFFSET];
+                $value = $tokens->values[$index];
 
                 if (\strlen($value) >= $length && \substr_compare($value, $endTag, -$length) === 0) {
                     return true;
                 }
             }
 
-            $index = self::skipWhitespace($tokens, $index + 1, $count);
+            $index = self::skipWhitespace($types, $index + 1, $count);
         }
 
         return false;
     }
 
     /**
-     * @param list<array{string, int, int}> $tokens
+     * @param list<int> $types
      */
-    private static function skipWhitespace(array $tokens, int $index, int $count): int
+    private static function skipWhitespace(array $types, int $index, int $count): int
     {
-        while ($index < $count && $tokens[$index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
+        while ($index < $count && $types[$index] === Lexer::TOKEN_HORIZONTAL_WS) {
             $index++;
         }
 

@@ -5,9 +5,9 @@ namespace PHPStan\PhpDocParser\Parser;
 use LogicException;
 use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\Lexer\TokenList;
 use function array_pop;
 use function assert;
-use function count;
 use function in_array;
 use function strlen;
 use function substr;
@@ -15,8 +15,18 @@ use function substr;
 class TokenIterator
 {
 
-	/** @var list<array{string, int, int}> */
-	private array $tokens;
+	private TokenList $tokens;
+
+	/** @var list<string> */
+	private array $values;
+
+	/** @var list<int> */
+	private array $types;
+
+	/** @var list<int> */
+	private array $lines;
+
+	private int $count;
 
 	private int $index;
 
@@ -31,34 +41,32 @@ class TokenIterator
 
 	private ?string $newline = null;
 
-	/**
-	 * @param list<array{string, int, int}> $tokens
-	 */
-	public function __construct(array $tokens, int $index = 0)
+	public function __construct(TokenList $tokens, int $index = 0)
 	{
 		$this->tokens = $tokens;
+		$this->values = $tokens->values;
+		$this->types = $tokens->types;
+		$this->lines = $tokens->lines;
+		$this->count = $tokens->count;
 		$this->index = $index;
 
 		$this->skipIrrelevantTokens();
 	}
 
-	/**
-	 * @return list<array{string, int, int}>
-	 */
-	public function getTokens(): array
+	public function getTokens(): TokenList
 	{
 		return $this->tokens;
 	}
 
 	public function getContentBetween(int $startPos, int $endPos): string
 	{
-		if ($startPos < 0 || $endPos > count($this->tokens)) {
+		if ($startPos < 0 || $endPos > $this->count) {
 			throw new LogicException();
 		}
 
 		$content = '';
 		for ($i = $startPos; $i < $endPos; $i++) {
-			$content .= $this->tokens[$i][Lexer::VALUE_OFFSET];
+			$content .= $this->values[$i];
 		}
 
 		return $content;
@@ -66,24 +74,24 @@ class TokenIterator
 
 	public function getTokenCount(): int
 	{
-		return count($this->tokens);
+		return $this->count;
 	}
 
 	public function currentTokenValue(): string
 	{
-		return $this->tokens[$this->index][Lexer::VALUE_OFFSET];
+		return $this->values[$this->index];
 	}
 
 	public function currentTokenType(): int
 	{
-		return $this->tokens[$this->index][Lexer::TYPE_OFFSET];
+		return $this->types[$this->index];
 	}
 
 	public function currentTokenOffset(): int
 	{
 		$offset = 0;
 		for ($i = 0; $i < $this->index; $i++) {
-			$offset += strlen($this->tokens[$i][Lexer::VALUE_OFFSET]);
+			$offset += strlen($this->values[$i]);
 		}
 
 		return $offset;
@@ -91,7 +99,7 @@ class TokenIterator
 
 	public function currentTokenLine(): int
 	{
-		return $this->tokens[$this->index][Lexer::LINE_OFFSET];
+		return $this->lines[$this->index];
 	}
 
 	public function currentTokenIndex(): int
@@ -103,8 +111,8 @@ class TokenIterator
 	{
 		$endIndex = $this->currentTokenIndex();
 		$endIndex--;
-		while (in_array($this->tokens[$endIndex][Lexer::TYPE_OFFSET], $this->skippedTokenTypes, true)) {
-			if (!isset($this->tokens[$endIndex - 1])) {
+		while (in_array($this->types[$endIndex], $this->skippedTokenTypes, true)) {
+			if ($endIndex - 1 < 0) {
 				break;
 			}
 			$endIndex--;
@@ -115,17 +123,17 @@ class TokenIterator
 
 	public function isCurrentTokenValue(string $tokenValue): bool
 	{
-		return $this->tokens[$this->index][Lexer::VALUE_OFFSET] === $tokenValue;
+		return $this->values[$this->index] === $tokenValue;
 	}
 
 	public function isCurrentTokenType(int ...$tokenType): bool
 	{
-		return in_array($this->tokens[$this->index][Lexer::TYPE_OFFSET], $tokenType, true);
+		return in_array($this->types[$this->index], $tokenType, true);
 	}
 
 	public function isPrecededByHorizontalWhitespace(): bool
 	{
-		return ($this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
+		return ($this->types[$this->index - 1] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
 	}
 
 	/**
@@ -133,7 +141,7 @@ class TokenIterator
 	 */
 	public function consumeTokenType(int $tokenType): void
 	{
-		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType) {
+		if ($this->types[$this->index] !== $tokenType) {
 			$this->throwError($tokenType);
 		}
 
@@ -151,7 +159,7 @@ class TokenIterator
 	 */
 	public function consumeTokenValue(int $tokenType, string $tokenValue): void
 	{
-		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType || $this->tokens[$this->index][Lexer::VALUE_OFFSET] !== $tokenValue) {
+		if ($this->types[$this->index] !== $tokenType || $this->values[$this->index] !== $tokenValue) {
 			$this->throwError($tokenType, $tokenValue);
 		}
 
@@ -161,7 +169,7 @@ class TokenIterator
 	/** @phpstan-impure */
 	public function tryConsumeTokenValue(string $tokenValue): bool
 	{
-		if ($this->tokens[$this->index][Lexer::VALUE_OFFSET] !== $tokenValue) {
+		if ($this->values[$this->index] !== $tokenValue) {
 			return false;
 		}
 
@@ -183,7 +191,7 @@ class TokenIterator
 	/** @phpstan-impure */
 	public function tryConsumeTokenType(int $tokenType): bool
 	{
-		if ($this->tokens[$this->index][Lexer::TYPE_OFFSET] !== $tokenType) {
+		if ($this->types[$this->index] !== $tokenType) {
 			return false;
 		}
 
@@ -246,8 +254,8 @@ class TokenIterator
 
 	public function getSkippedHorizontalWhiteSpaceIfAny(): string
 	{
-		if ($this->index > 0 && $this->tokens[$this->index - 1][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
-			return $this->tokens[$this->index - 1][Lexer::VALUE_OFFSET];
+		if ($this->index > 0 && $this->types[$this->index - 1] === Lexer::TOKEN_HORIZONTAL_WS) {
+			return $this->values[$this->index - 1];
 		}
 
 		return '';
@@ -257,8 +265,8 @@ class TokenIterator
 	public function joinUntil(int ...$tokenType): string
 	{
 		$s = '';
-		while (!in_array($this->tokens[$this->index][Lexer::TYPE_OFFSET], $tokenType, true)) {
-			$s .= $this->tokens[$this->index++][Lexer::VALUE_OFFSET];
+		while (!in_array($this->types[$this->index], $tokenType, true)) {
+			$s .= $this->values[$this->index++];
 		}
 		return $s;
 	}
@@ -271,12 +279,12 @@ class TokenIterator
 
 	private function skipIrrelevantTokens(): void
 	{
-		if (!isset($this->tokens[$this->index])) {
+		if ($this->index >= $this->count) {
 			return;
 		}
 
-		while (in_array($this->tokens[$this->index][Lexer::TYPE_OFFSET], $this->skippedTokenTypes, true)) {
-			if (!isset($this->tokens[$this->index + 1])) {
+		while (in_array($this->types[$this->index], $this->skippedTokenTypes, true)) {
+			if ($this->index + 1 >= $this->count) {
 				break;
 			}
 			$this->index++;
@@ -296,8 +304,7 @@ class TokenIterator
 	/** @phpstan-impure */
 	public function forwardToTheEnd(): void
 	{
-		$lastToken = count($this->tokens) - 1;
-		$this->index = $lastToken;
+		$this->index = $this->count - 1;
 	}
 
 	public function pushSavePoint(): void
@@ -339,11 +346,10 @@ class TokenIterator
 	 */
 	public function hasTokenImmediatelyBefore(int $pos, int $expectedTokenType): bool
 	{
-		$tokens = $this->tokens;
+		$types = $this->types;
 		$pos--;
 		for (; $pos >= 0; $pos--) {
-			$token = $tokens[$pos];
-			$type = $token[Lexer::TYPE_OFFSET];
+			$type = $types[$pos];
 			if ($type === $expectedTokenType) {
 				return true;
 			}
@@ -364,11 +370,10 @@ class TokenIterator
 	 */
 	public function hasTokenImmediatelyAfter(int $pos, int $expectedTokenType): bool
 	{
-		$tokens = $this->tokens;
+		$types = $this->types;
 		$pos++;
-		for ($c = count($tokens); $pos < $c; $pos++) {
-			$token = $tokens[$pos];
-			$type = $token[Lexer::TYPE_OFFSET];
+		for ($c = $this->count; $pos < $c; $pos++) {
+			$type = $types[$pos];
 			if ($type === $expectedTokenType) {
 				return true;
 			}
