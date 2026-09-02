@@ -200,6 +200,7 @@ class TokenIterator
 
 	/**
 	 * @deprecated Use skipNewLineTokensAndConsumeComments instead (when parsing a type)
+	 * @phpstan-ignore shipmonk.deadMethod
 	 */
 	public function skipNewLineTokens(): void
 	{
