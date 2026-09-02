@@ -93,10 +93,6 @@ class Lexer
 		self::TOKEN_WILDCARD => '*',
 	];
 
-	public const VALUE_OFFSET = 0;
-	public const TYPE_OFFSET = 1;
-	public const LINE_OFFSET = 2;
-
 	private ParserConfig $config; // @phpstan-ignore property.onlyWritten
 
 	private ?string $regexp = null;
@@ -106,10 +102,7 @@ class Lexer
 		$this->config = $config;
 	}
 
-	/**
-	 * @return list<array{string, int, int}>
-	 */
-	public function tokenize(string $s): array
+	public function tokenize(string $s): TokenList
 	{
 		if ($this->regexp === null) {
 			$this->regexp = $this->generateRegexp();
@@ -123,16 +116,18 @@ class Lexer
 
 		$values = $matches[0];
 		if ($values === []) {
-			return [['', self::TOKEN_END, 1]];
+			return new TokenList([''], [self::TOKEN_END], [1]);
 		}
 
-		$marks = $matches['MARK'];
-
-		$tokens = [];
+		// $matches[0] is already the values array of the TokenList, so the
+		// values never get copied out of it token by token.
+		$types = [];
+		$lines = [];
 		$line = 1;
-		foreach ($values as $i => $value) {
-			$type = (int) $marks[$i];
-			$tokens[] = [$value, $type, $line];
+		foreach ($matches['MARK'] as $mark) {
+			$type = (int) $mark;
+			$types[] = $type;
+			$lines[] = $line;
 			if ($type !== self::TOKEN_PHPDOC_EOL) {
 				continue;
 			}
@@ -140,9 +135,11 @@ class Lexer
 			$line++;
 		}
 
-		$tokens[] = ['', self::TOKEN_END, $line];
+		$values[] = '';
+		$types[] = self::TOKEN_END;
+		$lines[] = $line;
 
-		return $tokens;
+		return new TokenList($values, $types, $lines);
 	}
 
 	private function generateRegexp(): string

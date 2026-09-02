@@ -6,6 +6,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use function array_keys;
+use function count;
 use function preg_match_all;
 use const PHP_VERSION_ID;
 
@@ -38,6 +39,19 @@ class LexerTest extends TestCase
 		preg_match_all($regexp, $subject, $matches);
 
 		self::assertSame([0, 'MARK'], array_keys($matches));
+	}
+
+	/**
+	 * tokenize() used to return an array, so count() on its result has to keep
+	 * saying how many tokens there are.
+	 */
+	public function testTokenListIsCountable(): void
+	{
+		$lexer = new Lexer(new ParserConfig([]));
+		$tokens = $lexer->tokenize('/** @param int $a */');
+
+		self::assertCount($tokens->count, $tokens);
+		self::assertCount(count($tokens->values), $tokens);
 	}
 
 }
