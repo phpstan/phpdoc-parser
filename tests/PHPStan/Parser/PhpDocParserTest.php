@@ -34,6 +34,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamOutTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocInlineTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
@@ -6589,6 +6590,73 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@package', new GenericTagValueNode('core')),
 				new PhpDocTagNode('@copyright', new GenericTagValueNode('2024 onwards Catalyst IT EU {@link https://catalyst-eu.net}')),
 				new PhpDocTagNode('@\ORM\Entity', new DoctrineTagValueNode(new DoctrineAnnotation('@\ORM\Entity', []), '2024 onwards Catalyst IT EU {@link https://catalyst-eu.net}')),
+			]),
+		];
+
+		yield [
+			'Inline {@inheritDoc} alone',
+			'/** {@inheritDoc} */',
+			new PhpDocNode([
+				new PhpDocTextNode('{@inheritDoc}', [
+					new PhpDocInlineTagNode('@inheritDoc', ''),
+				]),
+			]),
+		];
+
+		yield [
+			'Inline {@inheritdoc} lowercase',
+			'/** {@inheritdoc} */',
+			new PhpDocNode([
+				new PhpDocTextNode('{@inheritdoc}', [
+					new PhpDocInlineTagNode('@inheritdoc', ''),
+				]),
+			]),
+		];
+
+		yield [
+			'Inline {@link} with description',
+			'/** see {@link https://example.com Example} for details */',
+			new PhpDocNode([
+				new PhpDocTextNode('see {@link https://example.com Example} for details', [
+					new PhpDocInlineTagNode('@link', 'https://example.com Example'),
+				]),
+			]),
+		];
+
+		yield [
+			'Multiple inline tags in text',
+			'/** see {@see Foo} or {@link https://example.com} */',
+			new PhpDocNode([
+				new PhpDocTextNode('see {@see Foo} or {@link https://example.com}', [
+					new PhpDocInlineTagNode('@see', 'Foo'),
+					new PhpDocInlineTagNode('@link', 'https://example.com'),
+				]),
+			]),
+		];
+
+		yield [
+			'Inline tag mixed with prose',
+			'/** Please do not add {@inheritDoc} to this method */',
+			new PhpDocNode([
+				new PhpDocTextNode('Please do not add {@inheritDoc} to this method', [
+					new PhpDocInlineTagNode('@inheritDoc', ''),
+				]),
+			]),
+		];
+
+		yield [
+			'Unclosed brace is not an inline tag',
+			'/** {@inheritDoc no closing brace */',
+			new PhpDocNode([
+				new PhpDocTextNode('{@inheritDoc no closing brace'),
+			]),
+		];
+
+		yield [
+			'Curly braces without @ are not inline tags',
+			'/** {key: value} */',
+			new PhpDocNode([
+				new PhpDocTextNode('{key: value}'),
 			]),
 		];
 	}

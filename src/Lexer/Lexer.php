@@ -51,6 +51,7 @@ class Lexer
 	public const TOKEN_ARROW = 36;
 
 	public const TOKEN_COMMENT = 37;
+	public const TOKEN_PHPDOC_INLINE_TAG = 38;
 
 	public const TOKEN_LABELS = [
 		self::TOKEN_REFERENCE => '\'&\'',
@@ -77,6 +78,7 @@ class Lexer
 		self::TOKEN_OPEN_PHPDOC => '\'/**\'',
 		self::TOKEN_CLOSE_PHPDOC => '\'*/\'',
 		self::TOKEN_PHPDOC_TAG => 'TOKEN_PHPDOC_TAG',
+		self::TOKEN_PHPDOC_INLINE_TAG => 'TOKEN_PHPDOC_INLINE_TAG',
 		self::TOKEN_DOCTRINE_TAG => 'TOKEN_DOCTRINE_TAG',
 		self::TOKEN_PHPDOC_EOL => 'TOKEN_PHPDOC_EOL',
 		self::TOKEN_FLOAT => 'TOKEN_FLOAT',
@@ -168,6 +170,7 @@ class Lexer
 			self::TOKEN_CLOSE_ANGLE_BRACKET => '>',
 			self::TOKEN_OPEN_SQUARE_BRACKET => '\\[',
 			self::TOKEN_CLOSE_SQUARE_BRACKET => '\\]',
+			self::TOKEN_PHPDOC_INLINE_TAG => '\\{@[a-z][a-z0-9-\\\\]*+(?:[\\x09\\x20]++[^}\\r\\n]*+)?+\\}',
 			self::TOKEN_OPEN_CURLY_BRACKET => '\\{',
 			self::TOKEN_CLOSE_CURLY_BRACKET => '\\}',
 
