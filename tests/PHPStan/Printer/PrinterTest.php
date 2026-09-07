@@ -24,6 +24,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessParameterIsPassedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
@@ -2690,6 +2691,88 @@ class PrinterTest extends TestCase
 				 */'),
 			$addCommentToObjectShapeItemMiddle,
 		];
+		$changeMultilineText = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTextNode) {
+					$node->text = str_replace('Foo', 'Bar', $node->text);
+				}
+				if ($node instanceof ParamTagValueNode) {
+					$node->description = str_replace('Foo', 'Bar', $node->description);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * First line Foo
+				 * second line Foo
+				 *
+				 * Third line Foo
+				 *
+				 * @param int $a Foo description
+				 *   continues Foo
+				 * @param int $b
+				 */'),
+			self::nowdoc('
+				/**
+				 * First line Bar
+				 * second line Bar
+				 *
+				 * Third line Bar
+				 *
+				 * @param int $a Bar description
+				 *   continues Bar
+				 * @param int $b
+				 */'),
+			$changeMultilineText,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				     * First line Foo
+				     * second line Foo
+				     */'),
+			self::nowdoc('
+				/**
+				     * First line Bar
+				     * second line Bar
+				     */'),
+			$changeMultilineText,
+		];
+
+		$addMultilineText = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocNode) {
+					array_unshift($node->children, new PhpDocTextNode("Added first\nadded second"));
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+				/**
+				 * @param int $a
+				 */'),
+			self::nowdoc('
+				/**
+				 * Added first
+				 * added second
+				 * @param int $a
+				 */'),
+			$addMultilineText,
+		];
 	}
 
 	/**
@@ -2951,6 +3034,28 @@ class PrinterTest extends TestCase
 			]),
 			'/**
  * @param int $a
+ */',
+		];
+		yield [
+			new PhpDocNode([
+				new PhpDocTextNode("First line\nsecond line\n\nthird line"),
+				new PhpDocTextNode(''),
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					"description\n  continues",
+					false,
+				)),
+			]),
+			'/**
+ * First line
+ * second line
+ *
+ * third line
+ *
+ * @param int $a description
+ *   continues
  */',
 		];
 	}
