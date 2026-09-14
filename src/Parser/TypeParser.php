@@ -34,44 +34,58 @@ class TypeParser
 	{
 		$startLine = $tokens->currentTokenLine();
 		$startIndex = $tokens->currentTokenIndex();
-		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
+		$nullable = $tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE);
+		if ($nullable) {
 			$type = $this->parseNullable($tokens);
 
 		} else {
 			$type = $this->parseAtomic($tokens);
+		}
 
-			$tokens->pushSavePoint();
-			$tokens->skipNewLineTokensAndConsumeComments();
+		$tokens->pushSavePoint();
+		$tokens->skipNewLineTokensAndConsumeComments();
 
-			try {
-				$enrichedType = $this->enrichTypeOnUnionOrIntersection($tokens, $type);
+		try {
+			$enrichedType = $this->enrichTypeOnUnionOrIntersection($tokens, $type, $nullable);
 
-			} catch (ParserException $parserException) {
-				$enrichedType = null;
-			}
+		} catch (ParserException $parserException) {
+			$enrichedType = null;
+		}
 
-			if ($enrichedType !== null) {
-				$type = $enrichedType;
-				$tokens->dropSavePoint();
+		if ($enrichedType !== null) {
+			$type = $enrichedType;
+			$tokens->dropSavePoint();
 
-			} else {
-				$tokens->rollback();
-				$type = $this->enrichTypeOnUnionOrIntersection($tokens, $type) ?? $type;
-			}
+		} else {
+			$tokens->rollback();
+			$type = $this->enrichTypeOnUnionOrIntersection($tokens, $type, $nullable) ?? $type;
 		}
 
 		return $this->enrichWithAttributes($tokens, $type, $startLine, $startIndex);
 	}
 
-	/** @phpstan-impure */
-	private function enrichTypeOnUnionOrIntersection(TokenIterator $tokens, Ast\Type\TypeNode $type): ?Ast\Type\TypeNode
+	/**
+	 * A "?" written before a type carries over the "|" that may follow it, because
+	 * "?A|B" is the same set of values whichever of the two the "?" is read to
+	 * belong to: "(?A)|B" and "?(A|B)" are both "A|B|null".
+	 *
+	 * An "&" is left alone, as "(?A)&B" and "?(A&B)" are not the same set, and
+	 * PHP itself writes the latter as "(A&B)|null" rather than as "?A&B".
+	 *
+	 * @phpstan-impure
+	 */
+	private function enrichTypeOnUnionOrIntersection(
+		TokenIterator $tokens,
+		Ast\Type\TypeNode $type,
+		bool $unionOnly = false
+	): ?Ast\Type\TypeNode
 	{
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
 			return $this->parseUnion($tokens, $type);
 
 		}
 
-		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+		if (!$unionOnly && $tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
 			return $this->parseIntersection($tokens, $type);
 		}
 
@@ -112,7 +126,11 @@ class TypeParser
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
 			$type = $this->parseNullable($tokens);
+			$tokens->skipNewLineTokensAndConsumeComments();
 
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+				$type = $this->subParseUnion($tokens, $type);
+			}
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
 			$type = $this->parseConditionalForParameter($tokens, $tokens->currentTokenValue());
 
@@ -395,11 +413,19 @@ class TypeParser
 	/** @phpstan-impure */
 	private function parseNullable(TokenIterator $tokens): Ast\Type\TypeNode
 	{
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+
 		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
 
 		$type = $this->parseAtomic($tokens);
 
-		return new Ast\Type\NullableTypeNode($type);
+		return $this->enrichWithAttributes(
+			$tokens,
+			new Ast\Type\NullableTypeNode($type),
+			$startLine,
+			$startIndex,
+		);
 	}
 
 	/** @phpstan-impure */

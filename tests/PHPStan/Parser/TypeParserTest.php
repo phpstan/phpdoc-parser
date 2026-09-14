@@ -547,6 +547,77 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'?int|null',
+				new UnionTypeNode([
+					new NullableTypeNode(new IdentifierTypeNode('int')),
+					new IdentifierTypeNode('null'),
+				]),
+			],
+			[
+				'?Foo|Bar',
+				new UnionTypeNode([
+					new NullableTypeNode(new IdentifierTypeNode('Foo')),
+					new IdentifierTypeNode('Bar'),
+				]),
+			],
+			[
+				'?Foo|Bar|Baz',
+				new UnionTypeNode([
+					new NullableTypeNode(new IdentifierTypeNode('Foo')),
+					new IdentifierTypeNode('Bar'),
+					new IdentifierTypeNode('Baz'),
+				]),
+			],
+			[
+				"?Foo\n|Bar",
+				new UnionTypeNode([
+					new NullableTypeNode(new IdentifierTypeNode('Foo')),
+					new IdentifierTypeNode('Bar'),
+				]),
+			],
+			[
+				'(?Foo|Bar)',
+				new UnionTypeNode([
+					new NullableTypeNode(new IdentifierTypeNode('Foo')),
+					new IdentifierTypeNode('Bar'),
+				]),
+			],
+			[
+				'array<?Foo|null>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('array'),
+					[
+						new UnionTypeNode([
+							new NullableTypeNode(new IdentifierTypeNode('Foo')),
+							new IdentifierTypeNode('null'),
+						]),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'array{a: ?Foo|null}',
+				ArrayShapeNode::createSealed([
+					new ArrayShapeItemNode(
+						new IdentifierTypeNode('a'),
+						false,
+						new UnionTypeNode([
+							new NullableTypeNode(new IdentifierTypeNode('Foo')),
+							new IdentifierTypeNode('null'),
+						]),
+					),
+				]),
+			],
+			[
+				// "(?Foo)&Bar" and "?(Foo&Bar)" are different types, so the "&"
+				// is left for the caller to reject rather than read into either.
+				'?Foo&Bar',
+				new NullableTypeNode(new IdentifierTypeNode('Foo')),
+				Lexer::TOKEN_INTERSECTION,
+			],
+			[
 				'?Foo<Bar>',
 				new NullableTypeNode(
 					new GenericTypeNode(

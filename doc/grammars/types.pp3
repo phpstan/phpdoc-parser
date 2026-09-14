@@ -29,14 +29,22 @@
  * "int\n|string" is one type while "int\nstring" is a type followed by a
  * description. Whichever of the two is written, a "|" or a "&" left unread is
  * an error rather than the end of the type, which is what the predicates say.
+ *
+ * A "?" written first carries over the "|" that may follow it, because "?A|B" is
+ * the same set of values whichever of the two the "?" is read to belong to. An
+ * "&" is not carried over, as "(?A)&B" and "?(A&B)" are not the same set.
  */
 Type
-  : Nullable()
+  : Nullable() ( NullableTail() | !<T_UNION> !<T_INTERSECTION> )
   | Atomic() ( TypeTail() | !<T_UNION> !<T_INTERSECTION> )
   ;
 
 TypeTail
   : Trivia() ( Union() | Intersection() )
+  ;
+
+NullableTail
+  : Trivia() Union()
   ;
 
 Union
@@ -56,13 +64,17 @@ Nullable
  * may be written and the only place a line break needs no "|" after it.
  */
 SubType
-  : Nullable()
+  : Nullable() SubNullableTail()
   | <T_VARIABLE> ConditionalForParameter()
   | Atomic() ( Conditional() | SubTypeTail() )
   ;
 
 SubTypeTail
   : Trivia() ( SubUnion() | SubIntersection() )?
+  ;
+
+SubNullableTail
+  : Trivia() SubUnion()?
   ;
 
 SubUnion
