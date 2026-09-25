@@ -4,92 +4,29 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "31e0382729bc7f44d23ee49bea1427eb",
+    "content-hash": "c752e581069f7a8c78d3efcf6c6db223",
     "packages": [
         {
-            "name": "laminas/laminas-code",
-            "version": "4.17.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laminas/laminas-code.git",
-                "reference": "40d61e2899ec17c5d08bbc0a2d586b3ca17ab9bd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-code/zipball/40d61e2899ec17c5d08bbc0a2d586b3ca17ab9bd",
-                "reference": "40d61e2899ec17c5d08bbc0a2d586b3ca17ab9bd",
-                "shasum": ""
-            },
-            "require": {
-                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
-            },
-            "require-dev": {
-                "doctrine/annotations": "^2.0.1",
-                "ext-phar": "*",
-                "laminas/laminas-coding-standard": "^3.0.0",
-                "laminas/laminas-stdlib": "^3.18.0",
-                "phpunit/phpunit": "^10.5.58",
-                "psalm/plugin-phpunit": "^0.19.0",
-                "vimeo/psalm": "^5.15.0"
-            },
-            "suggest": {
-                "doctrine/annotations": "Doctrine\\Common\\Annotations >=1.0 for annotation features",
-                "laminas/laminas-stdlib": "Laminas\\Stdlib component"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Laminas\\Code\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Extensions to the PHP Reflection API, static code scanning, and code generation",
-            "homepage": "https://laminas.dev",
-            "keywords": [
-                "code",
-                "laminas",
-                "laminasframework"
-            ],
-            "support": {
-                "chat": "https://laminas.dev/chat",
-                "docs": "https://docs.laminas.dev/laminas-code/",
-                "forum": "https://discourse.laminas.dev",
-                "issues": "https://github.com/laminas/laminas-code/issues",
-                "rss": "https://github.com/laminas/laminas-code/releases.atom",
-                "source": "https://github.com/laminas/laminas-code"
-            },
-            "funding": [
-                {
-                    "url": "https://funding.communitybridge.org/projects/laminas-project",
-                    "type": "community_bridge"
-                }
-            ],
-            "time": "2025-11-01T09:38:14+00:00"
-        },
-        {
             "name": "phplrt/phplrt",
-            "version": "4.0.0-rc1",
+            "version": "4.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phplrt/phplrt.git",
-                "reference": "348cd166f750d0021aa95e3f87ea6f17e29b2147"
+                "reference": "f2a4a2d8ce8c8d25e7623dc3201f705fe15d3415"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phplrt/phplrt/zipball/348cd166f750d0021aa95e3f87ea6f17e29b2147",
-                "reference": "348cd166f750d0021aa95e3f87ea6f17e29b2147",
+                "url": "https://api.github.com/repos/phplrt/phplrt/zipball/f2a4a2d8ce8c8d25e7623dc3201f705fe15d3415",
+                "reference": "f2a4a2d8ce8c8d25e7623dc3201f705fe15d3415",
                 "shasum": ""
             },
             "require": {
-                "composer-runtime-api": "^2.2",
+                "composer-runtime-api": "^2.0",
                 "ext-json": "*",
                 "ext-pcre": "*",
-                "laminas/laminas-code": "^4.17",
-                "php": "^8.4",
-                "symfony/console": "^7.4|^8.0",
+                "php": "^8.1",
+                "psr/log": "^3.0",
+                "symfony/console": "^6.4|^7.0|^8.0",
                 "twig/twig": "^3.28"
             },
             "provide": {
@@ -123,14 +60,18 @@
                 "friendsofphp/php-cs-fixer": "^3.95",
                 "phpstan/phpstan": "^2.2",
                 "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^13.2",
                 "symfony/var-dumper": "^6.4|^7.0|^8.0",
-                "symplify/monorepo-builder": "^12.7"
+                "testo/testo": "^0.10.45"
             },
             "bin": [
                 "libs/components/compiler/bin/phplrt"
             ],
             "type": "library",
+            "extra": {
+                "skills": {
+                    "source": "skills"
+                }
+            },
             "autoload": {
                 "files": [
                     "libs/components/source/src/polyfill.php"
@@ -172,7 +113,7 @@
                 "issues": "https://github.com/phplrt/phplrt/issues",
                 "source": "https://github.com/phplrt/phplrt"
             },
-            "time": "2026-08-25T09:57:58+00:00"
+            "time": "2026-09-14T13:16:14+00:00"
         },
         {
             "name": "psr/container",
@@ -226,6 +167,56 @@
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
             "time": "2021-11-05T16:47:00+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
+                "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/log/tree/3.0.2"
+            },
+            "time": "2024-09-11T13:17:53+00:00"
         },
         {
             "name": "symfony/console",
