@@ -31,6 +31,9 @@ class TokenIterator
 
 	private ?string $newline = null;
 
+	/** @var list<int>|null */
+	private ?array $offsets = null;
+
 	/**
 	 * @param list<array{string, int, int}> $tokens
 	 */
@@ -81,12 +84,16 @@ class TokenIterator
 
 	public function currentTokenOffset(): int
 	{
-		$offset = 0;
-		for ($i = 0; $i < $this->index; $i++) {
-			$offset += strlen($this->tokens[$i][Lexer::VALUE_OFFSET]);
+		if ($this->offsets === null) {
+			$offset = 0;
+			$this->offsets = [];
+			foreach ($this->tokens as $token) {
+				$this->offsets[] = $offset;
+				$offset += strlen($token[Lexer::VALUE_OFFSET]);
+			}
 		}
 
-		return $offset;
+		return $this->offsets[$this->index];
 	}
 
 	public function currentTokenLine(): int

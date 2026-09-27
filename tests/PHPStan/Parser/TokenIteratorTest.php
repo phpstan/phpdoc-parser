@@ -5,6 +5,8 @@ namespace PHPStan\PhpDocParser\Parser;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
+use function strlen;
+use function substr;
 use const PHP_EOL;
 
 class TokenIteratorTest extends TestCase
@@ -55,6 +57,21 @@ class TokenIteratorTest extends TestCase
 		$phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
 		$phpDocParser->parse($tokens);
 		$this->assertSame($expectedNewline, $tokens->getDetectedNewline());
+	}
+
+	public function testCurrentTokenOffset(): void
+	{
+		$lexer = new Lexer(new ParserConfig([]));
+		$phpDoc = "/**\n * @param array{size?: 'sm'|'md', icon: Icon} \$a\n */";
+		$tokens = new TokenIterator($lexer->tokenize($phpDoc));
+
+		do {
+			$this->assertSame($tokens->currentTokenValue(), substr($phpDoc, $tokens->currentTokenOffset(), strlen($tokens->currentTokenValue())));
+			$this->assertSame(strlen($tokens->getContentBetween(0, $tokens->currentTokenIndex())), $tokens->currentTokenOffset());
+			$tokens->next();
+		} while (!$tokens->isCurrentTokenType(Lexer::TOKEN_END));
+
+		$this->assertSame(strlen($phpDoc), $tokens->currentTokenOffset());
 	}
 
 }
