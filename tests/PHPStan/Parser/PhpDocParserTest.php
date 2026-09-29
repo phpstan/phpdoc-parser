@@ -29,6 +29,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureScopeTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureThisTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
@@ -103,6 +104,7 @@ class PhpDocParserTest extends TestCase
 	 * @dataProvider provideParamLaterInvokedCallableTagsData
 	 * @dataProvider provideTypelessParamTagsData
 	 * @dataProvider provideParamClosureThisTagsData
+	 * @dataProvider provideParamClosureScopeTagsData
 	 * @dataProvider providePureUnlessCallableIsImpureTagsData
 	 * @dataProvider providePureUnlessParameterIsPassedTagsData
 	 * @dataProvider provideVarTagsData
@@ -724,6 +726,54 @@ class PhpDocParserTest extends TestCase
 				new PhpDocTagNode(
 					'@param-closure-this',
 					new ParamClosureThisTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$a',
+						'test',
+					),
+				),
+			]),
+		];
+	}
+
+	public function provideParamClosureScopeTagsData(): Iterator
+	{
+		yield [
+			'OK',
+			'/** @param-closure-scope Foo $a */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-closure-scope',
+					new ParamClosureScopeTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$a',
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with prefix',
+			'/** @phpstan-param-closure-scope Foo $a */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@phpstan-param-closure-scope',
+					new ParamClosureScopeTagValueNode(
+						new IdentifierTypeNode('Foo'),
+						'$a',
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with description',
+			'/** @param-closure-scope Foo $a test */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param-closure-scope',
+					new ParamClosureScopeTagValueNode(
 						new IdentifierTypeNode('Foo'),
 						'$a',
 						'test',
@@ -7829,6 +7879,7 @@ Finder::findFiles('*.php')
 	 * @dataProvider provideParamImmediatelyInvokedCallableTagsData
 	 * @dataProvider provideParamLaterInvokedCallableTagsData
 	 * @dataProvider provideParamClosureThisTagsData
+	 * @dataProvider provideParamClosureScopeTagsData
 	 * @dataProvider provideVarTagsData
 	 * @dataProvider provideReturnTagsData
 	 * @dataProvider provideThrowsTagsData

@@ -357,6 +357,11 @@ class PhpDocParser
 					$tagValue = $this->parseParamClosureThisTagValue($tokens);
 					break;
 
+				case '@param-closure-scope':
+				case '@phpstan-param-closure-scope':
+					$tagValue = $this->parseParamClosureScopeTagValue($tokens);
+					break;
+
 				case '@pure-unless-callable-is-impure':
 				case '@phpstan-pure-unless-callable-is-impure':
 					$tagValue = $this->parsePureUnlessCallableIsImpureTagValue($tokens);
@@ -872,6 +877,15 @@ class PhpDocParser
 		$description = $this->parseOptionalDescription($tokens, false);
 
 		return new Ast\PhpDoc\ParamClosureThisTagValueNode($type, $parameterName, $description);
+	}
+
+	private function parseParamClosureScopeTagValue(TokenIterator $tokens): Ast\PhpDoc\ParamClosureScopeTagValueNode
+	{
+		$type = $this->typeParser->parse($tokens);
+		$parameterName = $this->parseRequiredVariableName($tokens);
+		$description = $this->parseOptionalDescription($tokens, false);
+
+		return new Ast\PhpDoc\ParamClosureScopeTagValueNode($type, $parameterName, $description);
 	}
 
 	private function parsePureUnlessCallableIsImpureTagValue(TokenIterator $tokens): Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode

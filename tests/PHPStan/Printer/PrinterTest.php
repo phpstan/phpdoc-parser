@@ -18,6 +18,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureScopeTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureThisTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
@@ -2134,6 +2135,25 @@ class PrinterTest extends TestCase
 				public function enterNode(Node $node)
 				{
 					if ($node instanceof ParamClosureThisTagValueNode) {
+						$node->type = new IdentifierTypeNode('Bar');
+						$node->parameterName = '$taste';
+						$node->description = 'hehe';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @param-closure-scope Foo $test haha */',
+			'/** @param-closure-scope Bar $taste hehe */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ParamClosureScopeTagValueNode) {
 						$node->type = new IdentifierTypeNode('Bar');
 						$node->parameterName = '$taste';
 						$node->description = 'hehe';

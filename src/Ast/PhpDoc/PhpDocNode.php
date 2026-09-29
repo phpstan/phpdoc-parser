@@ -108,6 +108,17 @@ class PhpDocNode implements Node
 	}
 
 	/**
+	 * @return ParamClosureScopeTagValueNode[]
+	 */
+	public function getParamClosureScopeTagValues(string $tagName = '@param-closure-scope'): array
+	{
+		return array_filter(
+			array_column($this->getTagsByName($tagName), 'value'),
+			static fn (PhpDocTagValueNode $value): bool => $value instanceof ParamClosureScopeTagValueNode,
+		);
+	}
+
+	/**
 	 * @return PureUnlessCallableIsImpureTagValueNode[]
 	 */
 	public function getPureUnlessCallableIsImpureTagValues(string $tagName = '@pure-unless-callable-is-impure'): array

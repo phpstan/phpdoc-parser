@@ -21,6 +21,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MixinTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureScopeTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureThisTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
@@ -360,6 +361,9 @@ final class Printer
 			return trim("{$node->parameterName} {$node->description}");
 		}
 		if ($node instanceof ParamClosureThisTagValueNode) {
+			return trim("{$node->type} {$node->parameterName} {$node->description}");
+		}
+		if ($node instanceof ParamClosureScopeTagValueNode) {
 			return trim("{$node->type} {$node->parameterName} {$node->description}");
 		}
 		if ($node instanceof PureUnlessCallableIsImpureTagValueNode) {
