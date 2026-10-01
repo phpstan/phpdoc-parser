@@ -69,6 +69,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use function array_keys;
 use function array_map;
+use function array_shift;
 use function assert;
 use function count;
 use function get_class;
@@ -77,6 +78,8 @@ use function implode;
 use function in_array;
 use function is_array;
 use function preg_match_all;
+use function preg_split;
+use function rtrim;
 use function sprintf;
 use function str_replace;
 use function strlen;
@@ -95,6 +98,12 @@ final class Printer
 
 	/** @var Differ<Node> */
 	private Differ $differ;
+
+	/**
+	 * Inserted before every continuation line of multi-line text inside a printed PhpDocTextNode or tag value.
+	 * printFormatPreserving() sets it to the indentation detected in the original PHPDoc.
+	 */
+	private string $continuationLinePrefix = "\n * ";
 
 	/**
 	 * Map From "{$class}->{$subNode}" to string that should be inserted
@@ -187,14 +196,18 @@ final class Printer
 		});
 
 		$tokenIndex = 0;
-		$result = $this->printArrayFormatPreserving(
-			$node->children,
-			$originalNode->children,
-			$originalTokens,
-			$tokenIndex,
-			PhpDocNode::class,
-			'children',
-		);
+		try {
+			$result = $this->printArrayFormatPreserving(
+				$node->children,
+				$originalNode->children,
+				$originalTokens,
+				$tokenIndex,
+				PhpDocNode::class,
+				'children',
+			);
+		} finally {
+			$this->continuationLinePrefix = "\n * ";
+		}
 		if ($result !== null) {
 			return $result . $originalTokens->getContentBetween($tokenIndex, $originalTokens->getTokenCount());
 		}
@@ -214,7 +227,7 @@ final class Printer
 			)) . "\n */";
 		}
 		if ($node instanceof PhpDocTextNode) {
-			return $node->text;
+			return $this->printMultilineText($node->text);
 		}
 		if ($node instanceof PhpDocTagNode) {
 			if ($node->value instanceof DoctrineTagValueNode) {
@@ -224,7 +237,7 @@ final class Printer
 			return trim(sprintf('%s %s', $node->name, $this->print($node->value)));
 		}
 		if ($node instanceof PhpDocTagValueNode) {
-			return $this->printTagValue($node);
+			return $this->printMultilineText($this->printTagValue($node));
 		}
 		if ($node instanceof TypeNode) {
 			return $this->printType($node);
@@ -290,6 +303,25 @@ final class Printer
 		}
 
 		throw new LogicException(sprintf('Unknown node type %s', get_class($node)));
+	}
+
+	private function printMultilineText(string $text): string
+	{
+		if (strpos($text, "\n") === false) {
+			return $text;
+		}
+
+		$lines = preg_split('~\r?\n~', $text);
+		if ($lines === false) {
+			return $text;
+		}
+
+		$result = array_shift($lines);
+		foreach ($lines as $line) {
+			$result .= $line === '' ? rtrim($this->continuationLinePrefix) : $this->continuationLinePrefix . $line;
+		}
+
+		return $result;
 	}
 
 	private function printTagValue(PhpDocTagValueNode $node): string
@@ -590,6 +622,8 @@ final class Printer
 
 		if ($insertStr === "\n * ") {
 			$insertStr = sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
+			// the lexer strips exactly one space after the asterisk, any further indentation stays in the text
+			$this->continuationLinePrefix = sprintf('%s%s* ', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent);
 		}
 
 		foreach ($diff as $i => $diffElem) {
