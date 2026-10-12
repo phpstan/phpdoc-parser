@@ -11,9 +11,16 @@ class PhpDocTextNode implements PhpDocChildNode
 
 	public string $text;
 
-	public function __construct(string $text)
+	/** @var list<PhpDocInlineTagNode> */
+	public array $inlineTags;
+
+	/**
+	 * @param list<PhpDocInlineTagNode> $inlineTags
+	 */
+	public function __construct(string $text, array $inlineTags = [])
 	{
 		$this->text = $text;
+		$this->inlineTags = $inlineTags;
 	}
 
 	public function __toString(): string
@@ -26,7 +33,7 @@ class PhpDocTextNode implements PhpDocChildNode
 	 */
 	public static function __set_state(array $properties): self
 	{
-		$instance = new self($properties['text']);
+		$instance = new self($properties['text'], $properties['inlineTags'] ?? []);
 		if (isset($properties['attributes'])) {
 			foreach ($properties['attributes'] as $key => $value) {
 				$instance->setAttribute($key, $value);

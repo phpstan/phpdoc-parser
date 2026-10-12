@@ -14,6 +14,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use PHPStan\ShouldNotHappenException;
 use function array_key_exists;
 use function count;
+use function preg_match;
 use function rtrim;
 use function str_replace;
 use function trim;
@@ -190,6 +191,7 @@ class PhpDocParser
 	private function parseText(TokenIterator $tokens): Ast\PhpDoc\PhpDocTextNode
 	{
 		$text = '';
+		$inlineTags = [];
 
 		$endTokens = [Lexer::TOKEN_CLOSE_PHPDOC, Lexer::TOKEN_END];
 
@@ -197,7 +199,9 @@ class PhpDocParser
 
 		// if the next token is EOL, everything below is skipped and empty string is returned
 		while (true) {
+			$startIndex = $tokens->currentTokenIndex();
 			$tmpText = $tokens->getSkippedHorizontalWhiteSpaceIfAny() . $tokens->joinUntil(Lexer::TOKEN_PHPDOC_EOL, ...$endTokens);
+			$this->collectInlineTags($tokens, $startIndex, $tokens->currentTokenIndex(), $inlineTags);
 			$text .= $tmpText;
 
 			// stop if we're not at EOL - meaning it's the end of PHPDoc
@@ -234,7 +238,36 @@ class PhpDocParser
 			$text = rtrim($text, $tokens->getDetectedNewline() ?? "\n");
 		}
 
-		return new Ast\PhpDoc\PhpDocTextNode(trim($text, " \t"));
+		return new Ast\PhpDoc\PhpDocTextNode(trim($text, " \t"), $inlineTags);
+	}
+
+	/**
+	 * @param list<Ast\PhpDoc\PhpDocInlineTagNode> $inlineTags
+	 */
+	private function collectInlineTags(TokenIterator $tokens, int $startIndex, int $endIndex, array &$inlineTags): void
+	{
+		$allTokens = $tokens->getTokens();
+		for ($i = $startIndex; $i < $endIndex; $i++) {
+			if ($allTokens[$i][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_PHPDOC_INLINE_TAG) {
+				continue;
+			}
+
+			$value = $allTokens[$i][Lexer::VALUE_OFFSET];
+			if (preg_match('~^\\{(@[a-z][a-z0-9-\\\\]*+)(?:[\\x09\\x20]++([^}\\r\\n]*+))?+\\}$~i', $value, $matches) !== 1) {
+				continue;
+			}
+
+			$node = new Ast\PhpDoc\PhpDocInlineTagNode($matches[1], $matches[2] ?? '');
+			if ($this->config->useLinesAttributes) {
+				$node->setAttribute(Ast\Attribute::START_LINE, $allTokens[$i][Lexer::LINE_OFFSET]);
+				$node->setAttribute(Ast\Attribute::END_LINE, $allTokens[$i][Lexer::LINE_OFFSET]);
+			}
+			if ($this->config->useIndexAttributes) {
+				$node->setAttribute(Ast\Attribute::START_INDEX, $i);
+				$node->setAttribute(Ast\Attribute::END_INDEX, $i);
+			}
+			$inlineTags[] = $node;
+		}
 	}
 
 	private function parseOptionalDescriptionAfterDoctrineTag(TokenIterator $tokens): string

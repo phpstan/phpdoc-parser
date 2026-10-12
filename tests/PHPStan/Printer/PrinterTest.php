@@ -22,8 +22,10 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureThisTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocInlineTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessParameterIsPassedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
@@ -2689,6 +2691,187 @@ class PrinterTest extends TestCase
 				 * } $foo
 				 */'),
 			$addCommentToObjectShapeItemMiddle,
+		];
+
+		yield [
+			'/** {@inheritDoc} */',
+			'/** {@inheritDoc} */',
+			$noopVisitor,
+		];
+
+		yield [
+			'/** see {@link https://example.com Example} for details */',
+			'/** see {@link https://example.com Example} for details */',
+			$noopVisitor,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * Description {@link https://example.com}
+				 * second line {@see Foo}
+				 */'),
+			self::nowdoc('
+				/**
+				 * Description {@link https://example.com}
+				 * second line {@see Foo}
+				 */'),
+			$noopVisitor,
+		];
+
+		$normalizeInheritdoc = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTextNode) {
+					$node->text = str_replace('{@inheritdoc}', '{@inheritDoc}', $node->text);
+				}
+				if ($node instanceof PhpDocInlineTagNode && $node->name === '@inheritdoc') {
+					$node->name = '@inheritDoc';
+				}
+
+				return null;
+			}
+
+		};
+
+		yield [
+			'/** {@inheritdoc} */',
+			'/** {@inheritDoc} */',
+			$normalizeInheritdoc,
+		];
+
+		yield [
+			'/** see {@inheritdoc} for details */',
+			'/** see {@inheritDoc} for details */',
+			$normalizeInheritdoc,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * Description {@inheritdoc}
+				 */'),
+			self::nowdoc('
+				/**
+				 * Description {@inheritDoc}
+				 */'),
+			$normalizeInheritdoc,
+		];
+
+		yield [
+			self::nowdoc('
+				/**
+				 * line 1
+				 * line 2 with {@inheritdoc}
+				 * line 3
+				 */'),
+			self::nowdoc('
+				/**
+				 * line 1
+				 * line 2 with {@inheritDoc}
+				 * line 3
+				 */'),
+			$normalizeInheritdoc,
+		];
+
+		yield [
+			'/** see {@link https://example.com Example} or {@inheritdoc} */',
+			'/** see {@link https://example.com Example} or {@inheritDoc} */',
+			$normalizeInheritdoc,
+		];
+
+		$replaceInheritdocWithSee = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTextNode) {
+					$node->text = str_replace('{@inheritdoc}', '{@see Foo}', $node->text);
+					foreach ($node->inlineTags as $i => $inlineTag) {
+						if ($inlineTag->name !== '@inheritdoc') {
+							continue;
+						}
+						$node->inlineTags[$i] = new PhpDocInlineTagNode('@see', 'Foo');
+					}
+				}
+
+				return null;
+			}
+
+		};
+
+		yield [
+			'/** see {@inheritdoc} for details */',
+			'/** see {@see Foo} for details */',
+			$replaceInheritdocWithSee,
+		];
+
+		$updateLink = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTextNode) {
+					$node->text = str_replace('https://old.example.com', 'https://new.example.com', $node->text);
+				}
+				if ($node instanceof PhpDocInlineTagNode && $node->name === '@link') {
+					$node->value = str_replace('https://old.example.com', 'https://new.example.com', $node->value);
+				}
+
+				return null;
+			}
+
+		};
+
+		yield [
+			'/** see {@link https://old.example.com Example} */',
+			'/** see {@link https://new.example.com Example} */',
+			$updateLink,
+		];
+
+		$replaceTextWithoutInlineTag = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTextNode) {
+					$node->text = 'no tag here';
+					$node->inlineTags = [];
+				}
+
+				return null;
+			}
+
+		};
+
+		yield [
+			'/** {@inheritDoc} */',
+			'/** no tag here */',
+			$replaceTextWithoutInlineTag,
+		];
+
+		yield [
+			'/** see {@inheritDoc} for details */',
+			'/** no tag here */',
+			$replaceTextWithoutInlineTag,
+		];
+
+		$addInlineTag = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTextNode && $node->text === 'see for details') {
+					$node->text = 'see {@inheritDoc} for details';
+					$node->inlineTags[] = new PhpDocInlineTagNode('@inheritDoc', '');
+				}
+
+				return null;
+			}
+
+		};
+
+		yield [
+			'/** see for details */',
+			'/** see {@inheritDoc} for details */',
+			$addInlineTag,
 		];
 	}
 
