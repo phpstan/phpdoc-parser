@@ -7,6 +7,12 @@ parameters:
 			path: src/Ast/ConstExpr/ConstExprStringNode.php
 
 		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\Node\:\:hasAttribute$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/Node.php
+
+		-
 			message: '#^Cannot use array destructuring on list\<array\<PHPStan\\PhpDocParser\\Ast\\Node\>\|int\|string\>\|null\.$#'
 			identifier: offsetAccess.nonArray
 			count: 1
@@ -17,6 +23,186 @@ parameters:
 			identifier: property.dynamicName
 			count: 1
 			path: src/Ast/NodeTraverser.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getAssertMethodTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getAssertPropertyTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getAssertTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getDeprecatedTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getExtendsTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getImplementsTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getMethodTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getMixinTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getParamClosureThisTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getParamImmediatelyInvokedCallableTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getParamLaterInvokedCallableTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getParamOutTypeTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getParamTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getPropertyReadTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getPropertyTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getPropertyWriteTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getPureUnlessCallableIsImpureTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getPureUnlessParameterIsPassedTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getRequireExtendsTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getRequireImplementsTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getSealedTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getSelfOutTypeTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getTemplateTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getThrowsTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getTypeAliasImportTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getTypeAliasTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getTypelessParamTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getUsesTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\PhpDoc\\PhpDocNode\:\:getVarTagValues$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/PhpDoc/PhpDocNode.php
+
+		-
+			message: '#^Unused PHPStan\\PhpDocParser\\Ast\\Type\\InvalidTypeNode\:\:getException$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: src/Ast/Type/InvalidTypeNode.php
 
 		-
 			message: '#^Method PHPStan\\PhpDocParser\\Parser\\StringUnescaper\:\:parseEscapeSequences\(\) should return string but returns string\|null\.$#'
