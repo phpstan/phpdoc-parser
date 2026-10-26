@@ -175,6 +175,11 @@ jobs:
       - name: "Install the grammar toolchain"
         run: "make grammars-install"
 
+      - name: "Check the generated parser is up to date"
+        run: |
+          make grammars-build
+          git diff --exit-code src/Parser/Generated
+
       - name: "Tests"
         run: "make tests"
 

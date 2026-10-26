@@ -1,0 +1,152 @@
+<?php declare(strict_types = 1);
+
+namespace PHPStan\PhpDocParser\Parser\Generated;
+
+use PHPStan\PhpDocParser\Ast\Comment;
+use PHPStan\PhpDocParser\Parser\Phplrt\Token;
+use Phplrt\Parser\Context;
+use function array_keys;
+use function is_array;
+use function ksort;
+
+/**
+ * The parser of "doc/grammars/phpdoc.pp3".
+ *
+ * DO NOT EDIT: this file is written by "tools/phplrt/build.php" (make grammars-build).
+ *
+ * Every rule of the grammar is a method reading it the way the runtime of
+ * phplrt would, and building its value along: a method named "b" followed by
+ * the identifier of a rule reads the rule and pushes its value, one named "s"
+ * only reads it. The values are built by the reducers of the class extending
+ * this one.
+ *
+ * @internal
+ */
+abstract class GeneratedParser
+{
+
+	/** @var array<string, int> the identifier of each rule a reading may start at */
+	public const RULES = /*RULES*/[];
+
+	/** @var array<string, int> the identifier of each token */
+	public const TOKENS = /*TOKENS*/[];
+
+	/** @var array<int, string> the name each token is expected by */
+	public const EXPECTATIONS = /*EXPECTATIONS*/[];
+
+	/*CONSTANTS*/
+
+	/** @var array<int, int> the identifier of the token at each position, the last one being -1 */
+	protected array $ids = [];
+
+	/** the position the reading is at */
+	protected int $p = 0;
+
+	/** @var array<int, mixed> the values built, as a stack */
+	protected array $v = [];
+
+	/** the size of the stack of values */
+	protected int $n = 0;
+
+	/** @var array<int, Comment> the comments read and not given to any node yet, by their index */
+	protected array $comments = [];
+
+	/** the furthest position a failure has been recorded at */
+	private int $f = -1;
+
+	/** @var list<int> the rules recorded as failed at the furthest position */
+	private array $er = [];
+
+	abstract protected function token(int $position): Token;
+
+	/**
+	 * The context of whatever has been read from the given position up to the
+	 * given one, or up to the position the reading is at.
+	 */
+	abstract protected function context(int $from, ?int $to = null): Context;
+
+	/*REDUCERS*/
+
+	/**
+	 * Where the last reading has failed, along with the tokens expected there.
+	 *
+	 * @return array{int, list<int>}
+	 */
+	protected function failure(): array
+	{
+		if ($this->f === -1 || $this->f < $this->p) {
+			return [$this->p, []];
+		}
+
+		$expected = [];
+		foreach ($this->er as $rule) {
+			foreach (self::EXPECTED[$rule] ?? [] as $token) {
+				$expected[$token] = true;
+			}
+		}
+
+		ksort($expected);
+
+		return [$this->f, array_keys($expected)];
+	}
+
+	/**
+	 * Saves the state of the reading, so that a reading may be started in the
+	 * middle of another one.
+	 *
+	 * @return array{int, int, list<int>}
+	 */
+	protected function saveReading(): array
+	{
+		return [$this->p, $this->f, $this->er];
+	}
+
+	/**
+	 * @param array{int, int, list<int>} $state
+	 */
+	protected function restoreReading(array $state): void
+	{
+		[$this->p, $this->f, $this->er] = $state;
+	}
+
+	private function rec(int $rule): void
+	{
+		$position = $this->p;
+		if ($position > $this->f) {
+			$this->f = $position;
+			$this->er = [$rule];
+			return;
+		}
+
+		if ($position !== $this->f || isset($this->er[3])) {
+			return;
+		}
+
+		$this->er[] = $rule;
+	}
+
+	/**
+	 * The values pushed since the given size, the lists among them flattened.
+	 *
+	 * @return list<mixed>
+	 */
+	private function merge(int $from): array
+	{
+		$result = [];
+		for ($i = $from, $n = $this->n; $i < $n; $i++) {
+			$value = $this->v[$i];
+			if (!is_array($value)) {
+				$result[] = $value;
+				continue;
+			}
+
+			foreach ($value as $nested) {
+				$result[] = $nested;
+			}
+		}
+
+		return $result;
+	}
+
+	/*METHODS*/
+}

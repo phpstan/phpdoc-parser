@@ -8,6 +8,9 @@
 	<arg name="cache" value="tmp/phpcs"/>
 	<arg value="sp"/>
 
+	<!-- written by tools/phplrt/build.php -->
+	<exclude-pattern>src/Parser/Generated/*</exclude-pattern>
+
 	<rule ref="build-cs/phpcs.xml">
 		<exclude name="Squiz.Strings.DoubleQuoteUsage.ContainsVar"/>
 	</rule>

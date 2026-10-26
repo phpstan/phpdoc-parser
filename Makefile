@@ -45,3 +45,9 @@ phpstan-generate-baseline:
 .PHONY: grammars-install
 grammars-install:
 	composer install --no-interaction --working-dir tools/phplrt
+
+# Writes the parser of src/Parser/Generated out of doc/grammars. Run it after
+# changing a grammar or a reducer of src/Parser/AstBuilder.php.
+.PHONY: grammars-build
+grammars-build:
+	php tools/phplrt/build.php

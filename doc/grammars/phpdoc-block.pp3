@@ -26,13 +26,18 @@ PhpDoc
   : <T_OPEN_PHPDOC> <T_PHPDOC_EOL>? ( !<T_CLOSE_PHPDOC> PhpDocChildren() )? <T_CLOSE_PHPDOC>
   ;
 
+/**
+ * The children one after another, written as a repetition rather than as a
+ * rule calling itself once per child, so that a PHPDoc of many tags is read
+ * without nesting a rule per tag.
+ */
 PhpDocChildren
-  : UnreadTagChild() <T_PHPDOC_EOL>? MorePhpDocChildren()?
-  | PhpDocChild() ( <T_PHPDOC_EOL> MorePhpDocChildren()? )?
+  : PhpDocChildrenItem() ( !<T_CLOSE_PHPDOC> PhpDocChildrenItem() )*
   ;
 
-MorePhpDocChildren
-  : !<T_CLOSE_PHPDOC> PhpDocChildren()
+PhpDocChildrenItem
+  : UnreadTagChild() <T_PHPDOC_EOL>?
+  | PhpDocChild() ( <T_PHPDOC_EOL> | &<T_CLOSE_PHPDOC> )
   ;
 
 /**
@@ -166,8 +171,7 @@ ParameterNameStart
  * space, which is what tells "@var Foo the one" from "@var Foo|the one".
  */
 VarTagValue
-  : Type() VariableName() Description()
-  | Type() DescriptionAfterType()
+  : Type() ( VariableName() Description() | DescriptionAfterType() )
   ;
 
 VariableName
@@ -189,10 +193,13 @@ VariableName
  *  meant.
  */
 MethodTagValue
-  : StaticType() Type() Identifier() MethodTagValueTail()
-  | StaticType() Type() MethodTagValueTail()
-  | Type() Identifier() MethodTagValueTail()
-  | Type() MethodTagValueTail()
+  : StaticType() Type() MethodNameAndTail()
+  | Type() MethodNameAndTail()
+  ;
+
+MethodNameAndTail
+  : Identifier() MethodTagValueTail()
+  | MethodTagValueTail()
   ;
 
 /**
@@ -354,12 +361,15 @@ DoctrineDescription
  * to it, while one written after it does not.
  */
 Text
-  : TextLine() TextTail()?
+  : TextLine() TextTail()*
   ;
 
+/**
+ * A line with something on it, along with the blank lines before it, so that
+ * the blank lines written after the last such line are left unread.
+ */
 TextTail
-  : <T_PHPDOC_EOL> !TextStop() TextLineWithSomethingOnIt() TextTail()?
-  | <T_PHPDOC_EOL> !TextStop() TextTail()
+  : ( <T_PHPDOC_EOL> !TextStop() )+ TextLineWithSomethingOnIt()
   ;
 
 TextLine
@@ -579,8 +589,7 @@ NonTagTextToken
  *  predicate says.
  */
 DoctrineTag
-  : DoctrineTagToken() DoctrineArguments() DoctrineDescription()
-  | DoctrineTagToken() !ParenthesesOpen() DoctrineDescription()
+  : DoctrineTagToken() ( DoctrineArguments() | !ParenthesesOpen() ) DoctrineDescription()
   | GenericTagToken() DoctrineArguments() DoctrineDescription()
   ;
 

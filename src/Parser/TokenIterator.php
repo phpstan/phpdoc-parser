@@ -300,6 +300,34 @@ class TokenIterator
 		$this->skippedTokenTypes = [Lexer::TOKEN_HORIZONTAL_WS];
 	}
 
+	/**
+	 * Moves the iterator to the given token, which the parsers do once they
+	 * have read everything up to it.
+	 *
+	 * @internal
+	 */
+	public function setCurrentTokenIndex(int $index): void
+	{
+		$this->index = $index;
+		$this->skipIrrelevantTokens();
+	}
+
+	/**
+	 * @internal
+	 */
+	public function detectNewlineOf(string $endOfLine): void
+	{
+		if ($this->newline !== null) {
+			return;
+		}
+
+		if (substr($endOfLine, 0, 2) === "\r\n") {
+			$this->newline = "\r\n";
+		} elseif (substr($endOfLine, 0, 1) === "\n") {
+			$this->newline = "\n";
+		}
+	}
+
 	/** @phpstan-impure */
 	public function forwardToTheEnd(): void
 	{

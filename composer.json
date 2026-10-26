@@ -3,7 +3,8 @@
 	"description": "PHPDoc parser with support for nullable, intersection and generic types",
 	"license": "MIT",
 	"require": {
-		"php": "^7.4 || ^8.0"
+		"php": "^7.4 || ^8.0",
+		"ondrejmirtes/phplrt-runtime": "^4.2.4"
 	},
 	"require-dev": {
 		"doctrine/annotations": "^2.0",

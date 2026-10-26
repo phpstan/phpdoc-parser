@@ -1,3 +1,16 @@
+Upgrading from phpstan/phpdoc-parser 2.x to 3.0
+=================================
+
+### The parser is generated from the grammars
+
+`ConstExprParser`, `TypeParser` and `PhpDocParser` are no longer written by hand. The parser is generated from the grammars in [`doc/grammars`](doc/grammars) with [phplrt](https://github.com/phplrt/phplrt), and the AST is built by `PHPStan\PhpDocParser\Parser\AstBuilder`. The library now requires `ondrejmirtes/phplrt-runtime`.
+
+Their constructors and `parse()` methods (and `PhpDocParser::parseTag()`, `PhpDocParser::parseTagValue()` and `ConstExprParser::parseDoctrineString()`) are the same, and so is the AST they build.
+
+* Some details of a `ParserException` thrown for an invalid input may be different: the token the parser stopped at, and the token it says it expected there.
+* These public methods of `TypeParser`, which were not meant to be called from the outside, are removed: `parseGeneric()`, `parseTemplateTagValue()`, `isHtml()` and `enrichWithAttributes()`.
+* The `TypeParser` and `ConstExprParser` given to the constructors of `TypeParser` and `PhpDocParser` are not used anymore.
+
 Upgrading from phpstan/phpdoc-parser 1.x to 2.0
 =================================
 

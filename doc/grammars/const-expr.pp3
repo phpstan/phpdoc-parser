@@ -88,8 +88,7 @@ ConstantArrayItem
  *  - BAR
  */
 ConstantFetch
-  : !ArrayKeyword() Identifier() <T_DOUBLE_COLON> ClassConstantName()
-  | !ArrayKeyword() Identifier()
+  : !ArrayKeyword() Identifier() ( <T_DOUBLE_COLON> ClassConstantName() )?
   ;
 
 /**

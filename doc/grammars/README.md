@@ -36,6 +36,21 @@ run are left in `temp/fuzzy` to be looked at.
 That is a great deal more of the language than a hand-written corpus covers, and
 it is what replaced the `abnfgen`-driven fuzzer this project used before.
 
+## The parser is generated from them
+
+`src/Parser/Generated/GeneratedParser.php` is the parser of `phpdoc.pp3`, and
+it is written by `tools/phplrt/build.php` — never edit it by hand:
+
+    make grammars-install                  # the toolchain, which asks for PHP 8.4
+    make grammars-build
+
+Every rule is a method reading it the way the phplrt runtime would read the
+compiled grammar, and building its value as it goes: the rules a node of the
+AST is built out of are the ones `src/Parser/AstBuilder.php` has a `reduce`
+method for, so a change of a grammar or of a reducer is followed by
+`make grammars-build`. The `Grammars` job of the CI checks that the parser in
+the repository is the one the grammars write.
+
 ## What keeps them in step
 
 The fuzzer walks the grammars one way; `tests/PHPStan/Parser/GrammarSyncTest.php`
