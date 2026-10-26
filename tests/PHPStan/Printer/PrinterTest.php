@@ -25,6 +25,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\ParamLaterInvokedCallableTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessParameterIsPassedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
@@ -1989,6 +1990,67 @@ class PrinterTest extends TestCase
 		];
 
 		yield [
+			self::nowdoc('
+			/**
+			 * @param int $foo multi
+			 *   line description
+			 * @return void
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param int $bar multi
+			 *   line description
+			 * @return void
+			 */'),
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ParamTagValueNode) {
+						$node->parameterName = '$bar';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			"/**\n     * First line\n     * second line\n     *\n     * @param int \$a\n     */",
+			"/**\n     * Changed line\n     * second line\n     *\n     * @param int \$a\n     */",
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof PhpDocTextNode && $node->text !== '') {
+						$node->text = "Changed line\nsecond line";
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			"/**\n     * @param int \$a\n     */",
+			"/**\n     * @param int \$a\n     * @return int first\n     *\n     *   second\n     */",
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof PhpDocNode) {
+						$node->children[] = new PhpDocTagNode('@return', new ReturnTagValueNode(new IdentifierTypeNode('int'), "first\n\n  second"));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
 			'/** @\Foo\Id */',
 			'/** @\Foo\Id */',
 			$noopVisitor,
@@ -3003,6 +3065,27 @@ class PrinterTest extends TestCase
 			]),
 			'/**
  * @param int $a
+ */',
+		];
+
+		yield [
+			new PhpDocNode([
+				new PhpDocTextNode("First line\nsecond line"),
+				new PhpDocTagNode('@param', new ParamTagValueNode(
+					new IdentifierTypeNode('int'),
+					false,
+					'$a',
+					"multi\n  line\n\nwith empty line",
+					false,
+				)),
+			]),
+			'/**
+ * First line
+ * second line
+ * @param int $a multi
+ *   line
+ *
+ * with empty line
  */',
 		];
 	}

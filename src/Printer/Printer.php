@@ -77,10 +77,12 @@ use function implode;
 use function in_array;
 use function is_array;
 use function preg_match_all;
+use function preg_replace_callback;
 use function sprintf;
 use function str_replace;
 use function strlen;
 use function strpos;
+use function substr;
 use function trim;
 use const PREG_SET_ORDER;
 
@@ -95,6 +97,12 @@ final class Printer
 
 	/** @var Differ<Node> */
 	private Differ $differ;
+
+	/**
+	 * Newline, indentation and asterisk at the start of a PHPDoc line.
+	 * Written after each newline in a printed text or description.
+	 */
+	private string $lineStart = "\n *";
 
 	/**
 	 * Map From "{$class}->{$subNode}" to string that should be inserted
@@ -178,6 +186,17 @@ final class Printer
 
 	public function printFormatPreserving(PhpDocNode $node, PhpDocNode $originalNode, TokenIterator $originalTokens): string
 	{
+		$lineStart = $this->lineStart;
+		$this->lineStart = $this->detectLineStart($originalTokens);
+		try {
+			return $this->printFormatPreservingWithLineStart($node, $originalNode, $originalTokens);
+		} finally {
+			$this->lineStart = $lineStart;
+		}
+	}
+
+	private function printFormatPreservingWithLineStart(PhpDocNode $node, PhpDocNode $originalNode, TokenIterator $originalTokens): string
+	{
 		$this->differ = new Differ(static function ($a, $b) {
 			if ($a instanceof Node && $b instanceof Node) {
 				return $a === $b->getAttribute(Attribute::ORIGINAL_NODE);
@@ -207,7 +226,7 @@ final class Printer
 		if ($node instanceof PhpDocNode) {
 			return "/**\n *" . implode("\n *", array_map(
 				function (PhpDocChildNode $child): string {
-					$s = $this->print($child);
+					$s = $this->addLineStarts($this->print($child));
 					return $s === '' ? '' : ' ' . $s;
 				},
 				$node->children,
@@ -970,7 +989,7 @@ final class Printer
 	private function printReplacement(Node $node): string
 	{
 		if (!$node instanceof DoctrineTagValueNode) {
-			return $this->print($node);
+			return $this->addLineStarts($this->print($node));
 		}
 
 		$arguments = '(' . implode(', ', $node->annotation->arguments) . ')';
@@ -984,7 +1003,40 @@ final class Printer
 			}
 		}
 
-		return trim($arguments . ' ' . $node->description);
+		return $this->addLineStarts(trim($arguments . ' ' . $node->description));
+	}
+
+	/**
+	 * The parser removes the asterisk at the start of each line of a text or description.
+	 * This puts it back.
+	 */
+	private function addLineStarts(string $s): string
+	{
+		return preg_replace_callback(
+			'~\r?\n(?=(.?))~',
+			fn (array $matches): string => $matches[1] === '' || $matches[1] === "\r" || $matches[1] === "\n"
+				? $this->lineStart
+				: $this->lineStart . ' ',
+			$s,
+		) ?? $s;
+	}
+
+	private function detectLineStart(TokenIterator $originalTokens): string
+	{
+		foreach ($originalTokens->getTokens() as $token) {
+			if ($token[Lexer::TYPE_OFFSET] !== Lexer::TOKEN_PHPDOC_EOL) {
+				continue;
+			}
+
+			$asteriskPosition = strpos($token[Lexer::VALUE_OFFSET], '*');
+			if ($asteriskPosition === false) {
+				continue;
+			}
+
+			return substr($token[Lexer::VALUE_OFFSET], 0, $asteriskPosition + 1);
+		}
+
+		return ($originalTokens->getDetectedNewline() ?? "\n") . ' *';
 	}
 
 }
