@@ -34,6 +34,12 @@ abstract class GeneratedParser
 	/** @var array<int, string> the name each token is expected by */
 	public const EXPECTATIONS = /*EXPECTATIONS*/[];
 
+	/** the pattern of the lexer, marking each token by its identifier */
+	public const LEXER_PATTERN = /*LEXER_PATTERN*/'';
+
+	/** @var array<int, int> the type of the lexer each token it reads is, by the identifier */
+	public const LEXER_TYPES = /*LEXER_TYPES*/[];
+
 	/*CONSTANTS*/
 
 	/** @var array<int, int> the identifier of the token at each position, the last one being -1 */

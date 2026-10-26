@@ -4,7 +4,9 @@ namespace PHPStan\PhpDocParser\Parser\Phplrt;
 
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\Generated\GeneratedParser;
+use function array_slice;
 use function count;
+use function preg_match_all;
 use function strlen;
 use function strpos;
 use function strtolower;
@@ -195,8 +197,19 @@ final class TokenStream
 		Lexer::TOKEN_OTHER => 'T_OTHER',
 	];
 
+	/** where the end of the input returned by {@see tokenize()} holds the identifiers of the stream */
+	public const STREAM_IDS = 3;
+
+	/** where it holds the index of the token each of them stands for */
+	public const STREAM_INDEXES = 4;
+
 	/** @var array<int, int> */
 	private static ?array $types = null;
+
+	/** @var array<int, int> the token each token preceded by whitespace is read as */
+	private static array $whitespaceVariants;
+
+	private static int $eol;
 
 	/** @var array<string, int> */
 	private static array $keywords;
@@ -326,6 +339,155 @@ final class TokenStream
 	}
 
 	/**
+	 * Reads the given PHPDoc into the tokens of {@see Lexer}, and the stream of
+	 * {@see create()} along with them, in one pass.
+	 *
+	 * The stream is handed over in the last token, the end of the input, as
+	 * its {@see STREAM_IDS} and {@see STREAM_INDEXES}: the tokens are all
+	 * {@see Lexer::tokenize()} returns, and the parser is given nothing else.
+	 * See {@see fromTokens()}.
+	 *
+	 * @return list<array{0: string, 1: int, 2: int, 3?: array<int, int>, 4?: list<int>}>
+	 */
+	public static function tokenize(string $s): array
+	{
+		if (self::$types === null) {
+			self::initialize();
+		}
+
+		// PREG_PATTERN_ORDER, not PREG_SET_ORDER: it collects the whole PHPDoc
+		// into two arrays instead of allocating one array per token. This only
+		// pays off while the token patterns have no capturing groups, because
+		// every group would get an array of its own, one entry per token.
+		preg_match_all(GeneratedParser::LEXER_PATTERN, $s, $matches);
+
+		$values = $matches[0];
+		// no MARK at all when nothing has been matched
+		$marks = $matches['MARK'] ?? [];
+
+		$lexerTypes = GeneratedParser::LEXER_TYPES;
+		$keywords = self::$keywords;
+		$tags = self::$tags;
+		$identifier = self::$identifier;
+		$phpDocTag = self::$phpDocTag;
+		$whitespaceVariants = self::$whitespaceVariants;
+		$wildcard = self::$wildcard;
+		$openAngle = self::$openAngle;
+		$eol = self::$eol;
+
+		$tokens = [];
+		$ids = [];
+		$indexes = [];
+		$angles = [];
+		$line = 1;
+		$afterWhitespace = false;
+
+		foreach ($values as $index => $value) {
+			/** @var key-of<GeneratedParser::LEXER_TYPES> $id every mark of the pattern is a token it reads */
+			$id = (int) $marks[$index];
+
+			if ($id === 0) {
+				// T_HORIZONTAL_WS, the first token of the grammar, which the
+				// stream leaves out
+				$tokens[] = [$value, Lexer::TOKEN_HORIZONTAL_WS, $line];
+				$afterWhitespace = true;
+				continue;
+			}
+
+			$tokens[] = [$value, $lexerTypes[$id], $line];
+
+			if ($id === $identifier) {
+				$id = $keywords[$value] ?? $identifier;
+			} elseif (isset($whitespaceVariants[$id])) {
+				if ($id === $phpDocTag && isset($tags[$value])) {
+					$id = $tags[$value];
+				} elseif ($afterWhitespace) {
+					$id = $whitespaceVariants[$id];
+				}
+			} elseif ($id === $wildcard) {
+				if (($marks[$index + 1] ?? null) === '0') {
+					$id = self::$wildcardWs;
+				}
+			} elseif ($id === $openAngle) {
+				$angles[] = count($ids);
+			} elseif ($id === $eol) {
+				$line++;
+			}
+
+			$ids[] = $id;
+			$indexes[] = $index;
+			$afterWhitespace = false;
+		}
+
+		$count = count($tokens);
+		$closable = [];
+		foreach ($angles as $position) {
+			// A tag is only closed by an end tag written somewhere in the
+			// PHPDoc, which is looked for once per name rather than once per
+			// "<": every "list<string>" would otherwise be one walk to the end
+			$name = $tokens[$indexes[$position + 1] ?? $count][0] ?? '';
+			$closable[$name] ??= $name !== '' && strpos($s, '/' . $name . '>') !== false;
+			if (!$closable[$name] || !self::isHtml($tokens, $indexes[$position], $count)) {
+				continue;
+			}
+
+			$ids[$position] = self::$openAngleHtml;
+		}
+
+		$ids[] = -1;
+		$indexes[] = $count;
+		$tokens[] = ['', Lexer::TOKEN_END, $line, $ids, $indexes];
+
+		return $tokens;
+	}
+
+	/**
+	 * The stream of the given tokens from the given index on, in case the
+	 * tokens are the ones {@see tokenize()} has returned, or null in case they
+	 * have to be read by {@see create()}.
+	 *
+	 * Whatever has been done to the tokens since, other than reading them,
+	 * leaves the stream describing other tokens. Of all that may be done, the
+	 * stream only tells apart the tokens being cut off or added to.
+	 *
+	 * @param list<array{0: string, 1: int, 2: int, 3?: array<int, int>, 4?: list<int>}> $tokens
+	 * @return array{array<int, int>, list<int>}|null
+	 */
+	public static function fromTokens(array $tokens, int $start): ?array
+	{
+		$last = count($tokens) - 1;
+		$end = $tokens[$last] ?? null;
+		if (!isset($end[self::STREAM_INDEXES])) {
+			return null;
+		}
+
+		$ids = $end[self::STREAM_IDS] ?? [];
+		$indexes = $end[self::STREAM_INDEXES];
+		$length = count($indexes);
+		if ($indexes[$length - 1] !== $last) {
+			return null;
+		}
+
+		if ($start <= $indexes[0]) {
+			return [$ids, $indexes];
+		}
+
+		// the first token of the stream at the given index or after it
+		$low = 0;
+		$high = $length - 1;
+		while ($low < $high) {
+			$middle = $low + $high >> 1;
+			if ($indexes[$middle] < $start) {
+				$low = $middle + 1;
+			} else {
+				$high = $middle;
+			}
+		}
+
+		return [array_slice($ids, $low), array_slice($indexes, $low)];
+	}
+
+	/**
 	 * The identifier of the token a tag written nowhere in the tokens is read as.
 	 */
 	public static function tagId(string $value): int
@@ -381,6 +543,14 @@ final class TokenStream
 		self::$wildcardWs = $ids['T_WILDCARD_WS'];
 		self::$openAngle = $ids['T_OPEN_ANGLE_BRACKET'];
 		self::$openAngleHtml = $ids['T_OPEN_ANGLE_BRACKET_HTML'];
+		self::$eol = $ids['T_PHPDOC_EOL'];
+		self::$whitespaceVariants = [
+			self::$phpDocTag => self::$phpDocTagWs,
+			self::$doctrineTag => self::$doctrineTagWs,
+			self::$openCurly => self::$openCurlyWs,
+			self::$openParentheses => self::$openParenthesesWs,
+			self::$openSquare => self::$openSquareWs,
+		];
 
 		self::$types = $types;
 	}

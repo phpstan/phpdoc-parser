@@ -125,16 +125,19 @@ most of them:
 - **A rule reads exactly the tokens its method reads**, down to the line breaks
   around it.
 
-### The tokens are not read by phplrt
+### The lexer is written out of the `%token` declarations
 
-A grammar of this directory is not read by the lexer it declares: it is read by
-the very tokens `PHPStan\PhpDocParser\Lexer\Lexer` produces, handed over by
-`tools/phplrt/Fuzzer/TokenStream.php`.
+`tools/phplrt/build.php` writes the pattern of `PHPStan\PhpDocParser\Lexer\Lexer`
+out of the `%token` declarations of `lexemes.pp3`, in the order they are
+declared, into `GeneratedParser::LEXER_PATTERN`. Each token is marked by the
+identifier the grammar gives it, and `GeneratedParser::LEXER_TYPES` maps it back
+to the `Lexer::TOKEN_*` type `tokenize()` returns, so the tokens are the very
+ones they always were.
 
-The `%token` declarations therefore name the tokens and document the language
-without being what reads it. Some of them describe something the lexer never
-reads as a token of its own, and `TokenStream` is what tells those apart in the
-stream:
+Some declarations describe something the lexer never reads as a token of its
+own. They are left out of the pattern, and `src/Parser/Phplrt/TokenStream.php`
+tells them apart in the stream the parser reads, while the PHPDoc is being
+lexed:
 
 - a word the parser compares by value (`is`, `array`, `covariant`, `static`, …)
   — every one of them is still an ordinary name as well, which is why they are

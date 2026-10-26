@@ -2,12 +2,15 @@
 
 namespace PHPStan\PhpDocParser\Lexer;
 
+use PHPStan\PhpDocParser\Parser\Generated\GeneratedParser;
+use PHPStan\PhpDocParser\Parser\Phplrt\TokenStream;
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
 use function array_keys;
+use function array_map;
+use function count;
+use function intdiv;
 use function preg_match_all;
-use const PHP_VERSION_ID;
 
 class LexerTest extends TestCase
 {
@@ -23,21 +26,46 @@ class LexerTest extends TestCase
 	 */
 	public function testTokenPatternsHaveNoCapturingGroups(): void
 	{
-		$lexer = new Lexer(new ParserConfig([]));
-		$lexer->tokenize('/** @param float $a */');
-
-		$property = new ReflectionProperty(Lexer::class, 'regexp');
-		if (PHP_VERSION_ID < 80100) {
-			$property->setAccessible(true);
-		}
-		$regexp = $property->getValue($lexer);
-		self::assertIsString($regexp);
+		$regexp = GeneratedParser::LEXER_PATTERN;
 
 		// exercises the patterns that are most likely to grow a group
 		$subject = '/** 0b1_0 0o1_0 0xa_b 1_0 1_0.0_1e+1_0 Foo|Bar $a ... */';
 		preg_match_all($regexp, $subject, $matches);
 
 		self::assertSame([0, 'MARK'], array_keys($matches));
+	}
+
+	/**
+	 * @return iterable<array{string}>
+	 */
+	public function dataStream(): iterable
+	{
+		yield ['/** @param ARRAY|Array{a: int}|array {b} $is IS is-a \\is not\\Of */'];
+		yield ['/** @Param @phpstan-param:foo @param-out @param- @psalm-param_x @ORM\\Entity  @Foo(1) */'];
+		yield ["/**\n * @var Foo[0] Foo [0] Foo(1) Foo (1) Foo{1} Foo {1}\n *  @return Foo::BAR* Foo::BAR*|Baz\n */"];
+		yield ['/** @return Foo<br>see below</br> < br > x </br> Foo<Bar> <a>b</A> */'];
+		yield ['/** TRUE False nULL true-ish 1_0.0_1e+1_0 0x1F -1 "a""b" \'c\' // comment */'];
+		yield [''];
+		yield ['@var int'];
+	}
+
+	/**
+	 * The stream the lexer reads along with the tokens is the very one the
+	 * parsers would otherwise read out of the tokens themselves.
+	 *
+	 * @dataProvider dataStream
+	 */
+	public function testStream(string $input): void
+	{
+		$tokens = (new Lexer(new ParserConfig([])))->tokenize($input);
+
+		foreach ([0, intdiv(count($tokens), 2), count($tokens) - 1] as $start) {
+			$ids = [];
+			$indexes = [];
+			TokenStream::create(array_map(static fn (array $token): array => [$token[0], $token[1], $token[2]], $tokens), $start, $ids, $indexes);
+
+			self::assertSame([$ids, $indexes], TokenStream::fromTokens($tokens, $start));
+		}
 	}
 
 }

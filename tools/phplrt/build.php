@@ -2,7 +2,9 @@
 
 /**
  * Writes the parser of "doc/grammars/phpdoc.pp3": a class of its own that runs
- * on PHP 7.4, "src/Parser/Generated/GeneratedParser.php".
+ * on PHP 7.4, "src/Parser/Generated/GeneratedParser.php". The class holds the
+ * pattern of "src/Lexer/Lexer.php" as well, written out of the tokens the
+ * grammar declares.
  *
  * The compiler asks for a recent PHP, so this runs here, as a development
  * tool, and only its output is a part of the library. The grammar is compiled
@@ -39,6 +41,7 @@ use Phplrt\Source\FileSource;
 require __DIR__ . '/vendor/autoload.php';
 
 require __DIR__ . '/ParserGenerator.php';
+require __DIR__ . '/../../src/Lexer/Lexer.php';
 
 $output = $argv[1] ?? __DIR__ . '/../../src/Parser/Generated/GeneratedParser.php';
 
@@ -309,6 +312,49 @@ foreach (['T_PHPDOC_EOL', 'T_OPEN_PHPDOC', 'T_CLOSE_PHPDOC', 'T_COMMENT'] as $na
     $silent[] = array_flip($result->lexer->names)[$name];
 }
 
+/**
+ * Whether the given token is one the lexer does not read on its own: a token
+ * it reads as another one, and only "TokenStream" tells apart, by its value or
+ * by its surroundings. See "doc/grammars/lexemes.pp3".
+ */
+function isClassified(string $name): bool
+{
+    return strncmp($name, 'T_KEYWORD_', 10) === 0
+        || strncmp($name, 'T_TAG_', 6) === 0
+        || ($name !== 'T_HORIZONTAL_WS' && substr($name, -3) === '_WS')
+        || $name === 'T_OPEN_ANGLE_BRACKET_HTML';
+}
+
+/**
+ * The pattern of "Lexer": every token it reads on its own, in the order the
+ * grammar declares them, marked by the identifier the grammar gives it. Along
+ * with it, the type of "Lexer" each of those tokens is.
+ */
+if (($result->lexer->names[0] ?? null) !== 'T_HORIZONTAL_WS') {
+    // "TokenStream::tokenize()" tells the whitespace by this very identifier
+    fwrite(STDERR, "T_HORIZONTAL_WS has to be the first token of doc/grammars/lexemes.pp3\n");
+    exit(1);
+}
+
+$lexerPatterns = [];
+$lexerTypes = [];
+foreach ($result->lexer->tokens as $id => $definition) {
+    $name = $result->lexer->names[$id] ?? null;
+    if ($name === null || isClassified($name)) {
+        continue;
+    }
+
+    $type = 'PHPStan\\PhpDocParser\\Lexer\\Lexer::TOKEN_' . substr($name, 2);
+    if (!defined($type)) {
+        fwrite(STDERR, sprintf("The lexer has no token %s for %s\n", $type, $name));
+        exit(1);
+    }
+
+    $lexerPatterns[] = '(?:' . $definition->regex . ')(*MARK:' . $id . ')';
+    $lexerTypes[$id] = constant($type);
+}
+$lexerPattern = '~' . implode('|', $lexerPatterns) . '~Asi';
+
 [$methods, $constants] = (new ParserGenerator($parser, $choicePrediction, $reducerIds, $tokenIds, $silent))->generate($rules);
 
 $template = file_get_contents(__DIR__ . '/GeneratedParser.template.php');
@@ -316,6 +362,8 @@ $generated = strtr($template, [
     '/*RULES*/[]' => export($rules),
     '/*TOKENS*/[]' => export(array_flip($result->lexer->names)),
     '/*EXPECTATIONS*/[]' => export($parser->expectations),
+    "/*LEXER_PATTERN*/''" => export($lexerPattern),
+    '/*LEXER_TYPES*/[]' => export($lexerTypes),
     "\t/*CONSTANTS*/\n" => $constants,
     "\t/*REDUCERS*/\n" => implode("\n", $abstracts),
     "\t/*METHODS*/\n" => $methods,

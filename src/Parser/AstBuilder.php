@@ -249,15 +249,27 @@ final class AstBuilder extends GeneratedParser
 		$lexerTokens = $tokens->getTokens();
 		$index = $tokens->currentTokenIndex();
 
-		$ids = [];
-		$indexes = [];
-		if ($tag !== null) {
-			// the value of a tag is read along with the tag it belongs to
-			$ids[] = TokenStream::tagId($tag);
-			$indexes[] = $index - 1;
-		}
+		$stream = TokenStream::fromTokens($lexerTokens, $index);
+		if ($stream !== null && $tag === null) {
+			[$ids, $indexes] = $stream;
+		} else {
+			$ids = [];
+			$indexes = [];
+			if ($tag !== null) {
+				// the value of a tag is read along with the tag it belongs to
+				$ids[] = TokenStream::tagId($tag);
+				$indexes[] = $index - 1;
+			}
 
-		TokenStream::create($lexerTokens, $index, $ids, $indexes);
+			if ($stream !== null) {
+				foreach ($stream[0] as $position => $id) {
+					$ids[] = $id;
+					$indexes[] = $stream[1][$position];
+				}
+			} else {
+				TokenStream::create($lexerTokens, $index, $ids, $indexes);
+			}
+		}
 
 		$previous = [$this->tokens, $this->ids, $this->indexes, $this->tag, $this->positions, $this->comments, $this->byteOffsets, $this->v, $this->n, $this->saveReading()];
 

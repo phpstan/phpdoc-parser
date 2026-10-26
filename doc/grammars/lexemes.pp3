@@ -3,23 +3,25 @@
  *  The Lexemes Of The PHPDoc Language
  * -----------------------------------------------------------------------------
  *
- *  Every token the PHPDoc language is read into, written the way
- *  "PHPStan\PhpDocParser\Lexer\Lexer" reads it.
+ *  Every token the PHPDoc language is read into.
  *
- *  A grammar of this directory is not read by the lexer it declares: it is read
- *  by the very tokens "Lexer" produces, handed over by
- *  "tools/phplrt/Fuzzer/TokenStream.php". The declarations below therefore
- *  serve three purposes:
+ *  "PHPStan\PhpDocParser\Lexer\Lexer" is written out of these declarations by
+ *  "tools/phplrt/build.php": every token that is not classified below becomes
+ *  an alternative of its pattern, tried in the order written here, so the
+ *  order is the one that decides between two tokens matching at one place.
+ *  The declarations also serve the grammar-driven fuzzer, which writes its
+ *  inputs out of them.
  *
- *   - they name the tokens the rules are written in terms of;
- *   - they document the language down to its lexical level;
- *   - they are what the grammar-driven fuzzer writes its inputs from.
+ *  Every group of a pattern is non-capturing: "preg_match_all()" collects
+ *  every capturing group for every token the lexer reads.
  *
- *  A block of tokens marked "classified" is not read as a token of its own by
- *  the lexer. Such a token is a T_IDENTIFIER (or a bracket, or an asterisk)
- *  whose surroundings or whose very value the hand-written parser asks about,
- *  and telling those apart in the token stream is what lets a grammar written
- *  without semantic predicates say the same thing.
+ *  A classified token is not an alternative of the pattern: the keywords, the
+ *  tags read by a rule of their own, the tokens ending in "_WS" and the "<" of
+ *  an HTML tag. Such a token is a T_IDENTIFIER (or a tag, a bracket, or an
+ *  asterisk) whose surroundings or whose very value the grammar asks about.
+ *  The lexer reads it as that token, and tells it apart only in the stream it
+ *  hands to the parser ("src/Parser/Phplrt/TokenStream.php"), which is what
+ *  lets a grammar written without semantic predicates say the same thing.
  */
 
 %pragma lexer.pcre.disable u
@@ -79,8 +81,8 @@
 //  Literals and names
 // -----------------------------------------------------------------------------
 
-%token T_FLOAT                       [+\-]?(?:(?:[0-9]++(_[0-9]++)*\.[0-9]*+(_[0-9]++)*(?:e[+\-]?[0-9]++(_[0-9]++)*)?)|(?:[0-9]*+(_[0-9]++)*\.[0-9]++(_[0-9]++)*(?:e[+\-]?[0-9]++(_[0-9]++)*)?)|(?:[0-9]++(_[0-9]++)*e[+\-]?[0-9]++(_[0-9]++)*))
-%token T_INTEGER                     [+\-]?(?:(?:0b[0-1]++(_[0-1]++)*)|(?:0o[0-7]++(_[0-7]++)*)|(?:0x[0-9a-f]++(_[0-9a-f]++)*)|(?:[0-9]++(_[0-9]++)*))
+%token T_FLOAT                       [+\-]?(?:(?:[0-9]++(?:_[0-9]++)*\.[0-9]*+(?:_[0-9]++)*(?:e[+\-]?[0-9]++(?:_[0-9]++)*)?)|(?:[0-9]*+(?:_[0-9]++)*\.[0-9]++(?:_[0-9]++)*(?:e[+\-]?[0-9]++(?:_[0-9]++)*)?)|(?:[0-9]++(?:_[0-9]++)*e[+\-]?[0-9]++(?:_[0-9]++)*))
+%token T_INTEGER                     [+\-]?(?:(?:0b[0-1]++(?:_[0-1]++)*)|(?:0o[0-7]++(?:_[0-7]++)*)|(?:0x[0-9a-f]++(?:_[0-9a-f]++)*)|(?:[0-9]++(?:_[0-9]++)*))
 %token T_SINGLE_QUOTED_STRING        '(?:\\[^\r\n]|[^'\r\n\\])*+'
 %token T_DOUBLE_QUOTED_STRING        "(?:\\[^\r\n]|[^"\r\n\\])*+"
 %token T_DOCTRINE_ANNOTATION_STRING  "(?:""|[^"])*+"
@@ -120,7 +122,6 @@
 %token T_ARROW                       ->
 %token T_EQUAL                       =
 %token T_COLON                       :
-%token T_WILDCARD                    \*
 
 // -----------------------------------------------------------------------------
 //  PHPDoc structure
@@ -128,6 +129,7 @@
 
 %token T_OPEN_PHPDOC                 /\*\*(?=\s)\x20?+
 %token T_CLOSE_PHPDOC                \*/
+%token T_WILDCARD                    \*
 
 /**
  * The tags whose value is read by a rule of its own, told apart from one
