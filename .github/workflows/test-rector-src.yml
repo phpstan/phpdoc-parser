@@ -1,0 +1,71 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Test Rector"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "2.3.x"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: "Tests"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "8.4"
+          - "8.5"
+
+    env:
+      COMPOSER_ROOT_VERSION: "dev-main"
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        with:
+          egress-policy: audit
+
+      - name: "Checkout"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Checkout rector-src"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: rectorphp/rector-src
+          path: rector-src
+          ref: main
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962" # v2
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+          ini-values: zend.assertions=1
+
+      - name: "Install dependencies"
+        working-directory: rector-src
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Remove stable phpdoc-parser"
+        working-directory: rector-src
+        run: "rm -r vendor/phpstan/phpdoc-parser/src"
+
+      - name: "Copy phpdoc-parser"
+        run: "cp -r src/ rector-src/vendor/phpstan/phpdoc-parser/src"
+
+      - name: "Tests"
+        working-directory: rector-src
+        run: "vendor/bin/fastunit tests rules-tests utils/phpstan/tests"
+
+      - name: "PHPStan"
+        if: matrix.php-version == '8.5'
+        working-directory: rector-src
+        run: "vendor/bin/phpstan analyse --ansi"
