@@ -24,9 +24,6 @@ jobs:
           - "8.4"
           - "8.5"
 
-    env:
-      COMPOSER_ROOT_VERSION: "dev-main"
-
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
@@ -35,6 +32,13 @@ jobs:
 
       - name: "Checkout"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Checkout phpstan-src"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: phpstan/phpstan-src
+          path: phpstan-src
+          ref: 2.3.x
 
       - name: "Checkout rector-src"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -48,18 +52,49 @@ jobs:
         with:
           coverage: "none"
           php-version: "${{ matrix.php-version }}"
+          extensions: mbstring, intl
           ini-values: zend.assertions=1
 
-      - name: "Install dependencies"
-        working-directory: rector-src
+      - name: "Install phpstan-src dependencies"
+        working-directory: phpstan-src
         run: "composer install --no-interaction --no-progress"
 
-      - name: "Remove stable phpdoc-parser"
-        working-directory: rector-src
-        run: "rm -r vendor/phpstan/phpdoc-parser/src"
+      - name: "Copy phpdoc-parser to phpstan-src"
+        run: |
+          rm -r phpstan-src/vendor/phpstan/phpdoc-parser/src
+          cp -r src/ phpstan-src/vendor/phpstan/phpdoc-parser/src
 
-      - name: "Copy phpdoc-parser"
-        run: "cp -r src/ rector-src/vendor/phpstan/phpdoc-parser/src"
+      - name: "Install compiler dependencies"
+        working-directory: phpstan-src/compiler
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Prepare for PHAR compilation"
+        working-directory: phpstan-src/compiler
+        run: "php bin/prepare"
+
+      - name: "Dump autoloader one more time for attributes"
+        working-directory: phpstan-src
+        run: "composer dump"
+
+      - name: "Install Box dependencies"
+        working-directory: phpstan-src/compiler/box
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Compile PHAR"
+        working-directory: phpstan-src/compiler/build
+        run: "php ../box/vendor/bin/box compile --no-parallel --sort-compiled-files"
+
+      - name: "Install rector-src dependencies"
+        working-directory: rector-src
+        env:
+          COMPOSER_ROOT_VERSION: "dev-main"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Copy phpdoc-parser and phpstan.phar to rector-src"
+        run: |
+          rm -r rector-src/vendor/phpstan/phpdoc-parser/src
+          cp -r src/ rector-src/vendor/phpstan/phpdoc-parser/src
+          cp phpstan-src/tmp/phpstan.phar rector-src/vendor/phpstan/phpstan/phpstan.phar
 
       - name: "Tests"
         working-directory: rector-src
