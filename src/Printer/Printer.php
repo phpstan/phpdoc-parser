@@ -855,7 +855,7 @@ final class Printer
 		/** @var Node|null $originalNode */
 		$originalNode = $node->getAttribute(Attribute::ORIGINAL_NODE);
 		if ($originalNode === null) {
-			return $this->print($node);
+			return $this->printReplacement($node);
 		}
 
 		$class = get_class($node);
@@ -897,14 +897,14 @@ final class Printer
 					);
 
 					if ($listResult === null) {
-						return $this->print($node);
+						return $this->printReplacement($node);
 					}
 
 					$result .= $listResult;
 					continue;
 				}
 
-				return $this->print($node);
+				return $this->printReplacement($node);
 			}
 
 			if ($origSubNode === null) {
@@ -913,7 +913,7 @@ final class Printer
 					continue;
 				}
 
-				return $this->print($node);
+				return $this->printReplacement($node);
 			}
 
 			$subStartPos = $origSubNode->getAttribute(Attribute::START_INDEX);
@@ -923,11 +923,16 @@ final class Printer
 			}
 
 			if ($subEndPos < $subStartPos) {
-				return $this->print($node);
+				// the original sub-node has no tokens, e.g. a Doctrine annotation without arguments
+				if ($subNode !== null && $this->print($subNode) === $this->print($origSubNode)) {
+					continue;
+				}
+
+				return $this->printReplacement($node);
 			}
 
 			if ($subNode === null) {
-				return $this->print($node);
+				return $this->printReplacement($node);
 			}
 
 			$result .= $originalTokens->getContentBetween($pos, $subStartPos);
@@ -954,6 +959,32 @@ final class Printer
 		}
 
 		return $result . $originalTokens->getContentBetween($pos, $endPos + 1);
+	}
+
+	/**
+	 * Prints a node that replaces the tokens of the original node.
+	 *
+	 * The tokens of a Doctrine tag value do not contain the annotation name.
+	 * The parent tag prints the name from its own tokens.
+	 */
+	private function printReplacement(Node $node): string
+	{
+		if (!$node instanceof DoctrineTagValueNode) {
+			return $this->print($node);
+		}
+
+		$arguments = '(' . implode(', ', $node->annotation->arguments) . ')';
+		if ($node->annotation->arguments === []) {
+			$originalNode = $node->getAttribute(Attribute::ORIGINAL_NODE);
+			if (
+				$originalNode instanceof DoctrineTagValueNode
+				&& $originalNode->annotation->getAttribute(Attribute::END_INDEX) < $originalNode->annotation->getAttribute(Attribute::START_INDEX)
+			) {
+				$arguments = '';
+			}
+		}
+
+		return trim($arguments . ' ' . $node->description);
 	}
 
 }
