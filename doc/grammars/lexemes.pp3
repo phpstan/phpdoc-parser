@@ -173,8 +173,8 @@
  * so that the "@baz" of "@author Foo <foo@baz.com>" belongs to the description
  * it is written in.
  */
-%token T_PHPDOC_TAG_WS               (?<=[\x09\x20])@(?:[a-z][a-z0-9-\\]+:)?[a-z][a-z0-9-\\]*+
-%token T_PHPDOC_TAG                  @(?:[a-z][a-z0-9-\\]+:)?[a-z][a-z0-9-\\]*+
+%token T_PHPDOC_TAG_WS               (?<=[\x09\x20])@(?:[a-z][a-z0-9-\\]+:)?[a-z][a-z0-9_\\-]*+
+%token T_PHPDOC_TAG                  @(?:[a-z][a-z0-9-\\]+:)?[a-z][a-z0-9_\\-]*+
 %token T_DOCTRINE_TAG_WS             (?<=[\x09\x20])@[a-z_\\][a-z0-9_:\\]*[a-z_][a-z0-9_]*
 %token T_DOCTRINE_TAG                @[a-z_\\][a-z0-9_:\\]*[a-z_][a-z0-9_]*
 %token T_PHPDOC_EOL                  \r?+\n[\x09\x20]*+(?:\*(?!/)\x20?+)?

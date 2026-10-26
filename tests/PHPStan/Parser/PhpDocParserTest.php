@@ -6339,6 +6339,30 @@ Finder::findFiles('*.php')
 	public function provideTagsWithBackslash(): Iterator
 	{
 		yield [
+			'OK tag with underscore in it',
+			'/** @Foo_Bar User */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@Foo_Bar',
+					new GenericTagValueNode('User'),
+				),
+			]),
+		];
+
+		yield [
+			'OK tag with underscore in it and parenthesis',
+			'/** @Foo\Bar_Baz(name="column_id") */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@Foo\Bar_Baz',
+					new DoctrineTagValueNode(new DoctrineAnnotation('@Foo\Bar_Baz', [
+						new DoctrineArgument(new IdentifierTypeNode('name'), new DoctrineConstExprStringNode('column_id')),
+					]), ''),
+				),
+			]),
+		];
+
+		yield [
 			'OK without description and tag with backslashes in it',
 			'/** @ORM\Mapping\Entity User */',
 			new PhpDocNode([
