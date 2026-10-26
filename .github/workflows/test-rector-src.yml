@@ -101,6 +101,6 @@ jobs:
         run: "vendor/bin/fastunit tests rules-tests utils/phpstan/tests"
 
       - name: "PHPStan"
-        if: matrix.php-version == '8.5'
+        if: matrix.php-version == '8.4'
         working-directory: rector-src
         run: "vendor/bin/phpstan analyse --ansi"
