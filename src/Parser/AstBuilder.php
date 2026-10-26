@@ -1057,14 +1057,10 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * A comment read right after the comma separating the items of a shape is
 	 * thrown away.
-	 *
-	 * @return list<mixed>
 	 */
-	protected function reduceDiscardedComment(int $begin, int $end): array
+	protected function reduceDiscardedComment(int $begin, int $end): void
 	{
 		unset($this->comments[$begin]);
-
-		return [];
 	}
 
 	// -------------------------------------------------------------------------

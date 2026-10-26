@@ -60,7 +60,7 @@ final class ParserGenerator
     /** @var array<int, bool> */
     private array $kept;
 
-    /** @var array<int, array{string, bool}> the reducer of each rule, and whether it reads the children */
+    /** @var array<int, array{string, bool, bool}> the reducer of each rule, whether it reads the children, and whether it builds nothing */
     private array $reducers;
 
     /** @var list<int> every token id, along with the end of the input */
@@ -80,12 +80,18 @@ final class ParserGenerator
 
     private int $labels = 0;
 
+    /**
+     * @var array<int, true>|null the tokens the reading is known to be at
+     *      where the code being written starts, or null when nothing is known
+     */
+    private ?array $known = null;
+
     /** @var array<string, true> the rules being written out into each other */
     private array $stack = [];
 
     /**
      * @param array<int, array<int, list<int>>> $choicePrediction
-     * @param array<int, array{string, bool}> $reducers
+     * @param array<int, array{string, bool, bool}> $reducers
      * @param list<int> $tokenIds
      * @param list<int> $silent the tokens no reducer reads
      */
@@ -218,6 +224,31 @@ final class ParserGenerator
         return $name;
     }
 
+    /**
+     * The tokens the reading is known to be at, which the code written next
+     * is the only one to be told about.
+     *
+     * @return array<int, true>|null
+     */
+    private function takeKnown(): ?array
+    {
+        $known = $this->known;
+        $this->known = null;
+
+        return $known;
+    }
+
+    /**
+     * Whether a check for the given tokens is known to pass.
+     *
+     * @param array<int, true>|null $known
+     * @param list<int> $tokens
+     */
+    private static function implied(?array $known, array $tokens): bool
+    {
+        return $known !== null && array_diff_key($known, array_flip($tokens)) === [];
+    }
+
     private function unique(): int
     {
         return ++$this->labels;
@@ -228,6 +259,7 @@ final class ParserGenerator
     private function method(int $id, bool $build): string
     {
         $this->stack = [($build ? 'b' : 's') . $id => true];
+        $this->known = null;
 
         return sprintf("\tprivate function %s%d(): bool\n\t{\n", $build ? 'b' : 's', $id)
             . self::indent($this->body($id, $build, 'return false;'), 2)
@@ -251,16 +283,22 @@ final class ParserGenerator
         // call, so there are as few of them as possible
         $d = count($this->stack);
 
+        $known = $this->takeKnown();
+
         // A rule whose reducer reads nothing of what it contains is only read
         if ($kept && !$reducer[1]) {
+            $this->known = $known;
             return "\$o{$d} = \$this->p;\n"
                 . $this->match($id, false, $fail)
-                . sprintf("\$this->v[\$this->n++] = \$this->%s(%s);\n", $reducer[0], self::span("\$o{$d}"));
+                . sprintf($reducer[2] ? "\$this->%s(%s);\n" : "\$this->v[\$this->n++] = \$this->%s(%s);\n", $reducer[0], self::span("\$o{$d}"));
         }
 
         $code = '';
         $start = $this->start[$id] ?? null;
-        if ($start !== null) {
+        if ($start !== null && self::implied($known, array_keys($start))) {
+            // the token is known to be one the rule may begin with
+        } elseif ($start !== null) {
+            $known = $known === null ? $start : array_intersect_key($known, $start);
             $code .= sprintf(
                 "if (!%s) {\n\tif (\$this->p > \$this->f) {\n\t\t\$this->rec(%d);\n\t}\n\n%s}\n\n",
                 $this->in(array_keys($start)),
@@ -278,6 +316,7 @@ final class ParserGenerator
         }
 
         $failure = "goto f{$u};";
+        $this->known = $known;
         if ($rule instanceof Concatenation) {
             $code .= $this->concatenation($id, $rule, $build, $failure);
         } elseif ($rule instanceof Alternation) {
@@ -300,7 +339,7 @@ final class ParserGenerator
 
         if ($kept) {
             $code .= sprintf(
-                "\$this->v[\$m%1\$d] = \$this->%2\$s(%3\$s, \$this->n === \$m%1\$d + 1 && !\\is_array(\$this->v[\$m%1\$d]) ? [\$this->v[\$m%1\$d]] : \$this->merge(\$m%1\$d));\n\$this->n = \$m%1\$d + 1;\n",
+                "\$this->v[\$m%1\$d] = \$this->%2\$s(%3\$s, \$this->n === \$m%1\$d + 1 ? [\$this->v[\$m%1\$d]] : \\array_slice(\$this->v, \$m%1\$d, \$this->n - \$m%1\$d));\n\$this->n = \$m%1\$d + 1;\n",
                 $d,
                 $reducer[0],
                 self::span("\$o{$d}"),
@@ -319,6 +358,10 @@ final class ParserGenerator
         $definition = $this->grammar[$inner];
         $tokens = $this->tokens($inner);
         if ($tokens !== null) {
+            if (self::implied($this->takeKnown(), $tokens[0])) {
+                return $this->read($inner, $build);
+            }
+
             return sprintf(
                 "if (!%s) {\n\tif (\$this->p %s \$this->f) {\n\t\t\$this->rec(%d);\n\t}\n\n%s}\n\n%s",
                 $this->in($tokens[0]),
@@ -330,6 +373,8 @@ final class ParserGenerator
         }
 
         if ($definition instanceof Predicate) {
+            $this->known = null;
+
             return $this->predicate($definition, $fail);
         }
 
@@ -348,12 +393,15 @@ final class ParserGenerator
             }
 
             // Too much to write out: the methods asked for along the way are
-            // not asked for after all
+            // not asked for after all, and the method called is told nothing
+            $this->known = null;
             $this->labels = $labels;
             $this->sets = $sets;
             $this->requested = $requested;
             $this->queue = $queue;
         }
+
+        $this->known = null;
 
         return sprintf("if (!\$this->%s()) {\n%s}\n", $this->request($inner, $build), self::indent($fail, 1));
     }
@@ -361,13 +409,20 @@ final class ParserGenerator
     private function concatenation(int $id, Concatenation $rule, bool $build, string $fail): string
     {
         $code = '';
+        $first = true;
         foreach ($this->sequence[$id] ?? $rule->ruleIds as $inner) {
+            if (!$first) {
+                $this->known = null;
+            }
+
+            $first = false;
             if ($inner >= 0) {
                 $code .= $this->match($inner, $build, $fail);
                 continue;
             }
 
             // An element that may be left out
+            $this->known = null;
             $inner = -$inner - 1;
             $element = $this->grammar[$inner];
             if ($element instanceof Predicate) {
@@ -393,6 +448,8 @@ final class ParserGenerator
             }
         }
 
+        $this->known = null;
+
         return $code;
     }
 
@@ -412,23 +469,26 @@ final class ParserGenerator
 
         uasort($groups, static fn (array $a, array $b): int => count($b) <=> count($a));
 
+        $known = $this->takeKnown();
         $code = '';
         if (count($groups) === 1) {
-            $code .= $this->attempts($lists[array_key_first($groups)], $build, $ok);
+            $code .= $this->attempts($lists[array_key_first($groups)], $build, $ok, $known);
         } else {
             $code .= "switch (\$this->ids[\$this->p]) {\n";
             $first = true;
             foreach ($groups as $key => $tokens) {
+                $caseKnown = null;
                 if ($first) {
                     $code .= "\tdefault:\n";
                     $first = false;
                 } else {
+                    $caseKnown = array_fill_keys($tokens, true);
                     foreach ($tokens as $token) {
                         $code .= sprintf("\tcase %d:\n", $token);
                     }
                 }
 
-                $code .= self::indent($this->attempts($lists[$key], $build, $ok), 2) . "\t\tbreak;\n";
+                $code .= self::indent($this->attempts($lists[$key], $build, $ok, $caseKnown), 2) . "\t\tbreak;\n";
             }
 
             $code .= "}\n";
@@ -439,17 +499,25 @@ final class ParserGenerator
 
     /**
      * @param list<int> $alternatives
+     * @param array<int, true>|null $known the tokens the reading is known to
+     *        be at, which it is at again whenever an alternative is given up
      */
-    private function attempts(array $alternatives, bool $build, string $ok): string
+    private function attempts(array $alternatives, bool $build, string $ok, ?array $known): string
     {
         $code = '';
         foreach ($alternatives as $inner) {
+            $this->known = null;
             if ($inner < 0) {
                 // A token predicted by the very token the reading is at
                 return $code . $this->push(-$inner - 1, $build) . "goto {$ok};\n";
             }
 
             $tokens = $this->tokens($inner);
+            if ($tokens !== null && self::implied($known, $tokens[0])) {
+                // the alternative cannot fail, so nothing after it is tried
+                return $code . $this->read($inner, $build) . "goto {$ok};\n";
+            }
+
             if ($tokens !== null) {
                 $code .= sprintf(
                     "if (%s) {\n%s\tgoto %s;\n}\n\nif (\$this->p %s \$this->f) {\n\t\$this->rec(%d);\n}\n",
@@ -463,15 +531,19 @@ final class ParserGenerator
             }
 
             $next = 'n' . $this->unique();
+            $this->known = $known;
             $read = $this->match($inner, $build, "goto {$next};") . "goto {$ok};\n";
             $code .= $read . "{$next}:\n";
         }
+
+        $this->known = null;
 
         return $code;
     }
 
     private function repetition(Repetition $rule, bool $build, string $fail): string
     {
+        $this->known = null;
         $inner = $rule->ruleId;
         $min = $rule->min;
         $max = $rule->max;
@@ -526,6 +598,7 @@ final class ParserGenerator
 
     private function optional(int $inner, bool $build): string
     {
+        $this->known = null;
         $tokens = $this->tokens($inner);
         if ($tokens !== null) {
             return sprintf(
@@ -548,6 +621,7 @@ final class ParserGenerator
      */
     private function predicate(Predicate $rule, string $fail, bool $predicted = false): string
     {
+        $this->known = null;
         $inner = $rule->ruleId;
         $tokens = $this->start[$inner] ?? null;
 
@@ -660,7 +734,9 @@ final class ParserGenerator
         $reducer = $this->reducers[$lexeme] ?? null;
         if ($reducer !== null) {
             return sprintf(
-                "\$this->v[\$this->n++] = \$this->%s(\$this->indexes[\$this->p], \$this->indexes[\$this->p]%s);\n\$this->p++;\n",
+                $reducer[2]
+                    ? "\$this->%s(\$this->indexes[\$this->p], \$this->indexes[\$this->p]%s);\n\$this->p++;\n"
+                    : "\$this->v[\$this->n++] = \$this->%s(\$this->indexes[\$this->p], \$this->indexes[\$this->p]%s);\n\$this->p++;\n",
                 $reducer[0],
                 $reducer[1] ? ', [$this->token($this->p)]' : '',
             );

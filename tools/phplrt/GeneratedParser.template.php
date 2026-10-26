@@ -5,7 +5,6 @@ namespace PHPStan\PhpDocParser\Parser\Generated;
 use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Parser\Phplrt\Token;
 use function array_keys;
-use function is_array;
 use function ksort;
 
 /**
@@ -127,29 +126,6 @@ abstract class GeneratedParser
 		}
 
 		$this->er[] = $rule;
-	}
-
-	/**
-	 * The values pushed since the given size, the lists among them flattened.
-	 *
-	 * @return list<mixed>
-	 */
-	private function merge(int $from): array
-	{
-		$result = [];
-		for ($i = $from, $n = $this->n; $i < $n; $i++) {
-			$value = $this->v[$i];
-			if (!is_array($value)) {
-				$result[] = $value;
-				continue;
-			}
-
-			foreach ($value as $nested) {
-				$result[] = $nested;
-			}
-		}
-
-		return $result;
 	}
 
 	/*METHODS*/

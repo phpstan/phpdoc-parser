@@ -55,12 +55,15 @@ const ENTRYPOINTS = ['PhpDoc', 'Type', 'ConstantExpr', 'KnownTag', 'UnreadTagChi
  * reduce, along with whether they read what the rule contains. The source is
  * read rather than the class, which extends the very class written here.
  *
- * @var array<string, array{string, bool}> $reducers
+ * @var array<string, array{string, bool, bool}> $reducers
  */
 $reducers = [];
-preg_match_all('/function (reduce(\w+))\(([^)]*)\)/', file_get_contents(__DIR__ . '/../../src/Parser/AstBuilder.php'), $matches, PREG_SET_ORDER);
-foreach ($matches as [, $method, $rule, $parameters]) {
-    $reducers[$rule] = [$method, strpos($parameters, '$children') !== false];
+preg_match_all('/function (reduce(\w+))\(([^)]*)\)(: \??\w+)?/', file_get_contents(__DIR__ . '/../../src/Parser/AstBuilder.php'), $matches, PREG_SET_ORDER);
+foreach ($matches as $match) {
+    [, $method, $rule, $parameters] = $match;
+    // A reducer returning nothing builds nothing: the value of the rule is
+    // left out of the values of the rule around it
+    $reducers[$rule] = [$method, strpos($parameters, '$children') !== false, ($match[4] ?? '') === ': void'];
 }
 
 /** @var array<string, true> $entrypoints */
@@ -302,7 +305,9 @@ foreach ($reducers as $name => $reducer) {
     $reducerIds[$id] = $reducer;
     $abstracts[] = $reducer[1]
         ? sprintf("\t/**\n\t * @param list<mixed> \$children\n\t * @return mixed\n\t */\n\tabstract protected function %s(int \$begin, int \$end, \$children);\n", $reducer[0])
-        : sprintf("\t/**\n\t * @return mixed\n\t */\n\tabstract protected function %s(int \$begin, int \$end);\n", $reducer[0]);
+        : ($reducer[2]
+            ? sprintf("\tabstract protected function %s(int \$begin, int \$end): void;\n", $reducer[0])
+            : sprintf("\t/**\n\t * @return mixed\n\t */\n\tabstract protected function %s(int \$begin, int \$end);\n", $reducer[0]));
 }
 
 // The tokens no reducer reads: they are only what the other tokens are
