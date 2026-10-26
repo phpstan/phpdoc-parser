@@ -6,3 +6,4 @@
 /vendor
 /composer.lock
 .phpunit.result.cache
+/.amp/portals/*
