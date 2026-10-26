@@ -1,0 +1,72 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Test PHPStan"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "2.3.x"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: "Tests"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "8.2"
+          - "8.3"
+          - "8.4"
+          - "8.5"
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        with:
+          egress-policy: audit
+
+      - name: "Checkout"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Checkout phpstan-src"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: phpstan/phpstan-src
+          path: phpstan-src
+          ref: 2.3.x
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962" # v2
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+          extensions: ds,mbstring
+          ini-file: development
+          ini-values: memory_limit=-1
+
+      - name: "Install dependencies"
+        working-directory: phpstan-src
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Remove stable phpdoc-parser"
+        working-directory: phpstan-src
+        run: "rm -r vendor/phpstan/phpdoc-parser/src"
+
+      - name: "Copy phpdoc-parser"
+        run: "cp -r src/ phpstan-src/vendor/phpstan/phpdoc-parser/src"
+
+      - name: "Tests"
+        working-directory: phpstan-src
+        run: "make tests"
+
+      - name: "PHPStan"
+        if: matrix.php-version == '8.5'
+        working-directory: phpstan-src
+        run: "make phpstan"
