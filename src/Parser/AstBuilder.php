@@ -3,8 +3,6 @@
 namespace PHPStan\PhpDocParser\Parser;
 
 use LogicException;
-use Phplrt\Parser\Context;
-use Phplrt\Source\StringSource;
 use PHPStan\PhpDocParser\Ast;
 use PHPStan\PhpDocParser\Ast\Attribute;
 use PHPStan\PhpDocParser\Ast\Comment;
@@ -87,9 +85,6 @@ final class AstBuilder extends GeneratedParser
 	/** @var list<array{string, int, int}> the tokens of the lexer being read */
 	private array $tokens = [];
 
-	/** @var array<int, int> the index of the token of the lexer each position stands for */
-	private array $indexes = [];
-
 	/** the tag the tokens read begin with, which is not one of the lexer */
 	private ?string $tag = null;
 
@@ -101,8 +96,6 @@ final class AstBuilder extends GeneratedParser
 
 	/** the index of the first token of the last text read, or -1 when it is empty */
 	private int $textStart = -1;
-
-	private ?Context $context = null;
 
 	/** @var array<int, true> */
 	private array $identifiers = [];
@@ -271,8 +264,8 @@ final class AstBuilder extends GeneratedParser
 			}
 		}
 
-		$previous = [$this->tokens, $this->ids, $this->indexes, $this->tag, $this->positions, $this->comments, $this->byteOffsets, $this->v, $this->n, $this->saveReading()];
-
+		// A reading is never started by another one, so the state of the last
+		// one is simply overwritten
 		$this->tokens = $lexerTokens;
 		$this->ids = $ids;
 		$this->indexes = $indexes;
@@ -283,31 +276,26 @@ final class AstBuilder extends GeneratedParser
 		$this->v = [];
 		$this->n = 0;
 
-		try {
-			if ($this->config->useCommentsAttributes) {
-				foreach ($ids as $position => $id) {
-					if ($id !== $this->tComment) {
-						continue;
-					}
-
-					$commentIndex = $indexes[$position];
-					$this->comments[$commentIndex] = new Comment($lexerTokens[$commentIndex][Lexer::VALUE_OFFSET], $lexerTokens[$commentIndex][Lexer::LINE_OFFSET], $commentIndex);
+		if ($this->config->useCommentsAttributes) {
+			foreach ($ids as $position => $id) {
+				if ($id !== $this->tComment) {
+					continue;
 				}
+
+				$commentIndex = $indexes[$position];
+				$this->comments[$commentIndex] = new Comment($lexerTokens[$commentIndex][Lexer::VALUE_OFFSET], $lexerTokens[$commentIndex][Lexer::LINE_OFFSET], $commentIndex);
 			}
-
-			// What has been read is given back even when the reading stops
-			// before the end, unless nothing at all has been built
-			if (!$this->parseRule(self::RULES[$rule], 0, true) || ($this->n === 0 && $this->ids[$this->p] !== -1)) {
-				throw $this->createException($this->failure());
-			}
-
-			$tokens->setCurrentTokenIndex($indexes[$this->p]);
-
-			return $this->n > 0 ? $this->v[0] : [];
-		} finally {
-			[$this->tokens, $this->ids, $this->indexes, $this->tag, $this->positions, $this->comments, $this->byteOffsets, $this->v, $this->n, $state] = $previous;
-			$this->restoreReading($state);
 		}
+
+		// What has been read is given back even when the reading stops
+		// before the end, unless nothing at all has been built
+		if (!$this->parseRule(self::RULES[$rule], 0, true) || ($this->n === 0 && $this->ids[$this->p] !== -1)) {
+			throw $this->createException($this->failure());
+		}
+
+		$tokens->setCurrentTokenIndex($indexes[$this->p]);
+
+		return $this->n > 0 ? $this->v[0] : [];
 	}
 
 	protected function token(int $position): Token
@@ -319,24 +307,6 @@ final class AstBuilder extends GeneratedParser
 			$position === 0 && $this->tag !== null ? $this->tag : $this->tokens[$index][Lexer::VALUE_OFFSET],
 			$index,
 		);
-	}
-
-	protected function context(int $from, ?int $to = null): Context
-	{
-		$context = $this->context ??= new Context(0, new StringSource());
-		$to ??= $this->p;
-		if ($to > $from) {
-			$begin = $this->indexes[$from];
-			$context->begin = $begin; // @phpstan-ignore property.readOnlyByPhpDocAssignOutOfClass
-			$context->length = $this->indexes[$to - 1] + 1 - $begin; // @phpstan-ignore property.readOnlyByPhpDocAssignOutOfClass
-		} else {
-			// A rule that has read nothing is empty right after what has been
-			// read before it
-			$context->begin = $from > 0 ? $this->indexes[$from - 1] + 1 : 0; // @phpstan-ignore property.readOnlyByPhpDocAssignOutOfClass
-			$context->length = 0; // @phpstan-ignore property.readOnlyByPhpDocAssignOutOfClass
-		}
-
-		return $context;
 	}
 
 	/**
@@ -457,37 +427,6 @@ final class AstBuilder extends GeneratedParser
 	 * @param T $node
 	 * @return T
 	 */
-	private function attributes(Node $node, Context $context, bool $takesComments = false): Node
-	{
-		if (!$this->useAttributes) {
-			return $node;
-		}
-
-		return $this->attributesAt($node, $context->begin, $context->begin + $context->length - 1, $takesComments);
-	}
-
-	/**
-	 * The attributes of a node of the arguments of a Doctrine annotation, which
-	 * are read walking over the line breaks.
-	 *
-	 * @template T of Node
-	 * @param T $node
-	 * @return T
-	 */
-	private function doctrineAttributes(Node $node, Context $context): Node
-	{
-		if (!$this->useAttributes) {
-			return $node;
-		}
-
-		return $this->attributesAt($node, $context->begin, $context->begin + $context->length - 1, false, true);
-	}
-
-	/**
-	 * @template T of Node
-	 * @param T $node
-	 * @return T
-	 */
 	private function attributesAt(Node $node, int $start, int $end, bool $takesComments = false, bool $skipsLineBreaks = false): Node
 	{
 		if (!$this->useAttributes) {
@@ -564,20 +503,6 @@ final class AstBuilder extends GeneratedParser
 		return $index;
 	}
 
-	private static function end(Context $context): int
-	{
-		return $context->begin + $context->length - 1;
-	}
-
-	/**
-	 * @param list<mixed> $children
-	 * @return list<mixed>
-	 */
-	private static function children(array $children): array
-	{
-		return $children;
-	}
-
 	// -------------------------------------------------------------------------
 	//  Types
 	// -------------------------------------------------------------------------
@@ -585,9 +510,8 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceType(Context $context, $children): TypeNode
+	protected function reduceType(int $begin, int $end, $children): TypeNode
 	{
-		$children = self::children($children);
 		$types = [];
 		$kind = 0;
 		foreach ($children as $child) {
@@ -610,15 +534,14 @@ final class AstBuilder extends GeneratedParser
 			$type = $types[0];
 		}
 
-		return $this->attributes($type, $context, true);
+		return $this->useAttributes ? $this->attributesAt($type, $begin, $end, true) : $type;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceSubType(Context $context, $children): TypeNode
+	protected function reduceSubType(int $begin, int $end, $children): TypeNode
 	{
-		$children = self::children($children);
 		$types = [];
 		$kind = 0;
 		$negated = false;
@@ -656,17 +579,17 @@ final class AstBuilder extends GeneratedParser
 			$type = $types[0];
 		}
 
-		return $this->attributes($type, $context, true);
+		return $this->useAttributes ? $this->attributesAt($type, $begin, $end, true) : $type;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceNullable(Context $context, $children): TypeNode
+	protected function reduceNullable(int $begin, int $end, $children): TypeNode
 	{
 		foreach ($children as $child) {
 			if ($child instanceof TypeNode) {
-				return $this->attributes(new Ast\Type\NullableTypeNode($child), $context, true);
+				return $this->useAttributes ? $this->attributesAt(new Ast\Type\NullableTypeNode($child), $begin, $end, true) : new Ast\Type\NullableTypeNode($child);
 			}
 		}
 
@@ -676,17 +599,21 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceAtomic(Context $context, $children): TypeNode
+	protected function reduceAtomic(int $begin, int $end, $children): TypeNode
 	{
-		return $this->attributes($this->assembleAtomic(self::children($children), $context->begin), $context, true);
+		$type = $this->assembleAtomic($children, $begin);
+
+		return $this->useAttributes ? $this->attributesAt($type, $begin, $end, true) : $type;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceCallableReturnType(Context $context, $children): TypeNode
+	protected function reduceCallableReturnType(int $begin, int $end, $children): TypeNode
 	{
-		return $this->attributes($this->assembleAtomic(self::children($children), $context->begin), $context, true);
+		$type = $this->assembleAtomic($children, $begin);
+
+		return $this->useAttributes ? $this->attributesAt($type, $begin, $end, true) : $type;
 	}
 
 	/**
@@ -706,7 +633,7 @@ final class AstBuilder extends GeneratedParser
 					if (isset($this->identifiers[$child->id])) {
 						$name = $child;
 					} elseif ($child->id === $this->tThis) {
-						$type = $this->attributesAt(new Ast\Type\ThisTypeNode(), $child->offset, $child->offset, true);
+						$type = ($this->useAttributes ? $this->attributesAt(new Ast\Type\ThisTypeNode(), $child->offset, $child->offset, true) : new Ast\Type\ThisTypeNode());
 					}
 				}
 
@@ -719,12 +646,12 @@ final class AstBuilder extends GeneratedParser
 			}
 
 			if ($child instanceof ConstExprNode) {
-				$type = $this->attributesAt(
+				$type = ($this->useAttributes ? $this->attributesAt(
 					new Ast\Type\ConstTypeNode($child),
 					$child->getAttribute(Attribute::START_INDEX) ?? $begin,
 					$child->getAttribute(Attribute::END_INDEX) ?? $begin,
 					true,
-				);
+				) : new Ast\Type\ConstTypeNode($child));
 				continue;
 			}
 
@@ -758,7 +685,7 @@ final class AstBuilder extends GeneratedParser
 					break;
 			}
 
-			$type = $this->attributesAt($type, $begin, $child->end, true);
+			$type = ($this->useAttributes ? $this->attributesAt($type, $begin, $child->end, true) : $type);
 		}
 
 		return $type ?? $this->identifier($name);
@@ -770,27 +697,27 @@ final class AstBuilder extends GeneratedParser
 			throw new LogicException('A type without a name');
 		}
 
-		return $this->attributesAt(new Ast\Type\IdentifierTypeNode($name->value), $name->offset, $name->offset, true);
+		return $this->useAttributes ? $this->attributesAt(new Ast\Type\IdentifierTypeNode($name->value), $name->offset, $name->offset, true) : new Ast\Type\IdentifierTypeNode($name->value);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceArrayOrOffsetAccessItem(Context $context, $children): Fragment
+	protected function reduceArrayOrOffsetAccessItem(int $begin, int $end, $children): Fragment
 	{
 		foreach ($children as $child) {
 			if ($child instanceof TypeNode) {
-				return new Fragment(Fragment::OFFSET, self::end($context), $child);
+				return new Fragment(Fragment::OFFSET, $end, $child);
 			}
 		}
 
-		return new Fragment(Fragment::ARRAY, self::end($context));
+		return new Fragment(Fragment::ARRAY, $end);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceGeneric(Context $context, $children): Fragment
+	protected function reduceGeneric(int $begin, int $end, $children): Fragment
 	{
 		$types = [];
 		$variances = [];
@@ -803,26 +730,26 @@ final class AstBuilder extends GeneratedParser
 			$variances[] = $child->b;
 		}
 
-		return new Fragment(Fragment::GENERIC, self::end($context), $types, $variances);
+		return new Fragment(Fragment::GENERIC, $end, $types, $variances);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceGenericInReturnType(Context $context, $children): Fragment
+	protected function reduceGenericInReturnType(int $begin, int $end, $children): Fragment
 	{
-		return $this->reduceGeneric($context, $children);
+		return $this->reduceGeneric($begin, $end, $children);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceGenericArgument(Context $context, $children): Fragment
+	protected function reduceGenericArgument(int $begin, int $end, $children): Fragment
 	{
 		$variance = Ast\Type\GenericTypeNode::VARIANCE_INVARIANT;
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if ($child instanceof TypeNode) {
-				return new Fragment(Fragment::GENERIC_ARGUMENT, self::end($context), $child, $variance);
+				return new Fragment(Fragment::GENERIC_ARGUMENT, $end, $child, $variance);
 			}
 
 			if (!$child instanceof Token) {
@@ -837,8 +764,8 @@ final class AstBuilder extends GeneratedParser
 				// the wildcard
 				return new Fragment(
 					Fragment::GENERIC_ARGUMENT,
-					self::end($context),
-					$this->attributes(new Ast\Type\IdentifierTypeNode('mixed'), $context, true),
+					$end,
+					($this->useAttributes ? $this->attributesAt(new Ast\Type\IdentifierTypeNode('mixed'), $begin, $end, true) : new Ast\Type\IdentifierTypeNode('mixed')),
 					Ast\Type\GenericTypeNode::VARIANCE_BIVARIANT,
 				);
 			}
@@ -850,7 +777,7 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceCallable(Context $context, $children): Fragment
+	protected function reduceCallable(int $begin, int $end, $children): Fragment
 	{
 		$templates = [];
 		$parameters = [];
@@ -865,23 +792,23 @@ final class AstBuilder extends GeneratedParser
 			}
 		}
 
-		return new Fragment(Fragment::CALLABLE, self::end($context), $parameters, $returnType, $templates);
+		return new Fragment(Fragment::CALLABLE, $end, $parameters, $returnType, $templates);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceCallableWithTemplates(Context $context, $children): Fragment
+	protected function reduceCallableWithTemplates(int $begin, int $end, $children): Fragment
 	{
-		return $this->reduceCallable($context, $children);
+		return $this->reduceCallable($begin, $end, $children);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceCallableTemplateArgument(Context $context, $children): Ast\PhpDoc\TemplateTagValueNode
+	protected function reduceCallableTemplateArgument(int $begin, int $end, $children): Ast\PhpDoc\TemplateTagValueNode
 	{
-		return $this->attributes($this->template(self::children($children), ''), $context, true);
+		return $this->attributesAt($this->template($children, ''), $begin, $end, true);
 	}
 
 	/**
@@ -923,14 +850,14 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceCallableParameter(Context $context, $children): Ast\Type\CallableTypeParameterNode
+	protected function reduceCallableParameter(int $begin, int $end, $children): Ast\Type\CallableTypeParameterNode
 	{
 		$type = null;
 		$isReference = false;
 		$isVariadic = false;
 		$name = '';
 		$isOptional = false;
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if ($child instanceof TypeNode) {
 				$type = $child;
 			} elseif ($child instanceof Token) {
@@ -948,13 +875,13 @@ final class AstBuilder extends GeneratedParser
 		}
 
 		/** @var TypeNode $type */
-		return $this->attributes(new Ast\Type\CallableTypeParameterNode($type, $isReference, $isVariadic, $name, $isOptional), $context, true);
+		return $this->useAttributes ? $this->attributesAt(new Ast\Type\CallableTypeParameterNode($type, $isReference, $isVariadic, $name, $isOptional), $begin, $end, true) : new Ast\Type\CallableTypeParameterNode($type, $isReference, $isVariadic, $name, $isOptional);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceArrayShape(Context $context, $children): Fragment
+	protected function reduceArrayShape(int $begin, int $end, $children): Fragment
 	{
 		$items = [];
 		$sealed = true;
@@ -969,21 +896,21 @@ final class AstBuilder extends GeneratedParser
 			}
 		}
 
-		return new Fragment(Fragment::SHAPE, self::end($context), $items, $sealed, $unsealedType);
+		return new Fragment(Fragment::SHAPE, $end, $items, $sealed, $unsealedType);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceListShape(Context $context, $children): Fragment
+	protected function reduceListShape(int $begin, int $end, $children): Fragment
 	{
-		return $this->reduceArrayShape($context, $children);
+		return $this->reduceArrayShape($begin, $end, $children);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceArrayShapeUnsealedType(Context $context, $children): Ast\Type\ArrayShapeUnsealedTypeNode
+	protected function reduceArrayShapeUnsealedType(int $begin, int $end, $children): Ast\Type\ArrayShapeUnsealedTypeNode
 	{
 		$types = [];
 		foreach ($children as $child) {
@@ -998,26 +925,26 @@ final class AstBuilder extends GeneratedParser
 			? new Ast\Type\ArrayShapeUnsealedTypeNode($types[1], $types[0])
 			: new Ast\Type\ArrayShapeUnsealedTypeNode($types[0], null);
 
-		return $this->attributes($node, $context, true);
+		return $this->useAttributes ? $this->attributesAt($node, $begin, $end, true) : $node;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceListShapeUnsealedType(Context $context, $children): Ast\Type\ArrayShapeUnsealedTypeNode
+	protected function reduceListShapeUnsealedType(int $begin, int $end, $children): Ast\Type\ArrayShapeUnsealedTypeNode
 	{
-		return $this->reduceArrayShapeUnsealedType($context, $children);
+		return $this->reduceArrayShapeUnsealedType($begin, $end, $children);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceArrayShapeItem(Context $context, $children): Ast\Type\ArrayShapeItemNode
+	protected function reduceArrayShapeItem(int $begin, int $end, $children): Ast\Type\ArrayShapeItemNode
 	{
 		$nodes = [];
 		$hasKey = false;
 		$optional = false;
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if ($child instanceof Node) {
 				$nodes[] = $child;
 			} elseif ($child instanceof Token) {
@@ -1039,16 +966,15 @@ final class AstBuilder extends GeneratedParser
 			$item = new Ast\Type\ArrayShapeItemNode(null, false, $value);
 		}
 
-		return $this->attributes($item, $context, true);
+		return $this->useAttributes ? $this->attributesAt($item, $begin, $end, true) : $item;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 * @return Ast\ConstExpr\ConstExprIntegerNode|Ast\ConstExpr\ConstExprStringNode|Ast\ConstExpr\ConstFetchNode|Ast\Type\IdentifierTypeNode
 	 */
-	protected function reduceArrayShapeKey(Context $context, $children): Node
+	protected function reduceArrayShapeKey(int $begin, int $end, $children): Node
 	{
-		$children = self::children($children);
 		$first = $children[0];
 		if (count($children) === 3) {
 			$key = new Ast\ConstExpr\ConstFetchNode($first->value, $children[2]->value);
@@ -1058,7 +984,7 @@ final class AstBuilder extends GeneratedParser
 			$key = $this->stringOrIdentifier($first);
 		}
 
-		return $this->attributes($key, $context, true);
+		return $this->useAttributes ? $this->attributesAt($key, $begin, $end, true) : $key;
 	}
 
 	/**
@@ -1080,7 +1006,7 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceObjectShape(Context $context, $children): Fragment
+	protected function reduceObjectShape(int $begin, int $end, $children): Fragment
 	{
 		$items = [];
 		foreach ($children as $child) {
@@ -1091,13 +1017,13 @@ final class AstBuilder extends GeneratedParser
 			$items[] = $child;
 		}
 
-		return new Fragment(Fragment::OBJECT_SHAPE, self::end($context), $items);
+		return new Fragment(Fragment::OBJECT_SHAPE, $end, $items);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceObjectShapeItem(Context $context, $children): Ast\Type\ObjectShapeItemNode
+	protected function reduceObjectShapeItem(int $begin, int $end, $children): Ast\Type\ObjectShapeItemNode
 	{
 		$key = null;
 		$value = null;
@@ -1116,16 +1042,16 @@ final class AstBuilder extends GeneratedParser
 
 		/** @var Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode $key */
 		/** @var TypeNode $value */
-		return $this->attributes(new Ast\Type\ObjectShapeItemNode($key, $optional, $value), $context, true);
+		return $this->useAttributes ? $this->attributesAt(new Ast\Type\ObjectShapeItemNode($key, $optional, $value), $begin, $end, true) : new Ast\Type\ObjectShapeItemNode($key, $optional, $value);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 * @return Ast\ConstExpr\ConstExprStringNode|Ast\Type\IdentifierTypeNode
 	 */
-	protected function reduceObjectShapeKey(Context $context, $children): Node
+	protected function reduceObjectShapeKey(int $begin, int $end, $children): Node
 	{
-		return $this->attributes($this->stringOrIdentifier(self::children($children)[0]), $context, true);
+		return $this->attributesAt($this->stringOrIdentifier($children[0]), $begin, $end, true);
 	}
 
 	/**
@@ -1134,9 +1060,9 @@ final class AstBuilder extends GeneratedParser
 	 *
 	 * @return list<mixed>
 	 */
-	protected function reduceDiscardedComment(Context $context): array
+	protected function reduceDiscardedComment(int $begin, int $end): array
 	{
-		unset($this->comments[$context->begin]);
+		unset($this->comments[$begin]);
 
 		return [];
 	}
@@ -1148,49 +1074,49 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantFloat(Context $context, $children): ConstExprNode
+	protected function reduceConstantFloat(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->attributes(new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', self::children($children)[0]->value)), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', $children[0]->value)), $begin, $end) : new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', $children[0]->value));
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantInteger(Context $context, $children): ConstExprNode
+	protected function reduceConstantInteger(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->attributes(new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', self::children($children)[0]->value)), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $children[0]->value)), $begin, $end) : new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $children[0]->value));
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantString(Context $context, $children): ConstExprNode
+	protected function reduceConstantString(int $begin, int $end, $children): ConstExprNode
 	{
 		/** @var Ast\ConstExpr\ConstExprStringNode $node */
-		$node = $this->stringOrIdentifier(self::children($children)[0]);
+		$node = $this->stringOrIdentifier($children[0]);
 
-		return $this->attributes($node, $context);
+		return $this->useAttributes ? $this->attributesAt($node, $begin, $end) : $node;
 	}
 
-	protected function reduceConstantTrue(Context $context): ConstExprNode
+	protected function reduceConstantTrue(int $begin, int $end): ConstExprNode
 	{
-		return $this->attributes(new Ast\ConstExpr\ConstExprTrueNode(), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprTrueNode(), $begin, $end) : new Ast\ConstExpr\ConstExprTrueNode();
 	}
 
-	protected function reduceConstantFalse(Context $context): ConstExprNode
+	protected function reduceConstantFalse(int $begin, int $end): ConstExprNode
 	{
-		return $this->attributes(new Ast\ConstExpr\ConstExprFalseNode(), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprFalseNode(), $begin, $end) : new Ast\ConstExpr\ConstExprFalseNode();
 	}
 
-	protected function reduceConstantNull(Context $context): ConstExprNode
+	protected function reduceConstantNull(int $begin, int $end): ConstExprNode
 	{
-		return $this->attributes(new Ast\ConstExpr\ConstExprNullNode(), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprNullNode(), $begin, $end) : new Ast\ConstExpr\ConstExprNullNode();
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantArrayLiteral(Context $context, $children): ConstExprNode
+	protected function reduceConstantArrayLiteral(int $begin, int $end, $children): ConstExprNode
 	{
 		$items = [];
 		foreach ($children as $child) {
@@ -1201,24 +1127,24 @@ final class AstBuilder extends GeneratedParser
 			$items[] = $child;
 		}
 
-		return $this->attributes(new Ast\ConstExpr\ConstExprArrayNode($items), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprArrayNode($items), $begin, $end) : new Ast\ConstExpr\ConstExprArrayNode($items);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantArrayShorthand(Context $context, $children): ConstExprNode
+	protected function reduceConstantArrayShorthand(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->reduceConstantArrayLiteral($context, $children);
+		return $this->reduceConstantArrayLiteral($begin, $end, $children);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantArrayItem(Context $context, $children): ConstExprNode
+	protected function reduceConstantArrayItem(int $begin, int $end, $children): ConstExprNode
 	{
 		$expressions = [];
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if (!$child instanceof ConstExprNode) {
 				continue;
 			}
@@ -1230,15 +1156,15 @@ final class AstBuilder extends GeneratedParser
 			? new Ast\ConstExpr\ConstExprArrayItemNode($expressions[0], $expressions[1])
 			: new Ast\ConstExpr\ConstExprArrayItemNode(null, $expressions[0]);
 
-		return $this->attributes($item, $context);
+		return $this->useAttributes ? $this->attributesAt($item, $begin, $end) : $item;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceConstantFetch(Context $context, $children): ConstExprNode
+	protected function reduceConstantFetch(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->attributes($this->constantFetch(self::children($children)), $context);
+		return $this->attributesAt($this->constantFetch($children), $begin, $end);
 	}
 
 	/**
@@ -1266,7 +1192,7 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reducePhpDoc(Context $context, $children): Ast\PhpDoc\PhpDocNode
+	protected function reducePhpDoc(int $begin, int $end, $children): Ast\PhpDoc\PhpDocNode
 	{
 		$nodes = [];
 		foreach ($children as $child) {
@@ -1277,16 +1203,16 @@ final class AstBuilder extends GeneratedParser
 			$nodes[] = $child;
 		}
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocNode($nodes), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocNode($nodes), $begin, $end) : new Ast\PhpDoc\PhpDocNode($nodes);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceTextChild(Context $context, $children): Ast\PhpDoc\PhpDocTextNode
+	protected function reduceTextChild(int $begin, int $end, $children): Ast\PhpDoc\PhpDocTextNode
 	{
 		$text = '';
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if (!is_string($child)) {
 				continue;
 			}
@@ -1294,32 +1220,31 @@ final class AstBuilder extends GeneratedParser
 			$text = $child;
 		}
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocTextNode($text), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocTextNode($text), $begin, $end) : new Ast\PhpDoc\PhpDocTextNode($text);
 	}
 
-	protected function reduceText(Context $context): string
+	protected function reduceText(int $begin, int $end): string
 	{
-		return $this->text($context);
+		return $this->text($begin, $end);
 	}
 
-	protected function reduceDoctrineText(Context $context): string
+	protected function reduceDoctrineText(int $begin, int $end): string
 	{
-		return $this->text($context);
+		return $this->text($begin, $end);
 	}
 
 	/**
 	 * The text the rule has been read from, the way it is written save for the
 	 * asterisks a PHPDoc starts its lines with.
 	 */
-	private function text(Context $context): string
+	private function text(int $begin, int $end): string
 	{
-		if ($context->length === 0) {
+		if ($end < $begin) {
 			$this->textStart = -1;
 			return '';
 		}
 
-		$start = $context->begin;
-		$end = $start + $context->length - 1;
+		$start = $begin;
 		$this->textStart = $start;
 		if ($this->comments !== []) {
 			$this->forgetComments($start, $end);
@@ -1359,9 +1284,8 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceKnownTag(Context $context, $children): Ast\PhpDoc\PhpDocTagNode
+	protected function reduceKnownTag(int $begin, int $end, $children): Ast\PhpDoc\PhpDocTagNode
 	{
-		$children = self::children($children);
 		if ($children[0] instanceof Ast\PhpDoc\PhpDocTagNode) {
 			// a type alias whose type cannot be read
 			return $children[0];
@@ -1370,7 +1294,7 @@ final class AstBuilder extends GeneratedParser
 		/** @var Token $tag */
 		$tag = $children[0];
 		$valueStart = $this->nextIndex($tag->offset);
-		$value = $this->tagValue($tag, $children, $valueStart, self::end($context));
+		$value = $this->tagValue($tag, $children, $valueStart, $end);
 
 		// A description written right after a type has to be written after a
 		// space, which is not something the grammar says
@@ -1387,15 +1311,15 @@ final class AstBuilder extends GeneratedParser
 				&& $tokens[$textStart - 1][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_HORIZONTAL_WS
 			) {
 				$value = new Ast\PhpDoc\InvalidTagValueNode(
-					trim($this->textBetween($valueStart, self::end($context)), " \t"),
+					trim($this->textBetween($valueStart, $end), " \t"),
 					$this->createExceptionAt($textStart, Lexer::TOKEN_HORIZONTAL_WS),
 				);
 			}
 		}
 
-		$value = $this->attributesAt($value, $valueStart, self::end($context));
+		$value = ($this->useAttributes ? $this->attributesAt($value, $valueStart, $end) : $value);
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $begin, $end) : new Ast\PhpDoc\PhpDocTagNode($tag->value, $value);
 	}
 
 	/**
@@ -1508,7 +1432,7 @@ final class AstBuilder extends GeneratedParser
 
 				return new Ast\PhpDoc\TypeAliasImportTagValueNode(
 					$alias->value,
-					$this->attributesAt(new Ast\Type\IdentifierTypeNode($from->value), $from->offset, $from->offset),
+					($this->useAttributes ? $this->attributesAt(new Ast\Type\IdentifierTypeNode($from->value), $from->offset, $from->offset) : new Ast\Type\IdentifierTypeNode($from->value)),
 					$as,
 				);
 			case 'assert':
@@ -1573,7 +1497,7 @@ final class AstBuilder extends GeneratedParser
 		}
 
 		$returnType = $static !== null
-			? $this->attributesAt(new Ast\Type\IdentifierTypeNode('static'), $static->offset, $static->offset, true)
+			? ($this->useAttributes ? $this->attributesAt(new Ast\Type\IdentifierTypeNode('static'), $static->offset, $static->offset, true) : new Ast\Type\IdentifierTypeNode('static'))
 			: null;
 
 		return new Ast\PhpDoc\MethodTagValueNode(false, $returnType, $type->name, $parameters, $description, $templates);
@@ -1588,12 +1512,12 @@ final class AstBuilder extends GeneratedParser
 		$name = $children[1];
 		/** @var Fragment $generic */
 		$generic = $children[2];
-		$type = $this->attributesAt(
+		$type = ($this->useAttributes ? $this->attributesAt(
 			new Ast\Type\GenericTypeNode($this->identifier($name), $generic->a, $generic->b),
 			$start,
 			$generic->end,
 			true,
-		);
+		) : new Ast\Type\GenericTypeNode($this->identifier($name), $generic->a, $generic->b));
 
 		switch ($kind) {
 			case 'extends':
@@ -1657,14 +1581,14 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceMethodParameter(Context $context, $children): Ast\PhpDoc\MethodTagValueParameterNode
+	protected function reduceMethodParameter(int $begin, int $end, $children): Ast\PhpDoc\MethodTagValueParameterNode
 	{
 		$type = null;
 		$isReference = false;
 		$isVariadic = false;
 		$name = '';
 		$default = null;
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if ($child instanceof TypeNode) {
 				$type = $child;
 			} elseif ($child instanceof ConstExprNode) {
@@ -1681,29 +1605,27 @@ final class AstBuilder extends GeneratedParser
 			}
 		}
 
-		return $this->attributes(new Ast\PhpDoc\MethodTagValueParameterNode($type, $isReference, $isVariadic, $name, $default), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\MethodTagValueParameterNode($type, $isReference, $isVariadic, $name, $default), $begin, $end) : new Ast\PhpDoc\MethodTagValueParameterNode($type, $isReference, $isVariadic, $name, $default);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceGenericTag(Context $context, $children): Ast\PhpDoc\PhpDocTagNode
+	protected function reduceGenericTag(int $begin, int $end, $children): Ast\PhpDoc\PhpDocTagNode
 	{
-		$children = self::children($children);
 		/** @var Token $tag */
 		$tag = $children[0];
 		$valueStart = $this->nextIndex($tag->offset);
-		$value = $this->attributesAt(new Ast\PhpDoc\GenericTagValueNode(self::description($children)), $valueStart, self::end($context));
+		$value = ($this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\GenericTagValueNode(self::description($children)), $valueStart, $end) : new Ast\PhpDoc\GenericTagValueNode(self::description($children)));
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $begin, $end) : new Ast\PhpDoc\PhpDocTagNode($tag->value, $value);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineTag(Context $context, $children): Ast\PhpDoc\PhpDocTagNode
+	protected function reduceDoctrineTag(int $begin, int $end, $children): Ast\PhpDoc\PhpDocTagNode
 	{
-		$children = self::children($children);
 		/** @var Token $tag */
 		$tag = $children[0];
 		$valueStart = $this->nextIndex($tag->offset);
@@ -1719,14 +1641,14 @@ final class AstBuilder extends GeneratedParser
 			}
 		}
 
-		$annotation = $this->attributesAt(new Doctrine\DoctrineAnnotation($tag->value, $arguments), $valueStart, $annotationEnd);
-		$value = $this->attributesAt(
+		$annotation = ($this->useAttributes ? $this->attributesAt(new Doctrine\DoctrineAnnotation($tag->value, $arguments), $valueStart, $annotationEnd) : new Doctrine\DoctrineAnnotation($tag->value, $arguments));
+		$value = ($this->useAttributes ? $this->attributesAt(
 			new Doctrine\DoctrineTagValueNode($annotation, self::description($children)),
 			$valueStart,
-			self::end($context),
-		);
+			$end,
+		) : new Doctrine\DoctrineTagValueNode($annotation, self::description($children)));
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $begin, $end) : new Ast\PhpDoc\PhpDocTagNode($tag->value, $value);
 	}
 
 	/**
@@ -1734,21 +1656,20 @@ final class AstBuilder extends GeneratedParser
 	 *
 	 * @param list<mixed> $children
 	 */
-	protected function reduceInvalidTag(Context $context, $children): Ast\PhpDoc\PhpDocTagNode
+	protected function reduceInvalidTag(int $begin, int $end, $children): Ast\PhpDoc\PhpDocTagNode
 	{
-		$children = self::children($children);
 		/** @var Token $tag */
 		$tag = $children[0];
 		$valueStart = $this->nextIndex($tag->offset);
 
 		$exception = $this->explain(isset($this->tagKinds[$tag->id]) ? 'KnownTag' : 'UnreadTagChild', $tag->offset);
-		$value = $this->attributesAt(
+		$value = ($this->useAttributes ? $this->attributesAt(
 			new Ast\PhpDoc\InvalidTagValueNode(self::description($children), $exception),
 			$valueStart,
-			self::end($context),
-		);
+			$end,
+		) : new Ast\PhpDoc\InvalidTagValueNode(self::description($children), $exception));
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $begin, $end) : new Ast\PhpDoc\PhpDocTagNode($tag->value, $value);
 	}
 
 	/**
@@ -1756,9 +1677,8 @@ final class AstBuilder extends GeneratedParser
 	 *
 	 * @param list<mixed> $children
 	 */
-	protected function reduceInvalidTypeAliasTag(Context $context, $children): Ast\PhpDoc\PhpDocTagNode
+	protected function reduceInvalidTypeAliasTag(int $begin, int $end, $children): Ast\PhpDoc\PhpDocTagNode
 	{
-		$children = self::children($children);
 		/** @var Token $tag */
 		$tag = $children[0];
 		/** @var Token $alias */
@@ -1769,12 +1689,12 @@ final class AstBuilder extends GeneratedParser
 		}
 
 		$exception = $this->explainTypeAlias($typeStart);
-		$type = $this->attributesAt(new Ast\Type\InvalidTypeNode($exception), $typeStart, self::end($context));
+		$type = ($this->useAttributes ? $this->attributesAt(new Ast\Type\InvalidTypeNode($exception), $typeStart, $end) : new Ast\Type\InvalidTypeNode($exception));
 
 		$valueStart = $this->nextIndex($tag->offset);
-		$value = $this->attributesAt(new Ast\PhpDoc\TypeAliasTagValueNode($alias->value, $type), $valueStart, self::end($context));
+		$value = ($this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\TypeAliasTagValueNode($alias->value, $type), $valueStart, $end) : new Ast\PhpDoc\TypeAliasTagValueNode($alias->value, $type));
 
-		return $this->attributes(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\PhpDoc\PhpDocTagNode($tag->value, $value), $begin, $end) : new Ast\PhpDoc\PhpDocTagNode($tag->value, $value);
 	}
 
 	private function explainTypeAlias(int $index): ParserException
@@ -1800,9 +1720,8 @@ final class AstBuilder extends GeneratedParser
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineArgument(Context $context, $children): Doctrine\DoctrineArgument
+	protected function reduceDoctrineArgument(int $begin, int $end, $children): Doctrine\DoctrineArgument
 	{
-		$children = self::children($children);
 		$key = null;
 		$value = null;
 		$hasKey = false;
@@ -1819,19 +1738,18 @@ final class AstBuilder extends GeneratedParser
 		if ($hasKey) {
 			/** @var Token $name */
 			$name = $children[0];
-			$key = $this->attributesAt(new Ast\Type\IdentifierTypeNode($name->value), $name->offset, $name->offset, false, true);
+			$key = ($this->useAttributes ? $this->attributesAt(new Ast\Type\IdentifierTypeNode($name->value), $name->offset, $name->offset, false, true) : new Ast\Type\IdentifierTypeNode($name->value));
 		}
 
 		/** @var Doctrine\DoctrineAnnotation|Ast\Type\IdentifierTypeNode|Doctrine\DoctrineArray|ConstExprNode $value */
-		return $this->doctrineAttributes(new Doctrine\DoctrineArgument($key, $value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Doctrine\DoctrineArgument($key, $value), $begin, $end, false, true) : new Doctrine\DoctrineArgument($key, $value);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineNestedAnnotation(Context $context, $children): Doctrine\DoctrineAnnotation
+	protected function reduceDoctrineNestedAnnotation(int $begin, int $end, $children): Doctrine\DoctrineAnnotation
 	{
-		$children = self::children($children);
 		$arguments = [];
 		foreach ($children as $child) {
 			if (!$child instanceof Doctrine\DoctrineArgument) {
@@ -1841,13 +1759,13 @@ final class AstBuilder extends GeneratedParser
 			$arguments[] = $child;
 		}
 
-		return $this->doctrineAttributes(new Doctrine\DoctrineAnnotation($children[0]->value, $arguments), $context);
+		return $this->useAttributes ? $this->attributesAt(new Doctrine\DoctrineAnnotation($children[0]->value, $arguments), $begin, $end, false, true) : new Doctrine\DoctrineAnnotation($children[0]->value, $arguments);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineArray(Context $context, $children): Doctrine\DoctrineArray
+	protected function reduceDoctrineArray(int $begin, int $end, $children): Doctrine\DoctrineArray
 	{
 		$items = [];
 		foreach ($children as $child) {
@@ -1858,16 +1776,16 @@ final class AstBuilder extends GeneratedParser
 			$items[] = $child;
 		}
 
-		return $this->doctrineAttributes(new Doctrine\DoctrineArray($items), $context);
+		return $this->useAttributes ? $this->attributesAt(new Doctrine\DoctrineArray($items), $begin, $end, false, true) : new Doctrine\DoctrineArray($items);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineArrayItem(Context $context, $children): Doctrine\DoctrineArrayItem
+	protected function reduceDoctrineArrayItem(int $begin, int $end, $children): Doctrine\DoctrineArrayItem
 	{
 		$nodes = [];
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			if ($child instanceof Token) {
 				continue;
 			}
@@ -1879,15 +1797,14 @@ final class AstBuilder extends GeneratedParser
 			? new Doctrine\DoctrineArrayItem($nodes[0], $nodes[1])
 			: new Doctrine\DoctrineArrayItem(null, $nodes[0]);
 
-		return $this->doctrineAttributes($item, $context);
+		return $this->useAttributes ? $this->attributesAt($item, $begin, $end, false, true) : $item;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineArrayKey(Context $context, $children): Node
+	protected function reduceDoctrineArrayKey(int $begin, int $end, $children): Node
 	{
-		$children = self::children($children);
 		$first = $children[0];
 		if ($first instanceof Node) {
 			return $first;
@@ -1899,52 +1816,52 @@ final class AstBuilder extends GeneratedParser
 			$key = $this->stringOrIdentifier($first);
 		}
 
-		return $this->doctrineAttributes($key, $context);
+		return $this->useAttributes ? $this->attributesAt($key, $begin, $end, false, true) : $key;
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineIdentifier(Context $context, $children): Ast\Type\IdentifierTypeNode
+	protected function reduceDoctrineIdentifier(int $begin, int $end, $children): Ast\Type\IdentifierTypeNode
 	{
-		return $this->doctrineAttributes(new Ast\Type\IdentifierTypeNode(self::children($children)[0]->value), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\Type\IdentifierTypeNode($children[0]->value), $begin, $end, false, true) : new Ast\Type\IdentifierTypeNode($children[0]->value);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineConstantFetch(Context $context, $children): ConstExprNode
+	protected function reduceDoctrineConstantFetch(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->doctrineAttributes($this->constantFetch(self::children($children)), $context);
+		return $this->attributesAt($this->constantFetch($children), $begin, $end, false, true);
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineFloat(Context $context, $children): ConstExprNode
+	protected function reduceDoctrineFloat(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->doctrineAttributes(new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', self::children($children)[0]->value)), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', $children[0]->value)), $begin, $end, false, true) : new Ast\ConstExpr\ConstExprFloatNode(str_replace('_', '', $children[0]->value));
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineInteger(Context $context, $children): ConstExprNode
+	protected function reduceDoctrineInteger(int $begin, int $end, $children): ConstExprNode
 	{
-		return $this->doctrineAttributes(new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', self::children($children)[0]->value)), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $children[0]->value)), $begin, $end, false, true) : new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $children[0]->value));
 	}
 
 	/**
 	 * @param list<mixed> $children
 	 */
-	protected function reduceDoctrineString(Context $context, $children): ConstExprNode
+	protected function reduceDoctrineString(int $begin, int $end, $children): ConstExprNode
 	{
 		$text = '';
-		foreach (self::children($children) as $child) {
+		foreach ($children as $child) {
 			$text .= $child->value;
 		}
 
-		return $this->doctrineAttributes(new Ast\ConstExpr\DoctrineConstExprStringNode(Ast\ConstExpr\DoctrineConstExprStringNode::unescape($text)), $context);
+		return $this->useAttributes ? $this->attributesAt(new Ast\ConstExpr\DoctrineConstExprStringNode(Ast\ConstExpr\DoctrineConstExprStringNode::unescape($text)), $begin, $end, false, true) : new Ast\ConstExpr\DoctrineConstExprStringNode(Ast\ConstExpr\DoctrineConstExprStringNode::unescape($text));
 	}
 
 }

@@ -255,7 +255,7 @@ final class ParserGenerator
         if ($kept && !$reducer[1]) {
             return "\$o{$d} = \$this->p;\n"
                 . $this->match($id, false, $fail)
-                . sprintf("\$this->v[\$this->n++] = \$this->%s(\$this->context(\$o%d));\n", $reducer[0], $d);
+                . sprintf("\$this->v[\$this->n++] = \$this->%s(%s);\n", $reducer[0], self::span("\$o{$d}"));
         }
 
         $code = '';
@@ -300,9 +300,10 @@ final class ParserGenerator
 
         if ($kept) {
             $code .= sprintf(
-                "\$this->v[\$m%1\$d] = \$this->%2\$s(\$this->context(\$o%1\$d), \$this->n === \$m%1\$d + 1 && !\\is_array(\$this->v[\$m%1\$d]) ? [\$this->v[\$m%1\$d]] : \$this->merge(\$m%1\$d));\n\$this->n = \$m%1\$d + 1;\n",
+                "\$this->v[\$m%1\$d] = \$this->%2\$s(%3\$s, \$this->n === \$m%1\$d + 1 && !\\is_array(\$this->v[\$m%1\$d]) ? [\$this->v[\$m%1\$d]] : \$this->merge(\$m%1\$d));\n\$this->n = \$m%1\$d + 1;\n",
                 $d,
                 $reducer[0],
+                self::span("\$o{$d}"),
             );
         }
 
@@ -659,7 +660,7 @@ final class ParserGenerator
         $reducer = $this->reducers[$lexeme] ?? null;
         if ($reducer !== null) {
             return sprintf(
-                "\$this->v[\$this->n++] = \$this->%s(\$this->context(\$this->p, \$this->p + 1)%s);\n\$this->p++;\n",
+                "\$this->v[\$this->n++] = \$this->%s(\$this->indexes[\$this->p], \$this->indexes[\$this->p]%s);\n\$this->p++;\n",
                 $reducer[0],
                 $reducer[1] ? ', [$this->token($this->p)]' : '',
             );
@@ -682,6 +683,20 @@ final class ParserGenerator
         $this->sets[$name] = '[' . implode(',', array_map(static fn (int $t): string => $t . '=>true', $tokens)) . ']';
 
         return sprintf('isset(self::%s[$this->ids[$this->p]])', $name);
+    }
+
+    /**
+     * The index of the first and of the last token of the lexer a rule
+     * entered at the given position has read up to the position the reading
+     * is at. A rule that has read nothing ends right before it begins, right
+     * after what has been read before it.
+     */
+    private static function span(string $origin): string
+    {
+        return strtr(
+            '(O < $this->p ? $this->indexes[O] : (O > 0 ? $this->indexes[O - 1] + 1 : 0)), (O < $this->p ? $this->indexes[$this->p - 1] : (O > 0 ? $this->indexes[O - 1] : -1))',
+            ['O' => $origin],
+        );
     }
 
     private static function indent(string $code, int $levels): string

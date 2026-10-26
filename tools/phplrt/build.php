@@ -60,7 +60,7 @@ const ENTRYPOINTS = ['PhpDoc', 'Type', 'ConstantExpr', 'KnownTag', 'UnreadTagChi
 $reducers = [];
 preg_match_all('/function (reduce(\w+))\(([^)]*)\)/', file_get_contents(__DIR__ . '/../../src/Parser/AstBuilder.php'), $matches, PREG_SET_ORDER);
 foreach ($matches as [, $method, $rule, $parameters]) {
-    $reducers[$rule] = [$method, substr_count($parameters, '$') > 1];
+    $reducers[$rule] = [$method, strpos($parameters, '$children') !== false];
 }
 
 /** @var array<string, true> $entrypoints */
@@ -301,8 +301,8 @@ foreach ($reducers as $name => $reducer) {
     $id = $parser->constants[$name];
     $reducerIds[$id] = $reducer;
     $abstracts[] = $reducer[1]
-        ? sprintf("\t/**\n\t * @param list<mixed> \$children\n\t * @return mixed\n\t */\n\tabstract protected function %s(Context \$context, \$children);\n", $reducer[0])
-        : sprintf("\t/**\n\t * @return mixed\n\t */\n\tabstract protected function %s(Context \$context);\n", $reducer[0]);
+        ? sprintf("\t/**\n\t * @param list<mixed> \$children\n\t * @return mixed\n\t */\n\tabstract protected function %s(int \$begin, int \$end, \$children);\n", $reducer[0])
+        : sprintf("\t/**\n\t * @return mixed\n\t */\n\tabstract protected function %s(int \$begin, int \$end);\n", $reducer[0]);
 }
 
 // The tokens no reducer reads: they are only what the other tokens are

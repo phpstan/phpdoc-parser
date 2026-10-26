@@ -4,7 +4,6 @@ namespace PHPStan\PhpDocParser\Parser\Generated;
 
 use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Parser\Phplrt\Token;
-use Phplrt\Parser\Context;
 use function array_keys;
 use function is_array;
 use function ksort;
@@ -18,7 +17,8 @@ use function ksort;
  * phplrt would, and building its value along: a method named "b" followed by
  * the identifier of a rule reads the rule and pushes its value, one named "s"
  * only reads it. The values are built by the reducers of the class extending
- * this one.
+ * this one, which are given the index of the first and of the last token of
+ * the lexer the rule has read.
  *
  * @internal
  */
@@ -100,6 +100,9 @@ abstract class GeneratedParser
 	/** @var array<int, int> the identifier of the token at each position, the last one being -1 */
 	protected array $ids = [];
 
+	/** @var array<int, int> the index of the token of the lexer at each position */
+	protected array $indexes = [];
+
 	/** the position the reading is at */
 	protected int $p = 0;
 
@@ -120,323 +123,318 @@ abstract class GeneratedParser
 
 	abstract protected function token(int $position): Token;
 
-	/**
-	 * The context of whatever has been read from the given position up to the
-	 * given one, or up to the position the reading is at.
-	 */
-	abstract protected function context(int $from, ?int $to = null): Context;
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceType(Context $context, $children);
+	abstract protected function reduceType(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceSubType(Context $context, $children);
+	abstract protected function reduceSubType(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceNullable(Context $context, $children);
+	abstract protected function reduceNullable(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceAtomic(Context $context, $children);
+	abstract protected function reduceAtomic(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceCallableReturnType(Context $context, $children);
+	abstract protected function reduceCallableReturnType(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceArrayOrOffsetAccessItem(Context $context, $children);
+	abstract protected function reduceArrayOrOffsetAccessItem(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceGeneric(Context $context, $children);
+	abstract protected function reduceGeneric(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceGenericInReturnType(Context $context, $children);
+	abstract protected function reduceGenericInReturnType(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceGenericArgument(Context $context, $children);
+	abstract protected function reduceGenericArgument(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceCallable(Context $context, $children);
+	abstract protected function reduceCallable(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceCallableWithTemplates(Context $context, $children);
+	abstract protected function reduceCallableWithTemplates(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceCallableTemplateArgument(Context $context, $children);
+	abstract protected function reduceCallableTemplateArgument(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceCallableParameter(Context $context, $children);
+	abstract protected function reduceCallableParameter(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceArrayShape(Context $context, $children);
+	abstract protected function reduceArrayShape(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceListShape(Context $context, $children);
+	abstract protected function reduceListShape(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceArrayShapeUnsealedType(Context $context, $children);
+	abstract protected function reduceArrayShapeUnsealedType(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceListShapeUnsealedType(Context $context, $children);
+	abstract protected function reduceListShapeUnsealedType(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceArrayShapeItem(Context $context, $children);
+	abstract protected function reduceArrayShapeItem(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceArrayShapeKey(Context $context, $children);
+	abstract protected function reduceArrayShapeKey(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceObjectShape(Context $context, $children);
+	abstract protected function reduceObjectShape(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceObjectShapeItem(Context $context, $children);
+	abstract protected function reduceObjectShapeItem(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceObjectShapeKey(Context $context, $children);
+	abstract protected function reduceObjectShapeKey(int $begin, int $end, $children);
 
 	/**
 	 * @return mixed
 	 */
-	abstract protected function reduceDiscardedComment(Context $context);
-
-	/**
-	 * @param list<mixed> $children
-	 * @return mixed
-	 */
-	abstract protected function reduceConstantFloat(Context $context, $children);
+	abstract protected function reduceDiscardedComment(int $begin, int $end);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceConstantInteger(Context $context, $children);
+	abstract protected function reduceConstantFloat(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceConstantString(Context $context, $children);
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function reduceConstantTrue(Context $context);
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function reduceConstantFalse(Context $context);
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function reduceConstantNull(Context $context);
+	abstract protected function reduceConstantInteger(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceConstantArrayLiteral(Context $context, $children);
+	abstract protected function reduceConstantString(int $begin, int $end, $children);
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function reduceConstantTrue(int $begin, int $end);
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function reduceConstantFalse(int $begin, int $end);
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function reduceConstantNull(int $begin, int $end);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceConstantArrayShorthand(Context $context, $children);
+	abstract protected function reduceConstantArrayLiteral(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceConstantArrayItem(Context $context, $children);
+	abstract protected function reduceConstantArrayShorthand(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceConstantFetch(Context $context, $children);
+	abstract protected function reduceConstantArrayItem(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reducePhpDoc(Context $context, $children);
+	abstract protected function reduceConstantFetch(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceTextChild(Context $context, $children);
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function reduceText(Context $context);
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function reduceDoctrineText(Context $context);
+	abstract protected function reducePhpDoc(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceKnownTag(Context $context, $children);
+	abstract protected function reduceTextChild(int $begin, int $end, $children);
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function reduceText(int $begin, int $end);
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function reduceDoctrineText(int $begin, int $end);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceMethodParameter(Context $context, $children);
+	abstract protected function reduceKnownTag(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceGenericTag(Context $context, $children);
+	abstract protected function reduceMethodParameter(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineTag(Context $context, $children);
+	abstract protected function reduceGenericTag(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceInvalidTag(Context $context, $children);
+	abstract protected function reduceDoctrineTag(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceInvalidTypeAliasTag(Context $context, $children);
+	abstract protected function reduceInvalidTag(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineArgument(Context $context, $children);
+	abstract protected function reduceInvalidTypeAliasTag(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineNestedAnnotation(Context $context, $children);
+	abstract protected function reduceDoctrineArgument(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineArray(Context $context, $children);
+	abstract protected function reduceDoctrineNestedAnnotation(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineArrayItem(Context $context, $children);
+	abstract protected function reduceDoctrineArray(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineArrayKey(Context $context, $children);
+	abstract protected function reduceDoctrineArrayItem(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineIdentifier(Context $context, $children);
+	abstract protected function reduceDoctrineArrayKey(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineConstantFetch(Context $context, $children);
+	abstract protected function reduceDoctrineIdentifier(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineFloat(Context $context, $children);
+	abstract protected function reduceDoctrineConstantFetch(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineInteger(Context $context, $children);
+	abstract protected function reduceDoctrineFloat(int $begin, int $end, $children);
 
 	/**
 	 * @param list<mixed> $children
 	 * @return mixed
 	 */
-	abstract protected function reduceDoctrineString(Context $context, $children);
+	abstract protected function reduceDoctrineInteger(int $begin, int $end, $children);
+
+	/**
+	 * @param list<mixed> $children
+	 * @return mixed
+	 */
+	abstract protected function reduceDoctrineString(int $begin, int $end, $children);
 
 	/**
 	 * Where the last reading has failed, along with the tokens expected there.
@@ -591,7 +589,7 @@ abstract class GeneratedParser
 		$this->comments = $cs1;
 		return false;
 		k1:
-		$this->v[$m1] = $this->reducePhpDoc($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->v[$m1] = $this->reducePhpDoc(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -608,10 +606,10 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f200;}
+				goto f186;}
 		}
 		if (!$this->b8()) {
-			goto f200;}
+			goto f186;}
 		// b460
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -628,29 +626,29 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto f203;}
+					goto f189;}
 			}
 			if (!$this->b8()) {
-				goto f203;}
-			goto k203;
-			f203:
+				goto f189;}
+			goto k189;
+			f189:
 			$this->p = $o3;
 			$this->n = $m3;
 			$this->comments = $cs3;
-			goto e202;
-			k203:
+			goto e188;
+			k189:
 			if ($this->p === $b2) {
-				goto e202;
+				goto e188;
 			}
 		}
-		e202:
-		goto k200;
-		f200:
+		e188:
+		goto k186;
+		f186:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k200:
+		k186:
 
 		return true;
 	}
@@ -667,7 +665,7 @@ abstract class GeneratedParser
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b189()) {
-					goto f461;}
+					goto f437;}
 				// b458
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -681,13 +679,13 @@ abstract class GeneratedParser
 								$this->rec(7);
 							}
 
-							goto n464;}
-						goto a463;
-						n464:
+							goto n440;}
+						goto a439;
+						n440:
 						break;
 					case 80:
 						$this->p++;
-						goto a463;
+						goto a439;
 						break;
 				}
 
@@ -695,62 +693,39 @@ abstract class GeneratedParser
 					$this->rec(458);
 				}
 
-				goto f462;
-				a463:
-				goto k462;
-				f462:
+				goto f438;
+				a439:
+				goto k438;
+				f438:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f461;
-				k462:
-				goto k461;
-				f461:
+				goto f437;
+				k438:
+				goto k437;
+				f437:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n460;
-				k461:
-				goto a459;
-				n460:
+				goto n436;
+				k437:
+				goto a435;
+				n436:
 				break;
 			case 76:
 			case 77:
 			case 78:
 			case 79:
-				// b9
-				if (!isset(self::T942497bd[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(9);
-					}
-
-					goto n465;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!$this->b10()) {
-					goto f466;}
-				if (($this->ids[$this->p] === 80)) {
-					$this->p++;
-				} elseif ($this->p >= $this->f) {
-					$this->rec(3);
-				}
-				goto k466;
-				f466:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n465;
-				k466:
-				goto a459;
-				n465:
+				if (!$this->b9()) {
+					goto n441;}
+				goto a435;
+				n441:
 				// b188
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b189()) {
-					goto f468;}
+					goto f443;}
 				// b458
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -764,13 +739,13 @@ abstract class GeneratedParser
 								$this->rec(7);
 							}
 
-							goto n471;}
-						goto a470;
-						n471:
+							goto n446;}
+						goto a445;
+						n446:
 						break;
 					case 80:
 						$this->p++;
-						goto a470;
+						goto a445;
 						break;
 				}
 
@@ -778,24 +753,24 @@ abstract class GeneratedParser
 					$this->rec(458);
 				}
 
-				goto f469;
-				a470:
-				goto k469;
-				f469:
+				goto f444;
+				a445:
+				goto k444;
+				f444:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f468;
-				k469:
-				goto k468;
-				f468:
+				goto f443;
+				k444:
+				goto k443;
+				f443:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n467;
-				k468:
-				goto a459;
-				n467:
+				goto n442;
+				k443:
+				goto a435;
+				n442:
 				break;
 		}
 
@@ -803,15 +778,90 @@ abstract class GeneratedParser
 			$this->rec(8);
 		}
 
-		goto f458;
-		a459:
-		goto k458;
-		f458:
+		goto f434;
+		a435:
+		goto k434;
+		f434:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k458:
+		k434:
+
+		return true;
+	}
+
+	private function b9(): bool
+	{
+		if (!isset(self::T942497bd[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(9);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		// b10
+		if (!isset(self::T942497bd[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(10);
+			}
+
+			goto f715;}
+
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				break;
+			case 76:
+			case 77:
+				if (!$this->b11()) {
+					goto n718;}
+				goto a717;
+				n718:
+				if (!$this->b134()) {
+					goto n719;}
+				goto a717;
+				n719:
+				break;
+			case 78:
+			case 79:
+				if (!$this->b134()) {
+					goto n720;}
+				goto a717;
+				n720:
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(10);
+		}
+
+		goto f716;
+		a717:
+		goto k716;
+		f716:
+		$this->p = $o2;
+		$this->n = $m2;
+		$this->comments = $cs2;
+		goto f715;
+		k716:
+		if (($this->ids[$this->p] === 80)) {
+			$this->p++;
+		} elseif ($this->p >= $this->f) {
+			$this->rec(3);
+		}
+		goto k715;
+		f715:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k715:
 
 		return true;
 	}
@@ -885,7 +935,7 @@ abstract class GeneratedParser
 				$this->rec(12);
 			}
 
-			goto f218;}
+			goto f204;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -894,7 +944,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f218;}
+				goto f204;}
 		}
 		// b19
 		$o2 = $this->p;
@@ -909,61 +959,29 @@ abstract class GeneratedParser
 					$this->rec(21);
 				}
 
-				goto e222;
+				goto e208;
 			}
 
 			$this->p++;
 		}
-		e222:
+		e208:
 		if (!$this->s74()) {
-			goto f220;}
-		goto k220;
-		f220:
+			goto f206;}
+		goto k206;
+		f206:
 		$this->p = $o3;
-		goto f218;
-		k220:
-		$this->v[$this->n++] = $this->reduceDoctrineText($this->context($o2));
-		goto k218;
-		f218:
+		goto f204;
+		k206:
+		$this->v[$this->n++] = $this->reduceDoctrineText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k204;
+		f204:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k218:
-		$this->v[$m1] = $this->reduceGenericTag($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k204:
+		$this->v[$m1] = $this->reduceGenericTag(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
-
-		return true;
-	}
-
-	private function b125(): bool
-	{
-		$o1 = $this->p;
-		// s125
-		$o2 = $this->p;
-		// s126
-		$o3 = $this->p;
-		while (true) {
-			$b3 = $this->p;
-			if (!isset(self::T61cd0e44[$this->ids[$this->p]])) {
-				if ($b3 > $this->f) {
-					$this->rec(116);
-				}
-
-				goto e255;
-			}
-
-			$this->p++;
-		}
-		e255:
-		if (($this->ids[$this->p] === 80)) {
-			if (!$this->s128()) {
-				goto n256;}
-			n256:
-		} elseif ($this->p > $this->f) {
-			$this->rec(128);
-		}
-		$this->v[$this->n++] = $this->reduceText($this->context($o1));
 
 		return true;
 	}
@@ -986,16 +1004,16 @@ abstract class GeneratedParser
 			case 76:
 			case 77:
 				if (!$this->b187()) {
-					goto n225;}
-				goto a224;
-				n225:
+					goto n211;}
+				goto a210;
+				n211:
 				break;
 			case 78:
 			case 79:
 				if (!$this->b135()) {
-					goto n226;}
-				goto a224;
-				n226:
+					goto n212;}
+				goto a210;
+				n212:
 				break;
 		}
 
@@ -1003,16 +1021,16 @@ abstract class GeneratedParser
 			$this->rec(134);
 		}
 
-		goto f223;
-		a224:
-		goto k223;
-		f223:
+		goto f209;
+		a210:
+		goto k209;
+		f209:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k223:
-		$this->v[$m1] = $this->reduceDoctrineTag($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k209:
+		$this->v[$m1] = $this->reduceDoctrineTag(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -1035,7 +1053,7 @@ abstract class GeneratedParser
 				$this->rec(136);
 			}
 
-			goto f477;}
+			goto f452;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b137
@@ -1049,24 +1067,24 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n480;}
-				goto a479;
-				n480:
+					goto n455;}
+				goto a454;
+				n455:
 				break;
 			case 32:
 			case 82:
 				if (!$this->b138()) {
-					goto n481;}
-				goto a479;
-				n481:
+					goto n456;}
+				goto a454;
+				n456:
 				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n482;}
-				goto a479;
-				n482:
+					goto n457;}
+				goto a454;
+				n457:
 				break;
 		}
 
@@ -1074,15 +1092,15 @@ abstract class GeneratedParser
 			$this->rec(137);
 		}
 
-		goto f478;
-		a479:
-		goto k478;
-		f478:
+		goto f453;
+		a454:
+		goto k453;
+		f453:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f477;
-		k478:
+		goto f452;
+		k453:
 		// b19
 		$o2 = $this->p;
 		// s19
@@ -1096,27 +1114,27 @@ abstract class GeneratedParser
 					$this->rec(21);
 				}
 
-				goto e486;
+				goto e461;
 			}
 
 			$this->p++;
 		}
-		e486:
+		e461:
 		if (!$this->s74()) {
-			goto f484;}
-		goto k484;
-		f484:
+			goto f459;}
+		goto k459;
+		f459:
 		$this->p = $o3;
-		goto f477;
-		k484:
-		$this->v[$this->n++] = $this->reduceDoctrineText($this->context($o2));
-		goto k477;
-		f477:
+		goto f452;
+		k459:
+		$this->v[$this->n++] = $this->reduceDoctrineText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k452;
+		f452:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k477:
+		k452:
 
 		return true;
 	}
@@ -1138,7 +1156,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f731;}
+			goto f721;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b139
@@ -1152,12 +1170,12 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e733;
+				goto e723;
 			}
 
 			$this->p++;
 		}
-		e733:
+		e723:
 		if (isset(self::T1e2ed78c[$this->ids[$this->p]])) {
 			// b141
 			if (!isset(self::T1e2ed78c[$this->ids[$this->p]])) {
@@ -1165,13 +1183,13 @@ abstract class GeneratedParser
 					$this->rec(141);
 				}
 
-				goto n734;}
+				goto n724;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
 			if (!$this->b142()) {
-				goto f735;}
+				goto f725;}
 			// b139
 			$o3 = $this->p;
 			$m3 = $this->n;
@@ -1183,27 +1201,27 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e737;
+					goto e727;
 				}
 
 				$this->p++;
 			}
-			e737:
+			e727:
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->b182()) {
-					goto n738;}
-				n738:
+					goto n728;}
+				n728:
 			} elseif ($this->p > $this->f) {
 				$this->rec(182);
 			}
-			goto k735;
-			f735:
+			goto k725;
+			f725:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n734;
-			k735:
-			n734:
+			goto n724;
+			k725:
+			n724:
 		} elseif ($this->p > $this->f) {
 			$this->rec(141);
 		}
@@ -1212,16 +1230,16 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f731;}
+			goto f721;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k731;
-		f731:
+		goto k721;
+		f721:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k731:
+		k721:
 
 		return true;
 	}
@@ -1270,43 +1288,10 @@ abstract class GeneratedParser
 			case 77:
 			case 78:
 			case 79:
-				// b146
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(146);
-					}
-
-					goto n979;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(119);
-					}
-
-					goto f980;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
-					if (!$this->b138()) {
-						goto n981;}
-					n981:
-				} elseif ($this->p > $this->f) {
-					$this->rec(138);
-				}
-				goto k980;
-				f980:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n979;
-				k980:
-				$this->v[$m2] = $this->reduceDoctrineNestedAnnotation($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a978;
-				n979:
+				if (!$this->b146()) {
+					goto n974;}
+				goto a973;
+				n974:
 				break;
 			case 1:
 			case 2:
@@ -1323,51 +1308,17 @@ abstract class GeneratedParser
 			case 14:
 			case 24:
 				if (!$this->b143()) {
-					goto n982;}
-				goto a978;
-				n982:
-				// b172
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(172);
-					}
-
-					goto n983;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(144);
-					}
-
-					goto f984;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f984;}
-				}
-				goto k984;
-				f984:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n983;
-				k984:
-				$this->v[$m2] = $this->reduceDoctrineIdentifier($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a978;
-				n983:
+					goto n975;}
+				goto a973;
+				n975:
+				if (!$this->b172()) {
+					goto n976;}
+				goto a973;
+				n976:
 				if (!$this->b160()) {
-					goto n985;}
-				goto a978;
-				n985:
+					goto n977;}
+				goto a973;
+				n977:
 				break;
 			case 7:
 			case 15:
@@ -1375,110 +1326,37 @@ abstract class GeneratedParser
 			case 17:
 			case 18:
 				if (!$this->b143()) {
-					goto n986;}
-				goto a978;
-				n986:
-				// b172
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(172);
-					}
-
-					goto n987;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(144);
-					}
-
-					goto f988;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f988;}
-				}
-				goto k988;
-				f988:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n987;
-				k988:
-				$this->v[$m2] = $this->reduceDoctrineIdentifier($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a978;
-				n987:
+					goto n978;}
+				goto a973;
+				n978:
+				if (!$this->b172()) {
+					goto n979;}
+				goto a973;
+				n979:
 				break;
 			case 22:
 			case 23:
-				// b155
-				if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(155);
-					}
-
-					goto n989;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				switch ($this->ids[$this->p]) {
-					default:
-						break;
-					case 22:
-						if (!$this->b156()) {
-							goto n992;}
-						goto a991;
-						n992:
-						break;
-					case 23:
-						$this->v[$this->n++] = $this->token($this->p++);
-						goto a991;
-						break;
-				}
-
-				if ($this->p > $this->f) {
-					$this->rec(155);
-				}
-
-				goto f990;
-				a991:
-				goto k990;
-				f990:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n989;
-				k990:
-				$this->v[$m2] = $this->reduceDoctrineString($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a978;
-				n989:
+				if (!$this->b155()) {
+					goto n980;}
+				goto a973;
+				n980:
 				break;
 			case 38:
 			case 83:
 				if (!$this->b148()) {
-					goto n993;}
-				goto a978;
-				n993:
+					goto n981;}
+				goto a973;
+				n981:
 				break;
 			case 19:
-				$this->v[$this->n++] = $this->reduceDoctrineFloat($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceDoctrineFloat($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a978;
+				goto a973;
 				break;
 			case 20:
-				$this->v[$this->n++] = $this->reduceDoctrineInteger($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceDoctrineInteger($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a978;
+				goto a973;
 				break;
 		}
 
@@ -1486,16 +1364,16 @@ abstract class GeneratedParser
 			$this->rec(142);
 		}
 
-		goto f977;
-		a978:
-		goto k977;
-		f977:
+		goto f972;
+		a973:
+		goto k972;
+		f972:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k977:
-		$this->v[$m1] = $this->reduceDoctrineArgument($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k972:
+		$this->v[$m1] = $this->reduceDoctrineArgument(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -1518,7 +1396,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1290;}
+			goto f1275;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b139
@@ -1532,18 +1410,18 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1292;
+				goto e1277;
 			}
 
 			$this->p++;
 		}
-		e1292:
+		e1277:
 		if (!($this->ids[$this->p] === 46)) {
 			if ($this->p >= $this->f) {
 				$this->rec(69);
 			}
 
-			goto f1290;}
+			goto f1275;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b139
@@ -1557,21 +1435,21 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1294;
+				goto e1279;
 			}
 
 			$this->p++;
 		}
-		e1294:
+		e1279:
 		if (!$this->b145()) {
-			goto f1290;}
-		goto k1290;
-		f1290:
+			goto f1275;}
+		goto k1275;
+		f1275:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1290:
+		k1275:
 
 		return true;
 	}
@@ -1620,43 +1498,10 @@ abstract class GeneratedParser
 			case 77:
 			case 78:
 			case 79:
-				// b146
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(146);
-					}
-
-					goto n1580;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(119);
-					}
-
-					goto f1581;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
-					if (!$this->b138()) {
-						goto n1582;}
-					n1582:
-				} elseif ($this->p > $this->f) {
-					$this->rec(138);
-				}
-				goto k1581;
-				f1581:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1580;
-				k1581:
-				$this->v[$m2] = $this->reduceDoctrineNestedAnnotation($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1579;
-				n1580:
+				if (!$this->b146()) {
+					goto n1558;}
+				goto a1557;
+				n1558:
 				break;
 			case 1:
 			case 2:
@@ -1672,155 +1517,48 @@ abstract class GeneratedParser
 			case 13:
 			case 14:
 			case 24:
-				// b172
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(172);
-					}
-
-					goto n1583;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(144);
-					}
-
-					goto f1584;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1584;}
-				}
-				goto k1584;
-				f1584:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1583;
-				k1584:
-				$this->v[$m2] = $this->reduceDoctrineIdentifier($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1579;
-				n1583:
+				if (!$this->b172()) {
+					goto n1559;}
+				goto a1557;
+				n1559:
 				if (!$this->b160()) {
-					goto n1585;}
-				goto a1579;
-				n1585:
+					goto n1560;}
+				goto a1557;
+				n1560:
 				break;
 			case 7:
 			case 15:
 			case 16:
 			case 17:
 			case 18:
-				// b172
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(172);
-					}
-
-					goto n1586;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(144);
-					}
-
-					goto f1587;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1587;}
-				}
-				goto k1587;
-				f1587:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1586;
-				k1587:
-				$this->v[$m2] = $this->reduceDoctrineIdentifier($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1579;
-				n1586:
+				if (!$this->b172()) {
+					goto n1561;}
+				goto a1557;
+				n1561:
 				break;
 			case 22:
 			case 23:
-				// b155
-				if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(155);
-					}
-
-					goto n1588;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				switch ($this->ids[$this->p]) {
-					default:
-						break;
-					case 22:
-						if (!$this->b156()) {
-							goto n1591;}
-						goto a1590;
-						n1591:
-						break;
-					case 23:
-						$this->v[$this->n++] = $this->token($this->p++);
-						goto a1590;
-						break;
-				}
-
-				if ($this->p > $this->f) {
-					$this->rec(155);
-				}
-
-				goto f1589;
-				a1590:
-				goto k1589;
-				f1589:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1588;
-				k1589:
-				$this->v[$m2] = $this->reduceDoctrineString($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1579;
-				n1588:
+				if (!$this->b155()) {
+					goto n1562;}
+				goto a1557;
+				n1562:
 				break;
 			case 38:
 			case 83:
 				if (!$this->b148()) {
-					goto n1592;}
-				goto a1579;
-				n1592:
+					goto n1563;}
+				goto a1557;
+				n1563:
 				break;
 			case 19:
-				$this->v[$this->n++] = $this->reduceDoctrineFloat($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceDoctrineFloat($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a1579;
+				goto a1557;
 				break;
 			case 20:
-				$this->v[$this->n++] = $this->reduceDoctrineInteger($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceDoctrineInteger($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a1579;
+				goto a1557;
 				break;
 		}
 
@@ -1828,15 +1566,55 @@ abstract class GeneratedParser
 			$this->rec(145);
 		}
 
-		goto f1578;
-		a1579:
-		goto k1578;
-		f1578:
+		goto f1556;
+		a1557:
+		goto k1556;
+		f1556:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1578:
+		k1556:
+
+		return true;
+	}
+
+	private function b146(): bool
+	{
+		if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(146);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(119);
+			}
+
+			goto f1273;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
+			if (!$this->b138()) {
+				goto n1274;}
+			n1274:
+		} elseif ($this->p > $this->f) {
+			$this->rec(138);
+		}
+		goto k1273;
+		f1273:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1273:
+		$this->v[$m1] = $this->reduceDoctrineNestedAnnotation(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
 
 		return true;
 	}
@@ -1858,7 +1636,7 @@ abstract class GeneratedParser
 				$this->rec(149);
 			}
 
-			goto f1300;}
+			goto f1285;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b139
@@ -1872,12 +1650,12 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1302;
+				goto e1287;
 			}
 
 			$this->p++;
 		}
-		e1302:
+		e1287:
 		if (isset(self::T1490fe7f[$this->ids[$this->p]])) {
 			// b151
 			if (!isset(self::T1490fe7f[$this->ids[$this->p]])) {
@@ -1885,13 +1663,13 @@ abstract class GeneratedParser
 					$this->rec(151);
 				}
 
-				goto n1303;}
+				goto n1288;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
 			if (!$this->b152()) {
-				goto f1304;}
+				goto f1289;}
 			// b139
 			$o3 = $this->p;
 			$m3 = $this->n;
@@ -1903,27 +1681,27 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e1306;
+					goto e1291;
 				}
 
 				$this->p++;
 			}
-			e1306:
+			e1291:
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->b176()) {
-					goto n1307;}
-				n1307:
+					goto n1292;}
+				n1292:
 			} elseif ($this->p > $this->f) {
 				$this->rec(176);
 			}
-			goto k1304;
-			f1304:
+			goto k1289;
+			f1289:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1303;
-			k1304:
-			n1303:
+			goto n1288;
+			k1289:
+			n1288:
 		} elseif ($this->p > $this->f) {
 			$this->rec(151);
 		}
@@ -1932,17 +1710,17 @@ abstract class GeneratedParser
 				$this->rec(62);
 			}
 
-			goto f1300;}
+			goto f1285;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k1300;
-		f1300:
+		goto k1285;
+		f1285:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1300:
-		$this->v[$m1] = $this->reduceDoctrineArray($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1285:
+		$this->v[$m1] = $this->reduceDoctrineArray(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -1992,43 +1770,10 @@ abstract class GeneratedParser
 			case 77:
 			case 78:
 			case 79:
-				// b146
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(146);
-					}
-
-					goto n1595;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(119);
-					}
-
-					goto f1596;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
-					if (!$this->b138()) {
-						goto n1597;}
-					n1597:
-				} elseif ($this->p > $this->f) {
-					$this->rec(138);
-				}
-				goto k1596;
-				f1596:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1595;
-				k1596:
-				$this->v[$m2] = $this->reduceDoctrineNestedAnnotation($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1594;
-				n1595:
+				if (!$this->b146()) {
+					goto n1570;}
+				goto a1569;
+				n1570:
 				break;
 			case 1:
 			case 2:
@@ -2045,51 +1790,17 @@ abstract class GeneratedParser
 			case 14:
 			case 24:
 				if (!$this->b153()) {
-					goto n1598;}
-				goto a1594;
-				n1598:
-				// b172
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(172);
-					}
-
-					goto n1599;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(144);
-					}
-
-					goto f1600;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1600;}
-				}
-				goto k1600;
-				f1600:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1599;
-				k1600:
-				$this->v[$m2] = $this->reduceDoctrineIdentifier($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1594;
-				n1599:
+					goto n1571;}
+				goto a1569;
+				n1571:
+				if (!$this->b172()) {
+					goto n1572;}
+				goto a1569;
+				n1572:
 				if (!$this->b160()) {
-					goto n1601;}
-				goto a1594;
-				n1601:
+					goto n1573;}
+				goto a1569;
+				n1573:
 				break;
 			case 7:
 			case 15:
@@ -2097,124 +1808,51 @@ abstract class GeneratedParser
 			case 17:
 			case 18:
 				if (!$this->b153()) {
-					goto n1602;}
-				goto a1594;
-				n1602:
-				// b172
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(172);
-					}
-
-					goto n1603;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(144);
-					}
-
-					goto f1604;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1604;}
-				}
-				goto k1604;
-				f1604:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1603;
-				k1604:
-				$this->v[$m2] = $this->reduceDoctrineIdentifier($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1594;
-				n1603:
+					goto n1574;}
+				goto a1569;
+				n1574:
+				if (!$this->b172()) {
+					goto n1575;}
+				goto a1569;
+				n1575:
 				break;
 			case 22:
 			case 23:
 				if (!$this->b153()) {
-					goto n1605;}
-				goto a1594;
-				n1605:
-				// b155
-				if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(155);
-					}
-
-					goto n1606;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				switch ($this->ids[$this->p]) {
-					default:
-						break;
-					case 22:
-						if (!$this->b156()) {
-							goto n1609;}
-						goto a1608;
-						n1609:
-						break;
-					case 23:
-						$this->v[$this->n++] = $this->token($this->p++);
-						goto a1608;
-						break;
-				}
-
-				if ($this->p > $this->f) {
-					$this->rec(155);
-				}
-
-				goto f1607;
-				a1608:
-				goto k1607;
-				f1607:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1606;
-				k1607:
-				$this->v[$m2] = $this->reduceDoctrineString($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1594;
-				n1606:
+					goto n1576;}
+				goto a1569;
+				n1576:
+				if (!$this->b155()) {
+					goto n1577;}
+				goto a1569;
+				n1577:
 				break;
 			case 38:
 			case 83:
 				if (!$this->b148()) {
-					goto n1610;}
-				goto a1594;
-				n1610:
+					goto n1578;}
+				goto a1569;
+				n1578:
 				break;
 			case 19:
-				$this->v[$this->n++] = $this->reduceDoctrineFloat($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceDoctrineFloat($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a1594;
+				goto a1569;
 				break;
 			case 20:
 				if (!$this->b153()) {
-					goto n1611;}
-				goto a1594;
-				n1611:
-				$this->v[$this->n++] = $this->reduceDoctrineInteger($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+					goto n1579;}
+				goto a1569;
+				n1579:
+				$this->v[$this->n++] = $this->reduceDoctrineInteger($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a1594;
+				goto a1569;
 				break;
 			case 21:
 				if (!$this->b153()) {
-					goto n1612;}
-				goto a1594;
-				n1612:
+					goto n1580;}
+				goto a1569;
+				n1580:
 				break;
 		}
 
@@ -2222,16 +1860,16 @@ abstract class GeneratedParser
 			$this->rec(152);
 		}
 
-		goto f1593;
-		a1594:
-		goto k1593;
-		f1593:
+		goto f1568;
+		a1569:
+		goto k1568;
+		f1568:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1593:
-		$this->v[$m1] = $this->reduceDoctrineArrayItem($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1568:
+		$this->v[$m1] = $this->reduceDoctrineArrayItem(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -2250,7 +1888,7 @@ abstract class GeneratedParser
 		$m1 = $this->n;
 		$cs1 = $this->comments;
 		if (!$this->b154()) {
-			goto f1735;}
+			goto f1706;}
 		// b139
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -2262,18 +1900,18 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1737;
+				goto e1708;
 			}
 
 			$this->p++;
 		}
-		e1737:
+		e1708:
 		if (!isset(self::Ta7068161[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(171);
 			}
 
-			goto f1735;}
+			goto f1706;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b139
@@ -2287,21 +1925,21 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1739;
+				goto e1710;
 			}
 
 			$this->p++;
 		}
-		e1739:
+		e1710:
 		if (!$this->b145()) {
-			goto f1735;}
-		goto k1735;
-		f1735:
+			goto f1706;}
+		goto k1706;
+		f1706:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1735:
+		k1706:
 
 		return true;
 	}
@@ -2336,16 +1974,16 @@ abstract class GeneratedParser
 			case 14:
 			case 24:
 				if (!$this->b160()) {
-					goto n1780;}
-				goto a1779;
-				n1780:
+					goto n1751;}
+				goto a1750;
+				n1751:
 				// b169
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(169);
 					}
 
-					goto n1781;}
+					goto n1752;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -2355,7 +1993,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1782;}
+					goto f1753;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -2364,17 +2002,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1782;}
+						goto f1753;}
 				}
-				goto k1782;
-				f1782:
+				goto k1753;
+				f1753:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1781;
-				k1782:
-				goto a1779;
-				n1781:
+				goto n1752;
+				k1753:
+				goto a1750;
+				n1752:
 				break;
 			case 7:
 			case 15:
@@ -2387,7 +2025,7 @@ abstract class GeneratedParser
 						$this->rec(169);
 					}
 
-					goto n1783;}
+					goto n1754;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -2397,7 +2035,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1784;}
+					goto f1755;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -2406,71 +2044,32 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1784;}
+						goto f1755;}
 				}
-				goto k1784;
-				f1784:
+				goto k1755;
+				f1755:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1783;
-				k1784:
-				goto a1779;
-				n1783:
+				goto n1754;
+				k1755:
+				goto a1750;
+				n1754:
 				break;
 			case 22:
 			case 23:
-				// b155
-				if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(155);
-					}
-
-					goto n1785;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				switch ($this->ids[$this->p]) {
-					default:
-						break;
-					case 22:
-						if (!$this->b156()) {
-							goto n1788;}
-						goto a1787;
-						n1788:
-						break;
-					case 23:
-						$this->v[$this->n++] = $this->token($this->p++);
-						goto a1787;
-						break;
-				}
-
-				if ($this->p > $this->f) {
-					$this->rec(155);
-				}
-
-				goto f1786;
-				a1787:
-				goto k1786;
-				f1786:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1785;
-				k1786:
-				$this->v[$m2] = $this->reduceDoctrineString($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a1779;
-				n1785:
+				if (!$this->b155()) {
+					goto n1756;}
+				goto a1750;
+				n1756:
 				break;
 			case 20:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1779;
+				goto a1750;
 				break;
 			case 21:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1779;
+				goto a1750;
 				break;
 		}
 
@@ -2478,16 +2077,62 @@ abstract class GeneratedParser
 			$this->rec(154);
 		}
 
-		goto f1778;
-		a1779:
-		goto k1778;
-		f1778:
+		goto f1749;
+		a1750:
+		goto k1749;
+		f1749:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1778:
-		$this->v[$m1] = $this->reduceDoctrineArrayKey($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1749:
+		$this->v[$m1] = $this->reduceDoctrineArrayKey(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b155(): bool
+	{
+		if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(155);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				break;
+			case 22:
+				if (!$this->b156()) {
+					goto n1284;}
+				goto a1283;
+				n1284:
+				break;
+			case 23:
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto a1283;
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(155);
+		}
+
+		goto f1282;
+		a1283:
+		goto k1282;
+		f1282:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1282:
+		$this->v[$m1] = $this->reduceDoctrineString(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -2510,7 +2155,7 @@ abstract class GeneratedParser
 				$this->rec(44);
 			}
 
-			goto f1296;}
+			goto f1564;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
@@ -2520,7 +2165,7 @@ abstract class GeneratedParser
 					$this->rec(158);
 				}
 
-				goto n1297;}
+				goto n1565;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -2533,36 +2178,36 @@ abstract class GeneratedParser
 						$this->rec(159);
 					}
 
-					goto e1299;
+					goto e1567;
 				}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 
 				$k2++;
 			}
-			e1299:
+			e1567:
 
 			if ($k2 < 1) {
-				goto f1298;
+				goto f1566;
 			}
-			goto k1298;
-			f1298:
+			goto k1566;
+			f1566:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1297;
-			k1298:
-			n1297:
+			goto n1565;
+			k1566:
+			n1565:
 		} elseif ($this->p > $this->f) {
 			$this->rec(158);
 		}
-		goto k1296;
-		f1296:
+		goto k1564;
+		f1564:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1296:
+		k1564:
 
 		return true;
 	}
@@ -2585,14 +2230,14 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f1295;}
+				goto f1281;}
 		}
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(144);
 			}
 
-			goto f1295;}
+			goto f1281;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!($this->ids[$this->p] === 43)) {
@@ -2600,19 +2245,19 @@ abstract class GeneratedParser
 				$this->rec(66);
 			}
 
-			goto f1295;}
+			goto f1281;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b163()) {
-			goto f1295;}
-		goto k1295;
-		f1295:
+			goto f1281;}
+		goto k1281;
+		f1281:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1295:
-		$this->v[$m1] = $this->reduceDoctrineConstantFetch($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1281:
+		$this->v[$m1] = $this->reduceDoctrineConstantFetch(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -2658,7 +2303,7 @@ abstract class GeneratedParser
 						$this->rec(166);
 					}
 
-					goto n709;}
+					goto n693;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -2668,25 +2313,25 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f710;}
+					goto f694;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (isset(self::T4d756b3a[$this->ids[$this->p]])) {
 					if (!$this->b168()) {
-						goto n711;}
-					n711:
+						goto n695;}
+					n695:
 				} elseif ($this->p > $this->f) {
 					$this->rec(168);
 				}
-				goto k710;
-				f710:
+				goto k694;
+				f694:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n709;
-				k710:
-				goto a708;
-				n709:
+				goto n693;
+				k694:
+				goto a692;
+				n693:
 				break;
 			case 50:
 				// b164
@@ -2695,7 +2340,7 @@ abstract class GeneratedParser
 						$this->rec(164);
 					}
 
-					goto n712;}
+					goto n696;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -2705,29 +2350,29 @@ abstract class GeneratedParser
 						$this->rec(71);
 					}
 
-					goto f713;}
+					goto f697;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
 					if (!$this->b166()) {
-						goto n714;}
-					n714:
+						goto n698;}
+					n698:
 				} elseif ($this->p > $this->f) {
 					$this->rec(166);
 				}
-				goto k713;
-				f713:
+				goto k697;
+				f697:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n712;
-				k713:
-				goto a708;
-				n712:
+				goto n696;
+				k697:
+				goto a692;
+				n696:
 				break;
 			case 85:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a708;
+				goto a692;
 				break;
 		}
 
@@ -2735,15 +2380,15 @@ abstract class GeneratedParser
 			$this->rec(163);
 		}
 
-		goto f707;
-		a708:
-		goto k707;
-		f707:
+		goto f691;
+		a692:
+		goto k691;
+		f691:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k707:
+		k691:
 
 		return true;
 	}
@@ -2765,23 +2410,23 @@ abstract class GeneratedParser
 				$this->rec(71);
 			}
 
-			goto f1286;}
+			goto f1269;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T83e30518[$this->ids[$this->p]])) {
 			if (!$this->b166()) {
-				goto n1287;}
-			n1287:
+				goto n1270;}
+			n1270:
 		} elseif ($this->p > $this->f) {
 			$this->rec(166);
 		}
-		goto k1286;
-		f1286:
+		goto k1269;
+		f1269:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1286:
+		k1269:
 
 		return true;
 	}
@@ -2803,23 +2448,23 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f952;}
+			goto f947;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T4d756b3a[$this->ids[$this->p]])) {
 			if (!$this->b168()) {
-				goto n953;}
-			n953:
+				goto n948;}
+			n948:
 		} elseif ($this->p > $this->f) {
 			$this->rec(168);
 		}
-		goto k952;
-		f952:
+		goto k947;
+		f947:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k952:
+		k947:
 
 		return true;
 	}
@@ -2841,13 +2486,13 @@ abstract class GeneratedParser
 				break;
 			case 50:
 				if (!$this->b164()) {
-					goto n951;}
-				goto a950;
-				n951:
+					goto n946;}
+				goto a945;
+				n946:
 				break;
 			case 85:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a950;
+				goto a945;
 				break;
 		}
 
@@ -2855,15 +2500,56 @@ abstract class GeneratedParser
 			$this->rec(168);
 		}
 
-		goto f949;
-		a950:
-		goto k949;
-		f949:
+		goto f944;
+		a945:
+		goto k944;
+		f944:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k949:
+		k944:
+
+		return true;
+	}
+
+	private function b172(): bool
+	{
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(172);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(144);
+			}
+
+			goto f1280;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (($this->ids[$this->p] === 43)) {
+			if (($this->ids[$this->p] === 43)) {
+				if ($this->p > $this->f) {
+					$this->f = $this->p;
+					$this->er = [];
+				}
+				goto f1280;}
+		}
+		goto k1280;
+		f1280:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1280:
+		$this->v[$m1] = $this->reduceDoctrineIdentifier(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
 
 		return true;
 	}
@@ -2888,7 +2574,7 @@ abstract class GeneratedParser
 					$this->rec(177);
 				}
 
-				goto e1614;
+				goto e1582;
 			}
 
 			// b177
@@ -2897,7 +2583,7 @@ abstract class GeneratedParser
 					$this->rec(177);
 				}
 
-				goto e1614;}
+				goto e1582;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -2907,7 +2593,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1615;}
+				goto f1583;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			// b139
@@ -2921,40 +2607,40 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e1617;
+					goto e1585;
 				}
 
 				$this->p++;
 			}
-			e1617:
+			e1585:
 			if (!$this->b178()) {
-				goto f1615;}
-			goto k1615;
-			f1615:
+				goto f1583;}
+			goto k1583;
+			f1583:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto e1614;
-			k1615:
+			goto e1582;
+			k1583:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1614;
+				goto e1582;
 			}
 
 			$k1++;
 		}
-		e1614:
+		e1582:
 
 		if ($k1 < 1) {
-			goto f1613;
+			goto f1581;
 		}
-		goto k1613;
-		f1613:
+		goto k1581;
+		f1581:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1613:
+		k1581:
 
 		return true;
 	}
@@ -2972,13 +2658,13 @@ abstract class GeneratedParser
 						$this->rec(180);
 					}
 
-					goto n1742;}
+					goto n1713;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b152()) {
-					goto f1743;}
+					goto f1714;}
 				// b139
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -2990,21 +2676,21 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1745;
+						goto e1716;
 					}
 
 					$this->p++;
 				}
-				e1745:
-				goto k1743;
-				f1743:
+				e1716:
+				goto k1714;
+				f1714:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1742;
-				k1743:
-				goto a1741;
-				n1742:
+				goto n1713;
+				k1714:
+				goto a1712;
+				n1713:
 				break;
 			case 0:
 			case 25:
@@ -3045,9 +2731,9 @@ abstract class GeneratedParser
 						$this->rec(62);
 					}
 
-					goto n1746;}
-				goto a1741;
-				n1746:
+					goto n1717;}
+				goto a1712;
+				n1717:
 				break;
 		}
 
@@ -3055,15 +2741,15 @@ abstract class GeneratedParser
 			$this->rec(178);
 		}
 
-		goto f1740;
-		a1741:
-		goto k1740;
-		f1740:
+		goto f1711;
+		a1712:
+		goto k1711;
+		f1711:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1740:
+		k1711:
 
 		return true;
 	}
@@ -3088,7 +2774,7 @@ abstract class GeneratedParser
 					$this->rec(183);
 				}
 
-				goto e995;
+				goto e983;
 			}
 
 			// b183
@@ -3097,7 +2783,7 @@ abstract class GeneratedParser
 					$this->rec(183);
 				}
 
-				goto e995;}
+				goto e983;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -3107,7 +2793,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f996;}
+				goto f984;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			// b139
@@ -3121,40 +2807,40 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e998;
+					goto e986;
 				}
 
 				$this->p++;
 			}
-			e998:
+			e986:
 			if (!$this->b184()) {
-				goto f996;}
-			goto k996;
-			f996:
+				goto f984;}
+			goto k984;
+			f984:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto e995;
-			k996:
+			goto e983;
+			k984:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e995;
+				goto e983;
 			}
 
 			$k1++;
 		}
-		e995:
+		e983:
 
 		if ($k1 < 1) {
-			goto f994;
+			goto f982;
 		}
-		goto k994;
-		f994:
+		goto k982;
+		f982:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k994:
+		k982:
 
 		return true;
 	}
@@ -3172,13 +2858,13 @@ abstract class GeneratedParser
 						$this->rec(186);
 					}
 
-					goto n1310;}
+					goto n1295;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b142()) {
-					goto f1311;}
+					goto f1296;}
 				// b139
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -3190,21 +2876,21 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1313;
+						goto e1298;
 					}
 
 					$this->p++;
 				}
-				e1313:
-				goto k1311;
-				f1311:
+				e1298:
+				goto k1296;
+				f1296:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1310;
-				k1311:
-				goto a1309;
-				n1310:
+				goto n1295;
+				k1296:
+				goto a1294;
+				n1295:
 				break;
 			case 0:
 			case 21:
@@ -3246,9 +2932,9 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto n1314;}
-				goto a1309;
-				n1314:
+					goto n1299;}
+				goto a1294;
+				n1299:
 				break;
 		}
 
@@ -3256,15 +2942,15 @@ abstract class GeneratedParser
 			$this->rec(184);
 		}
 
-		goto f1308;
-		a1309:
-		goto k1308;
-		f1308:
+		goto f1293;
+		a1294:
+		goto k1293;
+		f1293:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1308:
+		k1293:
 
 		return true;
 	}
@@ -3286,11 +2972,11 @@ abstract class GeneratedParser
 				$this->rec(12);
 			}
 
-			goto f472;}
+			goto f447;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b138()) {
-			goto f472;}
+			goto f447;}
 		// b19
 		$o2 = $this->p;
 		// s19
@@ -3304,27 +2990,27 @@ abstract class GeneratedParser
 					$this->rec(21);
 				}
 
-				goto e476;
+				goto e451;
 			}
 
 			$this->p++;
 		}
-		e476:
+		e451:
 		if (!$this->s74()) {
-			goto f474;}
-		goto k474;
-		f474:
+			goto f449;}
+		goto k449;
+		f449:
 		$this->p = $o3;
-		goto f472;
-		k474:
-		$this->v[$this->n++] = $this->reduceDoctrineText($this->context($o2));
-		goto k472;
-		f472:
+		goto f447;
+		k449:
+		$this->v[$this->n++] = $this->reduceDoctrineText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k447;
+		f447:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k472:
+		k447:
 
 		return true;
 	}
@@ -3336,40 +3022,8 @@ abstract class GeneratedParser
 		$cs1 = $this->comments;
 		switch ($this->ids[$this->p]) {
 			default:
-				// b455
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f34;}
-				}
-				// b457
-				$o3 = $this->p;
-				$m3 = $this->n;
-				$cs3 = $this->comments;
-				if (!$this->b125()) {
-					goto f35;}
-				goto k35;
-				f35:
-				$this->p = $o3;
-				$this->n = $m3;
-				$this->comments = $cs3;
-				goto f34;
-				k35:
-				$this->v[$m3] = $this->reduceTextChild($this->context($o3), $this->n === $m3 + 1 && !\is_array($this->v[$m3]) ? [$this->v[$m3]] : $this->merge($m3));
-				$this->n = $m3 + 1;
-				goto k34;
-				f34:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n33;
-				k34:
+				if (!$this->b455()) {
+					goto n33;}
 				goto a32;
 				n33:
 				break;
@@ -3399,156 +3053,30 @@ abstract class GeneratedParser
 			case 74:
 			case 75:
 				if (!$this->b190()) {
+					goto n34;}
+				goto a32;
+				n34:
+				if (!$this->b454()) {
+					goto n35;}
+				goto a32;
+				n35:
+				if (!$this->b455()) {
 					goto n36;}
 				goto a32;
 				n36:
-				// b454
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(454);
-					}
-
-					goto n37;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(119);
-					}
-
-					goto f38;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				// b125
-				$o3 = $this->p;
-				if (!$this->s125()) {
-					goto f38;}
-				$this->v[$this->n++] = $this->reduceText($this->context($o3));
-				goto k38;
-				f38:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n37;
-				k38:
-				$this->v[$m2] = $this->reduceInvalidTag($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a32;
-				n37:
-				// b455
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f41;}
-				}
-				// b457
-				$o3 = $this->p;
-				$m3 = $this->n;
-				$cs3 = $this->comments;
-				if (!$this->b125()) {
-					goto f42;}
-				goto k42;
-				f42:
-				$this->p = $o3;
-				$this->n = $m3;
-				$this->comments = $cs3;
-				goto f41;
-				k42:
-				$this->v[$m3] = $this->reduceTextChild($this->context($o3), $this->n === $m3 + 1 && !\is_array($this->v[$m3]) ? [$this->v[$m3]] : $this->merge($m3));
-				$this->n = $m3 + 1;
-				goto k41;
-				f41:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n40;
-				k41:
-				goto a32;
-				n40:
 				break;
 			case 76:
 			case 77:
 			case 78:
 			case 79:
-				// b454
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(454);
-					}
-
-					goto n43;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(119);
-					}
-
-					goto f44;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				// b125
-				$o3 = $this->p;
-				if (!$this->s125()) {
-					goto f44;}
-				$this->v[$this->n++] = $this->reduceText($this->context($o3));
-				goto k44;
-				f44:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n43;
-				k44:
-				$this->v[$m2] = $this->reduceInvalidTag($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
+				if (!$this->b454()) {
+					goto n37;}
 				goto a32;
-				n43:
-				// b455
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-					if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f47;}
-				}
-				// b457
-				$o3 = $this->p;
-				$m3 = $this->n;
-				$cs3 = $this->comments;
-				if (!$this->b125()) {
-					goto f48;}
-				goto k48;
-				f48:
-				$this->p = $o3;
-				$this->n = $m3;
-				$this->comments = $cs3;
-				goto f47;
-				k48:
-				$this->v[$m3] = $this->reduceTextChild($this->context($o3), $this->n === $m3 + 1 && !\is_array($this->v[$m3]) ? [$this->v[$m3]] : $this->merge($m3));
-				$this->n = $m3 + 1;
-				goto k47;
-				f47:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n46;
-				k47:
+				n37:
+				if (!$this->b455()) {
+					goto n38;}
 				goto a32;
-				n46:
+				n38:
 				break;
 		}
 
@@ -3586,33 +3114,33 @@ abstract class GeneratedParser
 				break;
 			case 51:
 				if (!$this->b402()) {
-					goto n65;}
-				goto a64;
-				n65:
+					goto n55;}
+				goto a54;
+				n55:
 				break;
 			case 52:
 				if (!$this->b405()) {
-					goto n66;}
-				goto a64;
-				n66:
+					goto n56;}
+				goto a54;
+				n56:
 				break;
 			case 53:
 				if (!$this->b406()) {
-					goto n67;}
-				goto a64;
-				n67:
+					goto n57;}
+				goto a54;
+				n57:
 				break;
 			case 54:
 				if (!$this->b404()) {
-					goto n68;}
-				goto a64;
-				n68:
+					goto n58;}
+				goto a54;
+				n58:
 				break;
 			case 55:
 				if (!$this->b401()) {
-					goto n69;}
-				goto a64;
-				n69:
+					goto n59;}
+				goto a54;
+				n59:
 				break;
 			case 56:
 				// b395
@@ -3621,7 +3149,7 @@ abstract class GeneratedParser
 						$this->rec(395);
 					}
 
-					goto n70;}
+					goto n60;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3631,7 +3159,7 @@ abstract class GeneratedParser
 						$this->rec(95);
 					}
 
-					goto f71;}
+					goto f61;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -3640,31 +3168,31 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f71;}
+					goto f61;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f72;}
+					goto f62;}
 				if (!$this->b388()) {
-					goto f72;}
-				goto k72;
-				f72:
+					goto f62;}
+				goto k62;
+				f62:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f71;
-				k72:
-				goto k71;
-				f71:
+				goto f61;
+				k62:
+				goto k61;
+				f61:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n70;
-				k71:
-				goto a64;
-				n70:
+				goto n60;
+				k61:
+				goto a54;
+				n60:
 				break;
 			case 57:
 				// b394
@@ -3673,7 +3201,7 @@ abstract class GeneratedParser
 						$this->rec(394);
 					}
 
-					goto n73;}
+					goto n63;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3683,7 +3211,7 @@ abstract class GeneratedParser
 						$this->rec(94);
 					}
 
-					goto f74;}
+					goto f64;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -3692,43 +3220,43 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f74;}
+					goto f64;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f75;}
+					goto f65;}
 				if (!$this->b388()) {
-					goto f75;}
-				goto k75;
-				f75:
+					goto f65;}
+				goto k65;
+				f65:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f74;
-				k75:
-				goto k74;
-				f74:
+				goto f64;
+				k65:
+				goto k64;
+				f64:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n73;
-				k74:
-				goto a64;
-				n73:
+				goto n63;
+				k64:
+				goto a54;
+				n63:
 				break;
 			case 58:
 				if (!$this->b443()) {
-					goto n76;}
-				goto a64;
-				n76:
+					goto n66;}
+				goto a54;
+				n66:
 				break;
 			case 59:
 				if (!$this->b446()) {
-					goto n77;}
-				goto a64;
-				n77:
+					goto n67;}
+				goto a54;
+				n67:
 				break;
 			case 60:
 				// b397
@@ -3737,7 +3265,7 @@ abstract class GeneratedParser
 						$this->rec(397);
 					}
 
-					goto n78;}
+					goto n68;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3747,7 +3275,7 @@ abstract class GeneratedParser
 						$this->rec(107);
 					}
 
-					goto f79;}
+					goto f69;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -3756,31 +3284,31 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f79;}
+					goto f69;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f80;}
+					goto f70;}
 				if (!$this->b388()) {
-					goto f80;}
-				goto k80;
-				f80:
+					goto f70;}
+				goto k70;
+				f70:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f79;
-				k80:
-				goto k79;
-				f79:
+				goto f69;
+				k70:
+				goto k69;
+				f69:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n78;
-				k79:
-				goto a64;
-				n78:
+				goto n68;
+				k69:
+				goto a54;
+				n68:
 				break;
 			case 61:
 				// b396
@@ -3789,7 +3317,7 @@ abstract class GeneratedParser
 						$this->rec(396);
 					}
 
-					goto n81;}
+					goto n71;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3799,7 +3327,7 @@ abstract class GeneratedParser
 						$this->rec(96);
 					}
 
-					goto f82;}
+					goto f72;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -3808,49 +3336,49 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f82;}
+					goto f72;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f83;}
+					goto f73;}
 				if (!$this->b388()) {
-					goto f83;}
-				goto k83;
-				f83:
+					goto f73;}
+				goto k73;
+				f73:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f82;
-				k83:
-				goto k82;
-				f82:
+				goto f72;
+				k73:
+				goto k72;
+				f72:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n81;
-				k82:
-				goto a64;
-				n81:
+				goto n71;
+				k72:
+				goto a54;
+				n71:
 				break;
 			case 62:
 				if (!$this->b436()) {
-					goto n84;}
-				goto a64;
-				n84:
+					goto n74;}
+				goto a54;
+				n74:
 				break;
 			case 63:
 				if (!$this->b398()) {
-					goto n85;}
-				goto a64;
-				n85:
+					goto n75;}
+				goto a54;
+				n75:
 				break;
 			case 64:
 				if (!$this->b439()) {
-					goto n86;}
-				goto a64;
-				n86:
+					goto n76;}
+				goto a54;
+				n76:
 				break;
 			case 65:
 				// b407
@@ -3859,7 +3387,7 @@ abstract class GeneratedParser
 						$this->rec(407);
 					}
 
-					goto n87;}
+					goto n77;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3869,45 +3397,45 @@ abstract class GeneratedParser
 						$this->rec(97);
 					}
 
-					goto f88;}
+					goto f78;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b125
 				$o3 = $this->p;
 				if (!$this->s125()) {
-					goto f88;}
-				$this->v[$this->n++] = $this->reduceText($this->context($o3));
-				goto k88;
-				f88:
+					goto f78;}
+				$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+				goto k78;
+				f78:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n87;
-				k88:
-				goto a64;
-				n87:
+				goto n77;
+				k78:
+				goto a54;
+				n77:
 				break;
 			case 66:
 				if (!$this->b441()) {
-					goto n90;}
-				goto a64;
-				n90:
+					goto n80;}
+				goto a54;
+				n80:
 				if (!$this->b442()) {
-					goto n91;}
-				goto a64;
-				n91:
+					goto n81;}
+				goto a54;
+				n81:
 				break;
 			case 67:
 				if (!$this->b400()) {
-					goto n92;}
-				goto a64;
-				n92:
+					goto n82;}
+				goto a54;
+				n82:
 				break;
 			case 68:
 				if (!$this->b437()) {
-					goto n93;}
-				goto a64;
-				n93:
+					goto n83;}
+				goto a54;
+				n83:
 				break;
 			case 69:
 				// b408
@@ -3916,7 +3444,7 @@ abstract class GeneratedParser
 						$this->rec(408);
 					}
 
-					goto n94;}
+					goto n84;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3926,20 +3454,20 @@ abstract class GeneratedParser
 						$this->rec(99);
 					}
 
-					goto f95;}
+					goto f85;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b409()) {
-					goto f95;}
-				goto k95;
-				f95:
+					goto f85;}
+				goto k85;
+				f85:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n94;
-				k95:
-				goto a64;
-				n94:
+				goto n84;
+				k85:
+				goto a54;
+				n84:
 				break;
 			case 70:
 				// b390
@@ -3948,7 +3476,7 @@ abstract class GeneratedParser
 						$this->rec(390);
 					}
 
-					goto n96;}
+					goto n86;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -3958,7 +3486,7 @@ abstract class GeneratedParser
 						$this->rec(91);
 					}
 
-					goto f97;}
+					goto f87;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -3967,31 +3495,31 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f97;}
+					goto f87;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f98;}
+					goto f88;}
 				if (!$this->b388()) {
-					goto f98;}
-				goto k98;
-				f98:
+					goto f88;}
+				goto k88;
+				f88:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f97;
-				k98:
-				goto k97;
-				f97:
+				goto f87;
+				k88:
+				goto k87;
+				f87:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n96;
-				k97:
-				goto a64;
-				n96:
+				goto n86;
+				k87:
+				goto a54;
+				n86:
 				break;
 			case 71:
 				// b392
@@ -4000,7 +3528,7 @@ abstract class GeneratedParser
 						$this->rec(392);
 					}
 
-					goto n99;}
+					goto n89;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4010,7 +3538,7 @@ abstract class GeneratedParser
 						$this->rec(92);
 					}
 
-					goto f100;}
+					goto f90;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -4019,63 +3547,37 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f100;}
+					goto f90;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f101;}
+					goto f91;}
 				if (!$this->b388()) {
-					goto f101;}
-				goto k101;
-				f101:
+					goto f91;}
+				goto k91;
+				f91:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f100;
-				k101:
-				goto k100;
-				f100:
+				goto f90;
+				k91:
+				goto k90;
+				f90:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n99;
-				k100:
-				goto a64;
-				n99:
+				goto n89;
+				k90:
+				goto a54;
+				n89:
 				break;
 			case 72:
-				// b191
-				if (!($this->ids[$this->p] === 72)) {
-					if ($this->p > $this->f) {
-						$this->rec(191);
-					}
-
-					goto n102;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!($this->ids[$this->p] === 72)) {
-					if ($this->p >= $this->f) {
-						$this->rec(84);
-					}
-
-					goto f103;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (!$this->b192()) {
-					goto f103;}
-				goto k103;
-				f103:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n102;
-				k103:
-				goto a64;
-				n102:
+				if (!$this->b191()) {
+					goto n92;}
+				goto a54;
+				n92:
 				break;
 			case 73:
 				// b393
@@ -4084,7 +3586,7 @@ abstract class GeneratedParser
 						$this->rec(393);
 					}
 
-					goto n104;}
+					goto n93;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4094,7 +3596,7 @@ abstract class GeneratedParser
 						$this->rec(93);
 					}
 
-					goto f105;}
+					goto f94;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b391
@@ -4103,71 +3605,43 @@ abstract class GeneratedParser
 						$this->rec(391);
 					}
 
-					goto f105;}
+					goto f94;}
 
 				$o3 = $this->p;
 				$m3 = $this->n;
 				$cs3 = $this->comments;
 				if (!$this->b199()) {
-					goto f106;}
+					goto f95;}
 				if (!$this->b388()) {
-					goto f106;}
-				goto k106;
-				f106:
+					goto f95;}
+				goto k95;
+				f95:
 				$this->p = $o3;
 				$this->n = $m3;
 				$this->comments = $cs3;
-				goto f105;
-				k106:
-				goto k105;
-				f105:
+				goto f94;
+				k95:
+				goto k94;
+				f94:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n104;
-				k105:
-				goto a64;
-				n104:
+				goto n93;
+				k94:
+				goto a54;
+				n93:
 				break;
 			case 74:
 				if (!$this->b440()) {
-					goto n107;}
-				goto a64;
-				n107:
+					goto n96;}
+				goto a54;
+				n96:
 				break;
 			case 75:
-				// b384
-				if (!($this->ids[$this->p] === 75)) {
-					if ($this->p > $this->f) {
-						$this->rec(384);
-					}
-
-					goto n108;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!($this->ids[$this->p] === 75)) {
-					if ($this->p >= $this->f) {
-						$this->rec(90);
-					}
-
-					goto f109;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (!$this->b199()) {
-					goto f109;}
-				if (!$this->b385()) {
-					goto f109;}
-				goto k109;
-				f109:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n108;
-				k109:
-				goto a64;
-				n108:
+				if (!$this->b384()) {
+					goto n97;}
+				goto a54;
+				n97:
 				break;
 		}
 
@@ -4175,17 +3649,50 @@ abstract class GeneratedParser
 			$this->rec(190);
 		}
 
-		goto f63;
-		a64:
-		goto k63;
-		f63:
+		goto f53;
+		a54:
+		goto k53;
+		f53:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k63:
-		$this->v[$m1] = $this->reduceKnownTag($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k53:
+		$this->v[$m1] = $this->reduceKnownTag(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b191(): bool
+	{
+		if (!($this->ids[$this->p] === 72)) {
+			if ($this->p > $this->f) {
+				$this->rec(191);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 72)) {
+			if ($this->p >= $this->f) {
+				$this->rec(84);
+			}
+
+			goto f295;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (!$this->b192()) {
+			goto f295;}
+		goto k295;
+		f295:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k295:
 
 		return true;
 	}
@@ -4233,17 +3740,17 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->b198()) {
-					goto n311;}
-				goto a310;
-				n311:
+					goto n544;}
+				goto a543;
+				n544:
 				break;
 			case 26:
 			case 27:
 			case 42:
 				if (!$this->b193()) {
-					goto n312;}
-				goto a310;
-				n312:
+					goto n545;}
+				goto a543;
+				n545:
 				break;
 		}
 
@@ -4251,15 +3758,15 @@ abstract class GeneratedParser
 			$this->rec(192);
 		}
 
-		goto f309;
-		a310:
-		goto k309;
-		f309:
+		goto f542;
+		a543:
+		goto k542;
+		f542:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k309:
+		k542:
 
 		return true;
 	}
@@ -4281,7 +3788,7 @@ abstract class GeneratedParser
 				$this->rec(195);
 			}
 
-			goto f566;}
+			goto f795;}
 		if (($this->ids[$this->p] === 27)) {
 			$this->v[$this->n++] = $this->token($this->p++);
 		} elseif ($this->p >= $this->f) {
@@ -4297,21 +3804,21 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f566;}
+			goto f795;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o2 = $this->p;
 		if (!$this->s125()) {
-			goto f566;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o2));
-		goto k566;
-		f566:
+			goto f795;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k795;
+		f795:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k566:
+		k795:
 
 		return true;
 	}
@@ -4329,7 +3836,7 @@ abstract class GeneratedParser
 		$m1 = $this->n;
 		$cs1 = $this->comments;
 		if (!$this->b199()) {
-			goto f564;}
+			goto f793;}
 		if (($this->ids[$this->p] === 27)) {
 			$this->v[$this->n++] = $this->token($this->p++);
 		} elseif ($this->p >= $this->f) {
@@ -4345,21 +3852,21 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f564;}
+			goto f793;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o2 = $this->p;
 		if (!$this->s125()) {
-			goto f564;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o2));
-		goto k564;
-		f564:
+			goto f793;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k793;
+		f793:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k564:
+		k793:
 
 		return true;
 	}
@@ -4411,24 +3918,24 @@ abstract class GeneratedParser
 						$this->rec(367);
 					}
 
-					goto n172;}
+					goto n160;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b201()) {
-					goto f173;}
+					goto f161;}
 				if (!$this->b368()) {
-					goto f173;}
-				goto k173;
-				f173:
+					goto f161;}
+				goto k161;
+				f161:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n172;
-				k173:
-				goto a171;
-				n172:
+				goto n160;
+				k161:
+				goto a159;
+				n160:
 				break;
 			case 30:
 				// b200
@@ -4437,7 +3944,7 @@ abstract class GeneratedParser
 						$this->rec(200);
 					}
 
-					goto n174;}
+					goto n162;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4447,22 +3954,22 @@ abstract class GeneratedParser
 						$this->rec(51);
 					}
 
-					goto f175;}
+					goto f163;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b201()) {
-					goto f175;}
-				goto k175;
-				f175:
+					goto f163;}
+				goto k163;
+				f163:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n174;
-				k175:
-				$this->v[$m2] = $this->reduceNullable($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
+				goto n162;
+				k163:
+				$this->v[$m2] = $this->reduceNullable(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
 				$this->n = $m2 + 1;
-				goto a171;
-				n174:
+				goto a159;
+				n162:
 				break;
 		}
 
@@ -4470,16 +3977,16 @@ abstract class GeneratedParser
 			$this->rec(199);
 		}
 
-		goto f170;
-		a171:
-		goto k170;
-		f170:
+		goto f158;
+		a159:
+		goto k158;
+		f158:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k170:
-		$this->v[$m1] = $this->reduceType($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k158:
+		$this->v[$m1] = $this->reduceType(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -4520,7 +4027,7 @@ abstract class GeneratedParser
 						$this->rec(366);
 					}
 
-					goto n368;}
+					goto n342;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4530,7 +4037,7 @@ abstract class GeneratedParser
 						$this->rec(332);
 					}
 
-					goto f369;}
+					goto f343;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -4539,26 +4046,26 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f369;}
+						goto f343;}
 				}
 				if (!$this->b281()) {
-					goto f369;}
-				goto k369;
-				f369:
+					goto f343;}
+				goto k343;
+				f343:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n368;
-				k369:
-				goto a367;
-				n368:
+				goto n342;
+				k343:
+				goto a341;
+				n342:
 				// b333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n370;}
+					goto n344;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4576,19 +4083,19 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f371;}
+						goto f345;}
 				}
 				if (!$this->b335()) {
-					goto f371;}
-				goto k371;
-				f371:
+					goto f345;}
+				goto k345;
+				f345:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n370;
-				k371:
-				goto a367;
-				n370:
+				goto n344;
+				k345:
+				goto a341;
+				n344:
 				break;
 			case 19:
 			case 20:
@@ -4600,7 +4107,7 @@ abstract class GeneratedParser
 						$this->rec(333);
 					}
 
-					goto n373;}
+					goto n347;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4618,34 +4125,34 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f374;}
+						goto f348;}
 				}
 				if (!$this->b335()) {
-					goto f374;}
-				goto k374;
-				f374:
+					goto f348;}
+				goto k348;
+				f348:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n373;
-				k374:
-				goto a367;
-				n373:
+				goto n347;
+				k348:
+				goto a341;
+				n347:
 				break;
 			case 3:
 			case 4:
 			case 8:
 				if (!$this->b255()) {
-					goto n376;}
-				goto a367;
-				n376:
+					goto n350;}
+				goto a341;
+				n350:
 				// b278
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(278);
 					}
 
-					goto n377;}
+					goto n351;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4655,7 +4162,7 @@ abstract class GeneratedParser
 						$this->rec(279);
 					}
 
-					goto f378;}
+					goto f352;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -4664,7 +4171,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f378;}
+						goto f352;}
 				}
 				if (($this->ids[$this->p] === 38)) {
 					if (($this->ids[$this->p] === 38)) {
@@ -4672,26 +4179,26 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f378;}
+						goto f352;}
 				}
 				if (!$this->b281()) {
-					goto f378;}
-				goto k378;
-				f378:
+					goto f352;}
+				goto k352;
+				f352:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n377;
-				k378:
-				goto a367;
-				n377:
+				goto n351;
+				k352:
+				goto a341;
+				n351:
 				// b333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n379;}
+					goto n353;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4709,39 +4216,39 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f380;}
+						goto f354;}
 				}
 				if (!$this->b335()) {
-					goto f380;}
-				goto k380;
-				f380:
+					goto f354;}
+				goto k354;
+				f354:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n379;
-				k380:
-				goto a367;
-				n379:
+				goto n353;
+				k354:
+				goto a341;
+				n353:
 				break;
 			case 32:
 			case 82:
 				if (!$this->b202()) {
-					goto n382;}
-				goto a367;
-				n382:
+					goto n356;}
+				goto a341;
+				n356:
 				break;
 			case 6:
 				if (!$this->b267()) {
-					goto n383;}
-				goto a367;
-				n383:
+					goto n357;}
+				goto a341;
+				n357:
 				// b278
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(278);
 					}
 
-					goto n384;}
+					goto n358;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4751,7 +4258,7 @@ abstract class GeneratedParser
 						$this->rec(279);
 					}
 
-					goto f385;}
+					goto f359;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -4760,7 +4267,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f385;}
+						goto f359;}
 				}
 				if (($this->ids[$this->p] === 38)) {
 					if (($this->ids[$this->p] === 38)) {
@@ -4768,26 +4275,26 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f385;}
+						goto f359;}
 				}
 				if (!$this->b281()) {
-					goto f385;}
-				goto k385;
-				f385:
+					goto f359;}
+				goto k359;
+				f359:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n384;
-				k385:
-				goto a367;
-				n384:
+				goto n358;
+				k359:
+				goto a341;
+				n358:
 				// b333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n386;}
+					goto n360;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4805,32 +4312,32 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f387;}
+						goto f361;}
 				}
 				if (!$this->b335()) {
-					goto f387;}
-				goto k387;
-				f387:
+					goto f361;}
+				goto k361;
+				f361:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n386;
-				k387:
-				goto a367;
-				n386:
+				goto n360;
+				k361:
+				goto a341;
+				n360:
 				break;
 			case 7:
 				if (!$this->b230()) {
-					goto n389;}
-				goto a367;
-				n389:
+					goto n363;}
+				goto a341;
+				n363:
 				// b278
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(278);
 					}
 
-					goto n390;}
+					goto n364;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4840,7 +4347,7 @@ abstract class GeneratedParser
 						$this->rec(279);
 					}
 
-					goto f391;}
+					goto f365;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -4849,7 +4356,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f391;}
+						goto f365;}
 				}
 				if (($this->ids[$this->p] === 38)) {
 					if (($this->ids[$this->p] === 38)) {
@@ -4857,26 +4364,26 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f391;}
+						goto f365;}
 				}
 				if (!$this->b281()) {
-					goto f391;}
-				goto k391;
-				f391:
+					goto f365;}
+				goto k365;
+				f365:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n390;
-				k391:
-				goto a367;
-				n390:
+				goto n364;
+				k365:
+				goto a341;
+				n364:
 				// b333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n392;}
+					goto n366;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -4894,25 +4401,25 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f393;}
+						goto f367;}
 				}
 				if (!$this->b335()) {
-					goto f393;}
-				goto k393;
-				f393:
+					goto f367;}
+				goto k367;
+				f367:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n392;
-				k393:
-				goto a367;
-				n392:
+				goto n366;
+				k367:
+				goto a341;
+				n366:
 				break;
 			case 25:
 				if (!$this->b229()) {
-					goto n395;}
-				goto a367;
-				n395:
+					goto n369;}
+				goto a341;
+				n369:
 				break;
 		}
 
@@ -4920,16 +4427,16 @@ abstract class GeneratedParser
 			$this->rec(201);
 		}
 
-		goto f366;
-		a367:
-		goto k366;
-		f366:
+		goto f340;
+		a341:
+		goto k340;
+		f340:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k366:
-		$this->v[$m1] = $this->reduceAtomic($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k340:
+		$this->v[$m1] = $this->reduceAtomic(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -4952,7 +4459,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f633;}
+			goto f617;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -4966,14 +4473,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e635;
+				goto e619;
 			}
 
 			$this->p++;
 		}
-		e635:
+		e619:
 		if (!$this->b205()) {
-			goto f633;}
+			goto f617;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -4985,18 +4492,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e637;
+				goto e621;
 			}
 
 			$this->p++;
 		}
-		e637:
+		e621:
 		if (!($this->ids[$this->p] === 33)) {
 			if ($this->p >= $this->f) {
 				$this->rec(53);
 			}
 
-			goto f633;}
+			goto f617;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -5006,7 +4513,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n638;}
+				goto n622;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -5019,41 +4526,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e640;
+					goto e624;
 				}
 
 				if (!$this->b224()) {
-					goto e640;}
+					goto e624;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e640;
+					goto e624;
 				}
 
 				$k2++;
 			}
-			e640:
+			e624:
 
 			if ($k2 < 1) {
-				goto f639;
+				goto f623;
 			}
-			goto k639;
-			f639:
+			goto k623;
+			f623:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n638;
-			k639:
-			n638:
+			goto n622;
+			k623:
+			n622:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k633;
-		f633:
+		goto k617;
+		f617:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k633:
+		k617:
 
 		return true;
 	}
@@ -5105,30 +4612,30 @@ abstract class GeneratedParser
 						$this->rec(208);
 					}
 
-					goto n859;}
+					goto n854;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b201()) {
-					goto f860;}
+					goto f855;}
 				if (!$this->b209()) {
-					goto f860;}
-				goto k860;
-				f860:
+					goto f855;}
+				goto k855;
+				f855:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n859;
-				k860:
-				goto a858;
-				n859:
+				goto n854;
+				k855:
+				goto a853;
+				n854:
 				break;
 			case 26:
 				if (!$this->b206()) {
-					goto n861;}
-				goto a858;
-				n861:
+					goto n856;}
+				goto a853;
+				n856:
 				break;
 			case 30:
 				// b200
@@ -5137,7 +4644,7 @@ abstract class GeneratedParser
 						$this->rec(200);
 					}
 
-					goto n862;}
+					goto n857;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -5147,22 +4654,22 @@ abstract class GeneratedParser
 						$this->rec(51);
 					}
 
-					goto f863;}
+					goto f858;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b201()) {
-					goto f863;}
-				goto k863;
-				f863:
+					goto f858;}
+				goto k858;
+				f858:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n862;
-				k863:
-				$this->v[$m2] = $this->reduceNullable($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
+				goto n857;
+				k858:
+				$this->v[$m2] = $this->reduceNullable(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
 				$this->n = $m2 + 1;
-				goto a858;
-				n862:
+				goto a853;
+				n857:
 				break;
 		}
 
@@ -5170,16 +4677,16 @@ abstract class GeneratedParser
 			$this->rec(205);
 		}
 
-		goto f857;
-		a858:
-		goto k857;
-		f857:
+		goto f852;
+		a853:
+		goto k852;
+		f852:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k857:
-		$this->v[$m1] = $this->reduceSubType($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k852:
+		$this->v[$m1] = $this->reduceSubType(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -5202,7 +4709,7 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f1135;}
+			goto f1118;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!($this->ids[$this->p] === 12)) {
@@ -5210,7 +4717,7 @@ abstract class GeneratedParser
 				$this->rec(23);
 			}
 
-			goto f1135;}
+			goto f1118;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 11)) {
@@ -5219,7 +4726,7 @@ abstract class GeneratedParser
 			$this->rec(24);
 		}
 		if (!$this->b199()) {
-			goto f1135;}
+			goto f1118;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5231,18 +4738,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1137;
+				goto e1120;
 			}
 
 			$this->p++;
 		}
-		e1137:
+		e1120:
 		if (!($this->ids[$this->p] === 30)) {
 			if ($this->p >= $this->f) {
 				$this->rec(51);
 			}
 
-			goto f1135;}
+			goto f1118;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -5256,14 +4763,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1139;
+				goto e1122;
 			}
 
 			$this->p++;
 		}
-		e1139:
+		e1122:
 		if (!$this->b199()) {
-			goto f1135;}
+			goto f1118;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5275,18 +4782,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1141;
+				goto e1124;
 			}
 
 			$this->p++;
 		}
-		e1141:
+		e1124:
 		if (!($this->ids[$this->p] === 47)) {
 			if ($this->p >= $this->f) {
 				$this->rec(70);
 			}
 
-			goto f1135;}
+			goto f1118;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -5300,21 +4807,21 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1143;
+				goto e1126;
 			}
 
 			$this->p++;
 		}
-		e1143:
+		e1126:
 		if (!$this->b205()) {
-			goto f1135;}
-		goto k1135;
-		f1135:
+			goto f1118;}
+		goto k1118;
+		f1118:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1135:
+		k1118:
 
 		return true;
 	}
@@ -5341,27 +4848,27 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1127;
+						goto e1110;
 					}
 
 					$this->p++;
 				}
-				e1127:
+				e1110:
 				if (isset(self::Tc8c984b6[$this->ids[$this->p]])) {
 					if (!$this->b213()) {
-						goto n1128;}
-					n1128:
+						goto n1111;}
+					n1111:
 				} elseif ($this->p > $this->f) {
 					$this->rec(213);
 				}
-				goto a1123;
-				n1124:
+				goto a1106;
+				n1107:
 				break;
 			case 12:
 				if (!$this->b210()) {
-					goto n1129;}
-				goto a1123;
-				n1129:
+					goto n1112;}
+				goto a1106;
+				n1112:
 				// b211
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -5377,21 +4884,21 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1133;
+						goto e1116;
 					}
 
 					$this->p++;
 				}
-				e1133:
+				e1116:
 				if (isset(self::Tc8c984b6[$this->ids[$this->p]])) {
 					if (!$this->b213()) {
-						goto n1134;}
-					n1134:
+						goto n1117;}
+					n1117:
 				} elseif ($this->p > $this->f) {
 					$this->rec(213);
 				}
-				goto a1123;
-				n1130:
+				goto a1106;
+				n1113:
 				break;
 		}
 
@@ -5399,15 +4906,15 @@ abstract class GeneratedParser
 			$this->rec(209);
 		}
 
-		goto f1122;
-		a1123:
-		goto k1122;
-		f1122:
+		goto f1105;
+		a1106:
+		goto k1105;
+		f1105:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1122:
+		k1105:
 
 		return true;
 	}
@@ -5429,7 +4936,7 @@ abstract class GeneratedParser
 				$this->rec(23);
 			}
 
-			goto f1467;}
+			goto f1445;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 11)) {
@@ -5438,7 +4945,7 @@ abstract class GeneratedParser
 			$this->rec(24);
 		}
 		if (!$this->b199()) {
-			goto f1467;}
+			goto f1445;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5450,18 +4957,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1469;
+				goto e1447;
 			}
 
 			$this->p++;
 		}
-		e1469:
+		e1447:
 		if (!($this->ids[$this->p] === 30)) {
 			if ($this->p >= $this->f) {
 				$this->rec(51);
 			}
 
-			goto f1467;}
+			goto f1445;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -5475,14 +4982,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1471;
+				goto e1449;
 			}
 
 			$this->p++;
 		}
-		e1471:
+		e1449:
 		if (!$this->b199()) {
-			goto f1467;}
+			goto f1445;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5494,18 +5001,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1473;
+				goto e1451;
 			}
 
 			$this->p++;
 		}
-		e1473:
+		e1451:
 		if (!($this->ids[$this->p] === 47)) {
 			if ($this->p >= $this->f) {
 				$this->rec(70);
 			}
 
-			goto f1467;}
+			goto f1445;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -5519,21 +5026,21 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1475;
+				goto e1453;
 			}
 
 			$this->p++;
 		}
-		e1475:
+		e1453:
 		if (!$this->b205()) {
-			goto f1467;}
-		goto k1467;
-		f1467:
+			goto f1445;}
+		goto k1445;
+		f1445:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1467:
+		k1445:
 
 		return true;
 	}
@@ -5555,15 +5062,15 @@ abstract class GeneratedParser
 				break;
 			case 28:
 				if (!$this->b214()) {
-					goto n1465;}
-				goto a1464;
-				n1465:
+					goto n1443;}
+				goto a1442;
+				n1443:
 				break;
 			case 29:
 				if (!$this->b218()) {
-					goto n1466;}
-				goto a1464;
-				n1466:
+					goto n1444;}
+				goto a1442;
+				n1444:
 				break;
 		}
 
@@ -5571,15 +5078,15 @@ abstract class GeneratedParser
 			$this->rec(213);
 		}
 
-		goto f1463;
-		a1464:
-		goto k1463;
-		f1463:
+		goto f1441;
+		a1442:
+		goto k1441;
+		f1441:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1463:
+		k1441:
 
 		return true;
 	}
@@ -5602,7 +5109,7 @@ abstract class GeneratedParser
 				$this->rec(215);
 			}
 
-			goto f1671;}
+			goto f1642;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5615,45 +5122,45 @@ abstract class GeneratedParser
 					$this->rec(216);
 				}
 
-				goto e1673;
+				goto e1644;
 			}
 
 			if (!$this->b216()) {
-				goto e1673;}
+				goto e1644;}
 			if ($this->p === $b2) {
 				$k2 = 1;
-				goto e1673;
+				goto e1644;
 			}
 
 			$k2++;
 		}
-		e1673:
+		e1644:
 
 		if ($k2 < 1) {
-			goto f1672;
+			goto f1643;
 		}
-		goto k1672;
-		f1672:
+		goto k1643;
+		f1643:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f1671;
-		k1672:
+		goto f1642;
+		k1643:
 		if (($this->ids[$this->p] === 28)) {
 			if (($this->ids[$this->p] === 28)) {
 				if ($this->p > $this->f) {
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f1671;}
+				goto f1642;}
 		}
-		goto k1671;
-		f1671:
+		goto k1642;
+		f1642:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1671:
+		k1642:
 
 		return true;
 	}
@@ -5675,7 +5182,7 @@ abstract class GeneratedParser
 				$this->rec(49);
 			}
 
-			goto f1755;}
+			goto f1726;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -5689,14 +5196,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1757;
+				goto e1728;
 			}
 
 			$this->p++;
 		}
-		e1757:
+		e1728:
 		if (!$this->b201()) {
-			goto f1755;}
+			goto f1726;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5708,19 +5215,19 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1759;
+				goto e1730;
 			}
 
 			$this->p++;
 		}
-		e1759:
-		goto k1755;
-		f1755:
+		e1730:
+		goto k1726;
+		f1726:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1755:
+		k1726:
 
 		return true;
 	}
@@ -5743,7 +5250,7 @@ abstract class GeneratedParser
 				$this->rec(219);
 			}
 
-			goto f1674;}
+			goto f1645;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5756,45 +5263,45 @@ abstract class GeneratedParser
 					$this->rec(220);
 				}
 
-				goto e1676;
+				goto e1647;
 			}
 
 			if (!$this->b220()) {
-				goto e1676;}
+				goto e1647;}
 			if ($this->p === $b2) {
 				$k2 = 1;
-				goto e1676;
+				goto e1647;
 			}
 
 			$k2++;
 		}
-		e1676:
+		e1647:
 
 		if ($k2 < 1) {
-			goto f1675;
+			goto f1646;
 		}
-		goto k1675;
-		f1675:
+		goto k1646;
+		f1646:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f1674;
-		k1675:
+		goto f1645;
+		k1646:
 		if (($this->ids[$this->p] === 29)) {
 			if (($this->ids[$this->p] === 29)) {
 				if ($this->p > $this->f) {
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f1674;}
+				goto f1645;}
 		}
-		goto k1674;
-		f1674:
+		goto k1645;
+		f1645:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1674:
+		k1645:
 
 		return true;
 	}
@@ -5816,7 +5323,7 @@ abstract class GeneratedParser
 				$this->rec(50);
 			}
 
-			goto f1760;}
+			goto f1731;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -5830,14 +5337,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1762;
+				goto e1733;
 			}
 
 			$this->p++;
 		}
-		e1762:
+		e1733:
 		if (!$this->b201()) {
-			goto f1760;}
+			goto f1731;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -5849,19 +5356,19 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1764;
+				goto e1735;
 			}
 
 			$this->p++;
 		}
-		e1764:
-		goto k1760;
-		f1760:
+		e1735:
+		goto k1731;
+		f1731:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1760:
+		k1731:
 
 		return true;
 	}
@@ -5888,7 +5395,7 @@ abstract class GeneratedParser
 						$this->rec(225);
 					}
 
-					goto n837;}
+					goto n831;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -5898,7 +5405,7 @@ abstract class GeneratedParser
 						$this->rec(57);
 					}
 
-					goto f838;}
+					goto f832;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 37)) {
@@ -5907,34 +5414,34 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f838;}
+						goto f832;}
 				}
 				if (!$this->b199()) {
-					goto f838;}
+					goto f832;}
 				if (!($this->ids[$this->p] === 37)) {
 					if ($this->p >= $this->f) {
 						$this->rec(59);
 					}
 
-					goto f838;}
+					goto f832;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto k838;
-				f838:
+				goto k832;
+				f832:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n837;
-				k838:
-				goto a836;
-				n837:
+				goto n831;
+				k832:
+				goto a830;
+				n831:
 				// b227
 				if (!isset(self::T885cd349[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(227);
 					}
 
-					goto n839;}
+					goto n833;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -5944,7 +5451,7 @@ abstract class GeneratedParser
 						$this->rec(228);
 					}
 
-					goto f840;}
+					goto f834;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!($this->ids[$this->p] === 37)) {
@@ -5952,18 +5459,18 @@ abstract class GeneratedParser
 						$this->rec(59);
 					}
 
-					goto f840;}
+					goto f834;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto k840;
-				f840:
+				goto k834;
+				f834:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n839;
-				k840:
-				goto a836;
-				n839:
+				goto n833;
+				k834:
+				goto a830;
+				n833:
 				break;
 			case 84:
 				// b227
@@ -5972,7 +5479,7 @@ abstract class GeneratedParser
 						$this->rec(227);
 					}
 
-					goto n841;}
+					goto n835;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -5982,7 +5489,7 @@ abstract class GeneratedParser
 						$this->rec(228);
 					}
 
-					goto f842;}
+					goto f836;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!($this->ids[$this->p] === 37)) {
@@ -5990,18 +5497,18 @@ abstract class GeneratedParser
 						$this->rec(59);
 					}
 
-					goto f842;}
+					goto f836;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto k842;
-				f842:
+				goto k836;
+				f836:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n841;
-				k842:
-				goto a836;
-				n841:
+				goto n835;
+				k836:
+				goto a830;
+				n835:
 				break;
 		}
 
@@ -6009,16 +5516,16 @@ abstract class GeneratedParser
 			$this->rec(224);
 		}
 
-		goto f835;
-		a836:
-		goto k835;
-		f835:
+		goto f829;
+		a830:
+		goto k829;
+		f829:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k835:
-		$this->v[$m1] = $this->reduceArrayOrOffsetAccessItem($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k829:
+		$this->v[$m1] = $this->reduceArrayOrOffsetAccessItem(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -6041,7 +5548,7 @@ abstract class GeneratedParser
 				$this->rec(46);
 			}
 
-			goto f649;}
+			goto f633;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -6051,7 +5558,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n650;}
+				goto n634;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -6064,41 +5571,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e652;
+					goto e636;
 				}
 
 				if (!$this->b224()) {
-					goto e652;}
+					goto e636;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e652;
+					goto e636;
 				}
 
 				$k2++;
 			}
-			e652:
+			e636:
 
 			if ($k2 < 1) {
-				goto f651;
+				goto f635;
 			}
-			goto k651;
-			f651:
+			goto k635;
+			f635:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n650;
-			k651:
-			n650:
+			goto n634;
+			k635:
+			n634:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k649;
-		f649:
+		goto k633;
+		f633:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k649:
+		k633:
 
 		return true;
 	}
@@ -6120,895 +5627,6 @@ abstract class GeneratedParser
 				$this->rec(32);
 			}
 
-			goto f645;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (($this->ids[$this->p] === 43)) {
-			if (($this->ids[$this->p] === 43)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f645;}
-		}
-		if (!$this->b231()) {
-			goto f645;}
-		if (isset(self::T885cd349[$this->ids[$this->p]])) {
-			// b223
-			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
-				if ($this->p > $this->f) {
-					$this->rec(223);
-				}
-
-				goto n646;}
-
-			$o2 = $this->p;
-			$m2 = $this->n;
-			$cs2 = $this->comments;
-			$k2 = 0;
-			while (true) {
-				$b2 = $this->p;
-				if (!isset(self::T885cd349[$this->ids[$this->p]])) {
-					if ($b2 > $this->f) {
-						$this->rec(224);
-					}
-
-					goto e648;
-				}
-
-				if (!$this->b224()) {
-					goto e648;}
-				if ($this->p === $b2) {
-					$k2 = 1;
-					goto e648;
-				}
-
-				$k2++;
-			}
-			e648:
-
-			if ($k2 < 1) {
-				goto f647;
-			}
-			goto k647;
-			f647:
-			$this->p = $o2;
-			$this->n = $m2;
-			$this->comments = $cs2;
-			goto n646;
-			k647:
-			n646:
-		} elseif ($this->p > $this->f) {
-			$this->rec(223);
-		}
-		goto k645;
-		f645:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k645:
-
-		return true;
-	}
-
-	private function b231(): bool
-	{
-		if (!($this->ids[$this->p] === 38)) {
-			if ($this->p > $this->f) {
-				$this->rec(231);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!($this->ids[$this->p] === 38)) {
-			if ($this->p >= $this->f) {
-				$this->rec(60);
-			}
-
-			goto f872;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e874;
-			}
-
-			$this->p++;
-		}
-		e874:
-		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
-			if (!$this->b233()) {
-				goto n875;}
-			n875:
-		} elseif ($this->p > $this->f) {
-			$this->rec(233);
-		}
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e877;
-			}
-
-			$this->p++;
-		}
-		e877:
-		if (!($this->ids[$this->p] === 39)) {
-			if ($this->p >= $this->f) {
-				$this->rec(62);
-			}
-
-			goto f872;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		goto k872;
-		f872:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k872:
-		$this->v[$m1] = $this->reduceArrayShape($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
-		$this->n = $m1 + 1;
-
-		return true;
-	}
-
-	private function b233(): bool
-	{
-		if (!isset(self::T50fd39f8[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(233);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		switch ($this->ids[$this->p]) {
-			default:
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-			case 15:
-			case 16:
-			case 17:
-			case 18:
-			case 19:
-			case 20:
-			case 21:
-			case 22:
-			case 24:
-			case 25:
-			case 30:
-			case 32:
-			case 82:
-				// b243
-				if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(243);
-					}
-
-					goto n1152;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!$this->b244()) {
-					goto f1153;}
-				// b203
-				$o3 = $this->p;
-				$m3 = $this->n;
-				$cs3 = $this->comments;
-				while (true) {
-					$b3 = $this->p;
-					if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-						if ($b3 > $this->f) {
-							$this->rec(204);
-						}
-
-						goto e1155;
-					}
-
-					$this->p++;
-				}
-				e1155:
-				if (($this->ids[$this->p] === 40)) {
-					if (!$this->b252()) {
-						goto n1156;}
-					n1156:
-				} elseif ($this->p > $this->f) {
-					$this->rec(252);
-				}
-				goto k1153;
-				f1153:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1152;
-				k1153:
-				goto a1151;
-				n1152:
-				break;
-			case 42:
-				if (!$this->b234()) {
-					goto n1157;}
-				goto a1151;
-				n1157:
-				break;
-		}
-
-		if ($this->p > $this->f) {
-			$this->rec(233);
-		}
-
-		goto f1150;
-		a1151:
-		goto k1150;
-		f1150:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1150:
-
-		return true;
-	}
-
-	private function b234(): bool
-	{
-		if (!($this->ids[$this->p] === 42)) {
-			if ($this->p > $this->f) {
-				$this->rec(234);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!($this->ids[$this->p] === 42)) {
-			if ($this->p >= $this->f) {
-				$this->rec(65);
-			}
-
-			goto f1489;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1491;
-			}
-
-			$this->p++;
-		}
-		e1491:
-		if (!$this->b235()) {
-			goto f1489;}
-		if (($this->ids[$this->p] === 40)) {
-			$this->v[$this->n++] = $this->token($this->p++);
-		} elseif ($this->p >= $this->f) {
-			$this->rec(63);
-		}
-		goto k1489;
-		f1489:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1489:
-
-		return true;
-	}
-
-	private function b235(): bool
-	{
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		switch ($this->ids[$this->p]) {
-			default:
-				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->f = $this->p;
-						$this->er = [];
-					}
-					goto n1679;}
-				goto a1678;
-				n1679:
-				break;
-			case 34:
-			case 86:
-				// b236
-				if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(236);
-					}
-
-					goto n1680;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!$this->b237()) {
-					goto f1681;}
-				// b203
-				$o3 = $this->p;
-				$m3 = $this->n;
-				$cs3 = $this->comments;
-				while (true) {
-					$b3 = $this->p;
-					if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-						if ($b3 > $this->f) {
-							$this->rec(204);
-						}
-
-						goto e1683;
-					}
-
-					$this->p++;
-				}
-				e1683:
-				goto k1681;
-				f1681:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1680;
-				k1681:
-				goto a1678;
-				n1680:
-				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->f = $this->p;
-						$this->er = [];
-					}
-					goto n1684;}
-				goto a1678;
-				n1684:
-				break;
-		}
-
-		if ($this->p > $this->f) {
-			$this->rec(235);
-		}
-
-		goto f1677;
-		a1678:
-		goto k1677;
-		f1677:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1677:
-
-		return true;
-	}
-
-	private function b237(): bool
-	{
-		if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(237);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(238);
-			}
-
-			goto f1765;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1767;
-			}
-
-			$this->p++;
-		}
-		e1767:
-		if (!$this->b199()) {
-			goto f1765;}
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1769;
-			}
-
-			$this->p++;
-		}
-		e1769:
-		if (($this->ids[$this->p] === 40)) {
-			if (!$this->b240()) {
-				goto n1770;}
-			n1770:
-		} elseif ($this->p > $this->f) {
-			$this->rec(240);
-		}
-		if (!($this->ids[$this->p] === 35)) {
-			if ($this->p >= $this->f) {
-				$this->rec(56);
-			}
-
-			goto f1765;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		goto k1765;
-		f1765:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1765:
-		$this->v[$m1] = $this->reduceArrayShapeUnsealedType($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
-		$this->n = $m1 + 1;
-
-		return true;
-	}
-
-	private function b240(): bool
-	{
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p > $this->f) {
-				$this->rec(240);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p >= $this->f) {
-				$this->rec(63);
-			}
-
-			goto f1789;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1791;
-			}
-
-			$this->p++;
-		}
-		e1791:
-		if (!$this->b199()) {
-			goto f1789;}
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1793;
-			}
-
-			$this->p++;
-		}
-		e1793:
-		goto k1789;
-		f1789:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1789:
-
-		return true;
-	}
-
-	private function b244(): bool
-	{
-		if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(244);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		switch ($this->ids[$this->p]) {
-			default:
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-			case 15:
-			case 16:
-			case 17:
-			case 18:
-			case 20:
-			case 21:
-			case 22:
-			case 24:
-				// b245
-				if (!isset(self::Tce797685[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(245);
-					}
-
-					goto n1452;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!$this->b246()) {
-					goto f1453;}
-				if (($this->ids[$this->p] === 30)) {
-					$this->v[$this->n++] = $this->token($this->p++);
-				} elseif ($this->p >= $this->f) {
-					$this->rec(51);
-				}
-				if (!($this->ids[$this->p] === 47)) {
-					if ($this->p >= $this->f) {
-						$this->rec(70);
-					}
-
-					goto f1453;}
-
-				$this->v[$this->n++] = $this->token($this->p++);
-				if (!$this->b199()) {
-					goto f1453;}
-				goto k1453;
-				f1453:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1452;
-				k1453:
-				goto a1451;
-				n1452:
-				if (!$this->b199()) {
-					goto n1454;}
-				goto a1451;
-				n1454:
-				break;
-			case 19:
-			case 25:
-			case 30:
-			case 32:
-			case 82:
-				if (!$this->b199()) {
-					goto n1455;}
-				goto a1451;
-				n1455:
-				break;
-		}
-
-		if ($this->p > $this->f) {
-			$this->rec(244);
-		}
-
-		goto f1450;
-		a1451:
-		goto k1450;
-		f1450:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1450:
-		$this->v[$m1] = $this->reduceArrayShapeItem($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
-		$this->n = $m1 + 1;
-
-		return true;
-	}
-
-	private function b246(): bool
-	{
-		if (!isset(self::Tce797685[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(246);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		switch ($this->ids[$this->p]) {
-			default:
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-			case 15:
-			case 16:
-			case 17:
-			case 18:
-			case 24:
-				if (!$this->b247()) {
-					goto n1662;}
-				goto a1661;
-				n1662:
-				break;
-			case 20:
-				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1661;
-				break;
-			case 21:
-				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1661;
-				break;
-			case 22:
-				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1661;
-				break;
-		}
-
-		if ($this->p > $this->f) {
-			$this->rec(246);
-		}
-
-		goto f1660;
-		a1661:
-		goto k1660;
-		f1660:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1660:
-		$this->v[$m1] = $this->reduceArrayShapeKey($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
-		$this->n = $m1 + 1;
-
-		return true;
-	}
-
-	private function b247(): bool
-	{
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(247);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(144);
-			}
-
-			goto f1747;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (($this->ids[$this->p] === 43)) {
-			// b249
-			if (!($this->ids[$this->p] === 43)) {
-				if ($this->p > $this->f) {
-					$this->rec(249);
-				}
-
-				goto n1748;}
-
-			$o2 = $this->p;
-			$m2 = $this->n;
-			$cs2 = $this->comments;
-			if (!($this->ids[$this->p] === 43)) {
-				if ($this->p >= $this->f) {
-					$this->rec(66);
-				}
-
-				goto f1749;}
-
-			$this->v[$this->n++] = $this->token($this->p++);
-			if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-				if ($this->p > $this->f) {
-					$this->rec(144);
-				}
-
-				goto f1749;}
-
-			$this->v[$this->n++] = $this->token($this->p++);
-			goto k1749;
-			f1749:
-			$this->p = $o2;
-			$this->n = $m2;
-			$this->comments = $cs2;
-			goto n1748;
-			k1749:
-			n1748:
-		} elseif ($this->p > $this->f) {
-			$this->rec(249);
-		}
-		goto k1747;
-		f1747:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1747:
-
-		return true;
-	}
-
-	private function b252(): bool
-	{
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p > $this->f) {
-				$this->rec(252);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p >= $this->f) {
-				$this->rec(63);
-			}
-
-			goto f1485;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (($this->ids[$this->p] === 41)) {
-			$this->v[$this->n++] = $this->reduceDiscardedComment($this->context($this->p, $this->p + 1));
-			$this->p++;
-		} elseif ($this->p >= $this->f) {
-			$this->rec(254);
-		}
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1487;
-			}
-
-			$this->p++;
-		}
-		e1487:
-		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
-			if (!$this->b233()) {
-				goto n1488;}
-			n1488:
-		} elseif ($this->p > $this->f) {
-			$this->rec(233);
-		}
-		goto k1485;
-		f1485:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1485:
-
-		return true;
-	}
-
-	private function b255(): bool
-	{
-		if (!isset(self::Ta8d79561[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(255);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!isset(self::Ta8d79561[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(256);
-			}
-
 			goto f629;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
@@ -7020,7 +5638,7 @@ abstract class GeneratedParser
 				}
 				goto f629;}
 		}
-		if (!$this->b257()) {
+		if (!$this->b231()) {
 			goto f629;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// b223
@@ -7081,6 +5699,895 @@ abstract class GeneratedParser
 		return true;
 	}
 
+	private function b231(): bool
+	{
+		if (!($this->ids[$this->p] === 38)) {
+			if ($this->p > $this->f) {
+				$this->rec(231);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 38)) {
+			if ($this->p >= $this->f) {
+				$this->rec(60);
+			}
+
+			goto f867;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e869;
+			}
+
+			$this->p++;
+		}
+		e869:
+		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
+			if (!$this->b233()) {
+				goto n870;}
+			n870:
+		} elseif ($this->p > $this->f) {
+			$this->rec(233);
+		}
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e872;
+			}
+
+			$this->p++;
+		}
+		e872:
+		if (!($this->ids[$this->p] === 39)) {
+			if ($this->p >= $this->f) {
+				$this->rec(62);
+			}
+
+			goto f867;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		goto k867;
+		f867:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k867:
+		$this->v[$m1] = $this->reduceArrayShape(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b233(): bool
+	{
+		if (!isset(self::T50fd39f8[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(233);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				break;
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+			case 18:
+			case 19:
+			case 20:
+			case 21:
+			case 22:
+			case 24:
+			case 25:
+			case 30:
+			case 32:
+			case 82:
+				// b243
+				if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(243);
+					}
+
+					goto n1135;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (!$this->b244()) {
+					goto f1136;}
+				// b203
+				$o3 = $this->p;
+				$m3 = $this->n;
+				$cs3 = $this->comments;
+				while (true) {
+					$b3 = $this->p;
+					if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+						if ($b3 > $this->f) {
+							$this->rec(204);
+						}
+
+						goto e1138;
+					}
+
+					$this->p++;
+				}
+				e1138:
+				if (($this->ids[$this->p] === 40)) {
+					if (!$this->b252()) {
+						goto n1139;}
+					n1139:
+				} elseif ($this->p > $this->f) {
+					$this->rec(252);
+				}
+				goto k1136;
+				f1136:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1135;
+				k1136:
+				goto a1134;
+				n1135:
+				break;
+			case 42:
+				if (!$this->b234()) {
+					goto n1140;}
+				goto a1134;
+				n1140:
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(233);
+		}
+
+		goto f1133;
+		a1134:
+		goto k1133;
+		f1133:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1133:
+
+		return true;
+	}
+
+	private function b234(): bool
+	{
+		if (!($this->ids[$this->p] === 42)) {
+			if ($this->p > $this->f) {
+				$this->rec(234);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 42)) {
+			if ($this->p >= $this->f) {
+				$this->rec(65);
+			}
+
+			goto f1467;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e1469;
+			}
+
+			$this->p++;
+		}
+		e1469:
+		if (!$this->b235()) {
+			goto f1467;}
+		if (($this->ids[$this->p] === 40)) {
+			$this->v[$this->n++] = $this->token($this->p++);
+		} elseif ($this->p >= $this->f) {
+			$this->rec(63);
+		}
+		goto k1467;
+		f1467:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1467:
+
+		return true;
+	}
+
+	private function b235(): bool
+	{
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->f = $this->p;
+						$this->er = [];
+					}
+					goto n1650;}
+				goto a1649;
+				n1650:
+				break;
+			case 34:
+			case 86:
+				// b236
+				if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(236);
+					}
+
+					goto n1651;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (!$this->b237()) {
+					goto f1652;}
+				// b203
+				$o3 = $this->p;
+				$m3 = $this->n;
+				$cs3 = $this->comments;
+				while (true) {
+					$b3 = $this->p;
+					if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+						if ($b3 > $this->f) {
+							$this->rec(204);
+						}
+
+						goto e1654;
+					}
+
+					$this->p++;
+				}
+				e1654:
+				goto k1652;
+				f1652:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1651;
+				k1652:
+				goto a1649;
+				n1651:
+				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->f = $this->p;
+						$this->er = [];
+					}
+					goto n1655;}
+				goto a1649;
+				n1655:
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(235);
+		}
+
+		goto f1648;
+		a1649:
+		goto k1648;
+		f1648:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1648:
+
+		return true;
+	}
+
+	private function b237(): bool
+	{
+		if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(237);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(238);
+			}
+
+			goto f1736;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e1738;
+			}
+
+			$this->p++;
+		}
+		e1738:
+		if (!$this->b199()) {
+			goto f1736;}
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e1740;
+			}
+
+			$this->p++;
+		}
+		e1740:
+		if (($this->ids[$this->p] === 40)) {
+			if (!$this->b240()) {
+				goto n1741;}
+			n1741:
+		} elseif ($this->p > $this->f) {
+			$this->rec(240);
+		}
+		if (!($this->ids[$this->p] === 35)) {
+			if ($this->p >= $this->f) {
+				$this->rec(56);
+			}
+
+			goto f1736;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		goto k1736;
+		f1736:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1736:
+		$this->v[$m1] = $this->reduceArrayShapeUnsealedType(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b240(): bool
+	{
+		if (!($this->ids[$this->p] === 40)) {
+			if ($this->p > $this->f) {
+				$this->rec(240);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 40)) {
+			if ($this->p >= $this->f) {
+				$this->rec(63);
+			}
+
+			goto f1757;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e1759;
+			}
+
+			$this->p++;
+		}
+		e1759:
+		if (!$this->b199()) {
+			goto f1757;}
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e1761;
+			}
+
+			$this->p++;
+		}
+		e1761:
+		goto k1757;
+		f1757:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1757:
+
+		return true;
+	}
+
+	private function b244(): bool
+	{
+		if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(244);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				break;
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+			case 18:
+			case 20:
+			case 21:
+			case 22:
+			case 24:
+				// b245
+				if (!isset(self::Tce797685[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(245);
+					}
+
+					goto n1430;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (!$this->b246()) {
+					goto f1431;}
+				if (($this->ids[$this->p] === 30)) {
+					$this->v[$this->n++] = $this->token($this->p++);
+				} elseif ($this->p >= $this->f) {
+					$this->rec(51);
+				}
+				if (!($this->ids[$this->p] === 47)) {
+					if ($this->p >= $this->f) {
+						$this->rec(70);
+					}
+
+					goto f1431;}
+
+				$this->v[$this->n++] = $this->token($this->p++);
+				if (!$this->b199()) {
+					goto f1431;}
+				goto k1431;
+				f1431:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1430;
+				k1431:
+				goto a1429;
+				n1430:
+				if (!$this->b199()) {
+					goto n1432;}
+				goto a1429;
+				n1432:
+				break;
+			case 19:
+			case 25:
+			case 30:
+			case 32:
+			case 82:
+				if (!$this->b199()) {
+					goto n1433;}
+				goto a1429;
+				n1433:
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(244);
+		}
+
+		goto f1428;
+		a1429:
+		goto k1428;
+		f1428:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1428:
+		$this->v[$m1] = $this->reduceArrayShapeItem(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b246(): bool
+	{
+		if (!isset(self::Tce797685[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(246);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				break;
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+			case 18:
+			case 24:
+				if (!$this->b247()) {
+					goto n1633;}
+				goto a1632;
+				n1633:
+				break;
+			case 20:
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto a1632;
+				break;
+			case 21:
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto a1632;
+				break;
+			case 22:
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto a1632;
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(246);
+		}
+
+		goto f1631;
+		a1632:
+		goto k1631;
+		f1631:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1631:
+		$this->v[$m1] = $this->reduceArrayShapeKey(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b247(): bool
+	{
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(247);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(144);
+			}
+
+			goto f1718;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (($this->ids[$this->p] === 43)) {
+			// b249
+			if (!($this->ids[$this->p] === 43)) {
+				if ($this->p > $this->f) {
+					$this->rec(249);
+				}
+
+				goto n1719;}
+
+			$o2 = $this->p;
+			$m2 = $this->n;
+			$cs2 = $this->comments;
+			if (!($this->ids[$this->p] === 43)) {
+				if ($this->p >= $this->f) {
+					$this->rec(66);
+				}
+
+				goto f1720;}
+
+			$this->v[$this->n++] = $this->token($this->p++);
+			if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+				if ($this->p > $this->f) {
+					$this->rec(144);
+				}
+
+				goto f1720;}
+
+			$this->v[$this->n++] = $this->token($this->p++);
+			goto k1720;
+			f1720:
+			$this->p = $o2;
+			$this->n = $m2;
+			$this->comments = $cs2;
+			goto n1719;
+			k1720:
+			n1719:
+		} elseif ($this->p > $this->f) {
+			$this->rec(249);
+		}
+		goto k1718;
+		f1718:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1718:
+
+		return true;
+	}
+
+	private function b252(): bool
+	{
+		if (!($this->ids[$this->p] === 40)) {
+			if ($this->p > $this->f) {
+				$this->rec(252);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 40)) {
+			if ($this->p >= $this->f) {
+				$this->rec(63);
+			}
+
+			goto f1463;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (($this->ids[$this->p] === 41)) {
+			$this->v[$this->n++] = $this->reduceDiscardedComment($this->indexes[$this->p], $this->indexes[$this->p]);
+			$this->p++;
+		} elseif ($this->p >= $this->f) {
+			$this->rec(254);
+		}
+		// b203
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		while (true) {
+			$b2 = $this->p;
+			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+				if ($b2 > $this->f) {
+					$this->rec(204);
+				}
+
+				goto e1465;
+			}
+
+			$this->p++;
+		}
+		e1465:
+		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
+			if (!$this->b233()) {
+				goto n1466;}
+			n1466:
+		} elseif ($this->p > $this->f) {
+			$this->rec(233);
+		}
+		goto k1463;
+		f1463:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1463:
+
+		return true;
+	}
+
+	private function b255(): bool
+	{
+		if (!isset(self::Ta8d79561[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(255);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::Ta8d79561[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(256);
+			}
+
+			goto f613;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (($this->ids[$this->p] === 43)) {
+			if (($this->ids[$this->p] === 43)) {
+				if ($this->p > $this->f) {
+					$this->f = $this->p;
+					$this->er = [];
+				}
+				goto f613;}
+		}
+		if (!$this->b257()) {
+			goto f613;}
+		if (isset(self::T885cd349[$this->ids[$this->p]])) {
+			// b223
+			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
+				if ($this->p > $this->f) {
+					$this->rec(223);
+				}
+
+				goto n614;}
+
+			$o2 = $this->p;
+			$m2 = $this->n;
+			$cs2 = $this->comments;
+			$k2 = 0;
+			while (true) {
+				$b2 = $this->p;
+				if (!isset(self::T885cd349[$this->ids[$this->p]])) {
+					if ($b2 > $this->f) {
+						$this->rec(224);
+					}
+
+					goto e616;
+				}
+
+				if (!$this->b224()) {
+					goto e616;}
+				if ($this->p === $b2) {
+					$k2 = 1;
+					goto e616;
+				}
+
+				$k2++;
+			}
+			e616:
+
+			if ($k2 < 1) {
+				goto f615;
+			}
+			goto k615;
+			f615:
+			$this->p = $o2;
+			$this->n = $m2;
+			$this->comments = $cs2;
+			goto n614;
+			k615:
+			n614:
+		} elseif ($this->p > $this->f) {
+			$this->rec(223);
+		}
+		goto k613;
+		f613:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k613:
+
+		return true;
+	}
+
 	private function b257(): bool
 	{
 		if (!($this->ids[$this->p] === 38)) {
@@ -7098,7 +6605,7 @@ abstract class GeneratedParser
 				$this->rec(60);
 			}
 
-			goto f851;}
+			goto f846;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -7112,16 +6619,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e853;
+				goto e848;
 			}
 
 			$this->p++;
 		}
-		e853:
+		e848:
 		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
 			if (!$this->b259()) {
-				goto n854;}
-			n854:
+				goto n849;}
+			n849:
 		} elseif ($this->p > $this->f) {
 			$this->rec(259);
 		}
@@ -7136,28 +6643,28 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e856;
+				goto e851;
 			}
 
 			$this->p++;
 		}
-		e856:
+		e851:
 		if (!($this->ids[$this->p] === 39)) {
 			if ($this->p >= $this->f) {
 				$this->rec(62);
 			}
 
-			goto f851;}
+			goto f846;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k851;
-		f851:
+		goto k846;
+		f846:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k851:
-		$this->v[$m1] = $this->reduceListShape($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k846:
+		$this->v[$m1] = $this->reduceListShape(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -7211,13 +6718,13 @@ abstract class GeneratedParser
 						$this->rec(264);
 					}
 
-					goto n1116;}
+					goto n1099;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b244()) {
-					goto f1117;}
+					goto f1100;}
 				// b203
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -7229,34 +6736,34 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1119;
+						goto e1102;
 					}
 
 					$this->p++;
 				}
-				e1119:
+				e1102:
 				if (($this->ids[$this->p] === 40)) {
 					if (!$this->b266()) {
-						goto n1120;}
-					n1120:
+						goto n1103;}
+					n1103:
 				} elseif ($this->p > $this->f) {
 					$this->rec(266);
 				}
-				goto k1117;
-				f1117:
+				goto k1100;
+				f1100:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1116;
-				k1117:
-				goto a1115;
-				n1116:
+				goto n1099;
+				k1100:
+				goto a1098;
+				n1099:
 				break;
 			case 42:
 				if (!$this->b260()) {
-					goto n1121;}
-				goto a1115;
-				n1121:
+					goto n1104;}
+				goto a1098;
+				n1104:
 				break;
 		}
 
@@ -7264,15 +6771,15 @@ abstract class GeneratedParser
 			$this->rec(259);
 		}
 
-		goto f1114;
-		a1115:
-		goto k1114;
-		f1114:
+		goto f1097;
+		a1098:
+		goto k1097;
+		f1097:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1114:
+		k1097:
 
 		return true;
 	}
@@ -7294,7 +6801,7 @@ abstract class GeneratedParser
 				$this->rec(65);
 			}
 
-			goto f1460;}
+			goto f1438;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -7308,26 +6815,26 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1462;
+				goto e1440;
 			}
 
 			$this->p++;
 		}
-		e1462:
+		e1440:
 		if (!$this->b261()) {
-			goto f1460;}
+			goto f1438;}
 		if (($this->ids[$this->p] === 40)) {
 			$this->v[$this->n++] = $this->token($this->p++);
 		} elseif ($this->p >= $this->f) {
 			$this->rec(63);
 		}
-		goto k1460;
-		f1460:
+		goto k1438;
+		f1438:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1460:
+		k1438:
 
 		return true;
 	}
@@ -7344,9 +6851,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1665;}
-				goto a1664;
-				n1665:
+					goto n1636;}
+				goto a1635;
+				n1636:
 				break;
 			case 34:
 			case 86:
@@ -7356,13 +6863,13 @@ abstract class GeneratedParser
 						$this->rec(262);
 					}
 
-					goto n1666;}
+					goto n1637;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b263()) {
-					goto f1667;}
+					goto f1638;}
 				// b203
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -7374,29 +6881,29 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1669;
+						goto e1640;
 					}
 
 					$this->p++;
 				}
-				e1669:
-				goto k1667;
-				f1667:
+				e1640:
+				goto k1638;
+				f1638:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1666;
-				k1667:
-				goto a1664;
-				n1666:
+				goto n1637;
+				k1638:
+				goto a1635;
+				n1637:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1670;}
-				goto a1664;
-				n1670:
+					goto n1641;}
+				goto a1635;
+				n1641:
 				break;
 		}
 
@@ -7404,15 +6911,15 @@ abstract class GeneratedParser
 			$this->rec(261);
 		}
 
-		goto f1663;
-		a1664:
-		goto k1663;
-		f1663:
+		goto f1634;
+		a1635:
+		goto k1634;
+		f1634:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1663:
+		k1634:
 
 		return true;
 	}
@@ -7434,7 +6941,7 @@ abstract class GeneratedParser
 				$this->rec(238);
 			}
 
-			goto f1750;}
+			goto f1721;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -7448,14 +6955,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1752;
+				goto e1723;
 			}
 
 			$this->p++;
 		}
-		e1752:
+		e1723:
 		if (!$this->b199()) {
-			goto f1750;}
+			goto f1721;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -7467,28 +6974,28 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1754;
+				goto e1725;
 			}
 
 			$this->p++;
 		}
-		e1754:
+		e1725:
 		if (!($this->ids[$this->p] === 35)) {
 			if ($this->p >= $this->f) {
 				$this->rec(56);
 			}
 
-			goto f1750;}
+			goto f1721;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k1750;
-		f1750:
+		goto k1721;
+		f1721:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1750:
-		$this->v[$m1] = $this->reduceListShapeUnsealedType($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1721:
+		$this->v[$m1] = $this->reduceListShapeUnsealedType(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -7511,11 +7018,11 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f1456;}
+			goto f1434;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 41)) {
-			$this->v[$this->n++] = $this->reduceDiscardedComment($this->context($this->p, $this->p + 1));
+			$this->v[$this->n++] = $this->reduceDiscardedComment($this->indexes[$this->p], $this->indexes[$this->p]);
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
 			$this->rec(254);
@@ -7531,26 +7038,26 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1458;
+				goto e1436;
 			}
 
 			$this->p++;
 		}
-		e1458:
+		e1436:
 		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
 			if (!$this->b259()) {
-				goto n1459;}
-			n1459:
+				goto n1437;}
+			n1437:
 		} elseif ($this->p > $this->f) {
 			$this->rec(259);
 		}
-		goto k1456;
-		f1456:
+		goto k1434;
+		f1434:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1456:
+		k1434:
 
 		return true;
 	}
@@ -7572,7 +7079,7 @@ abstract class GeneratedParser
 				$this->rec(37);
 			}
 
-			goto f641;}
+			goto f625;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 43)) {
@@ -7581,10 +7088,10 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f641;}
+				goto f625;}
 		}
 		if (!$this->b268()) {
-			goto f641;}
+			goto f625;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// b223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -7592,7 +7099,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n642;}
+				goto n626;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -7605,41 +7112,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e644;
+					goto e628;
 				}
 
 				if (!$this->b224()) {
-					goto e644;}
+					goto e628;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e644;
+					goto e628;
 				}
 
 				$k2++;
 			}
-			e644:
+			e628:
 
 			if ($k2 < 1) {
-				goto f643;
+				goto f627;
 			}
-			goto k643;
-			f643:
+			goto k627;
+			f627:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n642;
-			k643:
-			n642:
+			goto n626;
+			k627:
+			n626:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k641;
-		f641:
+		goto k625;
+		f625:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k641:
+		k625:
 
 		return true;
 	}
@@ -7661,7 +7168,7 @@ abstract class GeneratedParser
 				$this->rec(60);
 			}
 
-			goto f864;}
+			goto f859;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -7675,12 +7182,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e866;
+				goto e861;
 			}
 
 			$this->p++;
 		}
-		e866:
+		e861:
 		if (isset(self::Td8017923[$this->ids[$this->p]])) {
 			// b270
 			if (!isset(self::Td8017923[$this->ids[$this->p]])) {
@@ -7688,13 +7195,13 @@ abstract class GeneratedParser
 					$this->rec(270);
 				}
 
-				goto n867;}
+				goto n862;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
 			if (!$this->b271()) {
-				goto f868;}
+				goto f863;}
 			// b203
 			$o3 = $this->p;
 			$m3 = $this->n;
@@ -7706,27 +7213,27 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e870;
+					goto e865;
 				}
 
 				$this->p++;
 			}
-			e870:
+			e865:
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->b274()) {
-					goto n871;}
-				n871:
+					goto n866;}
+				n866:
 			} elseif ($this->p > $this->f) {
 				$this->rec(274);
 			}
-			goto k868;
-			f868:
+			goto k863;
+			f863:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n867;
-			k868:
-			n867:
+			goto n862;
+			k863:
+			n862:
 		} elseif ($this->p > $this->f) {
 			$this->rec(270);
 		}
@@ -7735,17 +7242,17 @@ abstract class GeneratedParser
 				$this->rec(62);
 			}
 
-			goto f864;}
+			goto f859;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k864;
-		f864:
+		goto k859;
+		f859:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k864:
-		$this->v[$m1] = $this->reduceObjectShape($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k859:
+		$this->v[$m1] = $this->reduceObjectShape(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -7764,7 +7271,7 @@ abstract class GeneratedParser
 		$m1 = $this->n;
 		$cs1 = $this->comments;
 		if (!$this->b272()) {
-			goto f1144;}
+			goto f1127;}
 		if (($this->ids[$this->p] === 30)) {
 			$this->v[$this->n++] = $this->token($this->p++);
 		} elseif ($this->p >= $this->f) {
@@ -7775,19 +7282,19 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f1144;}
+			goto f1127;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b199()) {
-			goto f1144;}
-		goto k1144;
-		f1144:
+			goto f1127;}
+		goto k1127;
+		f1127:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1144:
-		$this->v[$m1] = $this->reduceObjectShapeItem($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1127:
+		$this->v[$m1] = $this->reduceObjectShapeItem(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -7810,87 +7317,87 @@ abstract class GeneratedParser
 				break;
 			case 1:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 2:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 3:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 4:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 5:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 6:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 7:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 8:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 9:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 10:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 11:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 12:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 13:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 14:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 15:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 16:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 17:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 18:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 21:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 22:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 			case 24:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1477;
+				goto a1455;
 				break;
 		}
 
@@ -7898,16 +7405,16 @@ abstract class GeneratedParser
 			$this->rec(272);
 		}
 
-		goto f1476;
-		a1477:
-		goto k1476;
-		f1476:
+		goto f1454;
+		a1455:
+		goto k1454;
+		f1454:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1476:
-		$this->v[$m1] = $this->reduceObjectShapeKey($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1454:
+		$this->v[$m1] = $this->reduceObjectShapeKey(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -7933,7 +7440,7 @@ abstract class GeneratedParser
 					$this->rec(275);
 				}
 
-				goto e1146;
+				goto e1129;
 			}
 
 			// b275
@@ -7942,7 +7449,7 @@ abstract class GeneratedParser
 					$this->rec(275);
 				}
 
-				goto e1146;}
+				goto e1129;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -7952,7 +7459,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1147;}
+				goto f1130;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			// b203
@@ -7966,40 +7473,40 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1149;
+					goto e1132;
 				}
 
 				$this->p++;
 			}
-			e1149:
+			e1132:
 			if (!$this->b276()) {
-				goto f1147;}
-			goto k1147;
-			f1147:
+				goto f1130;}
+			goto k1130;
+			f1130:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto e1146;
-			k1147:
+			goto e1129;
+			k1130:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1146;
+				goto e1129;
 			}
 
 			$k1++;
 		}
-		e1146:
+		e1129:
 
 		if ($k1 < 1) {
-			goto f1145;
+			goto f1128;
 		}
-		goto k1145;
-		f1145:
+		goto k1128;
+		f1128:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1145:
+		k1128:
 
 		return true;
 	}
@@ -8039,13 +7546,13 @@ abstract class GeneratedParser
 						$this->rec(277);
 					}
 
-					goto n1480;}
+					goto n1458;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b271()) {
-					goto f1481;}
+					goto f1459;}
 				// b203
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -8057,21 +7564,21 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1483;
+						goto e1461;
 					}
 
 					$this->p++;
 				}
-				e1483:
-				goto k1481;
-				f1481:
+				e1461:
+				goto k1459;
+				f1459:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1480;
-				k1481:
-				goto a1479;
-				n1480:
+				goto n1458;
+				k1459:
+				goto a1457;
+				n1458:
 				break;
 			case 39:
 				if (!($this->ids[$this->p] === 39)) {
@@ -8079,9 +7586,9 @@ abstract class GeneratedParser
 						$this->rec(62);
 					}
 
-					goto n1484;}
-				goto a1479;
-				n1484:
+					goto n1462;}
+				goto a1457;
+				n1462:
 				break;
 		}
 
@@ -8089,15 +7596,15 @@ abstract class GeneratedParser
 			$this->rec(276);
 		}
 
-		goto f1478;
-		a1479:
-		goto k1478;
-		f1478:
+		goto f1456;
+		a1457:
+		goto k1456;
+		f1456:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1478:
+		k1456:
 
 		return true;
 	}
@@ -8114,24 +7621,24 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n613;}
-				goto a612;
-				n613:
+					goto n598;}
+				goto a597;
+				n598:
 				break;
 			case 32:
 			case 82:
 				if (!$this->b364()) {
-					goto n614;}
-				goto a612;
-				n614:
+					goto n599;}
+				goto a597;
+				n599:
 				if (($this->ids[$this->p] === 34)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n615;}
-				goto a612;
-				n615:
+					goto n600;}
+				goto a597;
+				n600:
 				break;
 			case 36:
 			case 84:
@@ -8141,7 +7648,7 @@ abstract class GeneratedParser
 						$this->rec(223);
 					}
 
-					goto n616;}
+					goto n601;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8154,78 +7661,54 @@ abstract class GeneratedParser
 							$this->rec(224);
 						}
 
-						goto e618;
+						goto e603;
 					}
 
 					if (!$this->b224()) {
-						goto e618;}
+						goto e603;}
 					if ($this->p === $b2) {
 						$k2 = 1;
-						goto e618;
+						goto e603;
 					}
 
 					$k2++;
 				}
-				e618:
+				e603:
 
 				if ($k2 < 1) {
-					goto f617;
+					goto f602;
 				}
-				goto k617;
-				f617:
+				goto k602;
+				f602:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n616;
-				k617:
-				goto a612;
-				n616:
+				goto n601;
+				k602:
+				goto a597;
+				n601:
 				if (($this->ids[$this->p] === 34)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n619;}
-				goto a612;
-				n619:
+					goto n604;}
+				goto a597;
+				n604:
 				break;
 			case 34:
-				// b282
-				if (!($this->ids[$this->p] === 34)) {
-					if ($this->p > $this->f) {
-						$this->rec(282);
-					}
-
-					goto n620;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (!($this->ids[$this->p] === 34)) {
-					if ($this->p > $this->f) {
-						$this->rec(54);
-					}
-
-					goto f621;}
-				if (!$this->b284()) {
-					goto f621;}
-				goto k621;
-				f621:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n620;
-				k621:
-				goto a612;
-				n620:
+				if (!$this->b282()) {
+					goto n605;}
+				goto a597;
+				n605:
 				if (($this->ids[$this->p] === 34)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n622;}
-				goto a612;
-				n622:
+					goto n606;}
+				goto a597;
+				n606:
 				break;
 		}
 
@@ -8233,24 +7716,24 @@ abstract class GeneratedParser
 			$this->rec(281);
 		}
 
-		goto f611;
-		a612:
-		goto k611;
-		f611:
+		goto f596;
+		a597:
+		goto k596;
+		f596:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k611:
+		k596:
 
 		return true;
 	}
 
-	private function b284(): bool
+	private function b282(): bool
 	{
 		if (!($this->ids[$this->p] === 34)) {
 			if ($this->p > $this->f) {
-				$this->rec(284);
+				$this->rec(282);
 			}
 
 			return false;}
@@ -8258,18 +7741,35 @@ abstract class GeneratedParser
 		$o1 = $this->p;
 		$m1 = $this->n;
 		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 34)) {
+			if ($this->p > $this->f) {
+				$this->rec(54);
+			}
+
+			goto f837;}
+		// b284
+		if (!($this->ids[$this->p] === 34)) {
+			if ($this->p > $this->f) {
+				$this->rec(284);
+			}
+
+			goto f837;}
+
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
 		switch ($this->ids[$this->p]) {
 			default:
 				break;
 			case 34:
 				if (!$this->b285()) {
-					goto n845;}
-				goto a844;
-				n845:
+					goto n840;}
+				goto a839;
+				n840:
 				if (!$this->b362()) {
-					goto n846;}
-				goto a844;
-				n846:
+					goto n841;}
+				goto a839;
+				n841:
 				break;
 		}
 
@@ -8277,15 +7777,22 @@ abstract class GeneratedParser
 			$this->rec(284);
 		}
 
-		goto f843;
-		a844:
-		goto k843;
-		f843:
+		goto f838;
+		a839:
+		goto k838;
+		f838:
+		$this->p = $o2;
+		$this->n = $m2;
+		$this->comments = $cs2;
+		goto f837;
+		k838:
+		goto k837;
+		f837:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k843:
+		k837:
 
 		return true;
 	}
@@ -8307,7 +7814,7 @@ abstract class GeneratedParser
 				$this->rec(54);
 			}
 
-			goto f1094;}
+			goto f1080;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -8321,46 +7828,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1096;
+				goto e1082;
 			}
 
 			$this->p++;
 		}
-		e1096:
-		// b286
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(286);
-			}
-
-			goto f1094;}
-
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(144);
-			}
-
-			goto f1097;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b287()) {
-			goto f1097;}
-		if (!$this->b293()) {
-			goto f1097;}
-		if (!$this->b296()) {
-			goto f1097;}
-		goto k1097;
-		f1097:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f1094;
-		k1097:
-		$this->v[$m2] = $this->reduceCallableTemplateArgument($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-		$this->n = $m2 + 1;
+		e1082:
+		if (!$this->b286()) {
+			goto f1080;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -8372,57 +7847,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1099;
+				goto e1084;
 			}
 
 			$this->p++;
 		}
-		e1099:
+		e1084:
 		if (($this->ids[$this->p] === 40)) {
-			// b300
-			if (!($this->ids[$this->p] === 40)) {
-				if ($this->p > $this->f) {
-					$this->rec(300);
-				}
-
-				goto n1100;}
-
-			$o2 = $this->p;
-			$m2 = $this->n;
-			$cs2 = $this->comments;
-			$k2 = 0;
-			while (true) {
-				$b2 = $this->p;
-				if (!($this->ids[$this->p] === 40)) {
-					if ($b2 > $this->f) {
-						$this->rec(301);
-					}
-
-					goto e1102;
-				}
-
-				if (!$this->b301()) {
-					goto e1102;}
-				if ($this->p === $b2) {
-					$k2 = 1;
-					goto e1102;
-				}
-
-				$k2++;
-			}
-			e1102:
-
-			if ($k2 < 1) {
-				goto f1101;
-			}
-			goto k1101;
-			f1101:
-			$this->p = $o2;
-			$this->n = $m2;
-			$this->comments = $cs2;
-			goto n1100;
-			k1101:
-			n1100:
+			if (!$this->b300()) {
+				goto n1085;}
+			n1085:
 		} elseif ($this->p > $this->f) {
 			$this->rec(300);
 		}
@@ -8431,7 +7865,7 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f1094;}
+			goto f1080;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -8439,7 +7873,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f1094;}
+			goto f1080;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -8453,12 +7887,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1104;
+				goto e1087;
 			}
 
 			$this->p++;
 		}
-		e1104:
+		e1087:
 		if (isset(self::T7680fe2e[$this->ids[$this->p]])) {
 			// b306
 			if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
@@ -8466,13 +7900,13 @@ abstract class GeneratedParser
 					$this->rec(306);
 				}
 
-				goto n1105;}
+				goto n1088;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
 			if (!$this->b307()) {
-				goto f1106;}
+				goto f1089;}
 			// b203
 			$o3 = $this->p;
 			$m3 = $this->n;
@@ -8484,27 +7918,27 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1108;
+					goto e1091;
 				}
 
 				$this->p++;
 			}
-			e1108:
+			e1091:
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->b311()) {
-					goto n1109;}
-				n1109:
+					goto n1092;}
+				n1092:
 			} elseif ($this->p > $this->f) {
 				$this->rec(311);
 			}
-			goto k1106;
-			f1106:
+			goto k1089;
+			f1089:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1105;
-			k1106:
-			n1105:
+			goto n1088;
+			k1089:
+			n1088:
 		} elseif ($this->p > $this->f) {
 			$this->rec(306);
 		}
@@ -8513,7 +7947,7 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f1094;}
+			goto f1080;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!($this->ids[$this->p] === 47)) {
@@ -8521,19 +7955,58 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f1094;}
+			goto f1080;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b315()) {
-			goto f1094;}
-		goto k1094;
-		f1094:
+			goto f1080;}
+		goto k1080;
+		f1080:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1094:
-		$this->v[$m1] = $this->reduceCallableWithTemplates($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1080:
+		$this->v[$m1] = $this->reduceCallableWithTemplates(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b286(): bool
+	{
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(286);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(144);
+			}
+
+			goto f1375;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (!$this->b287()) {
+			goto f1375;}
+		if (!$this->b293()) {
+			goto f1375;}
+		if (!$this->b296()) {
+			goto f1375;}
+		goto k1375;
+		f1375:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1375:
+		$this->v[$m1] = $this->reduceCallableTemplateArgument(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -8556,7 +8029,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f529;}
+						goto f504;}
 				}
 				if (($this->ids[$this->p] === 14)) {
 					if (($this->ids[$this->p] === 14)) {
@@ -8564,17 +8037,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f529;}
+						goto f504;}
 				}
-				goto k529;
-				f529:
+				goto k504;
+				f504:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n528;
-				k529:
-				goto a527;
-				n528:
+				goto n503;
+				k504:
+				goto a502;
+				n503:
 				break;
 			case 13:
 				// b288
@@ -8583,7 +8056,7 @@ abstract class GeneratedParser
 						$this->rec(288);
 					}
 
-					goto n530;}
+					goto n505;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8593,20 +8066,20 @@ abstract class GeneratedParser
 						$this->rec(27);
 					}
 
-					goto f531;}
+					goto f506;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b199()) {
-					goto f531;}
-				goto k531;
-				f531:
+					goto f506;}
+				goto k506;
+				f506:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n530;
-				k531:
-				goto a527;
-				n530:
+				goto n505;
+				k506:
+				goto a502;
+				n505:
 				// b290
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8617,7 +8090,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f533;}
+						goto f508;}
 				}
 				if (($this->ids[$this->p] === 14)) {
 					if (($this->ids[$this->p] === 14)) {
@@ -8625,17 +8098,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f533;}
+						goto f508;}
 				}
-				goto k533;
-				f533:
+				goto k508;
+				f508:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n532;
-				k533:
-				goto a527;
-				n532:
+				goto n507;
+				k508:
+				goto a502;
+				n507:
 				break;
 			case 14:
 				// b289
@@ -8644,7 +8117,7 @@ abstract class GeneratedParser
 						$this->rec(289);
 					}
 
-					goto n534;}
+					goto n509;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8654,20 +8127,20 @@ abstract class GeneratedParser
 						$this->rec(28);
 					}
 
-					goto f535;}
+					goto f510;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b199()) {
-					goto f535;}
-				goto k535;
-				f535:
+					goto f510;}
+				goto k510;
+				f510:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n534;
-				k535:
-				goto a527;
-				n534:
+				goto n509;
+				k510:
+				goto a502;
+				n509:
 				// b290
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8678,7 +8151,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f537;}
+						goto f512;}
 				}
 				if (($this->ids[$this->p] === 14)) {
 					if (($this->ids[$this->p] === 14)) {
@@ -8686,17 +8159,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f537;}
+						goto f512;}
 				}
-				goto k537;
-				f537:
+				goto k512;
+				f512:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n536;
-				k537:
-				goto a527;
-				n536:
+				goto n511;
+				k512:
+				goto a502;
+				n511:
 				break;
 		}
 
@@ -8704,15 +8177,15 @@ abstract class GeneratedParser
 			$this->rec(287);
 		}
 
-		goto f526;
-		a527:
-		goto k526;
-		f526:
+		goto f501;
+		a502:
+		goto k501;
+		f501:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k526:
+		k501:
 
 		return true;
 	}
@@ -8729,9 +8202,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n540;}
-				goto a539;
-				n540:
+					goto n515;}
+				goto a514;
+				n515:
 				break;
 			case 5:
 				// b294
@@ -8740,7 +8213,7 @@ abstract class GeneratedParser
 						$this->rec(294);
 					}
 
-					goto n541;}
+					goto n516;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8750,28 +8223,28 @@ abstract class GeneratedParser
 						$this->rec(29);
 					}
 
-					goto f542;}
+					goto f517;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b199()) {
-					goto f542;}
-				goto k542;
-				f542:
+					goto f517;}
+				goto k517;
+				f517:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n541;
-				k542:
-				goto a539;
-				n541:
+				goto n516;
+				k517:
+				goto a514;
+				n516:
 				if (($this->ids[$this->p] === 5)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n543;}
-				goto a539;
-				n543:
+					goto n518;}
+				goto a514;
+				n518:
 				break;
 		}
 
@@ -8779,15 +8252,15 @@ abstract class GeneratedParser
 			$this->rec(293);
 		}
 
-		goto f538;
-		a539:
-		goto k538;
-		f538:
+		goto f513;
+		a514:
+		goto k513;
+		f513:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k538:
+		k513:
 
 		return true;
 	}
@@ -8804,9 +8277,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n546;}
-				goto a545;
-				n546:
+					goto n521;}
+				goto a520;
+				n521:
 				break;
 			case 46:
 				// b297
@@ -8815,7 +8288,7 @@ abstract class GeneratedParser
 						$this->rec(297);
 					}
 
-					goto n547;}
+					goto n522;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -8825,28 +8298,28 @@ abstract class GeneratedParser
 						$this->rec(69);
 					}
 
-					goto f548;}
+					goto f523;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b199()) {
-					goto f548;}
-				goto k548;
-				f548:
+					goto f523;}
+				goto k523;
+				f523:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n547;
-				k548:
-				goto a545;
-				n547:
+				goto n522;
+				k523:
+				goto a520;
+				n522:
 				if (($this->ids[$this->p] === 46)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n549;}
-				goto a545;
-				n549:
+					goto n524;}
+				goto a520;
+				n524:
 				break;
 		}
 
@@ -8854,24 +8327,24 @@ abstract class GeneratedParser
 			$this->rec(296);
 		}
 
-		goto f544;
-		a545:
-		goto k544;
-		f544:
+		goto f519;
+		a520:
+		goto k519;
+		f519:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k544:
+		k519:
 
 		return true;
 	}
 
-	private function b301(): bool
+	private function b300(): bool
 	{
 		if (!($this->ids[$this->p] === 40)) {
 			if ($this->p > $this->f) {
-				$this->rec(301);
+				$this->rec(300);
 			}
 
 			return false;}
@@ -8879,35 +8352,90 @@ abstract class GeneratedParser
 		$o1 = $this->p;
 		$m1 = $this->n;
 		$cs1 = $this->comments;
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p >= $this->f) {
-				$this->rec(63);
-			}
-
-			goto f1437;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
+		$k1 = 0;
 		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
+			$b1 = $this->p;
+			if (!($this->ids[$this->p] === 40)) {
+				if ($b1 > $this->f) {
+					$this->rec(301);
 				}
 
-				goto e1439;
+				goto e1418;
 			}
 
-			$this->p++;
+			// b301
+			if (!($this->ids[$this->p] === 40)) {
+				if ($this->p > $this->f) {
+					$this->rec(301);
+				}
+
+				goto e1418;}
+
+			$o2 = $this->p;
+			$m2 = $this->n;
+			$cs2 = $this->comments;
+			if (!($this->ids[$this->p] === 40)) {
+				if ($this->p >= $this->f) {
+					$this->rec(63);
+				}
+
+				goto f1419;}
+
+			$this->v[$this->n++] = $this->token($this->p++);
+			// b203
+			$o3 = $this->p;
+			$m3 = $this->n;
+			$cs3 = $this->comments;
+			while (true) {
+				$b3 = $this->p;
+				if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+					if ($b3 > $this->f) {
+						$this->rec(204);
+					}
+
+					goto e1421;
+				}
+
+				$this->p++;
+			}
+			e1421:
+			if (!$this->b302()) {
+				goto f1419;}
+			goto k1419;
+			f1419:
+			$this->p = $o2;
+			$this->n = $m2;
+			$this->comments = $cs2;
+			goto e1418;
+			k1419:
+			if ($this->p === $b1) {
+				$k1 = 1;
+				goto e1418;
+			}
+
+			$k1++;
 		}
-		e1439:
-		// b302
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
+		e1418:
+
+		if ($k1 < 1) {
+			goto f1417;
+		}
+		goto k1417;
+		f1417:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1417:
+
+		return true;
+	}
+
+	private function b302(): bool
+	{
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
 		switch ($this->ids[$this->p]) {
 			default:
 				break;
@@ -8930,10 +8458,45 @@ abstract class GeneratedParser
 			case 17:
 			case 18:
 			case 24:
-				if (!$this->b304()) {
-					goto n1442;}
-				goto a1441;
-				n1442:
+				// b304
+				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(304);
+					}
+
+					goto n1626;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (!$this->b286()) {
+					goto f1627;}
+				// b203
+				$o3 = $this->p;
+				$m3 = $this->n;
+				$cs3 = $this->comments;
+				while (true) {
+					$b3 = $this->p;
+					if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
+						if ($b3 > $this->f) {
+							$this->rec(204);
+						}
+
+						goto e1629;
+					}
+
+					$this->p++;
+				}
+				e1629:
+				goto k1627;
+				f1627:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1626;
+				k1627:
+				goto a1625;
+				n1626:
 				break;
 			case 35:
 				if (!($this->ids[$this->p] === 35)) {
@@ -8941,9 +8504,9 @@ abstract class GeneratedParser
 						$this->rec(56);
 					}
 
-					goto n1443;}
-				goto a1441;
-				n1443:
+					goto n1630;}
+				goto a1625;
+				n1630:
 				break;
 		}
 
@@ -8951,96 +8514,15 @@ abstract class GeneratedParser
 			$this->rec(302);
 		}
 
-		goto f1440;
-		a1441:
-		goto k1440;
-		f1440:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f1437;
-		k1440:
-		goto k1437;
-		f1437:
+		goto f1624;
+		a1625:
+		goto k1624;
+		f1624:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1437:
-
-		return true;
-	}
-
-	private function b304(): bool
-	{
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(304);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		// b286
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(286);
-			}
-
-			goto f1656;}
-
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(144);
-			}
-
-			goto f1657;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b287()) {
-			goto f1657;}
-		if (!$this->b293()) {
-			goto f1657;}
-		if (!$this->b296()) {
-			goto f1657;}
-		goto k1657;
-		f1657:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f1656;
-		k1657:
-		$this->v[$m2] = $this->reduceCallableTemplateArgument($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-		$this->n = $m2 + 1;
-		// b203
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		while (true) {
-			$b2 = $this->p;
-			if (!isset(self::T5448ab4c[$this->ids[$this->p]])) {
-				if ($b2 > $this->f) {
-					$this->rec(204);
-				}
-
-				goto e1659;
-			}
-
-			$this->p++;
-		}
-		e1659:
-		goto k1656;
-		f1656:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1656:
+		k1624:
 
 		return true;
 	}
@@ -9058,7 +8540,7 @@ abstract class GeneratedParser
 		$m1 = $this->n;
 		$cs1 = $this->comments;
 		if (!$this->b199()) {
-			goto f1059;}
+			goto f1045;}
 		if (($this->ids[$this->p] === 27)) {
 			$this->v[$this->n++] = $this->token($this->p++);
 		} elseif ($this->p >= $this->f) {
@@ -9079,14 +8561,14 @@ abstract class GeneratedParser
 		} elseif ($this->p >= $this->f) {
 			$this->rec(69);
 		}
-		goto k1059;
-		f1059:
+		goto k1045;
+		f1045:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1059:
-		$this->v[$m1] = $this->reduceCallableParameter($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1045:
+		$this->v[$m1] = $this->reduceCallableParameter(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -9112,7 +8594,7 @@ abstract class GeneratedParser
 					$this->rec(312);
 				}
 
-				goto e1061;
+				goto e1047;
 			}
 
 			// b312
@@ -9121,7 +8603,7 @@ abstract class GeneratedParser
 					$this->rec(312);
 				}
 
-				goto e1061;}
+				goto e1047;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -9131,7 +8613,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1062;}
+				goto f1048;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			// b203
@@ -9145,40 +8627,40 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1064;
+					goto e1050;
 				}
 
 				$this->p++;
 			}
-			e1064:
+			e1050:
 			if (!$this->b313()) {
-				goto f1062;}
-			goto k1062;
-			f1062:
+				goto f1048;}
+			goto k1048;
+			f1048:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto e1061;
-			k1062:
+			goto e1047;
+			k1048:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1061;
+				goto e1047;
 			}
 
 			$k1++;
 		}
-		e1061:
+		e1047:
 
 		if ($k1 < 1) {
-			goto f1060;
+			goto f1046;
 		}
-		goto k1060;
-		f1060:
+		goto k1046;
+		f1046:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1060:
+		k1046:
 
 		return true;
 	}
@@ -9224,13 +8706,13 @@ abstract class GeneratedParser
 						$this->rec(314);
 					}
 
-					goto n1418;}
+					goto n1398;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b307()) {
-					goto f1419;}
+					goto f1399;}
 				// b203
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -9242,21 +8724,21 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1421;
+						goto e1401;
 					}
 
 					$this->p++;
 				}
-				e1421:
-				goto k1419;
-				f1419:
+				e1401:
+				goto k1399;
+				f1399:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1418;
-				k1419:
-				goto a1417;
-				n1418:
+				goto n1398;
+				k1399:
+				goto a1397;
+				n1398:
 				break;
 			case 33:
 				if (!($this->ids[$this->p] === 33)) {
@@ -9264,9 +8746,9 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto n1422;}
-				goto a1417;
-				n1422:
+					goto n1402;}
+				goto a1397;
+				n1402:
 				break;
 		}
 
@@ -9274,15 +8756,15 @@ abstract class GeneratedParser
 			$this->rec(313);
 		}
 
-		goto f1416;
-		a1417:
-		goto k1416;
-		f1416:
+		goto f1396;
+		a1397:
+		goto k1396;
+		f1396:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1416:
+		k1396:
 
 		return true;
 	}
@@ -9322,7 +8804,7 @@ abstract class GeneratedParser
 						$this->rec(331);
 					}
 
-					goto n1067;}
+					goto n1053;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -9332,7 +8814,7 @@ abstract class GeneratedParser
 						$this->rec(332);
 					}
 
-					goto f1068;}
+					goto f1054;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (($this->ids[$this->p] === 43)) {
@@ -9341,19 +8823,164 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1068;}
+						goto f1054;}
 				}
 				if (!$this->b318()) {
-					goto f1068;}
-				goto k1068;
-				f1068:
+					goto f1054;}
+				goto k1054;
+				f1054:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1067;
-				k1068:
-				goto a1066;
+				goto n1053;
+				k1054:
+				goto a1052;
+				n1053:
+				// b333
+				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(333);
+					}
+
+					goto n1055;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (isset(self::T83e30518[$this->ids[$this->p]])) {
+					$sf = $this->f;
+					$se = $this->er;
+					$sp = $this->p;
+					$matched = $this->s169();
+					$this->f = $sf;
+					$this->er = $se;
+					$this->p = $sp;
+					if ($matched) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1056;}
+				}
+				if (!$this->b335()) {
+					goto f1056;}
+				goto k1056;
+				f1056:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1055;
+				k1056:
+				goto a1052;
+				n1055:
+				break;
+			case 19:
+			case 20:
+			case 21:
+			case 22:
+				// b333
+				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(333);
+					}
+
+					goto n1058;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (isset(self::T83e30518[$this->ids[$this->p]])) {
+					$sf = $this->f;
+					$se = $this->er;
+					$sp = $this->p;
+					$matched = $this->s169();
+					$this->f = $sf;
+					$this->er = $se;
+					$this->p = $sp;
+					if ($matched) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1059;}
+				}
+				if (!$this->b335()) {
+					goto f1059;}
+				goto k1059;
+				f1059:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1058;
+				k1059:
+				goto a1052;
+				n1058:
+				break;
+			case 3:
+			case 4:
+			case 8:
+				if (!$this->b255()) {
+					goto n1061;}
+				goto a1052;
+				n1061:
+				if (!$this->b317()) {
+					goto n1062;}
+				goto a1052;
+				n1062:
+				// b333
+				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(333);
+					}
+
+					goto n1063;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (isset(self::T83e30518[$this->ids[$this->p]])) {
+					$sf = $this->f;
+					$se = $this->er;
+					$sp = $this->p;
+					$matched = $this->s169();
+					$this->f = $sf;
+					$this->er = $se;
+					$this->p = $sp;
+					if ($matched) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1064;}
+				}
+				if (!$this->b335()) {
+					goto f1064;}
+				goto k1064;
+				f1064:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1063;
+				k1064:
+				goto a1052;
+				n1063:
+				break;
+			case 32:
+			case 82:
+				if (!$this->b316()) {
+					goto n1066;}
+				goto a1052;
+				n1066:
+				break;
+			case 6:
+				if (!$this->b267()) {
+					goto n1067;}
+				goto a1052;
 				n1067:
+				if (!$this->b317()) {
+					goto n1068;}
+				goto a1052;
+				n1068:
 				// b333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
@@ -9389,170 +9016,25 @@ abstract class GeneratedParser
 				$this->comments = $cs2;
 				goto n1069;
 				k1070:
-				goto a1066;
+				goto a1052;
 				n1069:
-				break;
-			case 19:
-			case 20:
-			case 21:
-			case 22:
-				// b333
-				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(333);
-					}
-
-					goto n1072;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (isset(self::T83e30518[$this->ids[$this->p]])) {
-					$sf = $this->f;
-					$se = $this->er;
-					$sp = $this->p;
-					$matched = $this->s169();
-					$this->f = $sf;
-					$this->er = $se;
-					$this->p = $sp;
-					if ($matched) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1073;}
-				}
-				if (!$this->b335()) {
-					goto f1073;}
-				goto k1073;
-				f1073:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1072;
-				k1073:
-				goto a1066;
-				n1072:
-				break;
-			case 3:
-			case 4:
-			case 8:
-				if (!$this->b255()) {
-					goto n1075;}
-				goto a1066;
-				n1075:
-				if (!$this->b317()) {
-					goto n1076;}
-				goto a1066;
-				n1076:
-				// b333
-				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(333);
-					}
-
-					goto n1077;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (isset(self::T83e30518[$this->ids[$this->p]])) {
-					$sf = $this->f;
-					$se = $this->er;
-					$sp = $this->p;
-					$matched = $this->s169();
-					$this->f = $sf;
-					$this->er = $se;
-					$this->p = $sp;
-					if ($matched) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1078;}
-				}
-				if (!$this->b335()) {
-					goto f1078;}
-				goto k1078;
-				f1078:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1077;
-				k1078:
-				goto a1066;
-				n1077:
-				break;
-			case 32:
-			case 82:
-				if (!$this->b316()) {
-					goto n1080;}
-				goto a1066;
-				n1080:
-				break;
-			case 6:
-				if (!$this->b267()) {
-					goto n1081;}
-				goto a1066;
-				n1081:
-				if (!$this->b317()) {
-					goto n1082;}
-				goto a1066;
-				n1082:
-				// b333
-				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(333);
-					}
-
-					goto n1083;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (isset(self::T83e30518[$this->ids[$this->p]])) {
-					$sf = $this->f;
-					$se = $this->er;
-					$sp = $this->p;
-					$matched = $this->s169();
-					$this->f = $sf;
-					$this->er = $se;
-					$this->p = $sp;
-					if ($matched) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1084;}
-				}
-				if (!$this->b335()) {
-					goto f1084;}
-				goto k1084;
-				f1084:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n1083;
-				k1084:
-				goto a1066;
-				n1083:
 				break;
 			case 7:
 				if (!$this->b230()) {
-					goto n1086;}
-				goto a1066;
-				n1086:
+					goto n1072;}
+				goto a1052;
+				n1072:
 				if (!$this->b317()) {
-					goto n1087;}
-				goto a1066;
-				n1087:
+					goto n1073;}
+				goto a1052;
+				n1073:
 				// b333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n1088;}
+					goto n1074;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -9570,25 +9052,25 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1089;}
+						goto f1075;}
 				}
 				if (!$this->b335()) {
-					goto f1089;}
-				goto k1089;
-				f1089:
+					goto f1075;}
+				goto k1075;
+				f1075:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1088;
-				k1089:
-				goto a1066;
-				n1088:
+				goto n1074;
+				k1075:
+				goto a1052;
+				n1074:
 				break;
 			case 25:
 				if (!$this->b229()) {
-					goto n1091;}
-				goto a1066;
-				n1091:
+					goto n1077;}
+				goto a1052;
+				n1077:
 				break;
 			case 30:
 				// b200
@@ -9597,7 +9079,7 @@ abstract class GeneratedParser
 						$this->rec(200);
 					}
 
-					goto n1092;}
+					goto n1078;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -9607,22 +9089,22 @@ abstract class GeneratedParser
 						$this->rec(51);
 					}
 
-					goto f1093;}
+					goto f1079;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b201()) {
-					goto f1093;}
-				goto k1093;
-				f1093:
+					goto f1079;}
+				goto k1079;
+				f1079:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1092;
-				k1093:
-				$this->v[$m2] = $this->reduceNullable($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
+				goto n1078;
+				k1079:
+				$this->v[$m2] = $this->reduceNullable(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
 				$this->n = $m2 + 1;
-				goto a1066;
-				n1092:
+				goto a1052;
+				n1078:
 				break;
 		}
 
@@ -9630,16 +9112,16 @@ abstract class GeneratedParser
 			$this->rec(315);
 		}
 
-		goto f1065;
-		a1066:
-		goto k1065;
-		f1065:
+		goto f1051;
+		a1052:
+		goto k1051;
+		f1051:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1065:
-		$this->v[$m1] = $this->reduceCallableReturnType($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1051:
+		$this->v[$m1] = $this->reduceCallableReturnType(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -9662,17 +9144,17 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f1433;}
+			goto f1413;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b205()) {
-			goto f1433;}
+			goto f1413;}
 		if (!($this->ids[$this->p] === 33)) {
 			if ($this->p >= $this->f) {
 				$this->rec(53);
 			}
 
-			goto f1433;}
+			goto f1413;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -9682,7 +9164,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n1434;}
+				goto n1414;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -9695,41 +9177,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e1436;
+					goto e1416;
 				}
 
 				if (!$this->b224()) {
-					goto e1436;}
+					goto e1416;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1436;
+					goto e1416;
 				}
 
 				$k2++;
 			}
-			e1436:
+			e1416:
 
 			if ($k2 < 1) {
-				goto f1435;
+				goto f1415;
 			}
-			goto k1435;
-			f1435:
+			goto k1415;
+			f1415:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1434;
-			k1435:
-			n1434:
+			goto n1414;
+			k1415:
+			n1414:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k1433;
-		f1433:
+		goto k1413;
+		f1413:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1433:
+		k1413:
 
 		return true;
 	}
@@ -9751,7 +9233,7 @@ abstract class GeneratedParser
 				$this->rec(279);
 			}
 
-			goto f1432;}
+			goto f1412;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 43)) {
@@ -9760,7 +9242,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f1432;}
+				goto f1412;}
 		}
 		if (($this->ids[$this->p] === 38)) {
 			if (($this->ids[$this->p] === 38)) {
@@ -9768,17 +9250,17 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f1432;}
+				goto f1412;}
 		}
 		if (!$this->b318()) {
-			goto f1432;}
-		goto k1432;
-		f1432:
+			goto f1412;}
+		goto k1412;
+		f1412:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1432:
+		k1412:
 
 		return true;
 	}
@@ -9795,24 +9277,24 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1425;}
-				goto a1424;
-				n1425:
+					goto n1405;}
+				goto a1404;
+				n1405:
 				break;
 			case 34:
 			case 86:
 				if (!$this->b319()) {
-					goto n1426;}
-				goto a1424;
-				n1426:
+					goto n1406;}
+				goto a1404;
+				n1406:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1427;}
-				goto a1424;
-				n1427:
+					goto n1407;}
+				goto a1404;
+				n1407:
 				break;
 			case 36:
 			case 84:
@@ -9822,7 +9304,7 @@ abstract class GeneratedParser
 						$this->rec(223);
 					}
 
-					goto n1428;}
+					goto n1408;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -9835,40 +9317,40 @@ abstract class GeneratedParser
 							$this->rec(224);
 						}
 
-						goto e1430;
+						goto e1410;
 					}
 
 					if (!$this->b224()) {
-						goto e1430;}
+						goto e1410;}
 					if ($this->p === $b2) {
 						$k2 = 1;
-						goto e1430;
+						goto e1410;
 					}
 
 					$k2++;
 				}
-				e1430:
+				e1410:
 
 				if ($k2 < 1) {
-					goto f1429;
+					goto f1409;
 				}
-				goto k1429;
-				f1429:
+				goto k1409;
+				f1409:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1428;
-				k1429:
-				goto a1424;
-				n1428:
+				goto n1408;
+				k1409:
+				goto a1404;
+				n1408:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1431;}
-				goto a1424;
-				n1431:
+					goto n1411;}
+				goto a1404;
+				n1411:
 				break;
 		}
 
@@ -9876,15 +9358,15 @@ abstract class GeneratedParser
 			$this->rec(318);
 		}
 
-		goto f1423;
-		a1424:
-		goto k1423;
-		f1423:
+		goto f1403;
+		a1404:
+		goto k1403;
+		f1403:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1423:
+		k1403:
 
 		return true;
 	}
@@ -9902,7 +9384,7 @@ abstract class GeneratedParser
 		$m1 = $this->n;
 		$cs1 = $this->comments;
 		if (!$this->b320()) {
-			goto f1652;}
+			goto f1620;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// b223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -9910,7 +9392,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n1653;}
+				goto n1621;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -9923,41 +9405,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e1655;
+					goto e1623;
 				}
 
 				if (!$this->b224()) {
-					goto e1655;}
+					goto e1623;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1655;
+					goto e1623;
 				}
 
 				$k2++;
 			}
-			e1655:
+			e1623:
 
 			if ($k2 < 1) {
-				goto f1654;
+				goto f1622;
 			}
-			goto k1654;
-			f1654:
+			goto k1622;
+			f1622:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1653;
-			k1654:
-			n1653:
+			goto n1621;
+			k1622:
+			n1621:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k1652;
-		f1652:
+		goto k1620;
+		f1620:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1652:
+		k1620:
 
 		return true;
 	}
@@ -9979,7 +9461,7 @@ abstract class GeneratedParser
 				$this->rec(238);
 			}
 
-			goto f787;}
+			goto f525;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -9993,14 +9475,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e789;
+				goto e527;
 			}
 
 			$this->p++;
 		}
-		e789:
+		e527:
 		if (!$this->b321()) {
-			goto f787;}
+			goto f525;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -10012,16 +9494,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e791;
+				goto e529;
 			}
 
 			$this->p++;
 		}
-		e791:
+		e529:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->b327()) {
-				goto n792;}
-			n792:
+				goto n530;}
+			n530:
 		} elseif ($this->p > $this->f) {
 			$this->rec(327);
 		}
@@ -10030,17 +9512,17 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f787;}
+			goto f525;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k787;
-		f787:
+		goto k525;
+		f525:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k787:
-		$this->v[$m1] = $this->reduceGenericInReturnType($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k525:
+		$this->v[$m1] = $this->reduceGenericInReturnType(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -10092,7 +9574,7 @@ abstract class GeneratedParser
 						$this->rec(324);
 					}
 
-					goto n1027;}
+					goto n779;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -10103,19 +9585,19 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1028;}
+						goto f780;}
 				}
 				if (!$this->b199()) {
-					goto f1028;}
-				goto k1028;
-				f1028:
+					goto f780;}
+				goto k780;
+				f780:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1027;
-				k1028:
-				goto a1026;
-				n1027:
+				goto n779;
+				k780:
+				goto a778;
+				n779:
 				break;
 			case 1:
 			case 2:
@@ -10125,7 +9607,7 @@ abstract class GeneratedParser
 						$this->rec(322);
 					}
 
-					goto n1029;}
+					goto n781;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -10135,28 +9617,28 @@ abstract class GeneratedParser
 						$this->rec(323);
 					}
 
-					goto f1030;}
+					goto f782;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b199()) {
-					goto f1030;}
-				goto k1030;
-				f1030:
+					goto f782;}
+				goto k782;
+				f782:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1029;
-				k1030:
-				goto a1026;
-				n1029:
+				goto n781;
+				k782:
+				goto a778;
+				n781:
 				break;
 			case 50:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1026;
+				goto a778;
 				break;
 			case 85:
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto a1026;
+				goto a778;
 				break;
 		}
 
@@ -10164,16 +9646,16 @@ abstract class GeneratedParser
 			$this->rec(321);
 		}
 
-		goto f1025;
-		a1026:
-		goto k1025;
-		f1025:
+		goto f777;
+		a778:
+		goto k777;
+		f777:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1025:
-		$this->v[$m1] = $this->reduceGenericArgument($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k777:
+		$this->v[$m1] = $this->reduceGenericArgument(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -10199,7 +9681,7 @@ abstract class GeneratedParser
 					$this->rec(328);
 				}
 
-				goto e1032;
+				goto e784;
 			}
 
 			// b328
@@ -10208,7 +9690,7 @@ abstract class GeneratedParser
 					$this->rec(328);
 				}
 
-				goto e1032;}
+				goto e784;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -10218,7 +9700,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1033;}
+				goto f785;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			// b203
@@ -10232,40 +9714,40 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1035;
+					goto e787;
 				}
 
 				$this->p++;
 			}
-			e1035:
+			e787:
 			if (!$this->b329()) {
-				goto f1033;}
-			goto k1033;
-			f1033:
+				goto f785;}
+			goto k785;
+			f785:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto e1032;
-			k1033:
+			goto e784;
+			k785:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1032;
+				goto e784;
 			}
 
 			$k1++;
 		}
-		e1032:
+		e784:
 
 		if ($k1 < 1) {
-			goto f1031;
+			goto f783;
 		}
-		goto k1031;
-		f1031:
+		goto k783;
+		f783:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1031:
+		k783:
 
 		return true;
 	}
@@ -10313,13 +9795,13 @@ abstract class GeneratedParser
 						$this->rec(330);
 					}
 
-					goto n1392;}
+					goto n1015;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b321()) {
-					goto f1393;}
+					goto f1016;}
 				// b203
 				$o3 = $this->p;
 				$m3 = $this->n;
@@ -10331,21 +9813,21 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1395;
+						goto e1018;
 					}
 
 					$this->p++;
 				}
-				e1395:
-				goto k1393;
-				f1393:
+				e1018:
+				goto k1016;
+				f1016:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1392;
-				k1393:
-				goto a1391;
-				n1392:
+				goto n1015;
+				k1016:
+				goto a1014;
+				n1015:
 				break;
 			case 35:
 				if (!($this->ids[$this->p] === 35)) {
@@ -10353,9 +9835,9 @@ abstract class GeneratedParser
 						$this->rec(56);
 					}
 
-					goto n1396;}
-				goto a1391;
-				n1396:
+					goto n1019;}
+				goto a1014;
+				n1019:
 				break;
 		}
 
@@ -10363,15 +9845,15 @@ abstract class GeneratedParser
 			$this->rec(329);
 		}
 
-		goto f1390;
-		a1391:
-		goto k1390;
-		f1390:
+		goto f1013;
+		a1014:
+		goto k1013;
+		f1013:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1390:
+		k1013:
 
 		return true;
 	}
@@ -10401,10 +9883,10 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f624;}
+				goto f608;}
 		}
 		if (!$this->b340()) {
-			goto f624;}
+			goto f608;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// b223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -10412,7 +9894,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n626;}
+				goto n610;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -10425,41 +9907,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e628;
+					goto e612;
 				}
 
 				if (!$this->b224()) {
-					goto e628;}
+					goto e612;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e628;
+					goto e612;
 				}
 
 				$k2++;
 			}
-			e628:
+			e612:
 
 			if ($k2 < 1) {
-				goto f627;
+				goto f611;
 			}
-			goto k627;
-			f627:
+			goto k611;
+			f611:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n626;
-			k627:
-			n626:
+			goto n610;
+			k611:
+			n610:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k624;
-		f624:
+		goto k608;
+		f608:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k624:
+		k608:
 
 		return true;
 	}
@@ -10494,92 +9976,55 @@ abstract class GeneratedParser
 			case 14:
 			case 24:
 				if (!$this->b357()) {
-					goto n184;}
-				goto a183;
-				n184:
+					goto n172;}
+				goto a171;
+				n172:
 				break;
 			case 7:
 			case 18:
 				if (!$this->b347()) {
-					goto n185;}
-				goto a183;
-				n185:
+					goto n173;}
+				goto a171;
+				n173:
 				break;
 			case 21:
 			case 22:
-				// b343
-				if (!isset(self::T24d0f25b[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(343);
-					}
-
-					goto n186;}
-
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				switch ($this->ids[$this->p]) {
-					default:
-						break;
-					case 21:
-						$this->v[$this->n++] = $this->token($this->p++);
-						goto a188;
-						break;
-					case 22:
-						$this->v[$this->n++] = $this->token($this->p++);
-						goto a188;
-						break;
-				}
-
-				if ($this->p > $this->f) {
-					$this->rec(343);
-				}
-
-				goto f187;
-				a188:
-				goto k187;
-				f187:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n186;
-				k187:
-				$this->v[$m2] = $this->reduceConstantString($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-				$this->n = $m2 + 1;
-				goto a183;
-				n186:
+				if (!$this->b343()) {
+					goto n174;}
+				goto a171;
+				n174:
 				break;
 			case 36:
 			case 84:
 				if (!$this->b361()) {
-					goto n189;}
-				goto a183;
-				n189:
+					goto n175;}
+				goto a171;
+				n175:
 				break;
 			case 15:
-				$this->v[$this->n++] = $this->reduceConstantFalse($this->context($this->p, $this->p + 1));
+				$this->v[$this->n++] = $this->reduceConstantFalse($this->indexes[$this->p], $this->indexes[$this->p]);
 				$this->p++;
-				goto a183;
+				goto a171;
 				break;
 			case 16:
-				$this->v[$this->n++] = $this->reduceConstantTrue($this->context($this->p, $this->p + 1));
+				$this->v[$this->n++] = $this->reduceConstantTrue($this->indexes[$this->p], $this->indexes[$this->p]);
 				$this->p++;
-				goto a183;
+				goto a171;
 				break;
 			case 17:
-				$this->v[$this->n++] = $this->reduceConstantNull($this->context($this->p, $this->p + 1));
+				$this->v[$this->n++] = $this->reduceConstantNull($this->indexes[$this->p], $this->indexes[$this->p]);
 				$this->p++;
-				goto a183;
+				goto a171;
 				break;
 			case 19:
-				$this->v[$this->n++] = $this->reduceConstantFloat($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceConstantFloat($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a183;
+				goto a171;
 				break;
 			case 20:
-				$this->v[$this->n++] = $this->reduceConstantInteger($this->context($this->p, $this->p + 1), [$this->token($this->p)]);
+				$this->v[$this->n++] = $this->reduceConstantInteger($this->indexes[$this->p], $this->indexes[$this->p], [$this->token($this->p)]);
 				$this->p++;
-				goto a183;
+				goto a171;
 				break;
 		}
 
@@ -10587,15 +10032,59 @@ abstract class GeneratedParser
 			$this->rec(340);
 		}
 
-		goto f182;
-		a183:
-		goto k182;
-		f182:
+		goto f170;
+		a171:
+		goto k170;
+		f170:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k182:
+		k170:
+
+		return true;
+	}
+
+	private function b343(): bool
+	{
+		if (!isset(self::T24d0f25b[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(343);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				break;
+			case 21:
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto a426;
+				break;
+			case 22:
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto a426;
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(343);
+		}
+
+		goto f425;
+		a426:
+		goto k425;
+		f425:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k425:
+		$this->v[$m1] = $this->reduceConstantString(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
 
 		return true;
 	}
@@ -10617,7 +10106,7 @@ abstract class GeneratedParser
 				$this->rec(339);
 			}
 
-			goto f449;}
+			goto f423;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -10625,13 +10114,13 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f449;}
+			goto f423;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T69bf8cc4[$this->ids[$this->p]])) {
 			if (!$this->b349()) {
-				goto n450;}
-			n450:
+				goto n424;}
+			n424:
 		} elseif ($this->p > $this->f) {
 			$this->rec(349);
 		}
@@ -10640,17 +10129,17 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f449;}
+			goto f423;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k449;
-		f449:
+		goto k423;
+		f423:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k449:
-		$this->v[$m1] = $this->reduceConstantArrayLiteral($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k423:
+		$this->v[$m1] = $this->reduceConstantArrayLiteral(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -10674,23 +10163,23 @@ abstract class GeneratedParser
 				$this->rec(350);
 			}
 
-			goto f715;}
+			goto f699;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
 		$cs2 = $this->comments;
 		if (!$this->b340()) {
-			goto f716;}
+			goto f700;}
 		if (!$this->b351()) {
-			goto f716;}
-		goto k716;
-		f716:
+			goto f700;}
+		goto k700;
+		f700:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f715;
-		k716:
-		$this->v[$m2] = $this->reduceConstantArrayItem($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
+		goto f699;
+		k700:
+		$this->v[$m2] = $this->reduceConstantArrayItem(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
 		$this->n = $m2 + 1;
 		if (($this->ids[$this->p] === 40)) {
 			// b355
@@ -10699,7 +10188,7 @@ abstract class GeneratedParser
 					$this->rec(355);
 				}
 
-				goto n717;}
+				goto n701;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -10712,31 +10201,31 @@ abstract class GeneratedParser
 						$this->rec(356);
 					}
 
-					goto e719;
+					goto e703;
 				}
 
 				if (!$this->b356()) {
-					goto e719;}
+					goto e703;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e719;
+					goto e703;
 				}
 
 				$k2++;
 			}
-			e719:
+			e703:
 
 			if ($k2 < 1) {
-				goto f718;
+				goto f702;
 			}
-			goto k718;
-			f718:
+			goto k702;
+			f702:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n717;
-			k718:
-			n717:
+			goto n701;
+			k702:
+			n701:
 		} elseif ($this->p > $this->f) {
 			$this->rec(355);
 		}
@@ -10745,13 +10234,13 @@ abstract class GeneratedParser
 		} elseif ($this->p >= $this->f) {
 			$this->rec(63);
 		}
-		goto k715;
-		f715:
+		goto k699;
+		f699:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k715:
+		k699:
 
 		return true;
 	}
@@ -10768,9 +10257,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n956;}
-				goto a955;
-				n956:
+					goto n951;}
+				goto a950;
+				n951:
 				break;
 			case 44:
 				// b352
@@ -10779,7 +10268,7 @@ abstract class GeneratedParser
 						$this->rec(352);
 					}
 
-					goto n957;}
+					goto n952;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -10789,28 +10278,28 @@ abstract class GeneratedParser
 						$this->rec(67);
 					}
 
-					goto f958;}
+					goto f953;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b340()) {
-					goto f958;}
-				goto k958;
-				f958:
+					goto f953;}
+				goto k953;
+				f953:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n957;
-				k958:
-				goto a955;
-				n957:
+				goto n952;
+				k953:
+				goto a950;
+				n952:
 				if (($this->ids[$this->p] === 44)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n959;}
-				goto a955;
-				n959:
+					goto n954;}
+				goto a950;
+				n954:
 				break;
 		}
 
@@ -10818,15 +10307,15 @@ abstract class GeneratedParser
 			$this->rec(351);
 		}
 
-		goto f954;
-		a955:
-		goto k954;
-		f954:
+		goto f949;
+		a950:
+		goto k949;
+		f949:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k954:
+		k949:
 
 		return true;
 	}
@@ -10848,7 +10337,7 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f960;}
+			goto f955;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b350
@@ -10857,31 +10346,31 @@ abstract class GeneratedParser
 				$this->rec(350);
 			}
 
-			goto f960;}
+			goto f955;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
 		$cs2 = $this->comments;
 		if (!$this->b340()) {
-			goto f961;}
+			goto f956;}
 		if (!$this->b351()) {
-			goto f961;}
-		goto k961;
-		f961:
+			goto f956;}
+		goto k956;
+		f956:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f960;
-		k961:
-		$this->v[$m2] = $this->reduceConstantArrayItem($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
+		goto f955;
+		k956:
+		$this->v[$m2] = $this->reduceConstantArrayItem(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
 		$this->n = $m2 + 1;
-		goto k960;
-		f960:
+		goto k955;
+		f955:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k960:
+		k955:
 
 		return true;
 	}
@@ -10904,14 +10393,14 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f446;}
+				goto f420;}
 		}
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(144);
 			}
 
-			goto f446;}
+			goto f420;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 43)) {
@@ -10921,7 +10410,7 @@ abstract class GeneratedParser
 					$this->rec(360);
 				}
 
-				goto n447;}
+				goto n421;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -10931,30 +10420,30 @@ abstract class GeneratedParser
 					$this->rec(66);
 				}
 
-				goto f448;}
+				goto f422;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			if (!$this->b163()) {
-				goto f448;}
-			goto k448;
-			f448:
+				goto f422;}
+			goto k422;
+			f422:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n447;
-			k448:
-			n447:
+			goto n421;
+			k422:
+			n421:
 		} elseif ($this->p > $this->f) {
 			$this->rec(360);
 		}
-		goto k446;
-		f446:
+		goto k420;
+		f420:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k446:
-		$this->v[$m1] = $this->reduceConstantFetch($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k420:
+		$this->v[$m1] = $this->reduceConstantFetch(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -10977,13 +10466,13 @@ abstract class GeneratedParser
 				$this->rec(228);
 			}
 
-			goto f451;}
+			goto f427;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T69bf8cc4[$this->ids[$this->p]])) {
 			if (!$this->b349()) {
-				goto n452;}
-			n452:
+				goto n428;}
+			n428:
 		} elseif ($this->p > $this->f) {
 			$this->rec(349);
 		}
@@ -10992,17 +10481,17 @@ abstract class GeneratedParser
 				$this->rec(59);
 			}
 
-			goto f451;}
+			goto f427;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k451;
-		f451:
+		goto k427;
+		f427:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k451:
-		$this->v[$m1] = $this->reduceConstantArrayShorthand($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k427:
+		$this->v[$m1] = $this->reduceConstantArrayShorthand(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -11021,7 +10510,7 @@ abstract class GeneratedParser
 		$m1 = $this->n;
 		$cs1 = $this->comments;
 		if (!$this->b363()) {
-			goto f1110;}
+			goto f1093;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// b223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -11029,7 +10518,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n1111;}
+				goto n1094;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -11042,41 +10531,41 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e1113;
+					goto e1096;
 				}
 
 				if (!$this->b224()) {
-					goto e1113;}
+					goto e1096;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1113;
+					goto e1096;
 				}
 
 				$k2++;
 			}
-			e1113:
+			e1096:
 
 			if ($k2 < 1) {
-				goto f1112;
+				goto f1095;
 			}
-			goto k1112;
-			f1112:
+			goto k1095;
+			f1095:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1111;
-			k1112:
-			n1111:
+			goto n1094;
+			k1095:
+			n1094:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k1110;
-		f1110:
+		goto k1093;
+		f1093:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1110:
+		k1093:
 
 		return true;
 	}
@@ -11098,7 +10587,7 @@ abstract class GeneratedParser
 				$this->rec(54);
 			}
 
-			goto f1444;}
+			goto f1422;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -11112,14 +10601,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1446;
+				goto e1424;
 			}
 
 			$this->p++;
 		}
-		e1446:
+		e1424:
 		if (!$this->b321()) {
-			goto f1444;}
+			goto f1422;}
 		// b203
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -11131,16 +10620,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1448;
+				goto e1426;
 			}
 
 			$this->p++;
 		}
-		e1448:
+		e1426:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->b327()) {
-				goto n1449;}
-			n1449:
+				goto n1427;}
+			n1427:
 		} elseif ($this->p > $this->f) {
 			$this->rec(327);
 		}
@@ -11149,17 +10638,17 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f1444;}
+			goto f1422;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		goto k1444;
-		f1444:
+		goto k1422;
+		f1422:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1444:
-		$this->v[$m1] = $this->reduceGeneric($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1422:
+		$this->v[$m1] = $this->reduceGeneric(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -11182,7 +10671,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f827;}
+			goto f821;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b203
@@ -11196,12 +10685,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e829;
+				goto e823;
 			}
 
 			$this->p++;
 		}
-		e829:
+		e823:
 		if (isset(self::T7680fe2e[$this->ids[$this->p]])) {
 			// b306
 			if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
@@ -11209,13 +10698,13 @@ abstract class GeneratedParser
 					$this->rec(306);
 				}
 
-				goto n830;}
+				goto n824;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
 			if (!$this->b307()) {
-				goto f831;}
+				goto f825;}
 			// b203
 			$o3 = $this->p;
 			$m3 = $this->n;
@@ -11227,27 +10716,27 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e833;
+					goto e827;
 				}
 
 				$this->p++;
 			}
-			e833:
+			e827:
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->b311()) {
-					goto n834;}
-				n834:
+					goto n828;}
+				n828:
 			} elseif ($this->p > $this->f) {
 				$this->rec(311);
 			}
-			goto k831;
-			f831:
+			goto k825;
+			f825:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n830;
-			k831:
-			n830:
+			goto n824;
+			k825:
+			n824:
 		} elseif ($this->p > $this->f) {
 			$this->rec(306);
 		}
@@ -11256,7 +10745,7 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f827;}
+			goto f821;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!($this->ids[$this->p] === 47)) {
@@ -11264,19 +10753,19 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f827;}
+			goto f821;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b315()) {
-			goto f827;}
-		goto k827;
-		f827:
+			goto f821;}
+		goto k821;
+		f821:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k827:
-		$this->v[$m1] = $this->reduceCallable($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k821:
+		$this->v[$m1] = $this->reduceCallable(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -11299,7 +10788,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f399;}
+						goto f373;}
 				}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
@@ -11307,17 +10796,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f399;}
+						goto f373;}
 				}
-				goto k399;
-				f399:
+				goto k373;
+				f373:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n398;
-				k399:
-				goto a397;
-				n398:
+				goto n372;
+				k373:
+				goto a371;
+				n372:
 				break;
 			case 28:
 			case 29:
@@ -11329,7 +10818,7 @@ abstract class GeneratedParser
 						$this->rec(369);
 					}
 
-					goto n400;}
+					goto n374;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -11345,23 +10834,23 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e403;
+						goto e377;
 					}
 
 					$this->p++;
 				}
-				e403:
+				e377:
 				if (!$this->b370()) {
-					goto f401;}
-				goto k401;
-				f401:
+					goto f375;}
+				goto k375;
+				f375:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n400;
-				k401:
-				goto a397;
-				n400:
+				goto n374;
+				k375:
+				goto a371;
+				n374:
 				// b383
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -11372,7 +10861,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f405;}
+						goto f379;}
 				}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
@@ -11380,17 +10869,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f405;}
+						goto f379;}
 				}
-				goto k405;
-				f405:
+				goto k379;
+				f379:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n404;
-				k405:
-				goto a397;
-				n404:
+				goto n378;
+				k379:
+				goto a371;
+				n378:
 				break;
 		}
 
@@ -11398,15 +10887,15 @@ abstract class GeneratedParser
 			$this->rec(368);
 		}
 
-		goto f396;
-		a397:
-		goto k396;
-		f396:
+		goto f370;
+		a371:
+		goto k370;
+		f370:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k396:
+		k370:
 
 		return true;
 	}
@@ -11428,15 +10917,15 @@ abstract class GeneratedParser
 				break;
 			case 28:
 				if (!$this->b371()) {
-					goto n655;}
-				goto a654;
-				n655:
+					goto n639;}
+				goto a638;
+				n639:
 				break;
 			case 29:
 				if (!$this->b377()) {
-					goto n656;}
-				goto a654;
-				n656:
+					goto n640;}
+				goto a638;
+				n640:
 				break;
 		}
 
@@ -11444,15 +10933,15 @@ abstract class GeneratedParser
 			$this->rec(370);
 		}
 
-		goto f653;
-		a654:
-		goto k653;
-		f653:
+		goto f637;
+		a638:
+		goto k637;
+		f637:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k653:
+		k637:
 
 		return true;
 	}
@@ -11475,7 +10964,7 @@ abstract class GeneratedParser
 				$this->rec(372);
 			}
 
-			goto f878;}
+			goto f873;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -11488,45 +10977,45 @@ abstract class GeneratedParser
 					$this->rec(373);
 				}
 
-				goto e880;
+				goto e875;
 			}
 
 			if (!$this->b373()) {
-				goto e880;}
+				goto e875;}
 			if ($this->p === $b2) {
 				$k2 = 1;
-				goto e880;
+				goto e875;
 			}
 
 			$k2++;
 		}
-		e880:
+		e875:
 
 		if ($k2 < 1) {
-			goto f879;
+			goto f874;
 		}
-		goto k879;
-		f879:
+		goto k874;
+		f874:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f878;
-		k879:
+		goto f873;
+		k874:
 		if (($this->ids[$this->p] === 28)) {
 			if (($this->ids[$this->p] === 28)) {
 				if ($this->p > $this->f) {
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f878;}
+				goto f873;}
 		}
-		goto k878;
-		f878:
+		goto k873;
+		f873:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k878:
+		k873:
 
 		return true;
 	}
@@ -11548,11 +11037,11 @@ abstract class GeneratedParser
 				$this->rec(49);
 			}
 
-			goto f1158;}
+			goto f1141;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b201()) {
-			goto f1158;}
+			goto f1141;}
 		// b375
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -11568,33 +11057,33 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1162;
+				goto e1145;
 			}
 
 			$this->p++;
 		}
-		e1162:
+		e1145:
 		if (!($this->ids[$this->p] === 28)) {
 			if ($this->p > $this->f) {
 				$this->rec(49);
 			}
 
-			goto f1160;}
-		goto k1160;
-		f1160:
+			goto f1143;}
+		goto k1143;
+		f1143:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto n1159;
-		k1160:
-		n1159:
-		goto k1158;
-		f1158:
+		goto n1142;
+		k1143:
+		n1142:
+		goto k1141;
+		f1141:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1158:
+		k1141:
 
 		return true;
 	}
@@ -11617,7 +11106,7 @@ abstract class GeneratedParser
 				$this->rec(378);
 			}
 
-			goto f881;}
+			goto f876;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -11630,45 +11119,45 @@ abstract class GeneratedParser
 					$this->rec(379);
 				}
 
-				goto e883;
+				goto e878;
 			}
 
 			if (!$this->b379()) {
-				goto e883;}
+				goto e878;}
 			if ($this->p === $b2) {
 				$k2 = 1;
-				goto e883;
+				goto e878;
 			}
 
 			$k2++;
 		}
-		e883:
+		e878:
 
 		if ($k2 < 1) {
-			goto f882;
+			goto f877;
 		}
-		goto k882;
-		f882:
+		goto k877;
+		f877:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f881;
-		k882:
+		goto f876;
+		k877:
 		if (($this->ids[$this->p] === 29)) {
 			if (($this->ids[$this->p] === 29)) {
 				if ($this->p > $this->f) {
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f881;}
+				goto f876;}
 		}
-		goto k881;
-		f881:
+		goto k876;
+		f876:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k881:
+		k876:
 
 		return true;
 	}
@@ -11690,11 +11179,11 @@ abstract class GeneratedParser
 				$this->rec(50);
 			}
 
-			goto f1163;}
+			goto f1146;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b201()) {
-			goto f1163;}
+			goto f1146;}
 		// b381
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -11710,33 +11199,68 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1167;
+				goto e1150;
 			}
 
 			$this->p++;
 		}
-		e1167:
+		e1150:
 		if (!($this->ids[$this->p] === 29)) {
 			if ($this->p > $this->f) {
 				$this->rec(50);
 			}
 
-			goto f1165;}
-		goto k1165;
-		f1165:
+			goto f1148;}
+		goto k1148;
+		f1148:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto n1164;
-		k1165:
-		n1164:
-		goto k1163;
-		f1163:
+		goto n1147;
+		k1148:
+		n1147:
+		goto k1146;
+		f1146:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1163:
+		k1146:
+
+		return true;
+	}
+
+	private function b384(): bool
+	{
+		if (!($this->ids[$this->p] === 75)) {
+			if ($this->p > $this->f) {
+				$this->rec(384);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!($this->ids[$this->p] === 75)) {
+			if ($this->p >= $this->f) {
+				$this->rec(90);
+			}
+
+			goto f298;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (!$this->b199()) {
+			goto f298;}
+		if (!$this->b385()) {
+			goto f298;}
+		goto k298;
+		f298:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k298:
 
 		return true;
 	}
@@ -11748,48 +11272,10 @@ abstract class GeneratedParser
 		$cs1 = $this->comments;
 		switch ($this->ids[$this->p]) {
 			default:
-				// b388
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (($this->ids[$this->p] === 28)) {
-					if (($this->ids[$this->p] === 28)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f317;}
-				}
-				if (($this->ids[$this->p] === 29)) {
-					if (($this->ids[$this->p] === 29)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f317;}
-				}
-				if (($this->ids[$this->p] === 32)) {
-					if (($this->ids[$this->p] === 32)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f317;}
-				}
-				// b125
-				$o3 = $this->p;
-				if (!$this->s125()) {
-					goto f317;}
-				$this->v[$this->n++] = $this->reduceText($this->context($o3));
-				goto k317;
-				f317:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n316;
-				k317:
-				goto a315;
-				n316:
+				if (!$this->b388()) {
+					goto n548;}
+				goto a547;
+				n548:
 				break;
 			case 25:
 			case 26:
@@ -11799,7 +11285,7 @@ abstract class GeneratedParser
 						$this->rec(386);
 					}
 
-					goto n319;}
+					goto n549;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -11809,65 +11295,27 @@ abstract class GeneratedParser
 						$this->rec(387);
 					}
 
-					goto f320;}
+					goto f550;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				// b125
 				$o3 = $this->p;
 				if (!$this->s125()) {
-					goto f320;}
-				$this->v[$this->n++] = $this->reduceText($this->context($o3));
-				goto k320;
-				f320:
+					goto f550;}
+				$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+				goto k550;
+				f550:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n319;
-				k320:
-				goto a315;
-				n319:
-				// b388
-				$o2 = $this->p;
-				$m2 = $this->n;
-				$cs2 = $this->comments;
-				if (($this->ids[$this->p] === 28)) {
-					if (($this->ids[$this->p] === 28)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f323;}
-				}
-				if (($this->ids[$this->p] === 29)) {
-					if (($this->ids[$this->p] === 29)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f323;}
-				}
-				if (($this->ids[$this->p] === 32)) {
-					if (($this->ids[$this->p] === 32)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f323;}
-				}
-				// b125
-				$o3 = $this->p;
-				if (!$this->s125()) {
-					goto f323;}
-				$this->v[$this->n++] = $this->reduceText($this->context($o3));
-				goto k323;
-				f323:
-				$this->p = $o2;
-				$this->n = $m2;
-				$this->comments = $cs2;
-				goto n322;
-				k323:
-				goto a315;
-				n322:
+				goto n549;
+				k550:
+				goto a547;
+				n549:
+				if (!$this->b388()) {
+					goto n552;}
+				goto a547;
+				n552:
 				break;
 		}
 
@@ -11875,15 +11323,15 @@ abstract class GeneratedParser
 			$this->rec(385);
 		}
 
-		goto f314;
-		a315:
-		goto k314;
-		f314:
+		goto f546;
+		a547:
+		goto k546;
+		f546:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k314:
+		k546:
 
 		return true;
 	}
@@ -11899,7 +11347,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f281;}
+				goto f267;}
 		}
 		if (($this->ids[$this->p] === 29)) {
 			if (($this->ids[$this->p] === 29)) {
@@ -11907,7 +11355,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f281;}
+				goto f267;}
 		}
 		if (($this->ids[$this->p] === 32)) {
 			if (($this->ids[$this->p] === 32)) {
@@ -11915,20 +11363,20 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f281;}
+				goto f267;}
 		}
 		// b125
 		$o2 = $this->p;
 		if (!$this->s125()) {
-			goto f281;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o2));
-		goto k281;
-		f281:
+			goto f267;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k267;
+		f267:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k281:
+		k267:
 
 		return true;
 	}
@@ -11950,7 +11398,7 @@ abstract class GeneratedParser
 				$this->rec(98);
 			}
 
-			goto f289;}
+			goto f273;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b399
@@ -11959,40 +11407,40 @@ abstract class GeneratedParser
 				$this->rec(399);
 			}
 
-			goto f289;}
+			goto f273;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
 		$cs2 = $this->comments;
 		if (!$this->b199()) {
-			goto f290;}
+			goto f274;}
 		if (!($this->ids[$this->p] === 26)) {
 			if ($this->p >= $this->f) {
 				$this->rec(47);
 			}
 
-			goto f290;}
+			goto f274;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f290;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k290;
-		f290:
+			goto f274;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k274;
+		f274:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f289;
-		k290:
-		goto k289;
-		f289:
+		goto f273;
+		k274:
+		goto k273;
+		f273:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k289:
+		k273:
 
 		return true;
 	}
@@ -12014,7 +11462,7 @@ abstract class GeneratedParser
 				$this->rec(108);
 			}
 
-			goto f296;}
+			goto f281;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b399
@@ -12023,40 +11471,40 @@ abstract class GeneratedParser
 				$this->rec(399);
 			}
 
-			goto f296;}
+			goto f281;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
 		$cs2 = $this->comments;
 		if (!$this->b199()) {
-			goto f297;}
+			goto f282;}
 		if (!($this->ids[$this->p] === 26)) {
 			if ($this->p >= $this->f) {
 				$this->rec(47);
 			}
 
-			goto f297;}
+			goto f282;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f297;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k297;
-		f297:
+			goto f282;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k282;
+		f282:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f296;
-		k297:
-		goto k296;
-		f296:
+		goto f281;
+		k282:
+		goto k281;
+		f281:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k296:
+		k281:
 
 		return true;
 	}
@@ -12078,7 +11526,7 @@ abstract class GeneratedParser
 				$this->rec(87);
 			}
 
-			goto f278;}
+			goto f264;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b399
@@ -12087,40 +11535,40 @@ abstract class GeneratedParser
 				$this->rec(399);
 			}
 
-			goto f278;}
+			goto f264;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
 		$cs2 = $this->comments;
 		if (!$this->b199()) {
-			goto f279;}
+			goto f265;}
 		if (!($this->ids[$this->p] === 26)) {
 			if ($this->p >= $this->f) {
 				$this->rec(47);
 			}
 
-			goto f279;}
+			goto f265;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f279;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k279;
-		f279:
+			goto f265;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k265;
+		f265:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f278;
-		k279:
-		goto k278;
-		f278:
+		goto f264;
+		k265:
+		goto k264;
+		f264:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k278:
+		k264:
 
 		return true;
 	}
@@ -12142,7 +11590,7 @@ abstract class GeneratedParser
 				$this->rec(85);
 			}
 
-			goto f266;}
+			goto f252;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b403
@@ -12151,7 +11599,7 @@ abstract class GeneratedParser
 				$this->rec(403);
 			}
 
-			goto f266;}
+			goto f252;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -12161,28 +11609,28 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f267;}
+			goto f253;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f267;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k267;
-		f267:
+			goto f253;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k253;
+		f253:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f266;
-		k267:
-		goto k266;
-		f266:
+		goto f252;
+		k253:
+		goto k252;
+		f252:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k266:
+		k252:
 
 		return true;
 	}
@@ -12204,7 +11652,7 @@ abstract class GeneratedParser
 				$this->rec(86);
 			}
 
-			goto f275;}
+			goto f261;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b403
@@ -12213,7 +11661,7 @@ abstract class GeneratedParser
 				$this->rec(403);
 			}
 
-			goto f275;}
+			goto f261;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -12223,28 +11671,28 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f276;}
+			goto f262;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f276;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k276;
-		f276:
+			goto f262;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k262;
+		f262:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f275;
-		k276:
-		goto k275;
-		f275:
+		goto f261;
+		k262:
+		goto k261;
+		f261:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k275:
+		k261:
 
 		return true;
 	}
@@ -12266,7 +11714,7 @@ abstract class GeneratedParser
 				$this->rec(88);
 			}
 
-			goto f269;}
+			goto f255;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b403
@@ -12275,7 +11723,7 @@ abstract class GeneratedParser
 				$this->rec(403);
 			}
 
-			goto f269;}
+			goto f255;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -12285,28 +11733,28 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f270;}
+			goto f256;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f270;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k270;
-		f270:
+			goto f256;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k256;
+		f256:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f269;
-		k270:
-		goto k269;
-		f269:
+		goto f255;
+		k256:
+		goto k255;
+		f255:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k269:
+		k255:
 
 		return true;
 	}
@@ -12328,7 +11776,7 @@ abstract class GeneratedParser
 				$this->rec(89);
 			}
 
-			goto f272;}
+			goto f258;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b403
@@ -12337,7 +11785,7 @@ abstract class GeneratedParser
 				$this->rec(403);
 			}
 
-			goto f272;}
+			goto f258;}
 
 		$o2 = $this->p;
 		$m2 = $this->n;
@@ -12347,28 +11795,28 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f273;}
+			goto f259;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o3 = $this->p;
 		if (!$this->s125()) {
-			goto f273;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k273;
-		f273:
+			goto f259;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k259;
+		f259:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f272;
-		k273:
-		goto k272;
-		f272:
+		goto f258;
+		k259:
+		goto k258;
+		f258:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k272:
+		k258:
 
 		return true;
 	}
@@ -12420,24 +11868,24 @@ abstract class GeneratedParser
 						$this->rec(435);
 					}
 
-					goto n302;}
+					goto n288;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b199()) {
-					goto f303;}
+					goto f289;}
 				if (!$this->b415()) {
-					goto f303;}
-				goto k303;
-				f303:
+					goto f289;}
+				goto k289;
+				f289:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n302;
-				k303:
-				goto a301;
-				n302:
+				goto n288;
+				k289:
+				goto a287;
+				n288:
 				break;
 			case 9:
 				// b410
@@ -12446,7 +11894,7 @@ abstract class GeneratedParser
 						$this->rec(410);
 					}
 
-					goto n304;}
+					goto n290;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -12456,7 +11904,7 @@ abstract class GeneratedParser
 						$this->rec(25);
 					}
 
-					goto f305;}
+					goto f291;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (isset(self::T648acf56[$this->ids[$this->p]])) {
@@ -12472,45 +11920,45 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f305;}
+						goto f291;}
 				}
 				if (!$this->b199()) {
-					goto f305;}
+					goto f291;}
 				if (!$this->b415()) {
-					goto f305;}
-				goto k305;
-				f305:
+					goto f291;}
+				goto k291;
+				f291:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n304;
-				k305:
-				goto a301;
-				n304:
+				goto n290;
+				k291:
+				goto a287;
+				n290:
 				// b435
 				if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(435);
 					}
 
-					goto n307;}
+					goto n293;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
 				$cs2 = $this->comments;
 				if (!$this->b199()) {
-					goto f308;}
+					goto f294;}
 				if (!$this->b415()) {
-					goto f308;}
-				goto k308;
-				f308:
+					goto f294;}
+				goto k294;
+				f294:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n307;
-				k308:
-				goto a301;
-				n307:
+				goto n293;
+				k294:
+				goto a287;
+				n293:
 				break;
 		}
 
@@ -12518,15 +11966,15 @@ abstract class GeneratedParser
 			$this->rec(409);
 		}
 
-		goto f300;
-		a301:
-		goto k300;
-		f300:
+		goto f286;
+		a287:
+		goto k286;
+		f286:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k300:
+		k286:
 
 		return true;
 	}
@@ -12571,7 +12019,7 @@ abstract class GeneratedParser
 						$this->rec(416);
 					}
 
-					goto n555;}
+					goto n533;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -12581,29 +12029,29 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f556;}
+					goto f534;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b417()) {
-					goto f556;}
-				goto k556;
-				f556:
+					goto f534;}
+				goto k534;
+				f534:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n555;
-				k556:
-				goto a554;
-				n555:
+				goto n533;
+				k534:
+				goto a532;
+				n533:
 				break;
 			case 32:
 			case 34:
 			case 82:
 			case 86:
 				if (!$this->b417()) {
-					goto n557;}
-				goto a554;
-				n557:
+					goto n535;}
+				goto a532;
+				n535:
 				break;
 		}
 
@@ -12611,15 +12059,15 @@ abstract class GeneratedParser
 			$this->rec(415);
 		}
 
-		goto f553;
-		a554:
-		goto k553;
-		f553:
+		goto f531;
+		a532:
+		goto k531;
+		f531:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k553:
+		k531:
 
 		return true;
 	}
@@ -12636,57 +12084,14 @@ abstract class GeneratedParser
 		$o1 = $this->p;
 		$m1 = $this->n;
 		$cs1 = $this->comments;
-		// b418
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		switch ($this->ids[$this->p]) {
-			default:
-				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->f = $this->p;
-						$this->er = [];
-					}
-					goto n796;}
-				goto a795;
-				n796:
-				break;
-			case 34:
-			case 86:
-				if (!$this->b419()) {
-					goto n797;}
-				goto a795;
-				n797:
-				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->f = $this->p;
-						$this->er = [];
-					}
-					goto n798;}
-				goto a795;
-				n798:
-				break;
-		}
-
-		if ($this->p > $this->f) {
-			$this->rec(418);
-		}
-
-		goto f794;
-		a795:
-		goto k794;
-		f794:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f793;
-		k794:
+		if (!$this->b418()) {
+			goto f788;}
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(16);
 			}
 
-			goto f793;}
+			goto f788;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (isset(self::T9373805c[$this->ids[$this->p]])) {
@@ -12696,28 +12101,28 @@ abstract class GeneratedParser
 					$this->rec(424);
 				}
 
-				goto n799;}
+				goto n789;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
 			if (!$this->b425()) {
-				goto f800;}
+				goto f790;}
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->b433()) {
-					goto n801;}
-				n801:
+					goto n791;}
+				n791:
 			} elseif ($this->p > $this->f) {
 				$this->rec(433);
 			}
-			goto k800;
-			f800:
+			goto k790;
+			f790:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n799;
-			k800:
-			n799:
+			goto n789;
+			k790:
+			n789:
 		} elseif ($this->p > $this->f) {
 			$this->rec(424);
 		}
@@ -12726,30 +12131,121 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f793;}
+			goto f788;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		// b125
 		$o2 = $this->p;
 		if (!$this->s125()) {
-			goto f793;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o2));
-		goto k793;
-		f793:
+			goto f788;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k788;
+		f788:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k793:
+		k788:
 
 		return true;
 	}
 
-	private function b419(): bool
+	private function b418(): bool
 	{
-		if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		switch ($this->ids[$this->p]) {
+			default:
+				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->f = $this->p;
+						$this->er = [];
+					}
+					goto n1022;}
+				goto a1021;
+				n1022:
+				break;
+			case 34:
+			case 86:
+				// b419
+				if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(419);
+					}
+
+					goto n1023;}
+
+				$o2 = $this->p;
+				$m2 = $this->n;
+				$cs2 = $this->comments;
+				if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(238);
+					}
+
+					goto f1024;}
+
+				$this->v[$this->n++] = $this->token($this->p++);
+				if (!$this->b286()) {
+					goto f1024;}
+				if (($this->ids[$this->p] === 40)) {
+					if (!$this->b421()) {
+						goto n1025;}
+					n1025:
+				} elseif ($this->p > $this->f) {
+					$this->rec(421);
+				}
+				if (!($this->ids[$this->p] === 35)) {
+					if ($this->p >= $this->f) {
+						$this->rec(56);
+					}
+
+					goto f1024;}
+
+				$this->v[$this->n++] = $this->token($this->p++);
+				goto k1024;
+				f1024:
+				$this->p = $o2;
+				$this->n = $m2;
+				$this->comments = $cs2;
+				goto n1023;
+				k1024:
+				goto a1021;
+				n1023:
+				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->f = $this->p;
+						$this->er = [];
+					}
+					goto n1026;}
+				goto a1021;
+				n1026:
+				break;
+		}
+
+		if ($this->p > $this->f) {
+			$this->rec(418);
+		}
+
+		goto f1020;
+		a1021:
+		goto k1020;
+		f1020:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k1020:
+
+		return true;
+	}
+
+	private function b421(): bool
+	{
+		if (!($this->ids[$this->p] === 40)) {
 			if ($this->p > $this->f) {
-				$this->rec(419);
+				$this->rec(421);
 			}
 
 			return false;}
@@ -12757,176 +12253,64 @@ abstract class GeneratedParser
 		$o1 = $this->p;
 		$m1 = $this->n;
 		$cs1 = $this->comments;
-		if (!isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(238);
-			}
-
-			goto f1036;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b286
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(286);
-			}
-
-			goto f1036;}
-
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(144);
-			}
-
-			goto f1037;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b287()) {
-			goto f1037;}
-		if (!$this->b293()) {
-			goto f1037;}
-		if (!$this->b296()) {
-			goto f1037;}
-		goto k1037;
-		f1037:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f1036;
-		k1037:
-		$this->v[$m2] = $this->reduceCallableTemplateArgument($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-		$this->n = $m2 + 1;
-		if (($this->ids[$this->p] === 40)) {
-			// b421
+		$k1 = 0;
+		while (true) {
+			$b1 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
-				if ($this->p > $this->f) {
-					$this->rec(421);
+				if ($b1 > $this->f) {
+					$this->rec(422);
 				}
 
-				goto n1038;}
+				goto e1377;
+			}
+
+			// b422
+			if (!($this->ids[$this->p] === 40)) {
+				if ($this->p > $this->f) {
+					$this->rec(422);
+				}
+
+				goto e1377;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
 			$cs2 = $this->comments;
-			$k2 = 0;
-			while (true) {
-				$b2 = $this->p;
-				if (!($this->ids[$this->p] === 40)) {
-					if ($b2 > $this->f) {
-						$this->rec(422);
-					}
-
-					goto e1040;
+			if (!($this->ids[$this->p] === 40)) {
+				if ($this->p >= $this->f) {
+					$this->rec(63);
 				}
 
-				if (!$this->b422()) {
-					goto e1040;}
-				if ($this->p === $b2) {
-					$k2 = 1;
-					goto e1040;
-				}
+				goto f1378;}
 
-				$k2++;
-			}
-			e1040:
-
-			if ($k2 < 1) {
-				goto f1039;
-			}
-			goto k1039;
-			f1039:
+			$this->v[$this->n++] = $this->token($this->p++);
+			if (!$this->b286()) {
+				goto f1378;}
+			goto k1378;
+			f1378:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto n1038;
-			k1039:
-			n1038:
-		} elseif ($this->p > $this->f) {
-			$this->rec(421);
+			goto e1377;
+			k1378:
+			if ($this->p === $b1) {
+				$k1 = 1;
+				goto e1377;
+			}
+
+			$k1++;
 		}
-		if (!($this->ids[$this->p] === 35)) {
-			if ($this->p >= $this->f) {
-				$this->rec(56);
-			}
+		e1377:
 
-			goto f1036;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		goto k1036;
-		f1036:
+		if ($k1 < 1) {
+			goto f1376;
+		}
+		goto k1376;
+		f1376:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1036:
-
-		return true;
-	}
-
-	private function b422(): bool
-	{
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p > $this->f) {
-				$this->rec(422);
-			}
-
-			return false;}
-
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
-		if (!($this->ids[$this->p] === 40)) {
-			if ($this->p >= $this->f) {
-				$this->rec(63);
-			}
-
-			goto f1397;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		// b286
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(286);
-			}
-
-			goto f1397;}
-
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
-			if ($this->p > $this->f) {
-				$this->rec(144);
-			}
-
-			goto f1398;}
-
-		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b287()) {
-			goto f1398;}
-		if (!$this->b293()) {
-			goto f1398;}
-		if (!$this->b296()) {
-			goto f1398;}
-		goto k1398;
-		f1398:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f1397;
-		k1398:
-		$this->v[$m2] = $this->reduceCallableTemplateArgument($this->context($o2), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
-		$this->n = $m2 + 1;
-		goto k1397;
-		f1397:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k1397:
+		k1376:
 
 		return true;
 	}
@@ -12969,9 +12353,9 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->b426()) {
-					goto n1043;}
-				goto a1042;
-				n1043:
+					goto n1029;}
+				goto a1028;
+				n1029:
 				break;
 			case 26:
 			case 27:
@@ -12982,7 +12366,7 @@ abstract class GeneratedParser
 						$this->rec(431);
 					}
 
-					goto n1044;}
+					goto n1030;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -13002,20 +12386,20 @@ abstract class GeneratedParser
 						$this->rec(47);
 					}
 
-					goto f1045;}
+					goto f1031;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b429()) {
-					goto f1045;}
-				goto k1045;
-				f1045:
+					goto f1031;}
+				goto k1031;
+				f1031:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1044;
-				k1045:
-				goto a1042;
-				n1044:
+				goto n1030;
+				k1031:
+				goto a1028;
+				n1030:
 				break;
 		}
 
@@ -13023,16 +12407,16 @@ abstract class GeneratedParser
 			$this->rec(425);
 		}
 
-		goto f1041;
-		a1042:
-		goto k1041;
-		f1041:
+		goto f1027;
+		a1028:
+		goto k1027;
+		f1027:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1041:
-		$this->v[$m1] = $this->reduceMethodParameter($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k1027:
+		$this->v[$m1] = $this->reduceMethodParameter(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -13055,9 +12439,9 @@ abstract class GeneratedParser
 				$this->rec(428);
 			}
 
-			goto f1399;}
+			goto f1379;}
 		if (!$this->b199()) {
-			goto f1399;}
+			goto f1379;}
 		if (($this->ids[$this->p] === 27)) {
 			$this->v[$this->n++] = $this->token($this->p++);
 		} elseif ($this->p >= $this->f) {
@@ -13073,18 +12457,18 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f1399;}
+			goto f1379;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b429()) {
-			goto f1399;}
-		goto k1399;
-		f1399:
+			goto f1379;}
+		goto k1379;
+		f1379:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1399:
+		k1379:
 
 		return true;
 	}
@@ -13101,9 +12485,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1402;}
-				goto a1401;
-				n1402:
+					goto n1382;}
+				goto a1381;
+				n1382:
 				break;
 			case 46:
 				// b430
@@ -13112,7 +12496,7 @@ abstract class GeneratedParser
 						$this->rec(430);
 					}
 
-					goto n1403;}
+					goto n1383;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -13122,28 +12506,28 @@ abstract class GeneratedParser
 						$this->rec(69);
 					}
 
-					goto f1404;}
+					goto f1384;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b340()) {
-					goto f1404;}
-				goto k1404;
-				f1404:
+					goto f1384;}
+				goto k1384;
+				f1384:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n1403;
-				k1404:
-				goto a1401;
-				n1403:
+				goto n1383;
+				k1384:
+				goto a1381;
+				n1383:
 				if (($this->ids[$this->p] === 46)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1405;}
-				goto a1401;
-				n1405:
+					goto n1385;}
+				goto a1381;
+				n1385:
 				break;
 		}
 
@@ -13151,15 +12535,15 @@ abstract class GeneratedParser
 			$this->rec(429);
 		}
 
-		goto f1400;
-		a1401:
-		goto k1400;
-		f1400:
+		goto f1380;
+		a1381:
+		goto k1380;
+		f1380:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1400:
+		k1380:
 
 		return true;
 	}
@@ -13184,7 +12568,7 @@ abstract class GeneratedParser
 					$this->rec(434);
 				}
 
-				goto e1047;
+				goto e1033;
 			}
 
 			// b434
@@ -13193,7 +12577,7 @@ abstract class GeneratedParser
 					$this->rec(434);
 				}
 
-				goto e1047;}
+				goto e1033;}
 
 			$o2 = $this->p;
 			$m2 = $this->n;
@@ -13203,37 +12587,37 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1048;}
+				goto f1034;}
 
 			$this->v[$this->n++] = $this->token($this->p++);
 			if (!$this->b425()) {
-				goto f1048;}
-			goto k1048;
-			f1048:
+				goto f1034;}
+			goto k1034;
+			f1034:
 			$this->p = $o2;
 			$this->n = $m2;
 			$this->comments = $cs2;
-			goto e1047;
-			k1048:
+			goto e1033;
+			k1034:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1047;
+				goto e1033;
 			}
 
 			$k1++;
 		}
-		e1047:
+		e1033:
 
 		if ($k1 < 1) {
-			goto f1046;
+			goto f1032;
 		}
-		goto k1046;
-		f1046:
+		goto k1032;
+		f1032:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k1046:
+		k1032:
 
 		return true;
 	}
@@ -13255,7 +12639,7 @@ abstract class GeneratedParser
 				$this->rec(100);
 			}
 
-			goto f286;}
+			goto f272;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13263,62 +12647,24 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f286;}
+			goto f272;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b287()) {
-			goto f286;}
+			goto f272;}
 		if (!$this->b293()) {
-			goto f286;}
+			goto f272;}
 		if (!$this->b296()) {
-			goto f286;}
-		// b388
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		if (($this->ids[$this->p] === 28)) {
-			if (($this->ids[$this->p] === 28)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f287;}
-		}
-		if (($this->ids[$this->p] === 29)) {
-			if (($this->ids[$this->p] === 29)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f287;}
-		}
-		if (($this->ids[$this->p] === 32)) {
-			if (($this->ids[$this->p] === 32)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f287;}
-		}
-		// b125
-		$o3 = $this->p;
-		if (!$this->s125()) {
-			goto f287;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k287;
-		f287:
-		$this->p = $o2;
-		$this->n = $m2;
-		$this->comments = $cs2;
-		goto f286;
-		k287:
-		goto k286;
-		f286:
+			goto f272;}
+		if (!$this->b388()) {
+			goto f272;}
+		goto k272;
+		f272:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k286:
+		k272:
 
 		return true;
 	}
@@ -13340,91 +12686,46 @@ abstract class GeneratedParser
 				$this->rec(101);
 			}
 
-			goto f299;}
+			goto f284;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b438()) {
-			goto f299;}
-		goto k299;
-		f299:
-		$this->p = $o1;
-		$this->n = $m1;
-		$this->comments = $cs1;
-		return false;
-		k299:
-
-		return true;
-	}
-
-	private function b438(): bool
-	{
+		// b438
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(438);
 			}
 
-			return false;}
+			goto f284;}
 
-		$o1 = $this->p;
-		$m1 = $this->n;
-		$cs1 = $this->comments;
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(144);
 			}
 
-			goto f550;}
+			goto f285;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b320()) {
-			goto f550;}
-		// b388
-		$o2 = $this->p;
-		$m2 = $this->n;
-		$cs2 = $this->comments;
-		if (($this->ids[$this->p] === 28)) {
-			if (($this->ids[$this->p] === 28)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f551;}
-		}
-		if (($this->ids[$this->p] === 29)) {
-			if (($this->ids[$this->p] === 29)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f551;}
-		}
-		if (($this->ids[$this->p] === 32)) {
-			if (($this->ids[$this->p] === 32)) {
-				if ($this->p > $this->f) {
-					$this->f = $this->p;
-					$this->er = [];
-				}
-				goto f551;}
-		}
-		// b125
-		$o3 = $this->p;
-		if (!$this->s125()) {
-			goto f551;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o3));
-		goto k551;
-		f551:
+			goto f285;}
+		if (!$this->b388()) {
+			goto f285;}
+		goto k285;
+		f285:
 		$this->p = $o2;
 		$this->n = $m2;
 		$this->comments = $cs2;
-		goto f550;
-		k551:
-		goto k550;
-		f550:
+		goto f284;
+		k285:
+		goto k284;
+		f284:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k550:
+		k284:
 
 		return true;
 	}
@@ -13446,18 +12747,46 @@ abstract class GeneratedParser
 				$this->rec(102);
 			}
 
-			goto f292;}
+			goto f276;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b438()) {
-			goto f292;}
-		goto k292;
-		f292:
+		// b438
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(438);
+			}
+
+			goto f276;}
+
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(144);
+			}
+
+			goto f277;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (!$this->b320()) {
+			goto f277;}
+		if (!$this->b388()) {
+			goto f277;}
+		goto k277;
+		f277:
+		$this->p = $o2;
+		$this->n = $m2;
+		$this->comments = $cs2;
+		goto f276;
+		k277:
+		goto k276;
+		f276:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k292:
+		k276:
 
 		return true;
 	}
@@ -13479,18 +12808,46 @@ abstract class GeneratedParser
 				$this->rec(103);
 			}
 
-			goto f313;}
+			goto f296;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
-		if (!$this->b438()) {
-			goto f313;}
-		goto k313;
-		f313:
+		// b438
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(438);
+			}
+
+			goto f296;}
+
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(144);
+			}
+
+			goto f297;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		if (!$this->b320()) {
+			goto f297;}
+		if (!$this->b388()) {
+			goto f297;}
+		goto k297;
+		f297:
+		$this->p = $o2;
+		$this->n = $m2;
+		$this->comments = $cs2;
+		goto f296;
+		k297:
+		goto k296;
+		f296:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k313:
+		k296:
 
 		return true;
 	}
@@ -13512,7 +12869,7 @@ abstract class GeneratedParser
 				$this->rec(104);
 			}
 
-			goto f293;}
+			goto f278;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13520,7 +12877,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f293;}
+			goto f278;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 46)) {
@@ -13529,20 +12886,20 @@ abstract class GeneratedParser
 			$this->rec(69);
 		}
 		if (!$this->b199()) {
-			goto f293;}
+			goto f278;}
 		if (!isset(self::T53b29bff[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(77);
 			}
 
-			goto f293;}
-		goto k293;
-		f293:
+			goto f278;}
+		goto k278;
+		f278:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k293:
+		k278:
 
 		return true;
 	}
@@ -13564,7 +12921,7 @@ abstract class GeneratedParser
 				$this->rec(104);
 			}
 
-			goto f294;}
+			goto f279;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13572,7 +12929,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f294;}
+			goto f279;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 46)) {
@@ -13583,16 +12940,16 @@ abstract class GeneratedParser
 		// b125
 		$o2 = $this->p;
 		if (!$this->s125()) {
-			goto f294;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o2));
-		goto k294;
-		f294:
+			goto f279;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k279;
+		f279:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k294:
-		$this->v[$m1] = $this->reduceInvalidTypeAliasTag($this->context($o1), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		k279:
+		$this->v[$m1] = $this->reduceInvalidTypeAliasTag(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
 		$this->n = $m1 + 1;
 
 		return true;
@@ -13615,7 +12972,7 @@ abstract class GeneratedParser
 				$this->rec(105);
 			}
 
-			goto f283;}
+			goto f269;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13623,7 +12980,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f283;}
+			goto f269;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!($this->ids[$this->p] === 10)) {
@@ -13631,7 +12988,7 @@ abstract class GeneratedParser
 				$this->rec(26);
 			}
 
-			goto f283;}
+			goto f269;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13639,18 +12996,18 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f283;}
+			goto f269;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b444()) {
-			goto f283;}
-		goto k283;
-		f283:
+			goto f269;}
+		goto k269;
+		f269:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k283:
+		k269:
 
 		return true;
 	}
@@ -13667,9 +13024,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n516;}
-				goto a515;
-				n516:
+					goto n491;}
+				goto a490;
+				n491:
 				break;
 			case 14:
 				// b445
@@ -13678,7 +13035,7 @@ abstract class GeneratedParser
 						$this->rec(445);
 					}
 
-					goto n517;}
+					goto n492;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -13688,7 +13045,7 @@ abstract class GeneratedParser
 						$this->rec(28);
 					}
 
-					goto f518;}
+					goto f493;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13696,26 +13053,26 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f518;}
+					goto f493;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto k518;
-				f518:
+				goto k493;
+				f493:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n517;
-				k518:
-				goto a515;
-				n517:
+				goto n492;
+				k493:
+				goto a490;
+				n492:
 				if (($this->ids[$this->p] === 14)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n519;}
-				goto a515;
-				n519:
+					goto n494;}
+				goto a490;
+				n494:
 				break;
 		}
 
@@ -13723,15 +13080,15 @@ abstract class GeneratedParser
 			$this->rec(444);
 		}
 
-		goto f514;
-		a515:
-		goto k514;
-		f514:
+		goto f489;
+		a490:
+		goto k489;
+		f489:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k514:
+		k489:
 
 		return true;
 	}
@@ -13753,7 +13110,7 @@ abstract class GeneratedParser
 				$this->rec(106);
 			}
 
-			goto f284;}
+			goto f270;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (($this->ids[$this->p] === 31)) {
@@ -13767,29 +13124,29 @@ abstract class GeneratedParser
 			$this->rec(69);
 		}
 		if (!$this->b199()) {
-			goto f284;}
+			goto f270;}
 		if (!isset(self::T29c7f960[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(448);
 			}
 
-			goto f284;}
+			goto f270;}
 
 		$this->v[$this->n++] = $this->token($this->p++);
 		if (!$this->b449()) {
-			goto f284;}
+			goto f270;}
 		// b125
 		$o2 = $this->p;
 		if (!$this->s125()) {
-			goto f284;}
-		$this->v[$this->n++] = $this->reduceText($this->context($o2));
-		goto k284;
-		f284:
+			goto f270;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k270;
+		f270:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k284:
+		k270:
 
 		return true;
 	}
@@ -13806,9 +13163,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n522;}
-				goto a521;
-				n522:
+					goto n497;}
+				goto a496;
+				n497:
 				break;
 			case 45:
 				// b450
@@ -13817,7 +13174,7 @@ abstract class GeneratedParser
 						$this->rec(450);
 					}
 
-					goto n523;}
+					goto n498;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -13827,7 +13184,7 @@ abstract class GeneratedParser
 						$this->rec(68);
 					}
 
-					goto f524;}
+					goto f499;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -13835,28 +13192,28 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f524;}
+					goto f499;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!$this->b451()) {
-					goto f524;}
-				goto k524;
-				f524:
+					goto f499;}
+				goto k499;
+				f499:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n523;
-				k524:
-				goto a521;
-				n523:
+				goto n498;
+				k499:
+				goto a496;
+				n498:
 				if (($this->ids[$this->p] === 45)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n525;}
-				goto a521;
-				n525:
+					goto n500;}
+				goto a496;
+				n500:
 				break;
 		}
 
@@ -13864,15 +13221,15 @@ abstract class GeneratedParser
 			$this->rec(449);
 		}
 
-		goto f520;
-		a521:
-		goto k520;
-		f520:
+		goto f495;
+		a496:
+		goto k495;
+		f495:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k520:
+		k495:
 
 		return true;
 	}
@@ -13889,9 +13246,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n783;}
-				goto a782;
-				n783:
+					goto n773;}
+				goto a772;
+				n773:
 				break;
 			case 32:
 			case 82:
@@ -13901,7 +13258,7 @@ abstract class GeneratedParser
 						$this->rec(452);
 					}
 
-					goto n784;}
+					goto n774;}
 
 				$o2 = $this->p;
 				$m2 = $this->n;
@@ -13911,7 +13268,7 @@ abstract class GeneratedParser
 						$this->rec(16);
 					}
 
-					goto f785;}
+					goto f775;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
 				if (!($this->ids[$this->p] === 33)) {
@@ -13919,26 +13276,26 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto f785;}
+					goto f775;}
 
 				$this->v[$this->n++] = $this->token($this->p++);
-				goto k785;
-				f785:
+				goto k775;
+				f775:
 				$this->p = $o2;
 				$this->n = $m2;
 				$this->comments = $cs2;
-				goto n784;
-				k785:
-				goto a782;
-				n784:
+				goto n774;
+				k775:
+				goto a772;
+				n774:
 				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n786;}
-				goto a782;
-				n786:
+					goto n776;}
+				goto a772;
+				n776:
 				break;
 		}
 
@@ -13946,15 +13303,95 @@ abstract class GeneratedParser
 			$this->rec(451);
 		}
 
-		goto f781;
-		a782:
-		goto k781;
-		f781:
+		goto f771;
+		a772:
+		goto k771;
+		f771:
 		$this->p = $o1;
 		$this->n = $m1;
 		$this->comments = $cs1;
 		return false;
-		k781:
+		k771:
+
+		return true;
+	}
+
+	private function b454(): bool
+	{
+		if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(454);
+			}
+
+			return false;}
+
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
+			if ($this->p > $this->f) {
+				$this->rec(119);
+			}
+
+			goto f241;}
+
+		$this->v[$this->n++] = $this->token($this->p++);
+		// b125
+		$o2 = $this->p;
+		if (!$this->s125()) {
+			goto f241;}
+		$this->v[$this->n++] = $this->reduceText(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)));
+		goto k241;
+		f241:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k241:
+		$this->v[$m1] = $this->reduceInvalidTag(($o1 < $this->p ? $this->indexes[$o1] : ($o1 > 0 ? $this->indexes[$o1 - 1] + 1 : 0)), ($o1 < $this->p ? $this->indexes[$this->p - 1] : ($o1 > 0 ? $this->indexes[$o1 - 1] : -1)), $this->n === $m1 + 1 && !\is_array($this->v[$m1]) ? [$this->v[$m1]] : $this->merge($m1));
+		$this->n = $m1 + 1;
+
+		return true;
+	}
+
+	private function b455(): bool
+	{
+		$o1 = $this->p;
+		$m1 = $this->n;
+		$cs1 = $this->comments;
+		if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
+			if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
+				if ($this->p > $this->f) {
+					$this->f = $this->p;
+					$this->er = [];
+				}
+				goto f238;}
+		}
+		// b457
+		$o2 = $this->p;
+		$m2 = $this->n;
+		$cs2 = $this->comments;
+		// b125
+		$o3 = $this->p;
+		if (!$this->s125()) {
+			goto f239;}
+		$this->v[$this->n++] = $this->reduceText(($o3 < $this->p ? $this->indexes[$o3] : ($o3 > 0 ? $this->indexes[$o3 - 1] + 1 : 0)), ($o3 < $this->p ? $this->indexes[$this->p - 1] : ($o3 > 0 ? $this->indexes[$o3 - 1] : -1)));
+		goto k239;
+		f239:
+		$this->p = $o2;
+		$this->n = $m2;
+		$this->comments = $cs2;
+		goto f238;
+		k239:
+		$this->v[$m2] = $this->reduceTextChild(($o2 < $this->p ? $this->indexes[$o2] : ($o2 > 0 ? $this->indexes[$o2 - 1] + 1 : 0)), ($o2 < $this->p ? $this->indexes[$this->p - 1] : ($o2 > 0 ? $this->indexes[$o2 - 1] : -1)), $this->n === $m2 + 1 && !\is_array($this->v[$m2]) ? [$this->v[$m2]] : $this->merge($m2));
+		$this->n = $m2 + 1;
+		goto k238;
+		f238:
+		$this->p = $o1;
+		$this->n = $m1;
+		$this->comments = $cs1;
+		return false;
+		k238:
 
 		return true;
 	}
@@ -14051,7 +13488,7 @@ abstract class GeneratedParser
 				// s188
 				$o2 = $this->p;
 				if (!$this->s189()) {
-					goto f207;}
+					goto f193;}
 				// s458
 				$o3 = $this->p;
 				switch ($this->ids[$this->p]) {
@@ -14063,13 +13500,13 @@ abstract class GeneratedParser
 								$this->rec(7);
 							}
 
-							goto n210;}
-						goto a209;
-						n210:
+							goto n196;}
+						goto a195;
+						n196:
 						break;
 					case 80:
 						$this->p++;
-						goto a209;
+						goto a195;
 						break;
 				}
 
@@ -14077,20 +13514,20 @@ abstract class GeneratedParser
 					$this->rec(458);
 				}
 
-				goto f208;
-				a209:
-				goto k208;
-				f208:
+				goto f194;
+				a195:
+				goto k194;
+				f194:
 				$this->p = $o3;
-				goto f207;
-				k208:
-				goto k207;
-				f207:
+				goto f193;
+				k194:
+				goto k193;
+				f193:
 				$this->p = $o2;
-				goto n206;
-				k207:
-				goto a205;
-				n206:
+				goto n192;
+				k193:
+				goto a191;
+				n192:
 				break;
 			case 76:
 			case 77:
@@ -14102,27 +13539,27 @@ abstract class GeneratedParser
 						$this->rec(9);
 					}
 
-					goto n211;}
+					goto n197;}
 
 				$o2 = $this->p;
 				if (!$this->s10()) {
-					goto f212;}
+					goto f198;}
 				if (($this->ids[$this->p] === 80)) {
 					$this->p++;
 				} elseif ($this->p >= $this->f) {
 					$this->rec(3);
 				}
-				goto k212;
-				f212:
+				goto k198;
+				f198:
 				$this->p = $o2;
-				goto n211;
-				k212:
-				goto a205;
-				n211:
+				goto n197;
+				k198:
+				goto a191;
+				n197:
 				// s188
 				$o2 = $this->p;
 				if (!$this->s189()) {
-					goto f214;}
+					goto f200;}
 				// s458
 				$o3 = $this->p;
 				switch ($this->ids[$this->p]) {
@@ -14134,13 +13571,13 @@ abstract class GeneratedParser
 								$this->rec(7);
 							}
 
-							goto n217;}
-						goto a216;
-						n217:
+							goto n203;}
+						goto a202;
+						n203:
 						break;
 					case 80:
 						$this->p++;
-						goto a216;
+						goto a202;
 						break;
 				}
 
@@ -14148,20 +13585,20 @@ abstract class GeneratedParser
 					$this->rec(458);
 				}
 
-				goto f215;
-				a216:
-				goto k215;
-				f215:
+				goto f201;
+				a202:
+				goto k201;
+				f201:
 				$this->p = $o3;
-				goto f214;
-				k215:
-				goto k214;
-				f214:
+				goto f200;
+				k201:
+				goto k200;
+				f200:
 				$this->p = $o2;
-				goto n213;
-				k214:
-				goto a205;
-				n213:
+				goto n199;
+				k200:
+				goto a191;
+				n199:
 				break;
 		}
 
@@ -14169,13 +13606,13 @@ abstract class GeneratedParser
 			$this->rec(8);
 		}
 
-		goto f204;
-		a205:
-		goto k204;
-		f204:
+		goto f190;
+		a191:
+		goto k190;
+		f190:
 		$this->p = $o1;
 		return false;
-		k204:
+		k190:
 
 		return true;
 	}
@@ -14366,16 +13803,16 @@ abstract class GeneratedParser
 						$this->rec(77);
 					}
 
-					goto f230;}
+					goto f216;}
 				if (!$this->s78()) {
-					goto f230;}
-				goto k230;
-				f230:
+					goto f216;}
+				goto k216;
+				f216:
 				$this->p = $o2;
-				goto n229;
-				k230:
-				goto a228;
-				n229:
+				goto n215;
+				k216:
+				goto a214;
+				n215:
 				// s117
 				$o2 = $this->p;
 				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
@@ -14383,14 +13820,14 @@ abstract class GeneratedParser
 						$this->rec(119);
 					}
 
-					goto f232;}
+					goto f218;}
 				if (isset(self::Tb3a20a39[$this->ids[$this->p]])) {
 					if (isset(self::Tb3a20a39[$this->ids[$this->p]])) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f232;}
+						goto f218;}
 				}
 				if (isset(self::Tce49e0fc[$this->ids[$this->p]])) {
 					$sf = $this->f;
@@ -14405,17 +13842,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f232;}
+						goto f218;}
 				}
 				if (!$this->s125()) {
-					goto f232;}
-				goto k232;
-				f232:
+					goto f218;}
+				goto k218;
+				f218:
 				$this->p = $o2;
-				goto n231;
-				k232:
-				goto a228;
-				n231:
+				goto n217;
+				k218:
+				goto a214;
+				n217:
 				break;
 			case 76:
 			case 78:
@@ -14426,16 +13863,16 @@ abstract class GeneratedParser
 						$this->rec(77);
 					}
 
-					goto f235;}
+					goto f221;}
 				if (!$this->s78()) {
-					goto f235;}
-				goto k235;
-				f235:
+					goto f221;}
+				goto k221;
+				f221:
 				$this->p = $o2;
-				goto n234;
-				k235:
-				goto a228;
-				n234:
+				goto n220;
+				k221:
+				goto a214;
+				n220:
 				// s117
 				$o2 = $this->p;
 				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
@@ -14443,14 +13880,14 @@ abstract class GeneratedParser
 						$this->rec(119);
 					}
 
-					goto f237;}
+					goto f223;}
 				if (isset(self::Tb3a20a39[$this->ids[$this->p]])) {
 					if (isset(self::Tb3a20a39[$this->ids[$this->p]])) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f237;}
+						goto f223;}
 				}
 				if (isset(self::Tce49e0fc[$this->ids[$this->p]])) {
 					$sf = $this->f;
@@ -14465,25 +13902,25 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f237;}
+						goto f223;}
 				}
 				if (!$this->s125()) {
-					goto f237;}
-				goto k237;
-				f237:
+					goto f223;}
+				goto k223;
+				f223:
 				$this->p = $o2;
-				goto n236;
-				k237:
-				goto a228;
-				n236:
+				goto n222;
+				k223:
+				goto a214;
+				n222:
 				if (!isset(self::Tb3a20a39[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(121);
 					}
 
-					goto n239;}
-				goto a228;
-				n239:
+					goto n225;}
+				goto a214;
+				n225:
 				break;
 		}
 
@@ -14491,13 +13928,13 @@ abstract class GeneratedParser
 			$this->rec(74);
 		}
 
-		goto f227;
-		a228:
-		goto k227;
-		f227:
+		goto f213;
+		a214:
+		goto k213;
+		f213:
 		$this->p = $o1;
 		return false;
-		k227:
+		k213:
 
 		return true;
 	}
@@ -14520,20 +13957,20 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto n489;}
+						goto n464;}
 				}
-				goto a488;
-				n489:
+				goto a463;
+				n464:
 				break;
 			case 80:
 				if (!$this->s79()) {
-					goto n491;}
-				goto a488;
-				n491:
+					goto n466;}
+				goto a463;
+				n466:
 				if (!$this->s110()) {
-					goto n492;}
-				goto a488;
-				n492:
+					goto n467;}
+				goto a463;
+				n467:
 				if (($this->ids[$this->p] === 80)) {
 					$sf = $this->f;
 					$se = $this->er;
@@ -14547,10 +13984,10 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto n493;}
+						goto n468;}
 				}
-				goto a488;
-				n493:
+				goto a463;
+				n468:
 				break;
 		}
 
@@ -14558,13 +13995,13 @@ abstract class GeneratedParser
 			$this->rec(78);
 		}
 
-		goto f487;
-		a488:
-		goto k487;
-		f487:
+		goto f462;
+		a463:
+		goto k462;
+		f462:
 		$this->p = $o1;
 		return false;
-		k487:
+		k462:
 
 		return true;
 	}
@@ -14584,7 +14021,7 @@ abstract class GeneratedParser
 				$this->rec(3);
 			}
 
-			goto f745;}
+			goto f735;}
 
 		$this->p++;
 		if (isset(self::T195b3f33[$this->ids[$this->p]])) {
@@ -14593,7 +14030,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f745;}
+				goto f735;}
 		}
 		// s109
 		if (!isset(self::T0979f8dc[$this->ids[$this->p]])) {
@@ -14601,7 +14038,7 @@ abstract class GeneratedParser
 				$this->rec(109);
 			}
 
-			goto f745;}
+			goto f735;}
 
 		$o2 = $this->p;
 		$k2 = 0;
@@ -14612,30 +14049,30 @@ abstract class GeneratedParser
 					$this->rec(21);
 				}
 
-				goto e747;
+				goto e737;
 			}
 
 			$this->p++;
 
 			$k2++;
 		}
-		e747:
+		e737:
 
 		if ($k2 < 1) {
-			goto f746;
+			goto f736;
 		}
-		goto k746;
-		f746:
+		goto k736;
+		f736:
 		$this->p = $o2;
-		goto f745;
-		k746:
+		goto f735;
+		k736:
 		if (!$this->s74()) {
-			goto f745;}
-		goto k745;
-		f745:
+			goto f735;}
+		goto k735;
+		f735:
 		$this->p = $o1;
 		return false;
-		k745:
+		k735:
 
 		return true;
 	}
@@ -14655,7 +14092,7 @@ abstract class GeneratedParser
 				$this->rec(3);
 			}
 
-			goto f748;}
+			goto f738;}
 
 		$this->p++;
 		if (isset(self::T195b3f33[$this->ids[$this->p]])) {
@@ -14664,7 +14101,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f748;}
+				goto f738;}
 		}
 		// s111
 		if (!($this->ids[$this->p] === 80)) {
@@ -14672,7 +14109,7 @@ abstract class GeneratedParser
 				$this->rec(111);
 			}
 
-			goto f748;}
+			goto f738;}
 
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -14680,13 +14117,13 @@ abstract class GeneratedParser
 				break;
 			case 80:
 				if (!$this->s79()) {
-					goto n751;}
-				goto a750;
-				n751:
+					goto n741;}
+				goto a740;
+				n741:
 				if (!$this->s110()) {
-					goto n752;}
-				goto a750;
-				n752:
+					goto n742;}
+				goto a740;
+				n742:
 				break;
 		}
 
@@ -14694,18 +14131,18 @@ abstract class GeneratedParser
 			$this->rec(111);
 		}
 
-		goto f749;
-		a750:
-		goto k749;
-		f749:
+		goto f739;
+		a740:
+		goto k739;
+		f739:
 		$this->p = $o2;
-		goto f748;
-		k749:
-		goto k748;
-		f748:
+		goto f738;
+		k739:
+		goto k738;
+		f738:
 		$this->p = $o1;
 		return false;
-		k748:
+		k738:
 
 		return true;
 	}
@@ -14730,7 +14167,7 @@ abstract class GeneratedParser
 						$this->rec(114);
 					}
 
-					goto n741;}
+					goto n731;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 80)) {
@@ -14738,7 +14175,7 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto f742;}
+					goto f732;}
 
 				$this->p++;
 				if (isset(self::T195b3f33[$this->ids[$this->p]])) {
@@ -14747,24 +14184,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f742;}
+						goto f732;}
 				}
 				if (!$this->s113()) {
-					goto f742;}
-				goto k742;
-				f742:
+					goto f732;}
+				goto k732;
+				f732:
 				$this->p = $o2;
-				goto n741;
-				k742:
-				goto a740;
-				n741:
+				goto n731;
+				k732:
+				goto a730;
+				n731:
 				// s115
 				if (!($this->ids[$this->p] === 80)) {
 					if ($this->p > $this->f) {
 						$this->rec(115);
 					}
 
-					goto n743;}
+					goto n733;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 80)) {
@@ -14772,7 +14209,7 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto f744;}
+					goto f734;}
 
 				$this->p++;
 				if (isset(self::T195b3f33[$this->ids[$this->p]])) {
@@ -14781,23 +14218,23 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f744;}
+						goto f734;}
 				}
 				if (!isset(self::T61cd0e44[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(116);
 					}
 
-					goto f744;}
+					goto f734;}
 
 				$this->p++;
-				goto k744;
-				f744:
+				goto k734;
+				f734:
 				$this->p = $o2;
-				goto n743;
-				k744:
-				goto a740;
-				n743:
+				goto n733;
+				k734:
+				goto a730;
+				n733:
 				break;
 		}
 
@@ -14805,13 +14242,13 @@ abstract class GeneratedParser
 			$this->rec(113);
 		}
 
-		goto f739;
-		a740:
-		goto k739;
-		f739:
+		goto f729;
+		a730:
+		goto k729;
+		f729:
 		$this->p = $o1;
 		return false;
-		k739:
+		k729:
 
 		return true;
 	}
@@ -14831,7 +14268,7 @@ abstract class GeneratedParser
 				$this->rec(124);
 			}
 
-			goto f495;}
+			goto f470;}
 
 		$this->p++;
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -14839,14 +14276,14 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f495;}
+			goto f470;}
 
 		$this->p++;
-		goto k495;
-		f495:
+		goto k470;
+		f470:
 		$this->p = $o1;
 		return false;
-		k495:
+		k470:
 
 		return true;
 	}
@@ -14863,16 +14300,16 @@ abstract class GeneratedParser
 					$this->rec(116);
 				}
 
-				goto e259;
+				goto e245;
 			}
 
 			$this->p++;
 		}
-		e259:
+		e245:
 		if (($this->ids[$this->p] === 80)) {
 			if (!$this->s128()) {
-				goto n260;}
-			n260:
+				goto n246;}
+			n246:
 		} elseif ($this->p > $this->f) {
 			$this->rec(128);
 		}
@@ -14898,7 +14335,7 @@ abstract class GeneratedParser
 					$this->rec(129);
 				}
 
-				goto e510;
+				goto e485;
 			}
 
 			// s129
@@ -14907,18 +14344,18 @@ abstract class GeneratedParser
 					$this->rec(129);
 				}
 
-				goto e510;}
+				goto e485;}
 
 			$o2 = $this->p;
 			if (!$this->s130()) {
-				goto f511;}
+				goto f486;}
 			// s132
 			if (!isset(self::T61cd0e44[$this->ids[$this->p]])) {
 				if ($this->p > $this->f) {
 					$this->rec(132);
 				}
 
-				goto f511;}
+				goto f486;}
 
 			$o3 = $this->p;
 			$k3 = 0;
@@ -14929,45 +14366,45 @@ abstract class GeneratedParser
 						$this->rec(116);
 					}
 
-					goto e513;
+					goto e488;
 				}
 
 				$this->p++;
 
 				$k3++;
 			}
-			e513:
+			e488:
 
 			if ($k3 < 1) {
-				goto f512;
+				goto f487;
 			}
-			goto k512;
-			f512:
+			goto k487;
+			f487:
 			$this->p = $o3;
-			goto f511;
-			k512:
-			goto k511;
-			f511:
+			goto f486;
+			k487:
+			goto k486;
+			f486:
 			$this->p = $o2;
-			goto e510;
-			k511:
+			goto e485;
+			k486:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e510;
+				goto e485;
 			}
 
 			$k1++;
 		}
-		e510:
+		e485:
 
 		if ($k1 < 1) {
-			goto f509;
+			goto f484;
 		}
-		goto k509;
-		f509:
+		goto k484;
+		f484:
 		$this->p = $o1;
 		return false;
-		k509:
+		k484:
 
 		return true;
 	}
@@ -14990,7 +14427,7 @@ abstract class GeneratedParser
 					$this->rec(131);
 				}
 
-				goto e779;
+				goto e769;
 			}
 
 			// s131
@@ -14999,7 +14436,7 @@ abstract class GeneratedParser
 					$this->rec(131);
 				}
 
-				goto e779;}
+				goto e769;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 80)) {
@@ -15007,7 +14444,7 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto f780;}
+				goto f770;}
 
 			$this->p++;
 			if (isset(self::T195b3f33[$this->ids[$this->p]])) {
@@ -15016,30 +14453,30 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto f780;}
+					goto f770;}
 			}
-			goto k780;
-			f780:
+			goto k770;
+			f770:
 			$this->p = $o2;
-			goto e779;
-			k780:
+			goto e769;
+			k770:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e779;
+				goto e769;
 			}
 
 			$k1++;
 		}
-		e779:
+		e769:
 
 		if ($k1 < 1) {
-			goto f778;
+			goto f768;
 		}
-		goto k778;
-		f778:
+		goto k768;
+		f768:
 		$this->p = $o1;
 		return false;
-		k778:
+		k768:
 
 		return true;
 	}
@@ -15059,11 +14496,11 @@ abstract class GeneratedParser
 				$this->rec(136);
 			}
 
-			goto f248;}
+			goto f234;}
 
 		$this->p++;
 		if (!$this->s137()) {
-			goto f248;}
+			goto f234;}
 		// s19
 		$o2 = $this->p;
 		// s20
@@ -15075,24 +14512,24 @@ abstract class GeneratedParser
 					$this->rec(21);
 				}
 
-				goto e251;
+				goto e237;
 			}
 
 			$this->p++;
 		}
-		e251:
+		e237:
 		if (!$this->s74()) {
-			goto f249;}
-		goto k249;
-		f249:
+			goto f235;}
+		goto k235;
+		f235:
 		$this->p = $o2;
-		goto f248;
-		k249:
-		goto k248;
-		f248:
+		goto f234;
+		k235:
+		goto k234;
+		f234:
 		$this->p = $o1;
 		return false;
-		k248:
+		k234:
 
 		return true;
 	}
@@ -15107,9 +14544,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n502;}
-				goto a501;
-				n502:
+					goto n477;}
+				goto a476;
+				n477:
 				break;
 			case 32:
 			case 82:
@@ -15119,7 +14556,7 @@ abstract class GeneratedParser
 						$this->rec(138);
 					}
 
-					goto n503;}
+					goto n478;}
 
 				$o2 = $this->p;
 				if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -15127,7 +14564,7 @@ abstract class GeneratedParser
 						$this->rec(16);
 					}
 
-					goto f504;}
+					goto f479;}
 
 				$this->p++;
 				// s139
@@ -15139,16 +14576,16 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e506;
+						goto e481;
 					}
 
 					$this->p++;
 				}
-				e506:
+				e481:
 				if (isset(self::T1e2ed78c[$this->ids[$this->p]])) {
 					if (!$this->s141()) {
-						goto n507;}
-					n507:
+						goto n482;}
+					n482:
 				} elseif ($this->p > $this->f) {
 					$this->rec(141);
 				}
@@ -15157,24 +14594,24 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto f504;}
+					goto f479;}
 
 				$this->p++;
-				goto k504;
-				f504:
+				goto k479;
+				f479:
 				$this->p = $o2;
-				goto n503;
-				k504:
-				goto a501;
-				n503:
+				goto n478;
+				k479:
+				goto a476;
+				n478:
 				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n508;}
-				goto a501;
-				n508:
+					goto n483;}
+				goto a476;
+				n483:
 				break;
 		}
 
@@ -15182,13 +14619,13 @@ abstract class GeneratedParser
 			$this->rec(137);
 		}
 
-		goto f500;
-		a501:
-		goto k500;
-		f500:
+		goto f475;
+		a476:
+		goto k475;
+		f475:
 		$this->p = $o1;
 		return false;
-		k500:
+		k475:
 
 		return true;
 	}
@@ -15208,7 +14645,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f1618;}
+			goto f1586;}
 
 		$this->p++;
 		// s139
@@ -15220,12 +14657,12 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1620;
+				goto e1588;
 			}
 
 			$this->p++;
 		}
-		e1620:
+		e1588:
 		if (isset(self::T1e2ed78c[$this->ids[$this->p]])) {
 			// s141
 			if (!isset(self::T1e2ed78c[$this->ids[$this->p]])) {
@@ -15233,11 +14670,11 @@ abstract class GeneratedParser
 					$this->rec(141);
 				}
 
-				goto n1621;}
+				goto n1589;}
 
 			$o2 = $this->p;
 			if (!$this->s142()) {
-				goto f1622;}
+				goto f1590;}
 			// s139
 			$o3 = $this->p;
 			while (true) {
@@ -15247,25 +14684,25 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e1624;
+					goto e1592;
 				}
 
 				$this->p++;
 			}
-			e1624:
+			e1592:
 			if (($this->ids[$this->p] === 40)) {
 				if (!$this->s182()) {
-					goto n1625;}
-				n1625:
+					goto n1593;}
+				n1593:
 			} elseif ($this->p > $this->f) {
 				$this->rec(182);
 			}
-			goto k1622;
-			f1622:
+			goto k1590;
+			f1590:
 			$this->p = $o2;
-			goto n1621;
-			k1622:
-			n1621:
+			goto n1589;
+			k1590:
+			n1589:
 		} elseif ($this->p > $this->f) {
 			$this->rec(141);
 		}
@@ -15274,14 +14711,14 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f1618;}
+			goto f1586;}
 
 		$this->p++;
-		goto k1618;
-		f1618:
+		goto k1586;
+		f1586:
 		$this->p = $o1;
 		return false;
-		k1618:
+		k1586:
 
 		return true;
 	}
@@ -15297,7 +14734,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s142()) {
-			goto f496;}
+			goto f471;}
 		// s139
 		$o2 = $this->p;
 		while (true) {
@@ -15307,24 +14744,24 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e498;
+				goto e473;
 			}
 
 			$this->p++;
 		}
-		e498:
+		e473:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->s182()) {
-				goto n499;}
-			n499:
+				goto n474;}
+			n474:
 		} elseif ($this->p > $this->f) {
 			$this->rec(182);
 		}
-		goto k496;
-		f496:
+		goto k471;
+		f471:
 		$this->p = $o1;
 		return false;
-		k496:
+		k471:
 
 		return true;
 	}
@@ -15372,9 +14809,9 @@ abstract class GeneratedParser
 			case 78:
 			case 79:
 				if (!$this->s146()) {
-					goto n755;}
-				goto a754;
-				n755:
+					goto n745;}
+				goto a744;
+				n745:
 				break;
 			case 1:
 			case 2:
@@ -15391,16 +14828,16 @@ abstract class GeneratedParser
 			case 14:
 			case 24:
 				if (!$this->s143()) {
-					goto n756;}
-				goto a754;
-				n756:
+					goto n746;}
+				goto a744;
+				n746:
 				// s172
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(172);
 					}
 
-					goto n757;}
+					goto n747;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -15408,7 +14845,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f758;}
+					goto f748;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -15417,22 +14854,22 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f758;}
+						goto f748;}
 				}
-				goto k758;
-				f758:
+				goto k748;
+				f748:
 				$this->p = $o2;
-				goto n757;
-				k758:
-				goto a754;
-				n757:
+				goto n747;
+				k748:
+				goto a744;
+				n747:
 				// s160
 				if (!isset(self::T96867045[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(160);
 					}
 
-					goto n759;}
+					goto n749;}
 
 				$o2 = $this->p;
 				if (isset(self::T00b73ddb[$this->ids[$this->p]])) {
@@ -15441,14 +14878,14 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f760;}
+						goto f750;}
 				}
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(144);
 					}
 
-					goto f760;}
+					goto f750;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 43)) {
@@ -15456,18 +14893,18 @@ abstract class GeneratedParser
 						$this->rec(66);
 					}
 
-					goto f760;}
+					goto f750;}
 
 				$this->p++;
 				if (!$this->s163()) {
-					goto f760;}
-				goto k760;
-				f760:
+					goto f750;}
+				goto k750;
+				f750:
 				$this->p = $o2;
-				goto n759;
-				k760:
-				goto a754;
-				n759:
+				goto n749;
+				k750:
+				goto a744;
+				n749:
 				break;
 			case 7:
 			case 15:
@@ -15475,16 +14912,16 @@ abstract class GeneratedParser
 			case 17:
 			case 18:
 				if (!$this->s143()) {
-					goto n761;}
-				goto a754;
-				n761:
+					goto n751;}
+				goto a744;
+				n751:
 				// s172
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(172);
 					}
 
-					goto n762;}
+					goto n752;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -15492,7 +14929,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f763;}
+					goto f753;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -15501,15 +14938,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f763;}
+						goto f753;}
 				}
-				goto k763;
-				f763:
+				goto k753;
+				f753:
 				$this->p = $o2;
-				goto n762;
-				k763:
-				goto a754;
-				n762:
+				goto n752;
+				k753:
+				goto a744;
+				n752:
 				break;
 			case 22:
 			case 23:
@@ -15519,7 +14956,7 @@ abstract class GeneratedParser
 						$this->rec(155);
 					}
 
-					goto n764;}
+					goto n754;}
 
 				$o2 = $this->p;
 				switch ($this->ids[$this->p]) {
@@ -15527,13 +14964,13 @@ abstract class GeneratedParser
 						break;
 					case 22:
 						if (!$this->s156()) {
-							goto n767;}
-						goto a766;
-						n767:
+							goto n757;}
+						goto a756;
+						n757:
 						break;
 					case 23:
 						$this->p++;
-						goto a766;
+						goto a756;
 						break;
 				}
 
@@ -15541,15 +14978,15 @@ abstract class GeneratedParser
 					$this->rec(155);
 				}
 
-				goto f765;
-				a766:
-				goto k765;
-				f765:
+				goto f755;
+				a756:
+				goto k755;
+				f755:
 				$this->p = $o2;
-				goto n764;
-				k765:
-				goto a754;
-				n764:
+				goto n754;
+				k755:
+				goto a744;
+				n754:
 				break;
 			case 38:
 			case 83:
@@ -15559,7 +14996,7 @@ abstract class GeneratedParser
 						$this->rec(148);
 					}
 
-					goto n768;}
+					goto n758;}
 
 				$o2 = $this->p;
 				if (!isset(self::T34048a70[$this->ids[$this->p]])) {
@@ -15567,7 +15004,7 @@ abstract class GeneratedParser
 						$this->rec(149);
 					}
 
-					goto f769;}
+					goto f759;}
 
 				$this->p++;
 				// s139
@@ -15579,16 +15016,16 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e771;
+						goto e761;
 					}
 
 					$this->p++;
 				}
-				e771:
+				e761:
 				if (isset(self::T1490fe7f[$this->ids[$this->p]])) {
 					if (!$this->s151()) {
-						goto n772;}
-					n772:
+						goto n762;}
+					n762:
 				} elseif ($this->p > $this->f) {
 					$this->rec(151);
 				}
@@ -15597,24 +15034,24 @@ abstract class GeneratedParser
 						$this->rec(62);
 					}
 
-					goto f769;}
+					goto f759;}
 
 				$this->p++;
-				goto k769;
-				f769:
+				goto k759;
+				f759:
 				$this->p = $o2;
-				goto n768;
-				k769:
-				goto a754;
-				n768:
+				goto n758;
+				k759:
+				goto a744;
+				n758:
 				break;
 			case 19:
 				$this->p++;
-				goto a754;
+				goto a744;
 				break;
 			case 20:
 				$this->p++;
-				goto a754;
+				goto a744;
 				break;
 		}
 
@@ -15622,13 +15059,13 @@ abstract class GeneratedParser
 			$this->rec(142);
 		}
 
-		goto f753;
-		a754:
-		goto k753;
-		f753:
+		goto f743;
+		a744:
+		goto k743;
+		f743:
 		$this->p = $o1;
 		return false;
-		k753:
+		k743:
 
 		return true;
 	}
@@ -15648,7 +15085,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1005;}
+			goto f993;}
 
 		$this->p++;
 		// s139
@@ -15660,18 +15097,18 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1007;
+				goto e995;
 			}
 
 			$this->p++;
 		}
-		e1007:
+		e995:
 		if (!($this->ids[$this->p] === 46)) {
 			if ($this->p >= $this->f) {
 				$this->rec(69);
 			}
 
-			goto f1005;}
+			goto f993;}
 
 		$this->p++;
 		// s139
@@ -15683,19 +15120,19 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1009;
+				goto e997;
 			}
 
 			$this->p++;
 		}
-		e1009:
+		e997:
 		if (!$this->s145()) {
-			goto f1005;}
-		goto k1005;
-		f1005:
+			goto f993;}
+		goto k993;
+		f993:
 		$this->p = $o1;
 		return false;
-		k1005:
+		k993:
 
 		return true;
 	}
@@ -15748,7 +15185,7 @@ abstract class GeneratedParser
 						$this->rec(146);
 					}
 
-					goto n1317;}
+					goto n1302;}
 
 				$o2 = $this->p;
 				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
@@ -15756,23 +15193,23 @@ abstract class GeneratedParser
 						$this->rec(119);
 					}
 
-					goto f1318;}
+					goto f1303;}
 
 				$this->p++;
 				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 					if (!$this->s138()) {
-						goto n1319;}
-					n1319:
+						goto n1304;}
+					n1304:
 				} elseif ($this->p > $this->f) {
 					$this->rec(138);
 				}
-				goto k1318;
-				f1318:
+				goto k1303;
+				f1303:
 				$this->p = $o2;
-				goto n1317;
-				k1318:
-				goto a1316;
-				n1317:
+				goto n1302;
+				k1303:
+				goto a1301;
+				n1302:
 				break;
 			case 1:
 			case 2:
@@ -15794,7 +15231,7 @@ abstract class GeneratedParser
 						$this->rec(172);
 					}
 
-					goto n1320;}
+					goto n1305;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -15802,7 +15239,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1321;}
+					goto f1306;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -15811,22 +15248,22 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1321;}
+						goto f1306;}
 				}
-				goto k1321;
-				f1321:
+				goto k1306;
+				f1306:
 				$this->p = $o2;
-				goto n1320;
-				k1321:
-				goto a1316;
-				n1320:
+				goto n1305;
+				k1306:
+				goto a1301;
+				n1305:
 				// s160
 				if (!isset(self::T96867045[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(160);
 					}
 
-					goto n1322;}
+					goto n1307;}
 
 				$o2 = $this->p;
 				if (isset(self::T00b73ddb[$this->ids[$this->p]])) {
@@ -15835,14 +15272,14 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1323;}
+						goto f1308;}
 				}
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(144);
 					}
 
-					goto f1323;}
+					goto f1308;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 43)) {
@@ -15850,18 +15287,18 @@ abstract class GeneratedParser
 						$this->rec(66);
 					}
 
-					goto f1323;}
+					goto f1308;}
 
 				$this->p++;
 				if (!$this->s163()) {
-					goto f1323;}
-				goto k1323;
-				f1323:
+					goto f1308;}
+				goto k1308;
+				f1308:
 				$this->p = $o2;
-				goto n1322;
-				k1323:
-				goto a1316;
-				n1322:
+				goto n1307;
+				k1308:
+				goto a1301;
+				n1307:
 				break;
 			case 7:
 			case 15:
@@ -15874,7 +15311,7 @@ abstract class GeneratedParser
 						$this->rec(172);
 					}
 
-					goto n1324;}
+					goto n1309;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -15882,7 +15319,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1325;}
+					goto f1310;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -15891,15 +15328,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1325;}
+						goto f1310;}
 				}
-				goto k1325;
-				f1325:
+				goto k1310;
+				f1310:
 				$this->p = $o2;
-				goto n1324;
-				k1325:
-				goto a1316;
-				n1324:
+				goto n1309;
+				k1310:
+				goto a1301;
+				n1309:
 				break;
 			case 22:
 			case 23:
@@ -15909,7 +15346,7 @@ abstract class GeneratedParser
 						$this->rec(155);
 					}
 
-					goto n1326;}
+					goto n1311;}
 
 				$o2 = $this->p;
 				switch ($this->ids[$this->p]) {
@@ -15917,13 +15354,13 @@ abstract class GeneratedParser
 						break;
 					case 22:
 						if (!$this->s156()) {
-							goto n1329;}
-						goto a1328;
-						n1329:
+							goto n1314;}
+						goto a1313;
+						n1314:
 						break;
 					case 23:
 						$this->p++;
-						goto a1328;
+						goto a1313;
 						break;
 				}
 
@@ -15931,15 +15368,15 @@ abstract class GeneratedParser
 					$this->rec(155);
 				}
 
-				goto f1327;
-				a1328:
-				goto k1327;
-				f1327:
+				goto f1312;
+				a1313:
+				goto k1312;
+				f1312:
 				$this->p = $o2;
-				goto n1326;
-				k1327:
-				goto a1316;
-				n1326:
+				goto n1311;
+				k1312:
+				goto a1301;
+				n1311:
 				break;
 			case 38:
 			case 83:
@@ -15949,7 +15386,7 @@ abstract class GeneratedParser
 						$this->rec(148);
 					}
 
-					goto n1330;}
+					goto n1315;}
 
 				$o2 = $this->p;
 				if (!isset(self::T34048a70[$this->ids[$this->p]])) {
@@ -15957,7 +15394,7 @@ abstract class GeneratedParser
 						$this->rec(149);
 					}
 
-					goto f1331;}
+					goto f1316;}
 
 				$this->p++;
 				// s139
@@ -15969,16 +15406,16 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1333;
+						goto e1318;
 					}
 
 					$this->p++;
 				}
-				e1333:
+				e1318:
 				if (isset(self::T1490fe7f[$this->ids[$this->p]])) {
 					if (!$this->s151()) {
-						goto n1334;}
-					n1334:
+						goto n1319;}
+					n1319:
 				} elseif ($this->p > $this->f) {
 					$this->rec(151);
 				}
@@ -15987,24 +15424,24 @@ abstract class GeneratedParser
 						$this->rec(62);
 					}
 
-					goto f1331;}
+					goto f1316;}
 
 				$this->p++;
-				goto k1331;
-				f1331:
+				goto k1316;
+				f1316:
 				$this->p = $o2;
-				goto n1330;
-				k1331:
-				goto a1316;
-				n1330:
+				goto n1315;
+				k1316:
+				goto a1301;
+				n1315:
 				break;
 			case 19:
 				$this->p++;
-				goto a1316;
+				goto a1301;
 				break;
 			case 20:
 				$this->p++;
-				goto a1316;
+				goto a1301;
 				break;
 		}
 
@@ -16012,13 +15449,13 @@ abstract class GeneratedParser
 			$this->rec(145);
 		}
 
-		goto f1315;
-		a1316:
-		goto k1315;
-		f1315:
+		goto f1300;
+		a1301:
+		goto k1300;
+		f1300:
 		$this->p = $o1;
 		return false;
-		k1315:
+		k1300:
 
 		return true;
 	}
@@ -16038,7 +15475,7 @@ abstract class GeneratedParser
 				$this->rec(119);
 			}
 
-			goto f999;}
+			goto f987;}
 
 		$this->p++;
 		if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -16048,7 +15485,7 @@ abstract class GeneratedParser
 					$this->rec(138);
 				}
 
-				goto n1000;}
+				goto n988;}
 
 			$o2 = $this->p;
 			if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -16056,7 +15493,7 @@ abstract class GeneratedParser
 					$this->rec(16);
 				}
 
-				goto f1001;}
+				goto f989;}
 
 			$this->p++;
 			// s139
@@ -16068,16 +15505,16 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e1003;
+					goto e991;
 				}
 
 				$this->p++;
 			}
-			e1003:
+			e991:
 			if (isset(self::T1e2ed78c[$this->ids[$this->p]])) {
 				if (!$this->s141()) {
-					goto n1004;}
-				n1004:
+					goto n992;}
+				n992:
 			} elseif ($this->p > $this->f) {
 				$this->rec(141);
 			}
@@ -16086,23 +15523,23 @@ abstract class GeneratedParser
 					$this->rec(53);
 				}
 
-				goto f1001;}
+				goto f989;}
 
 			$this->p++;
-			goto k1001;
-			f1001:
+			goto k989;
+			f989:
 			$this->p = $o2;
-			goto n1000;
-			k1001:
-			n1000:
+			goto n988;
+			k989:
+			n988:
 		} elseif ($this->p > $this->f) {
 			$this->rec(138);
 		}
-		goto k999;
-		f999:
+		goto k987;
+		f987:
 		$this->p = $o1;
 		return false;
-		k999:
+		k987:
 
 		return true;
 	}
@@ -16118,7 +15555,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s152()) {
-			goto f1014;}
+			goto f1002;}
 		// s139
 		$o2 = $this->p;
 		while (true) {
@@ -16128,24 +15565,24 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e1016;
+				goto e1004;
 			}
 
 			$this->p++;
 		}
-		e1016:
+		e1004:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->s176()) {
-				goto n1017;}
-			n1017:
+				goto n1005;}
+			n1005:
 		} elseif ($this->p > $this->f) {
 			$this->rec(176);
 		}
-		goto k1014;
-		f1014:
+		goto k1002;
+		f1002:
 		$this->p = $o1;
 		return false;
-		k1014:
+		k1002:
 
 		return true;
 	}
@@ -16198,7 +15635,7 @@ abstract class GeneratedParser
 						$this->rec(146);
 					}
 
-					goto n1337;}
+					goto n1322;}
 
 				$o2 = $this->p;
 				if (!isset(self::Tf4b693bf[$this->ids[$this->p]])) {
@@ -16206,23 +15643,23 @@ abstract class GeneratedParser
 						$this->rec(119);
 					}
 
-					goto f1338;}
+					goto f1323;}
 
 				$this->p++;
 				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 					if (!$this->s138()) {
-						goto n1339;}
-					n1339:
+						goto n1324;}
+					n1324:
 				} elseif ($this->p > $this->f) {
 					$this->rec(138);
 				}
-				goto k1338;
-				f1338:
+				goto k1323;
+				f1323:
 				$this->p = $o2;
-				goto n1337;
-				k1338:
-				goto a1336;
-				n1337:
+				goto n1322;
+				k1323:
+				goto a1321;
+				n1322:
 				break;
 			case 1:
 			case 2:
@@ -16244,11 +15681,11 @@ abstract class GeneratedParser
 						$this->rec(153);
 					}
 
-					goto n1340;}
+					goto n1325;}
 
 				$o2 = $this->p;
 				if (!$this->s154()) {
-					goto f1341;}
+					goto f1326;}
 				// s139
 				$o3 = $this->p;
 				while (true) {
@@ -16258,18 +15695,18 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1343;
+						goto e1328;
 					}
 
 					$this->p++;
 				}
-				e1343:
+				e1328:
 				if (!isset(self::Ta7068161[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(171);
 					}
 
-					goto f1341;}
+					goto f1326;}
 
 				$this->p++;
 				// s139
@@ -16281,28 +15718,28 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1345;
+						goto e1330;
 					}
 
 					$this->p++;
 				}
-				e1345:
+				e1330:
 				if (!$this->s145()) {
-					goto f1341;}
-				goto k1341;
-				f1341:
+					goto f1326;}
+				goto k1326;
+				f1326:
 				$this->p = $o2;
-				goto n1340;
-				k1341:
-				goto a1336;
-				n1340:
+				goto n1325;
+				k1326:
+				goto a1321;
+				n1325:
 				// s172
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(172);
 					}
 
-					goto n1346;}
+					goto n1331;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -16310,7 +15747,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1347;}
+					goto f1332;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -16319,22 +15756,22 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1347;}
+						goto f1332;}
 				}
-				goto k1347;
-				f1347:
+				goto k1332;
+				f1332:
 				$this->p = $o2;
-				goto n1346;
-				k1347:
-				goto a1336;
-				n1346:
+				goto n1331;
+				k1332:
+				goto a1321;
+				n1331:
 				// s160
 				if (!isset(self::T96867045[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(160);
 					}
 
-					goto n1348;}
+					goto n1333;}
 
 				$o2 = $this->p;
 				if (isset(self::T00b73ddb[$this->ids[$this->p]])) {
@@ -16343,14 +15780,14 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1349;}
+						goto f1334;}
 				}
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(144);
 					}
 
-					goto f1349;}
+					goto f1334;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 43)) {
@@ -16358,18 +15795,18 @@ abstract class GeneratedParser
 						$this->rec(66);
 					}
 
-					goto f1349;}
+					goto f1334;}
 
 				$this->p++;
 				if (!$this->s163()) {
-					goto f1349;}
-				goto k1349;
-				f1349:
+					goto f1334;}
+				goto k1334;
+				f1334:
 				$this->p = $o2;
-				goto n1348;
-				k1349:
-				goto a1336;
-				n1348:
+				goto n1333;
+				k1334:
+				goto a1321;
+				n1333:
 				break;
 			case 7:
 			case 15:
@@ -16382,11 +15819,11 @@ abstract class GeneratedParser
 						$this->rec(153);
 					}
 
-					goto n1350;}
+					goto n1335;}
 
 				$o2 = $this->p;
 				if (!$this->s154()) {
-					goto f1351;}
+					goto f1336;}
 				// s139
 				$o3 = $this->p;
 				while (true) {
@@ -16396,18 +15833,18 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1353;
+						goto e1338;
 					}
 
 					$this->p++;
 				}
-				e1353:
+				e1338:
 				if (!isset(self::Ta7068161[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(171);
 					}
 
-					goto f1351;}
+					goto f1336;}
 
 				$this->p++;
 				// s139
@@ -16419,28 +15856,28 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1355;
+						goto e1340;
 					}
 
 					$this->p++;
 				}
-				e1355:
+				e1340:
 				if (!$this->s145()) {
-					goto f1351;}
-				goto k1351;
-				f1351:
+					goto f1336;}
+				goto k1336;
+				f1336:
 				$this->p = $o2;
-				goto n1350;
-				k1351:
-				goto a1336;
-				n1350:
+				goto n1335;
+				k1336:
+				goto a1321;
+				n1335:
 				// s172
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(172);
 					}
 
-					goto n1356;}
+					goto n1341;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -16448,7 +15885,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1357;}
+					goto f1342;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -16457,18 +15894,176 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1357;}
+						goto f1342;}
 				}
-				goto k1357;
-				f1357:
+				goto k1342;
+				f1342:
 				$this->p = $o2;
-				goto n1356;
-				k1357:
-				goto a1336;
-				n1356:
+				goto n1341;
+				k1342:
+				goto a1321;
+				n1341:
 				break;
 			case 22:
 			case 23:
+				// s153
+				if (!isset(self::T7726a0df[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(153);
+					}
+
+					goto n1343;}
+
+				$o2 = $this->p;
+				if (!$this->s154()) {
+					goto f1344;}
+				// s139
+				$o3 = $this->p;
+				while (true) {
+					$b3 = $this->p;
+					if (!($this->ids[$this->p] === 80)) {
+						if ($b3 >= $this->f) {
+							$this->rec(3);
+						}
+
+						goto e1346;
+					}
+
+					$this->p++;
+				}
+				e1346:
+				if (!isset(self::Ta7068161[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(171);
+					}
+
+					goto f1344;}
+
+				$this->p++;
+				// s139
+				$o3 = $this->p;
+				while (true) {
+					$b3 = $this->p;
+					if (!($this->ids[$this->p] === 80)) {
+						if ($b3 >= $this->f) {
+							$this->rec(3);
+						}
+
+						goto e1348;
+					}
+
+					$this->p++;
+				}
+				e1348:
+				if (!$this->s145()) {
+					goto f1344;}
+				goto k1344;
+				f1344:
+				$this->p = $o2;
+				goto n1343;
+				k1344:
+				goto a1321;
+				n1343:
+				// s155
+				if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(155);
+					}
+
+					goto n1349;}
+
+				$o2 = $this->p;
+				switch ($this->ids[$this->p]) {
+					default:
+						break;
+					case 22:
+						if (!$this->s156()) {
+							goto n1352;}
+						goto a1351;
+						n1352:
+						break;
+					case 23:
+						$this->p++;
+						goto a1351;
+						break;
+				}
+
+				if ($this->p > $this->f) {
+					$this->rec(155);
+				}
+
+				goto f1350;
+				a1351:
+				goto k1350;
+				f1350:
+				$this->p = $o2;
+				goto n1349;
+				k1350:
+				goto a1321;
+				n1349:
+				break;
+			case 38:
+			case 83:
+				// s148
+				if (!isset(self::T34048a70[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(148);
+					}
+
+					goto n1353;}
+
+				$o2 = $this->p;
+				if (!isset(self::T34048a70[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(149);
+					}
+
+					goto f1354;}
+
+				$this->p++;
+				// s139
+				$o3 = $this->p;
+				while (true) {
+					$b3 = $this->p;
+					if (!($this->ids[$this->p] === 80)) {
+						if ($b3 >= $this->f) {
+							$this->rec(3);
+						}
+
+						goto e1356;
+					}
+
+					$this->p++;
+				}
+				e1356:
+				if (isset(self::T1490fe7f[$this->ids[$this->p]])) {
+					if (!$this->s151()) {
+						goto n1357;}
+					n1357:
+				} elseif ($this->p > $this->f) {
+					$this->rec(151);
+				}
+				if (!($this->ids[$this->p] === 39)) {
+					if ($this->p >= $this->f) {
+						$this->rec(62);
+					}
+
+					goto f1354;}
+
+				$this->p++;
+				goto k1354;
+				f1354:
+				$this->p = $o2;
+				goto n1353;
+				k1354:
+				goto a1321;
+				n1353:
+				break;
+			case 19:
+				$this->p++;
+				goto a1321;
+				break;
+			case 20:
 				// s153
 				if (!isset(self::T7726a0df[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
@@ -16525,168 +16120,10 @@ abstract class GeneratedParser
 				$this->p = $o2;
 				goto n1358;
 				k1359:
-				goto a1336;
+				goto a1321;
 				n1358:
-				// s155
-				if (!isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(155);
-					}
-
-					goto n1364;}
-
-				$o2 = $this->p;
-				switch ($this->ids[$this->p]) {
-					default:
-						break;
-					case 22:
-						if (!$this->s156()) {
-							goto n1367;}
-						goto a1366;
-						n1367:
-						break;
-					case 23:
-						$this->p++;
-						goto a1366;
-						break;
-				}
-
-				if ($this->p > $this->f) {
-					$this->rec(155);
-				}
-
-				goto f1365;
-				a1366:
-				goto k1365;
-				f1365:
-				$this->p = $o2;
-				goto n1364;
-				k1365:
-				goto a1336;
-				n1364:
-				break;
-			case 38:
-			case 83:
-				// s148
-				if (!isset(self::T34048a70[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(148);
-					}
-
-					goto n1368;}
-
-				$o2 = $this->p;
-				if (!isset(self::T34048a70[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(149);
-					}
-
-					goto f1369;}
-
 				$this->p++;
-				// s139
-				$o3 = $this->p;
-				while (true) {
-					$b3 = $this->p;
-					if (!($this->ids[$this->p] === 80)) {
-						if ($b3 >= $this->f) {
-							$this->rec(3);
-						}
-
-						goto e1371;
-					}
-
-					$this->p++;
-				}
-				e1371:
-				if (isset(self::T1490fe7f[$this->ids[$this->p]])) {
-					if (!$this->s151()) {
-						goto n1372;}
-					n1372:
-				} elseif ($this->p > $this->f) {
-					$this->rec(151);
-				}
-				if (!($this->ids[$this->p] === 39)) {
-					if ($this->p >= $this->f) {
-						$this->rec(62);
-					}
-
-					goto f1369;}
-
-				$this->p++;
-				goto k1369;
-				f1369:
-				$this->p = $o2;
-				goto n1368;
-				k1369:
-				goto a1336;
-				n1368:
-				break;
-			case 19:
-				$this->p++;
-				goto a1336;
-				break;
-			case 20:
-				// s153
-				if (!isset(self::T7726a0df[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(153);
-					}
-
-					goto n1373;}
-
-				$o2 = $this->p;
-				if (!$this->s154()) {
-					goto f1374;}
-				// s139
-				$o3 = $this->p;
-				while (true) {
-					$b3 = $this->p;
-					if (!($this->ids[$this->p] === 80)) {
-						if ($b3 >= $this->f) {
-							$this->rec(3);
-						}
-
-						goto e1376;
-					}
-
-					$this->p++;
-				}
-				e1376:
-				if (!isset(self::Ta7068161[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(171);
-					}
-
-					goto f1374;}
-
-				$this->p++;
-				// s139
-				$o3 = $this->p;
-				while (true) {
-					$b3 = $this->p;
-					if (!($this->ids[$this->p] === 80)) {
-						if ($b3 >= $this->f) {
-							$this->rec(3);
-						}
-
-						goto e1378;
-					}
-
-					$this->p++;
-				}
-				e1378:
-				if (!$this->s145()) {
-					goto f1374;}
-				goto k1374;
-				f1374:
-				$this->p = $o2;
-				goto n1373;
-				k1374:
-				goto a1336;
-				n1373:
-				$this->p++;
-				goto a1336;
+				goto a1321;
 				break;
 			case 21:
 				// s153
@@ -16695,11 +16132,11 @@ abstract class GeneratedParser
 						$this->rec(153);
 					}
 
-					goto n1379;}
+					goto n1364;}
 
 				$o2 = $this->p;
 				if (!$this->s154()) {
-					goto f1380;}
+					goto f1365;}
 				// s139
 				$o3 = $this->p;
 				while (true) {
@@ -16709,18 +16146,18 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1382;
+						goto e1367;
 					}
 
 					$this->p++;
 				}
-				e1382:
+				e1367:
 				if (!isset(self::Ta7068161[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(171);
 					}
 
-					goto f1380;}
+					goto f1365;}
 
 				$this->p++;
 				// s139
@@ -16732,21 +16169,21 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1384;
+						goto e1369;
 					}
 
 					$this->p++;
 				}
-				e1384:
+				e1369:
 				if (!$this->s145()) {
-					goto f1380;}
-				goto k1380;
-				f1380:
+					goto f1365;}
+				goto k1365;
+				f1365:
 				$this->p = $o2;
-				goto n1379;
-				k1380:
-				goto a1336;
-				n1379:
+				goto n1364;
+				k1365:
+				goto a1321;
+				n1364:
 				break;
 		}
 
@@ -16754,13 +16191,13 @@ abstract class GeneratedParser
 			$this->rec(152);
 		}
 
-		goto f1335;
-		a1336:
-		goto k1335;
-		f1335:
+		goto f1320;
+		a1321:
+		goto k1320;
+		f1320:
 		$this->p = $o1;
 		return false;
-		k1335:
+		k1320:
 
 		return true;
 	}
@@ -16798,7 +16235,7 @@ abstract class GeneratedParser
 						$this->rec(160);
 					}
 
-					goto n1628;}
+					goto n1596;}
 
 				$o2 = $this->p;
 				if (isset(self::T00b73ddb[$this->ids[$this->p]])) {
@@ -16807,14 +16244,14 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1629;}
+						goto f1597;}
 				}
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(144);
 					}
 
-					goto f1629;}
+					goto f1597;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 43)) {
@@ -16822,25 +16259,25 @@ abstract class GeneratedParser
 						$this->rec(66);
 					}
 
-					goto f1629;}
+					goto f1597;}
 
 				$this->p++;
 				if (!$this->s163()) {
-					goto f1629;}
-				goto k1629;
-				f1629:
+					goto f1597;}
+				goto k1597;
+				f1597:
 				$this->p = $o2;
-				goto n1628;
-				k1629:
-				goto a1627;
-				n1628:
+				goto n1596;
+				k1597:
+				goto a1595;
+				n1596:
 				// s169
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(169);
 					}
 
-					goto n1630;}
+					goto n1598;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -16848,7 +16285,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1631;}
+					goto f1599;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -16857,15 +16294,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1631;}
+						goto f1599;}
 				}
-				goto k1631;
-				f1631:
+				goto k1599;
+				f1599:
 				$this->p = $o2;
-				goto n1630;
-				k1631:
-				goto a1627;
-				n1630:
+				goto n1598;
+				k1599:
+				goto a1595;
+				n1598:
 				break;
 			case 7:
 			case 15:
@@ -16878,7 +16315,7 @@ abstract class GeneratedParser
 						$this->rec(169);
 					}
 
-					goto n1632;}
+					goto n1600;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -16886,7 +16323,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f1633;}
+					goto f1601;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -16895,15 +16332,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1633;}
+						goto f1601;}
 				}
-				goto k1633;
-				f1633:
+				goto k1601;
+				f1601:
 				$this->p = $o2;
-				goto n1632;
-				k1633:
-				goto a1627;
-				n1632:
+				goto n1600;
+				k1601:
+				goto a1595;
+				n1600:
 				break;
 			case 22:
 			case 23:
@@ -16913,7 +16350,7 @@ abstract class GeneratedParser
 						$this->rec(155);
 					}
 
-					goto n1634;}
+					goto n1602;}
 
 				$o2 = $this->p;
 				switch ($this->ids[$this->p]) {
@@ -16921,13 +16358,13 @@ abstract class GeneratedParser
 						break;
 					case 22:
 						if (!$this->s156()) {
-							goto n1637;}
-						goto a1636;
-						n1637:
+							goto n1605;}
+						goto a1604;
+						n1605:
 						break;
 					case 23:
 						$this->p++;
-						goto a1636;
+						goto a1604;
 						break;
 				}
 
@@ -16935,23 +16372,23 @@ abstract class GeneratedParser
 					$this->rec(155);
 				}
 
-				goto f1635;
-				a1636:
-				goto k1635;
-				f1635:
+				goto f1603;
+				a1604:
+				goto k1603;
+				f1603:
 				$this->p = $o2;
-				goto n1634;
-				k1635:
-				goto a1627;
-				n1634:
+				goto n1602;
+				k1603:
+				goto a1595;
+				n1602:
 				break;
 			case 20:
 				$this->p++;
-				goto a1627;
+				goto a1595;
 				break;
 			case 21:
 				$this->p++;
-				goto a1627;
+				goto a1595;
 				break;
 		}
 
@@ -16959,13 +16396,13 @@ abstract class GeneratedParser
 			$this->rec(154);
 		}
 
-		goto f1626;
-		a1627:
-		goto k1626;
-		f1626:
+		goto f1594;
+		a1595:
+		goto k1594;
+		f1594:
 		$this->p = $o1;
 		return false;
-		k1626:
+		k1594:
 
 		return true;
 	}
@@ -16985,7 +16422,7 @@ abstract class GeneratedParser
 				$this->rec(44);
 			}
 
-			goto f1010;}
+			goto f998;}
 
 		$this->p++;
 		if (isset(self::T7dfbf2bf[$this->ids[$this->p]])) {
@@ -16995,7 +16432,7 @@ abstract class GeneratedParser
 					$this->rec(158);
 				}
 
-				goto n1011;}
+				goto n999;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -17006,32 +16443,32 @@ abstract class GeneratedParser
 						$this->rec(159);
 					}
 
-					goto e1013;
+					goto e1001;
 				}
 
 				$this->p++;
 
 				$k2++;
 			}
-			e1013:
+			e1001:
 
 			if ($k2 < 1) {
-				goto f1012;
+				goto f1000;
 			}
-			goto k1012;
-			f1012:
+			goto k1000;
+			f1000:
 			$this->p = $o2;
-			goto n1011;
-			k1012:
-			n1011:
+			goto n999;
+			k1000:
+			n999:
 		} elseif ($this->p > $this->f) {
 			$this->rec(158);
 		}
-		goto k1010;
-		f1010:
+		goto k998;
+		f998:
 		$this->p = $o1;
 		return false;
-		k1010:
+		k998:
 
 		return true;
 	}
@@ -17074,7 +16511,7 @@ abstract class GeneratedParser
 						$this->rec(166);
 					}
 
-					goto n722;}
+					goto n706;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -17082,23 +16519,23 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f723;}
+					goto f707;}
 
 				$this->p++;
 				if (isset(self::T4d756b3a[$this->ids[$this->p]])) {
 					if (!$this->s168()) {
-						goto n724;}
-					n724:
+						goto n708;}
+					n708:
 				} elseif ($this->p > $this->f) {
 					$this->rec(168);
 				}
-				goto k723;
-				f723:
+				goto k707;
+				f707:
 				$this->p = $o2;
-				goto n722;
-				k723:
-				goto a721;
-				n722:
+				goto n706;
+				k707:
+				goto a705;
+				n706:
 				break;
 			case 50:
 				// s164
@@ -17107,7 +16544,7 @@ abstract class GeneratedParser
 						$this->rec(164);
 					}
 
-					goto n725;}
+					goto n709;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 50)) {
@@ -17115,27 +16552,27 @@ abstract class GeneratedParser
 						$this->rec(71);
 					}
 
-					goto f726;}
+					goto f710;}
 
 				$this->p++;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
 					if (!$this->s166()) {
-						goto n727;}
-					n727:
+						goto n711;}
+					n711:
 				} elseif ($this->p > $this->f) {
 					$this->rec(166);
 				}
-				goto k726;
-				f726:
+				goto k710;
+				f710:
 				$this->p = $o2;
-				goto n725;
-				k726:
-				goto a721;
-				n725:
+				goto n709;
+				k710:
+				goto a705;
+				n709:
 				break;
 			case 85:
 				$this->p++;
-				goto a721;
+				goto a705;
 				break;
 		}
 
@@ -17143,13 +16580,13 @@ abstract class GeneratedParser
 			$this->rec(163);
 		}
 
-		goto f720;
-		a721:
-		goto k720;
-		f720:
+		goto f704;
+		a705:
+		goto k704;
+		f704:
 		$this->p = $o1;
 		return false;
-		k720:
+		k704:
 
 		return true;
 	}
@@ -17169,21 +16606,21 @@ abstract class GeneratedParser
 				$this->rec(71);
 			}
 
-			goto f1288;}
+			goto f1271;}
 
 		$this->p++;
 		if (isset(self::T83e30518[$this->ids[$this->p]])) {
 			if (!$this->s166()) {
-				goto n1289;}
-			n1289:
+				goto n1272;}
+			n1272:
 		} elseif ($this->p > $this->f) {
 			$this->rec(166);
 		}
-		goto k1288;
-		f1288:
+		goto k1271;
+		f1271:
 		$this->p = $o1;
 		return false;
-		k1288:
+		k1271:
 
 		return true;
 	}
@@ -17203,21 +16640,21 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f965;}
+			goto f960;}
 
 		$this->p++;
 		if (isset(self::T4d756b3a[$this->ids[$this->p]])) {
 			if (!$this->s168()) {
-				goto n966;}
-			n966:
+				goto n961;}
+			n961:
 		} elseif ($this->p > $this->f) {
 			$this->rec(168);
 		}
-		goto k965;
-		f965:
+		goto k960;
+		f960:
 		$this->p = $o1;
 		return false;
-		k965:
+		k960:
 
 		return true;
 	}
@@ -17237,13 +16674,13 @@ abstract class GeneratedParser
 				break;
 			case 50:
 				if (!$this->s164()) {
-					goto n964;}
-				goto a963;
-				n964:
+					goto n959;}
+				goto a958;
+				n959:
 				break;
 			case 85:
 				$this->p++;
-				goto a963;
+				goto a958;
 				break;
 		}
 
@@ -17251,13 +16688,13 @@ abstract class GeneratedParser
 			$this->rec(168);
 		}
 
-		goto f962;
-		a963:
-		goto k962;
-		f962:
+		goto f957;
+		a958:
+		goto k957;
+		f957:
 		$this->p = $o1;
 		return false;
-		k962:
+		k957:
 
 		return true;
 	}
@@ -17277,7 +16714,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f623;}
+			goto f607;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 43)) {
@@ -17286,13 +16723,13 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f623;}
+				goto f607;}
 		}
-		goto k623;
-		f623:
+		goto k607;
+		f607:
 		$this->p = $o1;
 		return false;
-		k623:
+		k607:
 
 		return true;
 	}
@@ -17315,7 +16752,7 @@ abstract class GeneratedParser
 					$this->rec(177);
 				}
 
-				goto e1386;
+				goto e1371;
 			}
 
 			// s177
@@ -17324,7 +16761,7 @@ abstract class GeneratedParser
 					$this->rec(177);
 				}
 
-				goto e1386;}
+				goto e1371;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -17332,7 +16769,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1387;}
+				goto f1372;}
 
 			$this->p++;
 			// s139
@@ -17344,36 +16781,36 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e1389;
+					goto e1374;
 				}
 
 				$this->p++;
 			}
-			e1389:
+			e1374:
 			if (!$this->s178()) {
-				goto f1387;}
-			goto k1387;
-			f1387:
+				goto f1372;}
+			goto k1372;
+			f1372:
 			$this->p = $o2;
-			goto e1386;
-			k1387:
+			goto e1371;
+			k1372:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1386;
+				goto e1371;
 			}
 
 			$k1++;
 		}
-		e1386:
+		e1371:
 
 		if ($k1 < 1) {
-			goto f1385;
+			goto f1370;
 		}
-		goto k1385;
-		f1385:
+		goto k1370;
+		f1370:
 		$this->p = $o1;
 		return false;
-		k1385:
+		k1370:
 
 		return true;
 	}
@@ -17389,11 +16826,11 @@ abstract class GeneratedParser
 						$this->rec(180);
 					}
 
-					goto n1640;}
+					goto n1608;}
 
 				$o2 = $this->p;
 				if (!$this->s152()) {
-					goto f1641;}
+					goto f1609;}
 				// s139
 				$o3 = $this->p;
 				while (true) {
@@ -17403,19 +16840,19 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1643;
+						goto e1611;
 					}
 
 					$this->p++;
 				}
-				e1643:
-				goto k1641;
-				f1641:
+				e1611:
+				goto k1609;
+				f1609:
 				$this->p = $o2;
-				goto n1640;
-				k1641:
-				goto a1639;
-				n1640:
+				goto n1608;
+				k1609:
+				goto a1607;
+				n1608:
 				break;
 			case 0:
 			case 25:
@@ -17456,9 +16893,9 @@ abstract class GeneratedParser
 						$this->rec(62);
 					}
 
-					goto n1644;}
-				goto a1639;
-				n1644:
+					goto n1612;}
+				goto a1607;
+				n1612:
 				break;
 		}
 
@@ -17466,13 +16903,13 @@ abstract class GeneratedParser
 			$this->rec(178);
 		}
 
-		goto f1638;
-		a1639:
-		goto k1638;
-		f1638:
+		goto f1606;
+		a1607:
+		goto k1606;
+		f1606:
 		$this->p = $o1;
 		return false;
-		k1638:
+		k1606:
 
 		return true;
 	}
@@ -17495,7 +16932,7 @@ abstract class GeneratedParser
 					$this->rec(183);
 				}
 
-				goto e774;
+				goto e764;
 			}
 
 			// s183
@@ -17504,7 +16941,7 @@ abstract class GeneratedParser
 					$this->rec(183);
 				}
 
-				goto e774;}
+				goto e764;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -17512,7 +16949,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f775;}
+				goto f765;}
 
 			$this->p++;
 			// s139
@@ -17524,36 +16961,36 @@ abstract class GeneratedParser
 						$this->rec(3);
 					}
 
-					goto e777;
+					goto e767;
 				}
 
 				$this->p++;
 			}
-			e777:
+			e767:
 			if (!$this->s184()) {
-				goto f775;}
-			goto k775;
-			f775:
+				goto f765;}
+			goto k765;
+			f765:
 			$this->p = $o2;
-			goto e774;
-			k775:
+			goto e764;
+			k765:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e774;
+				goto e764;
 			}
 
 			$k1++;
 		}
-		e774:
+		e764:
 
 		if ($k1 < 1) {
-			goto f773;
+			goto f763;
 		}
-		goto k773;
-		f773:
+		goto k763;
+		f763:
 		$this->p = $o1;
 		return false;
-		k773:
+		k763:
 
 		return true;
 	}
@@ -17569,11 +17006,11 @@ abstract class GeneratedParser
 						$this->rec(186);
 					}
 
-					goto n1020;}
+					goto n1008;}
 
 				$o2 = $this->p;
 				if (!$this->s142()) {
-					goto f1021;}
+					goto f1009;}
 				// s139
 				$o3 = $this->p;
 				while (true) {
@@ -17583,19 +17020,19 @@ abstract class GeneratedParser
 							$this->rec(3);
 						}
 
-						goto e1023;
+						goto e1011;
 					}
 
 					$this->p++;
 				}
-				e1023:
-				goto k1021;
-				f1021:
+				e1011:
+				goto k1009;
+				f1009:
 				$this->p = $o2;
-				goto n1020;
-				k1021:
-				goto a1019;
-				n1020:
+				goto n1008;
+				k1009:
+				goto a1007;
+				n1008:
 				break;
 			case 0:
 			case 21:
@@ -17637,9 +17074,9 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto n1024;}
-				goto a1019;
-				n1024:
+					goto n1012;}
+				goto a1007;
+				n1012:
 				break;
 		}
 
@@ -17647,13 +17084,13 @@ abstract class GeneratedParser
 			$this->rec(184);
 		}
 
-		goto f1018;
-		a1019:
-		goto k1018;
-		f1018:
+		goto f1006;
+		a1007:
+		goto k1006;
+		f1006:
 		$this->p = $o1;
 		return false;
-		k1018:
+		k1006:
 
 		return true;
 	}
@@ -17673,7 +17110,7 @@ abstract class GeneratedParser
 				$this->rec(12);
 			}
 
-			goto f240;}
+			goto f226;}
 
 		$this->p++;
 		// s138
@@ -17682,7 +17119,7 @@ abstract class GeneratedParser
 				$this->rec(138);
 			}
 
-			goto f240;}
+			goto f226;}
 
 		$o2 = $this->p;
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -17690,7 +17127,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f241;}
+			goto f227;}
 
 		$this->p++;
 		// s139
@@ -17702,16 +17139,16 @@ abstract class GeneratedParser
 					$this->rec(3);
 				}
 
-				goto e243;
+				goto e229;
 			}
 
 			$this->p++;
 		}
-		e243:
+		e229:
 		if (isset(self::T1e2ed78c[$this->ids[$this->p]])) {
 			if (!$this->s141()) {
-				goto n244;}
-			n244:
+				goto n230;}
+			n230:
 		} elseif ($this->p > $this->f) {
 			$this->rec(141);
 		}
@@ -17720,14 +17157,14 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f241;}
+			goto f227;}
 
 		$this->p++;
-		goto k241;
-		f241:
+		goto k227;
+		f227:
 		$this->p = $o2;
-		goto f240;
-		k241:
+		goto f226;
+		k227:
 		// s19
 		$o2 = $this->p;
 		// s20
@@ -17739,24 +17176,24 @@ abstract class GeneratedParser
 					$this->rec(21);
 				}
 
-				goto e247;
+				goto e233;
 			}
 
 			$this->p++;
 		}
-		e247:
+		e233:
 		if (!$this->s74()) {
-			goto f245;}
-		goto k245;
-		f245:
+			goto f231;}
+		goto k231;
+		f231:
 		$this->p = $o2;
-		goto f240;
-		k245:
-		goto k240;
-		f240:
+		goto f226;
+		k231:
+		goto k226;
+		f226:
 		$this->p = $o1;
 		return false;
-		k240:
+		k226:
 
 		return true;
 	}
@@ -17774,24 +17211,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f52;}
+						goto f42;}
 				}
 				// s457
 				$o3 = $this->p;
 				if (!$this->s125()) {
-					goto f53;}
-				goto k53;
-				f53:
+					goto f43;}
+				goto k43;
+				f43:
 				$this->p = $o3;
-				goto f52;
-				k53:
-				goto k52;
-				f52:
+				goto f42;
+				k43:
+				goto k42;
+				f42:
 				$this->p = $o2;
-				goto n51;
-				k52:
-				goto a50;
-				n51:
+				goto n41;
+				k42:
+				goto a40;
+				n41:
 				break;
 			case 51:
 			case 52:
@@ -17819,13 +17256,13 @@ abstract class GeneratedParser
 			case 74:
 			case 75:
 				if (!$this->s190()) {
-					goto n54;}
-				goto a50;
-				n54:
+					goto n44;}
+				goto a40;
+				n44:
 				if (!$this->s454()) {
-					goto n55;}
-				goto a50;
-				n55:
+					goto n45;}
+				goto a40;
+				n45:
 				// s455
 				$o2 = $this->p;
 				if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
@@ -17834,33 +17271,33 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f57;}
+						goto f47;}
 				}
 				// s457
 				$o3 = $this->p;
 				if (!$this->s125()) {
-					goto f58;}
-				goto k58;
-				f58:
+					goto f48;}
+				goto k48;
+				f48:
 				$this->p = $o3;
-				goto f57;
-				k58:
-				goto k57;
-				f57:
+				goto f47;
+				k48:
+				goto k47;
+				f47:
 				$this->p = $o2;
-				goto n56;
-				k57:
-				goto a50;
-				n56:
+				goto n46;
+				k47:
+				goto a40;
+				n46:
 				break;
 			case 76:
 			case 77:
 			case 78:
 			case 79:
 				if (!$this->s454()) {
-					goto n59;}
-				goto a50;
-				n59:
+					goto n49;}
+				goto a40;
+				n49:
 				// s455
 				$o2 = $this->p;
 				if (isset(self::Tf4b693bf[$this->ids[$this->p]])) {
@@ -17869,24 +17306,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f61;}
+						goto f51;}
 				}
 				// s457
 				$o3 = $this->p;
 				if (!$this->s125()) {
-					goto f62;}
-				goto k62;
-				f62:
+					goto f52;}
+				goto k52;
+				f52:
 				$this->p = $o3;
-				goto f61;
-				k62:
-				goto k61;
-				f61:
+				goto f51;
+				k52:
+				goto k51;
+				f51:
 				$this->p = $o2;
-				goto n60;
-				k61:
-				goto a50;
-				n60:
+				goto n50;
+				k51:
+				goto a40;
+				n50:
 				break;
 		}
 
@@ -17894,13 +17331,13 @@ abstract class GeneratedParser
 			$this->rec(189);
 		}
 
-		goto f49;
-		a50:
-		goto k49;
-		f49:
+		goto f39;
+		a40:
+		goto k39;
+		f39:
 		$this->p = $o1;
 		return false;
-		k49:
+		k39:
 
 		return true;
 	}
@@ -17925,7 +17362,7 @@ abstract class GeneratedParser
 						$this->rec(402);
 					}
 
-					goto n112;}
+					goto n100;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 51)) {
@@ -17933,7 +17370,7 @@ abstract class GeneratedParser
 						$this->rec(85);
 					}
 
-					goto f113;}
+					goto f101;}
 
 				$this->p++;
 				// s403
@@ -17942,9 +17379,211 @@ abstract class GeneratedParser
 						$this->rec(403);
 					}
 
+					goto f101;}
+
+				$o3 = $this->p;
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p >= $this->f) {
+						$this->rec(47);
+					}
+
+					goto f102;}
+
+				$this->p++;
+				if (!$this->s125()) {
+					goto f102;}
+				goto k102;
+				f102:
+				$this->p = $o3;
+				goto f101;
+				k102:
+				goto k101;
+				f101:
+				$this->p = $o2;
+				goto n100;
+				k101:
+				goto a99;
+				n100:
+				break;
+			case 52:
+				// s405
+				if (!($this->ids[$this->p] === 52)) {
+					if ($this->p > $this->f) {
+						$this->rec(405);
+					}
+
+					goto n103;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 52)) {
+					if ($this->p >= $this->f) {
+						$this->rec(88);
+					}
+
+					goto f104;}
+
+				$this->p++;
+				// s403
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p > $this->f) {
+						$this->rec(403);
+					}
+
+					goto f104;}
+
+				$o3 = $this->p;
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p >= $this->f) {
+						$this->rec(47);
+					}
+
+					goto f105;}
+
+				$this->p++;
+				if (!$this->s125()) {
+					goto f105;}
+				goto k105;
+				f105:
+				$this->p = $o3;
+				goto f104;
+				k105:
+				goto k104;
+				f104:
+				$this->p = $o2;
+				goto n103;
+				k104:
+				goto a99;
+				n103:
+				break;
+			case 53:
+				// s406
+				if (!($this->ids[$this->p] === 53)) {
+					if ($this->p > $this->f) {
+						$this->rec(406);
+					}
+
+					goto n106;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 53)) {
+					if ($this->p >= $this->f) {
+						$this->rec(89);
+					}
+
+					goto f107;}
+
+				$this->p++;
+				// s403
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p > $this->f) {
+						$this->rec(403);
+					}
+
+					goto f107;}
+
+				$o3 = $this->p;
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p >= $this->f) {
+						$this->rec(47);
+					}
+
+					goto f108;}
+
+				$this->p++;
+				if (!$this->s125()) {
+					goto f108;}
+				goto k108;
+				f108:
+				$this->p = $o3;
+				goto f107;
+				k108:
+				goto k107;
+				f107:
+				$this->p = $o2;
+				goto n106;
+				k107:
+				goto a99;
+				n106:
+				break;
+			case 54:
+				// s404
+				if (!($this->ids[$this->p] === 54)) {
+					if ($this->p > $this->f) {
+						$this->rec(404);
+					}
+
+					goto n109;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 54)) {
+					if ($this->p >= $this->f) {
+						$this->rec(86);
+					}
+
+					goto f110;}
+
+				$this->p++;
+				// s403
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p > $this->f) {
+						$this->rec(403);
+					}
+
+					goto f110;}
+
+				$o3 = $this->p;
+				if (!($this->ids[$this->p] === 26)) {
+					if ($this->p >= $this->f) {
+						$this->rec(47);
+					}
+
+					goto f111;}
+
+				$this->p++;
+				if (!$this->s125()) {
+					goto f111;}
+				goto k111;
+				f111:
+				$this->p = $o3;
+				goto f110;
+				k111:
+				goto k110;
+				f110:
+				$this->p = $o2;
+				goto n109;
+				k110:
+				goto a99;
+				n109:
+				break;
+			case 55:
+				// s401
+				if (!($this->ids[$this->p] === 55)) {
+					if ($this->p > $this->f) {
+						$this->rec(401);
+					}
+
+					goto n112;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 55)) {
+					if ($this->p >= $this->f) {
+						$this->rec(87);
+					}
+
+					goto f113;}
+
+				$this->p++;
+				// s399
+				if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(399);
+					}
+
 					goto f113;}
 
 				$o3 = $this->p;
+				if (!$this->s199()) {
+					goto f114;}
 				if (!($this->ids[$this->p] === 26)) {
 					if ($this->p >= $this->f) {
 						$this->rec(47);
@@ -17965,210 +17604,8 @@ abstract class GeneratedParser
 				$this->p = $o2;
 				goto n112;
 				k113:
-				goto a111;
+				goto a99;
 				n112:
-				break;
-			case 52:
-				// s405
-				if (!($this->ids[$this->p] === 52)) {
-					if ($this->p > $this->f) {
-						$this->rec(405);
-					}
-
-					goto n115;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 52)) {
-					if ($this->p >= $this->f) {
-						$this->rec(88);
-					}
-
-					goto f116;}
-
-				$this->p++;
-				// s403
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p > $this->f) {
-						$this->rec(403);
-					}
-
-					goto f116;}
-
-				$o3 = $this->p;
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p >= $this->f) {
-						$this->rec(47);
-					}
-
-					goto f117;}
-
-				$this->p++;
-				if (!$this->s125()) {
-					goto f117;}
-				goto k117;
-				f117:
-				$this->p = $o3;
-				goto f116;
-				k117:
-				goto k116;
-				f116:
-				$this->p = $o2;
-				goto n115;
-				k116:
-				goto a111;
-				n115:
-				break;
-			case 53:
-				// s406
-				if (!($this->ids[$this->p] === 53)) {
-					if ($this->p > $this->f) {
-						$this->rec(406);
-					}
-
-					goto n118;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 53)) {
-					if ($this->p >= $this->f) {
-						$this->rec(89);
-					}
-
-					goto f119;}
-
-				$this->p++;
-				// s403
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p > $this->f) {
-						$this->rec(403);
-					}
-
-					goto f119;}
-
-				$o3 = $this->p;
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p >= $this->f) {
-						$this->rec(47);
-					}
-
-					goto f120;}
-
-				$this->p++;
-				if (!$this->s125()) {
-					goto f120;}
-				goto k120;
-				f120:
-				$this->p = $o3;
-				goto f119;
-				k120:
-				goto k119;
-				f119:
-				$this->p = $o2;
-				goto n118;
-				k119:
-				goto a111;
-				n118:
-				break;
-			case 54:
-				// s404
-				if (!($this->ids[$this->p] === 54)) {
-					if ($this->p > $this->f) {
-						$this->rec(404);
-					}
-
-					goto n121;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 54)) {
-					if ($this->p >= $this->f) {
-						$this->rec(86);
-					}
-
-					goto f122;}
-
-				$this->p++;
-				// s403
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p > $this->f) {
-						$this->rec(403);
-					}
-
-					goto f122;}
-
-				$o3 = $this->p;
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p >= $this->f) {
-						$this->rec(47);
-					}
-
-					goto f123;}
-
-				$this->p++;
-				if (!$this->s125()) {
-					goto f123;}
-				goto k123;
-				f123:
-				$this->p = $o3;
-				goto f122;
-				k123:
-				goto k122;
-				f122:
-				$this->p = $o2;
-				goto n121;
-				k122:
-				goto a111;
-				n121:
-				break;
-			case 55:
-				// s401
-				if (!($this->ids[$this->p] === 55)) {
-					if ($this->p > $this->f) {
-						$this->rec(401);
-					}
-
-					goto n124;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 55)) {
-					if ($this->p >= $this->f) {
-						$this->rec(87);
-					}
-
-					goto f125;}
-
-				$this->p++;
-				// s399
-				if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(399);
-					}
-
-					goto f125;}
-
-				$o3 = $this->p;
-				if (!$this->s199()) {
-					goto f126;}
-				if (!($this->ids[$this->p] === 26)) {
-					if ($this->p >= $this->f) {
-						$this->rec(47);
-					}
-
-					goto f126;}
-
-				$this->p++;
-				if (!$this->s125()) {
-					goto f126;}
-				goto k126;
-				f126:
-				$this->p = $o3;
-				goto f125;
-				k126:
-				goto k125;
-				f125:
-				$this->p = $o2;
-				goto n124;
-				k125:
-				goto a111;
-				n124:
 				break;
 			case 56:
 				// s395
@@ -18177,7 +17614,7 @@ abstract class GeneratedParser
 						$this->rec(395);
 					}
 
-					goto n127;}
+					goto n115;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 56)) {
@@ -18185,18 +17622,18 @@ abstract class GeneratedParser
 						$this->rec(95);
 					}
 
-					goto f128;}
+					goto f116;}
 
 				$this->p++;
 				if (!$this->s391()) {
-					goto f128;}
-				goto k128;
-				f128:
+					goto f116;}
+				goto k116;
+				f116:
 				$this->p = $o2;
-				goto n127;
-				k128:
-				goto a111;
-				n127:
+				goto n115;
+				k116:
+				goto a99;
+				n115:
 				break;
 			case 57:
 				// s394
@@ -18205,7 +17642,7 @@ abstract class GeneratedParser
 						$this->rec(394);
 					}
 
-					goto n129;}
+					goto n117;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 57)) {
@@ -18213,18 +17650,18 @@ abstract class GeneratedParser
 						$this->rec(94);
 					}
 
-					goto f130;}
+					goto f118;}
 
 				$this->p++;
 				if (!$this->s391()) {
-					goto f130;}
-				goto k130;
-				f130:
+					goto f118;}
+				goto k118;
+				f118:
 				$this->p = $o2;
-				goto n129;
-				k130:
-				goto a111;
-				n129:
+				goto n117;
+				k118:
+				goto a99;
+				n117:
 				break;
 			case 58:
 				// s443
@@ -18233,7 +17670,7 @@ abstract class GeneratedParser
 						$this->rec(443);
 					}
 
-					goto n131;}
+					goto n119;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 58)) {
@@ -18241,7 +17678,7 @@ abstract class GeneratedParser
 						$this->rec(105);
 					}
 
-					goto f132;}
+					goto f120;}
 
 				$this->p++;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -18249,7 +17686,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f132;}
+					goto f120;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 10)) {
@@ -18257,7 +17694,7 @@ abstract class GeneratedParser
 						$this->rec(26);
 					}
 
-					goto f132;}
+					goto f120;}
 
 				$this->p++;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -18265,18 +17702,18 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f132;}
+					goto f120;}
 
 				$this->p++;
 				if (!$this->s444()) {
-					goto f132;}
-				goto k132;
-				f132:
+					goto f120;}
+				goto k120;
+				f120:
 				$this->p = $o2;
-				goto n131;
-				k132:
-				goto a111;
-				n131:
+				goto n119;
+				k120:
+				goto a99;
+				n119:
 				break;
 			case 59:
 				// s446
@@ -18285,7 +17722,7 @@ abstract class GeneratedParser
 						$this->rec(446);
 					}
 
-					goto n133;}
+					goto n121;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 59)) {
@@ -18293,7 +17730,7 @@ abstract class GeneratedParser
 						$this->rec(106);
 					}
 
-					goto f134;}
+					goto f122;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 31)) {
@@ -18307,26 +17744,26 @@ abstract class GeneratedParser
 					$this->rec(69);
 				}
 				if (!$this->s199()) {
-					goto f134;}
+					goto f122;}
 				if (!isset(self::T29c7f960[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(448);
 					}
 
-					goto f134;}
+					goto f122;}
 
 				$this->p++;
 				if (!$this->s449()) {
-					goto f134;}
+					goto f122;}
 				if (!$this->s125()) {
-					goto f134;}
-				goto k134;
-				f134:
+					goto f122;}
+				goto k122;
+				f122:
 				$this->p = $o2;
-				goto n133;
-				k134:
-				goto a111;
-				n133:
+				goto n121;
+				k122:
+				goto a99;
+				n121:
 				break;
 			case 60:
 				// s397
@@ -18335,7 +17772,7 @@ abstract class GeneratedParser
 						$this->rec(397);
 					}
 
-					goto n135;}
+					goto n123;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 60)) {
@@ -18343,18 +17780,18 @@ abstract class GeneratedParser
 						$this->rec(107);
 					}
 
-					goto f136;}
+					goto f124;}
 
 				$this->p++;
 				if (!$this->s391()) {
-					goto f136;}
-				goto k136;
-				f136:
+					goto f124;}
+				goto k124;
+				f124:
 				$this->p = $o2;
-				goto n135;
-				k136:
-				goto a111;
-				n135:
+				goto n123;
+				k124:
+				goto a99;
+				n123:
 				break;
 			case 61:
 				// s396
@@ -18363,7 +17800,7 @@ abstract class GeneratedParser
 						$this->rec(396);
 					}
 
-					goto n137;}
+					goto n125;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 61)) {
@@ -18371,24 +17808,24 @@ abstract class GeneratedParser
 						$this->rec(96);
 					}
 
-					goto f138;}
+					goto f126;}
 
 				$this->p++;
 				if (!$this->s391()) {
-					goto f138;}
-				goto k138;
-				f138:
+					goto f126;}
+				goto k126;
+				f126:
 				$this->p = $o2;
-				goto n137;
-				k138:
-				goto a111;
-				n137:
+				goto n125;
+				k126:
+				goto a99;
+				n125:
 				break;
 			case 62:
 				if (!$this->s436()) {
-					goto n139;}
-				goto a111;
-				n139:
+					goto n127;}
+				goto a99;
+				n127:
 				break;
 			case 63:
 				// s398
@@ -18397,7 +17834,7 @@ abstract class GeneratedParser
 						$this->rec(398);
 					}
 
-					goto n140;}
+					goto n128;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 63)) {
@@ -18405,7 +17842,7 @@ abstract class GeneratedParser
 						$this->rec(98);
 					}
 
-					goto f141;}
+					goto f129;}
 
 				$this->p++;
 				// s399
@@ -18414,33 +17851,33 @@ abstract class GeneratedParser
 						$this->rec(399);
 					}
 
-					goto f141;}
+					goto f129;}
 
 				$o3 = $this->p;
 				if (!$this->s199()) {
-					goto f142;}
+					goto f130;}
 				if (!($this->ids[$this->p] === 26)) {
 					if ($this->p >= $this->f) {
 						$this->rec(47);
 					}
 
-					goto f142;}
+					goto f130;}
 
 				$this->p++;
 				if (!$this->s125()) {
-					goto f142;}
-				goto k142;
-				f142:
+					goto f130;}
+				goto k130;
+				f130:
 				$this->p = $o3;
-				goto f141;
-				k142:
-				goto k141;
-				f141:
+				goto f129;
+				k130:
+				goto k129;
+				f129:
 				$this->p = $o2;
-				goto n140;
-				k141:
-				goto a111;
-				n140:
+				goto n128;
+				k129:
+				goto a99;
+				n128:
 				break;
 			case 64:
 				// s439
@@ -18449,7 +17886,7 @@ abstract class GeneratedParser
 						$this->rec(439);
 					}
 
-					goto n143;}
+					goto n131;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 64)) {
@@ -18457,18 +17894,18 @@ abstract class GeneratedParser
 						$this->rec(102);
 					}
 
-					goto f144;}
+					goto f132;}
 
 				$this->p++;
 				if (!$this->s438()) {
-					goto f144;}
-				goto k144;
-				f144:
+					goto f132;}
+				goto k132;
+				f132:
 				$this->p = $o2;
-				goto n143;
-				k144:
-				goto a111;
-				n143:
+				goto n131;
+				k132:
+				goto a99;
+				n131:
 				break;
 			case 65:
 				// s407
@@ -18477,7 +17914,7 @@ abstract class GeneratedParser
 						$this->rec(407);
 					}
 
-					goto n145;}
+					goto n133;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 65)) {
@@ -18485,18 +17922,18 @@ abstract class GeneratedParser
 						$this->rec(97);
 					}
 
-					goto f146;}
+					goto f134;}
 
 				$this->p++;
 				if (!$this->s125()) {
-					goto f146;}
-				goto k146;
-				f146:
+					goto f134;}
+				goto k134;
+				f134:
 				$this->p = $o2;
-				goto n145;
-				k146:
-				goto a111;
-				n145:
+				goto n133;
+				k134:
+				goto a99;
+				n133:
 				break;
 			case 66:
 				// s441
@@ -18505,7 +17942,7 @@ abstract class GeneratedParser
 						$this->rec(441);
 					}
 
-					goto n147;}
+					goto n135;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 66)) {
@@ -18513,7 +17950,7 @@ abstract class GeneratedParser
 						$this->rec(104);
 					}
 
-					goto f148;}
+					goto f136;}
 
 				$this->p++;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -18521,7 +17958,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f148;}
+					goto f136;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 46)) {
@@ -18530,27 +17967,27 @@ abstract class GeneratedParser
 					$this->rec(69);
 				}
 				if (!$this->s199()) {
-					goto f148;}
+					goto f136;}
 				if (!isset(self::T53b29bff[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(77);
 					}
 
-					goto f148;}
-				goto k148;
-				f148:
+					goto f136;}
+				goto k136;
+				f136:
 				$this->p = $o2;
-				goto n147;
-				k148:
-				goto a111;
-				n147:
+				goto n135;
+				k136:
+				goto a99;
+				n135:
 				// s442
 				if (!($this->ids[$this->p] === 66)) {
 					if ($this->p > $this->f) {
 						$this->rec(442);
 					}
 
-					goto n149;}
+					goto n137;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 66)) {
@@ -18558,7 +17995,7 @@ abstract class GeneratedParser
 						$this->rec(104);
 					}
 
-					goto f150;}
+					goto f138;}
 
 				$this->p++;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -18566,7 +18003,7 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f150;}
+					goto f138;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 46)) {
@@ -18575,14 +18012,14 @@ abstract class GeneratedParser
 					$this->rec(69);
 				}
 				if (!$this->s125()) {
-					goto f150;}
-				goto k150;
-				f150:
+					goto f138;}
+				goto k138;
+				f138:
 				$this->p = $o2;
-				goto n149;
-				k150:
-				goto a111;
-				n149:
+				goto n137;
+				k138:
+				goto a99;
+				n137:
 				break;
 			case 67:
 				// s400
@@ -18591,7 +18028,7 @@ abstract class GeneratedParser
 						$this->rec(400);
 					}
 
-					goto n151;}
+					goto n139;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 67)) {
@@ -18599,7 +18036,7 @@ abstract class GeneratedParser
 						$this->rec(108);
 					}
 
-					goto f152;}
+					goto f140;}
 
 				$this->p++;
 				// s399
@@ -18608,33 +18045,33 @@ abstract class GeneratedParser
 						$this->rec(399);
 					}
 
-					goto f152;}
+					goto f140;}
 
 				$o3 = $this->p;
 				if (!$this->s199()) {
-					goto f153;}
+					goto f141;}
 				if (!($this->ids[$this->p] === 26)) {
 					if ($this->p >= $this->f) {
 						$this->rec(47);
 					}
 
-					goto f153;}
+					goto f141;}
 
 				$this->p++;
 				if (!$this->s125()) {
-					goto f153;}
-				goto k153;
-				f153:
+					goto f141;}
+				goto k141;
+				f141:
 				$this->p = $o3;
-				goto f152;
-				k153:
-				goto k152;
-				f152:
+				goto f140;
+				k141:
+				goto k140;
+				f140:
 				$this->p = $o2;
-				goto n151;
-				k152:
-				goto a111;
-				n151:
+				goto n139;
+				k140:
+				goto a99;
+				n139:
 				break;
 			case 68:
 				// s437
@@ -18643,12 +18080,180 @@ abstract class GeneratedParser
 						$this->rec(437);
 					}
 
-					goto n154;}
+					goto n142;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 68)) {
 					if ($this->p >= $this->f) {
 						$this->rec(101);
+					}
+
+					goto f143;}
+
+				$this->p++;
+				if (!$this->s438()) {
+					goto f143;}
+				goto k143;
+				f143:
+				$this->p = $o2;
+				goto n142;
+				k143:
+				goto a99;
+				n142:
+				break;
+			case 69:
+				// s408
+				if (!($this->ids[$this->p] === 69)) {
+					if ($this->p > $this->f) {
+						$this->rec(408);
+					}
+
+					goto n144;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 69)) {
+					if ($this->p >= $this->f) {
+						$this->rec(99);
+					}
+
+					goto f145;}
+
+				$this->p++;
+				if (!$this->s409()) {
+					goto f145;}
+				goto k145;
+				f145:
+				$this->p = $o2;
+				goto n144;
+				k145:
+				goto a99;
+				n144:
+				break;
+			case 70:
+				// s390
+				if (!($this->ids[$this->p] === 70)) {
+					if ($this->p > $this->f) {
+						$this->rec(390);
+					}
+
+					goto n146;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 70)) {
+					if ($this->p >= $this->f) {
+						$this->rec(91);
+					}
+
+					goto f147;}
+
+				$this->p++;
+				if (!$this->s391()) {
+					goto f147;}
+				goto k147;
+				f147:
+				$this->p = $o2;
+				goto n146;
+				k147:
+				goto a99;
+				n146:
+				break;
+			case 71:
+				// s392
+				if (!($this->ids[$this->p] === 71)) {
+					if ($this->p > $this->f) {
+						$this->rec(392);
+					}
+
+					goto n148;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 71)) {
+					if ($this->p >= $this->f) {
+						$this->rec(92);
+					}
+
+					goto f149;}
+
+				$this->p++;
+				if (!$this->s391()) {
+					goto f149;}
+				goto k149;
+				f149:
+				$this->p = $o2;
+				goto n148;
+				k149:
+				goto a99;
+				n148:
+				break;
+			case 72:
+				// s191
+				if (!($this->ids[$this->p] === 72)) {
+					if ($this->p > $this->f) {
+						$this->rec(191);
+					}
+
+					goto n150;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 72)) {
+					if ($this->p >= $this->f) {
+						$this->rec(84);
+					}
+
+					goto f151;}
+
+				$this->p++;
+				if (!$this->s192()) {
+					goto f151;}
+				goto k151;
+				f151:
+				$this->p = $o2;
+				goto n150;
+				k151:
+				goto a99;
+				n150:
+				break;
+			case 73:
+				// s393
+				if (!($this->ids[$this->p] === 73)) {
+					if ($this->p > $this->f) {
+						$this->rec(393);
+					}
+
+					goto n152;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 73)) {
+					if ($this->p >= $this->f) {
+						$this->rec(93);
+					}
+
+					goto f153;}
+
+				$this->p++;
+				if (!$this->s391()) {
+					goto f153;}
+				goto k153;
+				f153:
+				$this->p = $o2;
+				goto n152;
+				k153:
+				goto a99;
+				n152:
+				break;
+			case 74:
+				// s440
+				if (!($this->ids[$this->p] === 74)) {
+					if ($this->p > $this->f) {
+						$this->rec(440);
+					}
+
+					goto n154;}
+
+				$o2 = $this->p;
+				if (!($this->ids[$this->p] === 74)) {
+					if ($this->p >= $this->f) {
+						$this->rec(103);
 					}
 
 					goto f155;}
@@ -18661,176 +18266,8 @@ abstract class GeneratedParser
 				$this->p = $o2;
 				goto n154;
 				k155:
-				goto a111;
+				goto a99;
 				n154:
-				break;
-			case 69:
-				// s408
-				if (!($this->ids[$this->p] === 69)) {
-					if ($this->p > $this->f) {
-						$this->rec(408);
-					}
-
-					goto n156;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 69)) {
-					if ($this->p >= $this->f) {
-						$this->rec(99);
-					}
-
-					goto f157;}
-
-				$this->p++;
-				if (!$this->s409()) {
-					goto f157;}
-				goto k157;
-				f157:
-				$this->p = $o2;
-				goto n156;
-				k157:
-				goto a111;
-				n156:
-				break;
-			case 70:
-				// s390
-				if (!($this->ids[$this->p] === 70)) {
-					if ($this->p > $this->f) {
-						$this->rec(390);
-					}
-
-					goto n158;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 70)) {
-					if ($this->p >= $this->f) {
-						$this->rec(91);
-					}
-
-					goto f159;}
-
-				$this->p++;
-				if (!$this->s391()) {
-					goto f159;}
-				goto k159;
-				f159:
-				$this->p = $o2;
-				goto n158;
-				k159:
-				goto a111;
-				n158:
-				break;
-			case 71:
-				// s392
-				if (!($this->ids[$this->p] === 71)) {
-					if ($this->p > $this->f) {
-						$this->rec(392);
-					}
-
-					goto n160;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 71)) {
-					if ($this->p >= $this->f) {
-						$this->rec(92);
-					}
-
-					goto f161;}
-
-				$this->p++;
-				if (!$this->s391()) {
-					goto f161;}
-				goto k161;
-				f161:
-				$this->p = $o2;
-				goto n160;
-				k161:
-				goto a111;
-				n160:
-				break;
-			case 72:
-				// s191
-				if (!($this->ids[$this->p] === 72)) {
-					if ($this->p > $this->f) {
-						$this->rec(191);
-					}
-
-					goto n162;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 72)) {
-					if ($this->p >= $this->f) {
-						$this->rec(84);
-					}
-
-					goto f163;}
-
-				$this->p++;
-				if (!$this->s192()) {
-					goto f163;}
-				goto k163;
-				f163:
-				$this->p = $o2;
-				goto n162;
-				k163:
-				goto a111;
-				n162:
-				break;
-			case 73:
-				// s393
-				if (!($this->ids[$this->p] === 73)) {
-					if ($this->p > $this->f) {
-						$this->rec(393);
-					}
-
-					goto n164;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 73)) {
-					if ($this->p >= $this->f) {
-						$this->rec(93);
-					}
-
-					goto f165;}
-
-				$this->p++;
-				if (!$this->s391()) {
-					goto f165;}
-				goto k165;
-				f165:
-				$this->p = $o2;
-				goto n164;
-				k165:
-				goto a111;
-				n164:
-				break;
-			case 74:
-				// s440
-				if (!($this->ids[$this->p] === 74)) {
-					if ($this->p > $this->f) {
-						$this->rec(440);
-					}
-
-					goto n166;}
-
-				$o2 = $this->p;
-				if (!($this->ids[$this->p] === 74)) {
-					if ($this->p >= $this->f) {
-						$this->rec(103);
-					}
-
-					goto f167;}
-
-				$this->p++;
-				if (!$this->s438()) {
-					goto f167;}
-				goto k167;
-				f167:
-				$this->p = $o2;
-				goto n166;
-				k167:
-				goto a111;
-				n166:
 				break;
 			case 75:
 				// s384
@@ -18839,7 +18276,7 @@ abstract class GeneratedParser
 						$this->rec(384);
 					}
 
-					goto n168;}
+					goto n156;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 75)) {
@@ -18847,20 +18284,20 @@ abstract class GeneratedParser
 						$this->rec(90);
 					}
 
-					goto f169;}
+					goto f157;}
 
 				$this->p++;
 				if (!$this->s199()) {
-					goto f169;}
+					goto f157;}
 				if (!$this->s385()) {
-					goto f169;}
-				goto k169;
-				f169:
+					goto f157;}
+				goto k157;
+				f157:
 				$this->p = $o2;
-				goto n168;
-				k169:
-				goto a111;
-				n168:
+				goto n156;
+				k157:
+				goto a99;
+				n156:
 				break;
 		}
 
@@ -18868,13 +18305,13 @@ abstract class GeneratedParser
 			$this->rec(190);
 		}
 
-		goto f110;
-		a111:
-		goto k110;
-		f110:
+		goto f98;
+		a99:
+		goto k98;
+		f98:
 		$this->p = $o1;
 		return false;
-		k110:
+		k98:
 
 		return true;
 	}
@@ -18925,11 +18362,11 @@ abstract class GeneratedParser
 						$this->rec(198);
 					}
 
-					goto n354;}
+					goto n328;}
 
 				$o2 = $this->p;
 				if (!$this->s199()) {
-					goto f355;}
+					goto f329;}
 				if (($this->ids[$this->p] === 27)) {
 					$this->p++;
 				} elseif ($this->p >= $this->f) {
@@ -18945,18 +18382,18 @@ abstract class GeneratedParser
 						$this->rec(47);
 					}
 
-					goto f355;}
+					goto f329;}
 
 				$this->p++;
 				if (!$this->s125()) {
-					goto f355;}
-				goto k355;
-				f355:
+					goto f329;}
+				goto k329;
+				f329:
 				$this->p = $o2;
-				goto n354;
-				k355:
-				goto a353;
-				n354:
+				goto n328;
+				k329:
+				goto a327;
+				n328:
 				break;
 			case 26:
 			case 27:
@@ -18967,7 +18404,7 @@ abstract class GeneratedParser
 						$this->rec(193);
 					}
 
-					goto n356;}
+					goto n330;}
 
 				$o2 = $this->p;
 				if (!isset(self::T553dc07b[$this->ids[$this->p]])) {
@@ -18975,7 +18412,7 @@ abstract class GeneratedParser
 						$this->rec(195);
 					}
 
-					goto f357;}
+					goto f331;}
 				if (($this->ids[$this->p] === 27)) {
 					$this->p++;
 				} elseif ($this->p >= $this->f) {
@@ -18991,18 +18428,18 @@ abstract class GeneratedParser
 						$this->rec(47);
 					}
 
-					goto f357;}
+					goto f331;}
 
 				$this->p++;
 				if (!$this->s125()) {
-					goto f357;}
-				goto k357;
-				f357:
+					goto f331;}
+				goto k331;
+				f331:
 				$this->p = $o2;
-				goto n356;
-				k357:
-				goto a353;
-				n356:
+				goto n330;
+				k331:
+				goto a327;
+				n330:
 				break;
 		}
 
@@ -19010,13 +18447,13 @@ abstract class GeneratedParser
 			$this->rec(192);
 		}
 
-		goto f352;
-		a353:
-		goto k352;
-		f352:
+		goto f326;
+		a327:
+		goto k326;
+		f326:
 		$this->p = $o1;
 		return false;
-		k352:
+		k326:
 
 		return true;
 	}
@@ -19066,20 +18503,20 @@ abstract class GeneratedParser
 						$this->rec(367);
 					}
 
-					goto n178;}
+					goto n166;}
 
 				$o2 = $this->p;
 				if (!$this->s201()) {
-					goto f179;}
+					goto f167;}
 				if (!$this->s368()) {
-					goto f179;}
-				goto k179;
-				f179:
+					goto f167;}
+				goto k167;
+				f167:
 				$this->p = $o2;
-				goto n178;
-				k179:
-				goto a177;
-				n178:
+				goto n166;
+				k167:
+				goto a165;
+				n166:
 				break;
 			case 30:
 				// s200
@@ -19088,7 +18525,7 @@ abstract class GeneratedParser
 						$this->rec(200);
 					}
 
-					goto n180;}
+					goto n168;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 30)) {
@@ -19096,18 +18533,18 @@ abstract class GeneratedParser
 						$this->rec(51);
 					}
 
-					goto f181;}
+					goto f169;}
 
 				$this->p++;
 				if (!$this->s201()) {
-					goto f181;}
-				goto k181;
-				f181:
+					goto f169;}
+				goto k169;
+				f169:
 				$this->p = $o2;
-				goto n180;
-				k181:
-				goto a177;
-				n180:
+				goto n168;
+				k169:
+				goto a165;
+				n168:
 				break;
 		}
 
@@ -19115,13 +18552,13 @@ abstract class GeneratedParser
 			$this->rec(199);
 		}
 
-		goto f176;
-		a177:
-		goto k176;
-		f176:
+		goto f164;
+		a165:
+		goto k164;
+		f164:
 		$this->p = $o1;
 		return false;
-		k176:
+		k164:
 
 		return true;
 	}
@@ -19159,7 +18596,7 @@ abstract class GeneratedParser
 						$this->rec(366);
 					}
 
-					goto n408;}
+					goto n382;}
 
 				$o2 = $this->p;
 				if (!isset(self::T1921405e[$this->ids[$this->p]])) {
@@ -19167,7 +18604,7 @@ abstract class GeneratedParser
 						$this->rec(332);
 					}
 
-					goto f409;}
+					goto f383;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -19176,24 +18613,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f409;}
+						goto f383;}
 				}
 				if (!$this->s281()) {
-					goto f409;}
-				goto k409;
-				f409:
+					goto f383;}
+				goto k383;
+				f383:
 				$this->p = $o2;
-				goto n408;
-				k409:
-				goto a407;
-				n408:
+				goto n382;
+				k383:
+				goto a381;
+				n382:
 				// s333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n410;}
+					goto n384;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -19209,17 +18646,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f411;}
+						goto f385;}
 				}
 				if (!$this->s335()) {
-					goto f411;}
-				goto k411;
-				f411:
+					goto f385;}
+				goto k385;
+				f385:
 				$this->p = $o2;
-				goto n410;
-				k411:
-				goto a407;
-				n410:
+				goto n384;
+				k385:
+				goto a381;
+				n384:
 				break;
 			case 19:
 			case 20:
@@ -19231,7 +18668,7 @@ abstract class GeneratedParser
 						$this->rec(333);
 					}
 
-					goto n413;}
+					goto n387;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -19247,32 +18684,32 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f414;}
+						goto f388;}
 				}
 				if (!$this->s335()) {
-					goto f414;}
-				goto k414;
-				f414:
+					goto f388;}
+				goto k388;
+				f388:
 				$this->p = $o2;
-				goto n413;
-				k414:
-				goto a407;
-				n413:
+				goto n387;
+				k388:
+				goto a381;
+				n387:
 				break;
 			case 3:
 			case 4:
 			case 8:
 				if (!$this->s255()) {
-					goto n416;}
-				goto a407;
-				n416:
+					goto n390;}
+				goto a381;
+				n390:
 				// s278
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(278);
 					}
 
-					goto n417;}
+					goto n391;}
 
 				$o2 = $this->p;
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
@@ -19280,7 +18717,7 @@ abstract class GeneratedParser
 						$this->rec(279);
 					}
 
-					goto f418;}
+					goto f392;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -19289,7 +18726,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f418;}
+						goto f392;}
 				}
 				if (($this->ids[$this->p] === 38)) {
 					if (($this->ids[$this->p] === 38)) {
@@ -19297,24 +18734,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f418;}
+						goto f392;}
 				}
 				if (!$this->s281()) {
-					goto f418;}
-				goto k418;
-				f418:
+					goto f392;}
+				goto k392;
+				f392:
 				$this->p = $o2;
-				goto n417;
-				k418:
-				goto a407;
-				n417:
+				goto n391;
+				k392:
+				goto a381;
+				n391:
 				// s333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n419;}
+					goto n393;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -19330,37 +18767,37 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f420;}
+						goto f394;}
 				}
 				if (!$this->s335()) {
-					goto f420;}
-				goto k420;
-				f420:
+					goto f394;}
+				goto k394;
+				f394:
 				$this->p = $o2;
-				goto n419;
-				k420:
-				goto a407;
-				n419:
+				goto n393;
+				k394:
+				goto a381;
+				n393:
 				break;
 			case 32:
 			case 82:
 				if (!$this->s202()) {
-					goto n422;}
-				goto a407;
-				n422:
+					goto n396;}
+				goto a381;
+				n396:
 				break;
 			case 6:
 				if (!$this->s267()) {
-					goto n423;}
-				goto a407;
-				n423:
+					goto n397;}
+				goto a381;
+				n397:
 				// s278
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(278);
 					}
 
-					goto n424;}
+					goto n398;}
 
 				$o2 = $this->p;
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
@@ -19368,7 +18805,7 @@ abstract class GeneratedParser
 						$this->rec(279);
 					}
 
-					goto f425;}
+					goto f399;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -19377,7 +18814,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f425;}
+						goto f399;}
 				}
 				if (($this->ids[$this->p] === 38)) {
 					if (($this->ids[$this->p] === 38)) {
@@ -19385,24 +18822,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f425;}
+						goto f399;}
 				}
 				if (!$this->s281()) {
-					goto f425;}
-				goto k425;
-				f425:
+					goto f399;}
+				goto k399;
+				f399:
 				$this->p = $o2;
-				goto n424;
-				k425:
-				goto a407;
-				n424:
+				goto n398;
+				k399:
+				goto a381;
+				n398:
 				// s333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n426;}
+					goto n400;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -19418,30 +18855,30 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f427;}
+						goto f401;}
 				}
 				if (!$this->s335()) {
-					goto f427;}
-				goto k427;
-				f427:
+					goto f401;}
+				goto k401;
+				f401:
 				$this->p = $o2;
-				goto n426;
-				k427:
-				goto a407;
-				n426:
+				goto n400;
+				k401:
+				goto a381;
+				n400:
 				break;
 			case 7:
 				if (!$this->s230()) {
-					goto n429;}
-				goto a407;
-				n429:
+					goto n403;}
+				goto a381;
+				n403:
 				// s278
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(278);
 					}
 
-					goto n430;}
+					goto n404;}
 
 				$o2 = $this->p;
 				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
@@ -19449,7 +18886,7 @@ abstract class GeneratedParser
 						$this->rec(279);
 					}
 
-					goto f431;}
+					goto f405;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -19458,7 +18895,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f431;}
+						goto f405;}
 				}
 				if (($this->ids[$this->p] === 38)) {
 					if (($this->ids[$this->p] === 38)) {
@@ -19466,24 +18903,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f431;}
+						goto f405;}
 				}
 				if (!$this->s281()) {
-					goto f431;}
-				goto k431;
-				f431:
+					goto f405;}
+				goto k405;
+				f405:
 				$this->p = $o2;
-				goto n430;
-				k431:
-				goto a407;
-				n430:
+				goto n404;
+				k405:
+				goto a381;
+				n404:
 				// s333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n432;}
+					goto n406;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -19499,23 +18936,23 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f433;}
+						goto f407;}
 				}
 				if (!$this->s335()) {
-					goto f433;}
-				goto k433;
-				f433:
+					goto f407;}
+				goto k407;
+				f407:
 				$this->p = $o2;
-				goto n432;
-				k433:
-				goto a407;
-				n432:
+				goto n406;
+				k407:
+				goto a381;
+				n406:
 				break;
 			case 25:
 				if (!$this->s229()) {
-					goto n435;}
-				goto a407;
-				n435:
+					goto n409;}
+				goto a381;
+				n409:
 				break;
 		}
 
@@ -19523,13 +18960,13 @@ abstract class GeneratedParser
 			$this->rec(201);
 		}
 
-		goto f406;
-		a407:
-		goto k406;
-		f406:
+		goto f380;
+		a381:
+		goto k380;
+		f380:
 		$this->p = $o1;
 		return false;
-		k406:
+		k380:
 
 		return true;
 	}
@@ -19549,7 +18986,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f677;}
+			goto f661;}
 
 		$this->p++;
 		// s203
@@ -19561,14 +18998,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e679;
+				goto e663;
 			}
 
 			$this->p++;
 		}
-		e679:
+		e663:
 		if (!$this->s205()) {
-			goto f677;}
+			goto f661;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -19578,18 +19015,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e681;
+				goto e665;
 			}
 
 			$this->p++;
 		}
-		e681:
+		e665:
 		if (!($this->ids[$this->p] === 33)) {
 			if ($this->p >= $this->f) {
 				$this->rec(53);
 			}
 
-			goto f677;}
+			goto f661;}
 
 		$this->p++;
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -19599,7 +19036,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n682;}
+				goto n666;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -19610,37 +19047,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e684;
+					goto e668;
 				}
 
 				if (!$this->s224()) {
-					goto e684;}
+					goto e668;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e684;
+					goto e668;
 				}
 
 				$k2++;
 			}
-			e684:
+			e668:
 
 			if ($k2 < 1) {
-				goto f683;
+				goto f667;
 			}
-			goto k683;
-			f683:
+			goto k667;
+			f667:
 			$this->p = $o2;
-			goto n682;
-			k683:
-			n682:
+			goto n666;
+			k667:
+			n666:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k677;
-		f677:
+		goto k661;
+		f661:
 		$this->p = $o1;
 		return false;
-		k677:
+		k661:
 
 		return true;
 	}
@@ -19690,26 +19127,26 @@ abstract class GeneratedParser
 						$this->rec(208);
 					}
 
-					goto n913;}
+					goto n908;}
 
 				$o2 = $this->p;
 				if (!$this->s201()) {
-					goto f914;}
+					goto f909;}
 				if (!$this->s209()) {
-					goto f914;}
-				goto k914;
-				f914:
+					goto f909;}
+				goto k909;
+				f909:
 				$this->p = $o2;
-				goto n913;
-				k914:
-				goto a912;
-				n913:
+				goto n908;
+				k909:
+				goto a907;
+				n908:
 				break;
 			case 26:
 				if (!$this->s206()) {
-					goto n915;}
-				goto a912;
-				n915:
+					goto n910;}
+				goto a907;
+				n910:
 				break;
 			case 30:
 				// s200
@@ -19718,7 +19155,7 @@ abstract class GeneratedParser
 						$this->rec(200);
 					}
 
-					goto n916;}
+					goto n911;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 30)) {
@@ -19726,18 +19163,18 @@ abstract class GeneratedParser
 						$this->rec(51);
 					}
 
-					goto f917;}
+					goto f912;}
 
 				$this->p++;
 				if (!$this->s201()) {
-					goto f917;}
-				goto k917;
-				f917:
+					goto f912;}
+				goto k912;
+				f912:
 				$this->p = $o2;
-				goto n916;
-				k917:
-				goto a912;
-				n916:
+				goto n911;
+				k912:
+				goto a907;
+				n911:
 				break;
 		}
 
@@ -19745,13 +19182,13 @@ abstract class GeneratedParser
 			$this->rec(205);
 		}
 
-		goto f911;
-		a912:
-		goto k911;
-		f911:
+		goto f906;
+		a907:
+		goto k906;
+		f906:
 		$this->p = $o1;
 		return false;
-		k911:
+		k906:
 
 		return true;
 	}
@@ -19771,7 +19208,7 @@ abstract class GeneratedParser
 				$this->rec(47);
 			}
 
-			goto f1252;}
+			goto f1235;}
 
 		$this->p++;
 		if (!($this->ids[$this->p] === 12)) {
@@ -19779,7 +19216,7 @@ abstract class GeneratedParser
 				$this->rec(23);
 			}
 
-			goto f1252;}
+			goto f1235;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 11)) {
@@ -19788,7 +19225,7 @@ abstract class GeneratedParser
 			$this->rec(24);
 		}
 		if (!$this->s199()) {
-			goto f1252;}
+			goto f1235;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -19798,18 +19235,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1254;
+				goto e1237;
 			}
 
 			$this->p++;
 		}
-		e1254:
+		e1237:
 		if (!($this->ids[$this->p] === 30)) {
 			if ($this->p >= $this->f) {
 				$this->rec(51);
 			}
 
-			goto f1252;}
+			goto f1235;}
 
 		$this->p++;
 		// s203
@@ -19821,14 +19258,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1256;
+				goto e1239;
 			}
 
 			$this->p++;
 		}
-		e1256:
+		e1239:
 		if (!$this->s199()) {
-			goto f1252;}
+			goto f1235;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -19838,18 +19275,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1258;
+				goto e1241;
 			}
 
 			$this->p++;
 		}
-		e1258:
+		e1241:
 		if (!($this->ids[$this->p] === 47)) {
 			if ($this->p >= $this->f) {
 				$this->rec(70);
 			}
 
-			goto f1252;}
+			goto f1235;}
 
 		$this->p++;
 		// s203
@@ -19861,19 +19298,19 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1260;
+				goto e1243;
 			}
 
 			$this->p++;
 		}
-		e1260:
+		e1243:
 		if (!$this->s205()) {
-			goto f1252;}
-		goto k1252;
-		f1252:
+			goto f1235;}
+		goto k1235;
+		f1235:
 		$this->p = $o1;
 		return false;
-		k1252:
+		k1235:
 
 		return true;
 	}
@@ -19894,27 +19331,27 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1244;
+						goto e1227;
 					}
 
 					$this->p++;
 				}
-				e1244:
+				e1227:
 				if (isset(self::Tc8c984b6[$this->ids[$this->p]])) {
 					if (!$this->s213()) {
-						goto n1245;}
-					n1245:
+						goto n1228;}
+					n1228:
 				} elseif ($this->p > $this->f) {
 					$this->rec(213);
 				}
-				goto a1240;
-				n1241:
+				goto a1223;
+				n1224:
 				break;
 			case 12:
 				if (!$this->s210()) {
-					goto n1246;}
-				goto a1240;
-				n1246:
+					goto n1229;}
+				goto a1223;
+				n1229:
 				// s211
 				$o2 = $this->p;
 				// s203
@@ -19926,21 +19363,21 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1250;
+						goto e1233;
 					}
 
 					$this->p++;
 				}
-				e1250:
+				e1233:
 				if (isset(self::Tc8c984b6[$this->ids[$this->p]])) {
 					if (!$this->s213()) {
-						goto n1251;}
-					n1251:
+						goto n1234;}
+					n1234:
 				} elseif ($this->p > $this->f) {
 					$this->rec(213);
 				}
-				goto a1240;
-				n1247:
+				goto a1223;
+				n1230:
 				break;
 		}
 
@@ -19948,13 +19385,13 @@ abstract class GeneratedParser
 			$this->rec(209);
 		}
 
-		goto f1239;
-		a1240:
-		goto k1239;
-		f1239:
+		goto f1222;
+		a1223:
+		goto k1222;
+		f1222:
 		$this->p = $o1;
 		return false;
-		k1239:
+		k1222:
 
 		return true;
 	}
@@ -19974,7 +19411,7 @@ abstract class GeneratedParser
 				$this->rec(23);
 			}
 
-			goto f1550;}
+			goto f1528;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 11)) {
@@ -19983,7 +19420,7 @@ abstract class GeneratedParser
 			$this->rec(24);
 		}
 		if (!$this->s199()) {
-			goto f1550;}
+			goto f1528;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -19993,18 +19430,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1552;
+				goto e1530;
 			}
 
 			$this->p++;
 		}
-		e1552:
+		e1530:
 		if (!($this->ids[$this->p] === 30)) {
 			if ($this->p >= $this->f) {
 				$this->rec(51);
 			}
 
-			goto f1550;}
+			goto f1528;}
 
 		$this->p++;
 		// s203
@@ -20016,14 +19453,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1554;
+				goto e1532;
 			}
 
 			$this->p++;
 		}
-		e1554:
+		e1532:
 		if (!$this->s199()) {
-			goto f1550;}
+			goto f1528;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -20033,18 +19470,18 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1556;
+				goto e1534;
 			}
 
 			$this->p++;
 		}
-		e1556:
+		e1534:
 		if (!($this->ids[$this->p] === 47)) {
 			if ($this->p >= $this->f) {
 				$this->rec(70);
 			}
 
-			goto f1550;}
+			goto f1528;}
 
 		$this->p++;
 		// s203
@@ -20056,19 +19493,19 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1558;
+				goto e1536;
 			}
 
 			$this->p++;
 		}
-		e1558:
+		e1536:
 		if (!$this->s205()) {
-			goto f1550;}
-		goto k1550;
-		f1550:
+			goto f1528;}
+		goto k1528;
+		f1528:
 		$this->p = $o1;
 		return false;
-		k1550:
+		k1528:
 
 		return true;
 	}
@@ -20093,26 +19530,26 @@ abstract class GeneratedParser
 						$this->rec(214);
 					}
 
-					goto n1546;}
+					goto n1524;}
 
 				$o2 = $this->p;
 				if (!$this->s215()) {
-					goto f1547;}
+					goto f1525;}
 				if (($this->ids[$this->p] === 28)) {
 					if (($this->ids[$this->p] === 28)) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1547;}
+						goto f1525;}
 				}
-				goto k1547;
-				f1547:
+				goto k1525;
+				f1525:
 				$this->p = $o2;
-				goto n1546;
-				k1547:
-				goto a1545;
-				n1546:
+				goto n1524;
+				k1525:
+				goto a1523;
+				n1524:
 				break;
 			case 29:
 				// s218
@@ -20121,26 +19558,26 @@ abstract class GeneratedParser
 						$this->rec(218);
 					}
 
-					goto n1548;}
+					goto n1526;}
 
 				$o2 = $this->p;
 				if (!$this->s219()) {
-					goto f1549;}
+					goto f1527;}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1549;}
+						goto f1527;}
 				}
-				goto k1549;
-				f1549:
+				goto k1527;
+				f1527:
 				$this->p = $o2;
-				goto n1548;
-				k1549:
-				goto a1545;
-				n1548:
+				goto n1526;
+				k1527:
+				goto a1523;
+				n1526:
 				break;
 		}
 
@@ -20148,13 +19585,13 @@ abstract class GeneratedParser
 			$this->rec(213);
 		}
 
-		goto f1544;
-		a1545:
-		goto k1544;
-		f1544:
+		goto f1522;
+		a1523:
+		goto k1522;
+		f1522:
 		$this->p = $o1;
 		return false;
-		k1544:
+		k1522:
 
 		return true;
 	}
@@ -20177,7 +19614,7 @@ abstract class GeneratedParser
 					$this->rec(216);
 				}
 
-				goto e1711;
+				goto e1682;
 			}
 
 			// s216
@@ -20186,7 +19623,7 @@ abstract class GeneratedParser
 					$this->rec(216);
 				}
 
-				goto e1711;}
+				goto e1682;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 28)) {
@@ -20194,7 +19631,7 @@ abstract class GeneratedParser
 					$this->rec(49);
 				}
 
-				goto f1712;}
+				goto f1683;}
 
 			$this->p++;
 			// s203
@@ -20206,14 +19643,14 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1714;
+					goto e1685;
 				}
 
 				$this->p++;
 			}
-			e1714:
+			e1685:
 			if (!$this->s201()) {
-				goto f1712;}
+				goto f1683;}
 			// s203
 			$o3 = $this->p;
 			while (true) {
@@ -20223,34 +19660,34 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1716;
+					goto e1687;
 				}
 
 				$this->p++;
 			}
-			e1716:
-			goto k1712;
-			f1712:
+			e1687:
+			goto k1683;
+			f1683:
 			$this->p = $o2;
-			goto e1711;
-			k1712:
+			goto e1682;
+			k1683:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1711;
+				goto e1682;
 			}
 
 			$k1++;
 		}
-		e1711:
+		e1682:
 
 		if ($k1 < 1) {
-			goto f1710;
+			goto f1681;
 		}
-		goto k1710;
-		f1710:
+		goto k1681;
+		f1681:
 		$this->p = $o1;
 		return false;
-		k1710:
+		k1681:
 
 		return true;
 	}
@@ -20273,7 +19710,7 @@ abstract class GeneratedParser
 					$this->rec(220);
 				}
 
-				goto e1718;
+				goto e1689;
 			}
 
 			// s220
@@ -20282,7 +19719,7 @@ abstract class GeneratedParser
 					$this->rec(220);
 				}
 
-				goto e1718;}
+				goto e1689;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 29)) {
@@ -20290,7 +19727,7 @@ abstract class GeneratedParser
 					$this->rec(50);
 				}
 
-				goto f1719;}
+				goto f1690;}
 
 			$this->p++;
 			// s203
@@ -20302,14 +19739,14 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1721;
+					goto e1692;
 				}
 
 				$this->p++;
 			}
-			e1721:
+			e1692:
 			if (!$this->s201()) {
-				goto f1719;}
+				goto f1690;}
 			// s203
 			$o3 = $this->p;
 			while (true) {
@@ -20319,34 +19756,34 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1723;
+					goto e1694;
 				}
 
 				$this->p++;
 			}
-			e1723:
-			goto k1719;
-			f1719:
+			e1694:
+			goto k1690;
+			f1690:
 			$this->p = $o2;
-			goto e1718;
-			k1719:
+			goto e1689;
+			k1690:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1718;
+				goto e1689;
 			}
 
 			$k1++;
 		}
-		e1718:
+		e1689:
 
 		if ($k1 < 1) {
-			goto f1717;
+			goto f1688;
 		}
-		goto k1717;
-		f1717:
+		goto k1688;
+		f1688:
 		$this->p = $o1;
 		return false;
-		k1717:
+		k1688:
 
 		return true;
 	}
@@ -20371,7 +19808,7 @@ abstract class GeneratedParser
 						$this->rec(225);
 					}
 
-					goto n890;}
+					goto n885;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 36)) {
@@ -20379,7 +19816,7 @@ abstract class GeneratedParser
 						$this->rec(57);
 					}
 
-					goto f891;}
+					goto f886;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 37)) {
@@ -20388,32 +19825,32 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f891;}
+						goto f886;}
 				}
 				if (!$this->s199()) {
-					goto f891;}
+					goto f886;}
 				if (!($this->ids[$this->p] === 37)) {
 					if ($this->p >= $this->f) {
 						$this->rec(59);
 					}
 
-					goto f891;}
+					goto f886;}
 
 				$this->p++;
-				goto k891;
-				f891:
+				goto k886;
+				f886:
 				$this->p = $o2;
-				goto n890;
-				k891:
-				goto a889;
-				n890:
+				goto n885;
+				k886:
+				goto a884;
+				n885:
 				// s227
 				if (!isset(self::T885cd349[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(227);
 					}
 
-					goto n892;}
+					goto n887;}
 
 				$o2 = $this->p;
 				if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -20421,7 +19858,7 @@ abstract class GeneratedParser
 						$this->rec(228);
 					}
 
-					goto f893;}
+					goto f888;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 37)) {
@@ -20429,16 +19866,16 @@ abstract class GeneratedParser
 						$this->rec(59);
 					}
 
-					goto f893;}
+					goto f888;}
 
 				$this->p++;
-				goto k893;
-				f893:
+				goto k888;
+				f888:
 				$this->p = $o2;
-				goto n892;
-				k893:
-				goto a889;
-				n892:
+				goto n887;
+				k888:
+				goto a884;
+				n887:
 				break;
 			case 84:
 				// s227
@@ -20447,7 +19884,7 @@ abstract class GeneratedParser
 						$this->rec(227);
 					}
 
-					goto n894;}
+					goto n889;}
 
 				$o2 = $this->p;
 				if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -20455,7 +19892,7 @@ abstract class GeneratedParser
 						$this->rec(228);
 					}
 
-					goto f895;}
+					goto f890;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 37)) {
@@ -20463,16 +19900,16 @@ abstract class GeneratedParser
 						$this->rec(59);
 					}
 
-					goto f895;}
+					goto f890;}
 
 				$this->p++;
-				goto k895;
-				f895:
+				goto k890;
+				f890:
 				$this->p = $o2;
-				goto n894;
-				k895:
-				goto a889;
-				n894:
+				goto n889;
+				k890:
+				goto a884;
+				n889:
 				break;
 		}
 
@@ -20480,13 +19917,13 @@ abstract class GeneratedParser
 			$this->rec(224);
 		}
 
-		goto f888;
-		a889:
-		goto k888;
-		f888:
+		goto f883;
+		a884:
+		goto k883;
+		f883:
 		$this->p = $o1;
 		return false;
-		k888:
+		k883:
 
 		return true;
 	}
@@ -20506,7 +19943,7 @@ abstract class GeneratedParser
 				$this->rec(46);
 			}
 
-			goto f697;}
+			goto f681;}
 
 		$this->p++;
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -20516,7 +19953,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n698;}
+				goto n682;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -20527,37 +19964,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e700;
+					goto e684;
 				}
 
 				if (!$this->s224()) {
-					goto e700;}
+					goto e684;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e700;
+					goto e684;
 				}
 
 				$k2++;
 			}
-			e700:
+			e684:
 
 			if ($k2 < 1) {
-				goto f699;
+				goto f683;
 			}
-			goto k699;
-			f699:
+			goto k683;
+			f683:
 			$this->p = $o2;
-			goto n698;
-			k699:
-			n698:
+			goto n682;
+			k683:
+			n682:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k697;
-		f697:
+		goto k681;
+		f681:
 		$this->p = $o1;
 		return false;
-		k697:
+		k681:
 
 		return true;
 	}
@@ -20577,7 +20014,7 @@ abstract class GeneratedParser
 				$this->rec(32);
 			}
 
-			goto f693;}
+			goto f677;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 43)) {
@@ -20586,10 +20023,10 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f693;}
+				goto f677;}
 		}
 		if (!$this->s231()) {
-			goto f693;}
+			goto f677;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// s223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -20597,7 +20034,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n694;}
+				goto n678;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -20608,37 +20045,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e696;
+					goto e680;
 				}
 
 				if (!$this->s224()) {
-					goto e696;}
+					goto e680;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e696;
+					goto e680;
 				}
 
 				$k2++;
 			}
-			e696:
+			e680:
 
 			if ($k2 < 1) {
-				goto f695;
+				goto f679;
 			}
-			goto k695;
-			f695:
+			goto k679;
+			f679:
 			$this->p = $o2;
-			goto n694;
-			k695:
-			n694:
+			goto n678;
+			k679:
+			n678:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k693;
-		f693:
+		goto k677;
+		f677:
 		$this->p = $o1;
 		return false;
-		k693:
+		k677:
 
 		return true;
 	}
@@ -20658,7 +20095,7 @@ abstract class GeneratedParser
 				$this->rec(60);
 			}
 
-			goto f925;}
+			goto f920;}
 
 		$this->p++;
 		// s203
@@ -20670,12 +20107,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e927;
+				goto e922;
 			}
 
 			$this->p++;
 		}
-		e927:
+		e922:
 		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
 			// s233
 			if (!isset(self::T50fd39f8[$this->ids[$this->p]])) {
@@ -20683,7 +20120,7 @@ abstract class GeneratedParser
 					$this->rec(233);
 				}
 
-				goto n928;}
+				goto n923;}
 
 			$o2 = $this->p;
 			switch ($this->ids[$this->p]) {
@@ -20717,15 +20154,15 @@ abstract class GeneratedParser
 				case 32:
 				case 82:
 					if (!$this->s243()) {
-						goto n931;}
-					goto a930;
-					n931:
+						goto n926;}
+					goto a925;
+					n926:
 					break;
 				case 42:
 					if (!$this->s234()) {
-						goto n932;}
-					goto a930;
-					n932:
+						goto n927;}
+					goto a925;
+					n927:
 					break;
 			}
 
@@ -20733,14 +20170,14 @@ abstract class GeneratedParser
 				$this->rec(233);
 			}
 
-			goto f929;
-			a930:
-			goto k929;
-			f929:
+			goto f924;
+			a925:
+			goto k924;
+			f924:
 			$this->p = $o2;
-			goto n928;
-			k929:
-			n928:
+			goto n923;
+			k924:
+			n923:
 		} elseif ($this->p > $this->f) {
 			$this->rec(233);
 		}
@@ -20753,25 +20190,25 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e934;
+				goto e929;
 			}
 
 			$this->p++;
 		}
-		e934:
+		e929:
 		if (!($this->ids[$this->p] === 39)) {
 			if ($this->p >= $this->f) {
 				$this->rec(62);
 			}
 
-			goto f925;}
+			goto f920;}
 
 		$this->p++;
-		goto k925;
-		f925:
+		goto k920;
+		f920:
 		$this->p = $o1;
 		return false;
-		k925:
+		k920:
 
 		return true;
 	}
@@ -20817,9 +20254,9 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->s243()) {
-					goto n1565;}
-				goto a1564;
-				n1565:
+					goto n1543;}
+				goto a1542;
+				n1543:
 				break;
 			case 42:
 				// s234
@@ -20828,7 +20265,7 @@ abstract class GeneratedParser
 						$this->rec(234);
 					}
 
-					goto n1566;}
+					goto n1544;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 42)) {
@@ -20836,7 +20273,7 @@ abstract class GeneratedParser
 						$this->rec(65);
 					}
 
-					goto f1567;}
+					goto f1545;}
 
 				$this->p++;
 				// s203
@@ -20848,26 +20285,26 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1569;
+						goto e1547;
 					}
 
 					$this->p++;
 				}
-				e1569:
+				e1547:
 				if (!$this->s235()) {
-					goto f1567;}
+					goto f1545;}
 				if (($this->ids[$this->p] === 40)) {
 					$this->p++;
 				} elseif ($this->p >= $this->f) {
 					$this->rec(63);
 				}
-				goto k1567;
-				f1567:
+				goto k1545;
+				f1545:
 				$this->p = $o2;
-				goto n1566;
-				k1567:
-				goto a1564;
-				n1566:
+				goto n1544;
+				k1545:
+				goto a1542;
+				n1544:
 				break;
 		}
 
@@ -20875,13 +20312,13 @@ abstract class GeneratedParser
 			$this->rec(233);
 		}
 
-		goto f1563;
-		a1564:
-		goto k1563;
-		f1563:
+		goto f1541;
+		a1542:
+		goto k1541;
+		f1541:
 		$this->p = $o1;
 		return false;
-		k1563:
+		k1541:
 
 		return true;
 	}
@@ -20901,7 +20338,7 @@ abstract class GeneratedParser
 				$this->rec(65);
 			}
 
-			goto f1283;}
+			goto f1266;}
 
 		$this->p++;
 		// s203
@@ -20913,24 +20350,24 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1285;
+				goto e1268;
 			}
 
 			$this->p++;
 		}
-		e1285:
+		e1268:
 		if (!$this->s235()) {
-			goto f1283;}
+			goto f1266;}
 		if (($this->ids[$this->p] === 40)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
 			$this->rec(63);
 		}
-		goto k1283;
-		f1283:
+		goto k1266;
+		f1266:
 		$this->p = $o1;
 		return false;
-		k1283:
+		k1266:
 
 		return true;
 	}
@@ -20945,9 +20382,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1572;}
-				goto a1571;
-				n1572:
+					goto n1550;}
+				goto a1549;
+				n1550:
 				break;
 			case 34:
 			case 86:
@@ -20957,11 +20394,11 @@ abstract class GeneratedParser
 						$this->rec(236);
 					}
 
-					goto n1573;}
+					goto n1551;}
 
 				$o2 = $this->p;
 				if (!$this->s237()) {
-					goto f1574;}
+					goto f1552;}
 				// s203
 				$o3 = $this->p;
 				while (true) {
@@ -20971,27 +20408,27 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1576;
+						goto e1554;
 					}
 
 					$this->p++;
 				}
-				e1576:
-				goto k1574;
-				f1574:
+				e1554:
+				goto k1552;
+				f1552:
 				$this->p = $o2;
-				goto n1573;
-				k1574:
-				goto a1571;
-				n1573:
+				goto n1551;
+				k1552:
+				goto a1549;
+				n1551:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1577;}
-				goto a1571;
-				n1577:
+					goto n1555;}
+				goto a1549;
+				n1555:
 				break;
 		}
 
@@ -20999,13 +20436,13 @@ abstract class GeneratedParser
 			$this->rec(235);
 		}
 
-		goto f1570;
-		a1571:
-		goto k1570;
-		f1570:
+		goto f1548;
+		a1549:
+		goto k1548;
+		f1548:
 		$this->p = $o1;
 		return false;
-		k1570:
+		k1548:
 
 		return true;
 	}
@@ -21025,7 +20462,7 @@ abstract class GeneratedParser
 				$this->rec(238);
 			}
 
-			goto f1724;}
+			goto f1695;}
 
 		$this->p++;
 		// s203
@@ -21037,14 +20474,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1726;
+				goto e1697;
 			}
 
 			$this->p++;
 		}
-		e1726:
+		e1697:
 		if (!$this->s199()) {
-			goto f1724;}
+			goto f1695;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -21054,12 +20491,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1728;
+				goto e1699;
 			}
 
 			$this->p++;
 		}
-		e1728:
+		e1699:
 		if (($this->ids[$this->p] === 40)) {
 			// s240
 			if (!($this->ids[$this->p] === 40)) {
@@ -21067,7 +20504,7 @@ abstract class GeneratedParser
 					$this->rec(240);
 				}
 
-				goto n1729;}
+				goto n1700;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -21075,7 +20512,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1730;}
+				goto f1701;}
 
 			$this->p++;
 			// s203
@@ -21087,14 +20524,14 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1732;
+					goto e1703;
 				}
 
 				$this->p++;
 			}
-			e1732:
+			e1703:
 			if (!$this->s199()) {
-				goto f1730;}
+				goto f1701;}
 			// s203
 			$o3 = $this->p;
 			while (true) {
@@ -21104,18 +20541,18 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1734;
+					goto e1705;
 				}
 
 				$this->p++;
 			}
-			e1734:
-			goto k1730;
-			f1730:
+			e1705:
+			goto k1701;
+			f1701:
 			$this->p = $o2;
-			goto n1729;
-			k1730:
-			n1729:
+			goto n1700;
+			k1701:
+			n1700:
 		} elseif ($this->p > $this->f) {
 			$this->rec(240);
 		}
@@ -21124,14 +20561,14 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f1724;}
+			goto f1695;}
 
 		$this->p++;
-		goto k1724;
-		f1724:
+		goto k1695;
+		f1695:
 		$this->p = $o1;
 		return false;
-		k1724:
+		k1695:
 
 		return true;
 	}
@@ -21152,7 +20589,7 @@ abstract class GeneratedParser
 				$this->rec(244);
 			}
 
-			goto f1270;}
+			goto f1253;}
 
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -21181,13 +20618,13 @@ abstract class GeneratedParser
 			case 22:
 			case 24:
 				if (!$this->s245()) {
-					goto n1273;}
-				goto a1272;
-				n1273:
+					goto n1256;}
+				goto a1255;
+				n1256:
 				if (!$this->s199()) {
-					goto n1274;}
-				goto a1272;
-				n1274:
+					goto n1257;}
+				goto a1255;
+				n1257:
 				break;
 			case 19:
 			case 25:
@@ -21195,9 +20632,9 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->s199()) {
-					goto n1275;}
-				goto a1272;
-				n1275:
+					goto n1258;}
+				goto a1255;
+				n1258:
 				break;
 		}
 
@@ -21205,13 +20642,13 @@ abstract class GeneratedParser
 			$this->rec(244);
 		}
 
-		goto f1271;
-		a1272:
-		goto k1271;
-		f1271:
+		goto f1254;
+		a1255:
+		goto k1254;
+		f1254:
 		$this->p = $o2;
-		goto f1270;
-		k1271:
+		goto f1253;
+		k1254:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -21221,12 +20658,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1277;
+				goto e1260;
 			}
 
 			$this->p++;
 		}
-		e1277:
+		e1260:
 		if (($this->ids[$this->p] === 40)) {
 			// s252
 			if (!($this->ids[$this->p] === 40)) {
@@ -21234,7 +20671,7 @@ abstract class GeneratedParser
 					$this->rec(252);
 				}
 
-				goto n1278;}
+				goto n1261;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -21242,7 +20679,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1279;}
+				goto f1262;}
 
 			$this->p++;
 			if (($this->ids[$this->p] === 41)) {
@@ -21259,33 +20696,33 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1281;
+					goto e1264;
 				}
 
 				$this->p++;
 			}
-			e1281:
+			e1264:
 			if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
 				if (!$this->s233()) {
-					goto n1282;}
-				n1282:
+					goto n1265;}
+				n1265:
 			} elseif ($this->p > $this->f) {
 				$this->rec(233);
 			}
-			goto k1279;
-			f1279:
+			goto k1262;
+			f1262:
 			$this->p = $o2;
-			goto n1278;
-			k1279:
-			n1278:
+			goto n1261;
+			k1262:
+			n1261:
 		} elseif ($this->p > $this->f) {
 			$this->rec(252);
 		}
-		goto k1270;
-		f1270:
+		goto k1253;
+		f1253:
 		$this->p = $o1;
 		return false;
-		k1270:
+		k1253:
 
 		return true;
 	}
@@ -21306,7 +20743,7 @@ abstract class GeneratedParser
 				$this->rec(246);
 			}
 
-			goto f1525;}
+			goto f1503;}
 
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -21332,21 +20769,21 @@ abstract class GeneratedParser
 			case 18:
 			case 24:
 				if (!$this->s247()) {
-					goto n1528;}
-				goto a1527;
-				n1528:
+					goto n1506;}
+				goto a1505;
+				n1506:
 				break;
 			case 20:
 				$this->p++;
-				goto a1527;
+				goto a1505;
 				break;
 			case 21:
 				$this->p++;
-				goto a1527;
+				goto a1505;
 				break;
 			case 22:
 				$this->p++;
-				goto a1527;
+				goto a1505;
 				break;
 		}
 
@@ -21354,13 +20791,13 @@ abstract class GeneratedParser
 			$this->rec(246);
 		}
 
-		goto f1526;
-		a1527:
-		goto k1526;
-		f1526:
+		goto f1504;
+		a1505:
+		goto k1504;
+		f1504:
 		$this->p = $o2;
-		goto f1525;
-		k1526:
+		goto f1503;
+		k1504:
 		if (($this->ids[$this->p] === 30)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
@@ -21371,16 +20808,16 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f1525;}
+			goto f1503;}
 
 		$this->p++;
 		if (!$this->s199()) {
-			goto f1525;}
-		goto k1525;
-		f1525:
+			goto f1503;}
+		goto k1503;
+		f1503:
 		$this->p = $o1;
 		return false;
-		k1525:
+		k1503:
 
 		return true;
 	}
@@ -21400,7 +20837,7 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1702;}
+			goto f1673;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 43)) {
@@ -21410,7 +20847,7 @@ abstract class GeneratedParser
 					$this->rec(249);
 				}
 
-				goto n1703;}
+				goto n1674;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 43)) {
@@ -21418,7 +20855,7 @@ abstract class GeneratedParser
 					$this->rec(66);
 				}
 
-				goto f1704;}
+				goto f1675;}
 
 			$this->p++;
 			if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -21426,23 +20863,23 @@ abstract class GeneratedParser
 					$this->rec(144);
 				}
 
-				goto f1704;}
+				goto f1675;}
 
 			$this->p++;
-			goto k1704;
-			f1704:
+			goto k1675;
+			f1675:
 			$this->p = $o2;
-			goto n1703;
-			k1704:
-			n1703:
+			goto n1674;
+			k1675:
+			n1674:
 		} elseif ($this->p > $this->f) {
 			$this->rec(249);
 		}
-		goto k1702;
-		f1702:
+		goto k1673;
+		f1673:
 		$this->p = $o1;
 		return false;
-		k1702:
+		k1673:
 
 		return true;
 	}
@@ -21462,7 +20899,7 @@ abstract class GeneratedParser
 				$this->rec(256);
 			}
 
-			goto f673;}
+			goto f657;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 43)) {
@@ -21471,10 +20908,10 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f673;}
+				goto f657;}
 		}
 		if (!$this->s257()) {
-			goto f673;}
+			goto f657;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// s223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -21482,7 +20919,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n674;}
+				goto n658;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -21493,37 +20930,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e676;
+					goto e660;
 				}
 
 				if (!$this->s224()) {
-					goto e676;}
+					goto e660;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e676;
+					goto e660;
 				}
 
 				$k2++;
 			}
-			e676:
+			e660:
 
 			if ($k2 < 1) {
-				goto f675;
+				goto f659;
 			}
-			goto k675;
-			f675:
+			goto k659;
+			f659:
 			$this->p = $o2;
-			goto n674;
-			k675:
-			n674:
+			goto n658;
+			k659:
+			n658:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k673;
-		f673:
+		goto k657;
+		f657:
 		$this->p = $o1;
 		return false;
-		k673:
+		k657:
 
 		return true;
 	}
@@ -21543,7 +20980,7 @@ abstract class GeneratedParser
 				$this->rec(60);
 			}
 
-			goto f901;}
+			goto f896;}
 
 		$this->p++;
 		// s203
@@ -21555,12 +20992,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e903;
+				goto e898;
 			}
 
 			$this->p++;
 		}
-		e903:
+		e898:
 		if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
 			// s259
 			if (!isset(self::T50fd39f8[$this->ids[$this->p]])) {
@@ -21568,7 +21005,7 @@ abstract class GeneratedParser
 					$this->rec(259);
 				}
 
-				goto n904;}
+				goto n899;}
 
 			$o2 = $this->p;
 			switch ($this->ids[$this->p]) {
@@ -21602,15 +21039,15 @@ abstract class GeneratedParser
 				case 32:
 				case 82:
 					if (!$this->s264()) {
-						goto n907;}
-					goto a906;
-					n907:
+						goto n902;}
+					goto a901;
+					n902:
 					break;
 				case 42:
 					if (!$this->s260()) {
-						goto n908;}
-					goto a906;
-					n908:
+						goto n903;}
+					goto a901;
+					n903:
 					break;
 			}
 
@@ -21618,14 +21055,14 @@ abstract class GeneratedParser
 				$this->rec(259);
 			}
 
-			goto f905;
-			a906:
-			goto k905;
-			f905:
+			goto f900;
+			a901:
+			goto k900;
+			f900:
 			$this->p = $o2;
-			goto n904;
-			k905:
-			n904:
+			goto n899;
+			k900:
+			n899:
 		} elseif ($this->p > $this->f) {
 			$this->rec(259);
 		}
@@ -21638,25 +21075,25 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e910;
+				goto e905;
 			}
 
 			$this->p++;
 		}
-		e910:
+		e905:
 		if (!($this->ids[$this->p] === 39)) {
 			if ($this->p >= $this->f) {
 				$this->rec(62);
 			}
 
-			goto f901;}
+			goto f896;}
 
 		$this->p++;
-		goto k901;
-		f901:
+		goto k896;
+		f896:
 		$this->p = $o1;
 		return false;
-		k901:
+		k896:
 
 		return true;
 	}
@@ -21702,9 +21139,9 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->s264()) {
-					goto n1531;}
-				goto a1530;
-				n1531:
+					goto n1509;}
+				goto a1508;
+				n1509:
 				break;
 			case 42:
 				// s260
@@ -21713,7 +21150,7 @@ abstract class GeneratedParser
 						$this->rec(260);
 					}
 
-					goto n1532;}
+					goto n1510;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 42)) {
@@ -21721,7 +21158,7 @@ abstract class GeneratedParser
 						$this->rec(65);
 					}
 
-					goto f1533;}
+					goto f1511;}
 
 				$this->p++;
 				// s203
@@ -21733,26 +21170,26 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1535;
+						goto e1513;
 					}
 
 					$this->p++;
 				}
-				e1535:
+				e1513:
 				if (!$this->s261()) {
-					goto f1533;}
+					goto f1511;}
 				if (($this->ids[$this->p] === 40)) {
 					$this->p++;
 				} elseif ($this->p >= $this->f) {
 					$this->rec(63);
 				}
-				goto k1533;
-				f1533:
+				goto k1511;
+				f1511:
 				$this->p = $o2;
-				goto n1532;
-				k1533:
-				goto a1530;
-				n1532:
+				goto n1510;
+				k1511:
+				goto a1508;
+				n1510:
 				break;
 		}
 
@@ -21760,13 +21197,13 @@ abstract class GeneratedParser
 			$this->rec(259);
 		}
 
-		goto f1529;
-		a1530:
-		goto k1529;
-		f1529:
+		goto f1507;
+		a1508:
+		goto k1507;
+		f1507:
 		$this->p = $o1;
 		return false;
-		k1529:
+		k1507:
 
 		return true;
 	}
@@ -21786,7 +21223,7 @@ abstract class GeneratedParser
 				$this->rec(65);
 			}
 
-			goto f1236;}
+			goto f1219;}
 
 		$this->p++;
 		// s203
@@ -21798,24 +21235,24 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1238;
+				goto e1221;
 			}
 
 			$this->p++;
 		}
-		e1238:
+		e1221:
 		if (!$this->s261()) {
-			goto f1236;}
+			goto f1219;}
 		if (($this->ids[$this->p] === 40)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
 			$this->rec(63);
 		}
-		goto k1236;
-		f1236:
+		goto k1219;
+		f1219:
 		$this->p = $o1;
 		return false;
-		k1236:
+		k1219:
 
 		return true;
 	}
@@ -21830,9 +21267,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1538;}
-				goto a1537;
-				n1538:
+					goto n1516;}
+				goto a1515;
+				n1516:
 				break;
 			case 34:
 			case 86:
@@ -21842,11 +21279,11 @@ abstract class GeneratedParser
 						$this->rec(262);
 					}
 
-					goto n1539;}
+					goto n1517;}
 
 				$o2 = $this->p;
 				if (!$this->s263()) {
-					goto f1540;}
+					goto f1518;}
 				// s203
 				$o3 = $this->p;
 				while (true) {
@@ -21856,27 +21293,27 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1542;
+						goto e1520;
 					}
 
 					$this->p++;
 				}
-				e1542:
-				goto k1540;
-				f1540:
+				e1520:
+				goto k1518;
+				f1518:
 				$this->p = $o2;
-				goto n1539;
-				k1540:
-				goto a1537;
-				n1539:
+				goto n1517;
+				k1518:
+				goto a1515;
+				n1517:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1543;}
-				goto a1537;
-				n1543:
+					goto n1521;}
+				goto a1515;
+				n1521:
 				break;
 		}
 
@@ -21884,13 +21321,13 @@ abstract class GeneratedParser
 			$this->rec(261);
 		}
 
-		goto f1536;
-		a1537:
-		goto k1536;
-		f1536:
+		goto f1514;
+		a1515:
+		goto k1514;
+		f1514:
 		$this->p = $o1;
 		return false;
-		k1536:
+		k1514:
 
 		return true;
 	}
@@ -21910,7 +21347,7 @@ abstract class GeneratedParser
 				$this->rec(238);
 			}
 
-			goto f1705;}
+			goto f1676;}
 
 		$this->p++;
 		// s203
@@ -21922,14 +21359,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1707;
+				goto e1678;
 			}
 
 			$this->p++;
 		}
-		e1707:
+		e1678:
 		if (!$this->s199()) {
-			goto f1705;}
+			goto f1676;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -21939,25 +21376,25 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1709;
+				goto e1680;
 			}
 
 			$this->p++;
 		}
-		e1709:
+		e1680:
 		if (!($this->ids[$this->p] === 35)) {
 			if ($this->p >= $this->f) {
 				$this->rec(56);
 			}
 
-			goto f1705;}
+			goto f1676;}
 
 		$this->p++;
-		goto k1705;
-		f1705:
+		goto k1676;
+		f1676:
 		$this->p = $o1;
 		return false;
-		k1705:
+		k1676:
 
 		return true;
 	}
@@ -21978,7 +21415,7 @@ abstract class GeneratedParser
 				$this->rec(244);
 			}
 
-			goto f1223;}
+			goto f1206;}
 
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -22007,13 +21444,13 @@ abstract class GeneratedParser
 			case 22:
 			case 24:
 				if (!$this->s245()) {
-					goto n1226;}
-				goto a1225;
-				n1226:
+					goto n1209;}
+				goto a1208;
+				n1209:
 				if (!$this->s199()) {
-					goto n1227;}
-				goto a1225;
-				n1227:
+					goto n1210;}
+				goto a1208;
+				n1210:
 				break;
 			case 19:
 			case 25:
@@ -22021,9 +21458,9 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->s199()) {
-					goto n1228;}
-				goto a1225;
-				n1228:
+					goto n1211;}
+				goto a1208;
+				n1211:
 				break;
 		}
 
@@ -22031,13 +21468,13 @@ abstract class GeneratedParser
 			$this->rec(244);
 		}
 
-		goto f1224;
-		a1225:
-		goto k1224;
-		f1224:
+		goto f1207;
+		a1208:
+		goto k1207;
+		f1207:
 		$this->p = $o2;
-		goto f1223;
-		k1224:
+		goto f1206;
+		k1207:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -22047,12 +21484,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1230;
+				goto e1213;
 			}
 
 			$this->p++;
 		}
-		e1230:
+		e1213:
 		if (($this->ids[$this->p] === 40)) {
 			// s266
 			if (!($this->ids[$this->p] === 40)) {
@@ -22060,7 +21497,7 @@ abstract class GeneratedParser
 					$this->rec(266);
 				}
 
-				goto n1231;}
+				goto n1214;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -22068,7 +21505,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1232;}
+				goto f1215;}
 
 			$this->p++;
 			if (($this->ids[$this->p] === 41)) {
@@ -22085,33 +21522,33 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1234;
+					goto e1217;
 				}
 
 				$this->p++;
 			}
-			e1234:
+			e1217:
 			if (isset(self::T50fd39f8[$this->ids[$this->p]])) {
 				if (!$this->s259()) {
-					goto n1235;}
-				n1235:
+					goto n1218;}
+				n1218:
 			} elseif ($this->p > $this->f) {
 				$this->rec(259);
 			}
-			goto k1232;
-			f1232:
+			goto k1215;
+			f1215:
 			$this->p = $o2;
-			goto n1231;
-			k1232:
-			n1231:
+			goto n1214;
+			k1215:
+			n1214:
 		} elseif ($this->p > $this->f) {
 			$this->rec(266);
 		}
-		goto k1223;
-		f1223:
+		goto k1206;
+		f1206:
 		$this->p = $o1;
 		return false;
-		k1223:
+		k1206:
 
 		return true;
 	}
@@ -22131,7 +21568,7 @@ abstract class GeneratedParser
 				$this->rec(37);
 			}
 
-			goto f685;}
+			goto f669;}
 
 		$this->p++;
 		if (($this->ids[$this->p] === 43)) {
@@ -22140,7 +21577,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f685;}
+				goto f669;}
 		}
 		// s268
 		if (!($this->ids[$this->p] === 38)) {
@@ -22148,7 +21585,7 @@ abstract class GeneratedParser
 				$this->rec(268);
 			}
 
-			goto f685;}
+			goto f669;}
 
 		$o2 = $this->p;
 		if (!($this->ids[$this->p] === 38)) {
@@ -22156,7 +21593,7 @@ abstract class GeneratedParser
 				$this->rec(60);
 			}
 
-			goto f686;}
+			goto f670;}
 
 		$this->p++;
 		// s203
@@ -22168,16 +21605,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e688;
+				goto e672;
 			}
 
 			$this->p++;
 		}
-		e688:
+		e672:
 		if (isset(self::Td8017923[$this->ids[$this->p]])) {
 			if (!$this->s270()) {
-				goto n689;}
-			n689:
+				goto n673;}
+			n673:
 		} elseif ($this->p > $this->f) {
 			$this->rec(270);
 		}
@@ -22186,14 +21623,14 @@ abstract class GeneratedParser
 				$this->rec(62);
 			}
 
-			goto f686;}
+			goto f670;}
 
 		$this->p++;
-		goto k686;
-		f686:
+		goto k670;
+		f670:
 		$this->p = $o2;
-		goto f685;
-		k686:
+		goto f669;
+		k670:
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// s223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -22201,7 +21638,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n690;}
+				goto n674;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -22212,37 +21649,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e692;
+					goto e676;
 				}
 
 				if (!$this->s224()) {
-					goto e692;}
+					goto e676;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e692;
+					goto e676;
 				}
 
 				$k2++;
 			}
-			e692:
+			e676:
 
 			if ($k2 < 1) {
-				goto f691;
+				goto f675;
 			}
-			goto k691;
-			f691:
+			goto k675;
+			f675:
 			$this->p = $o2;
-			goto n690;
-			k691:
-			n690:
+			goto n674;
+			k675:
+			n674:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k685;
-		f685:
+		goto k669;
+		f669:
 		$this->p = $o1;
 		return false;
-		k685:
+		k669:
 
 		return true;
 	}
@@ -22263,11 +21700,11 @@ abstract class GeneratedParser
 				$this->rec(271);
 			}
 
-			goto f918;}
+			goto f913;}
 
 		$o2 = $this->p;
 		if (!$this->s272()) {
-			goto f919;}
+			goto f914;}
 		if (($this->ids[$this->p] === 30)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
@@ -22278,16 +21715,16 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f919;}
+			goto f914;}
 
 		$this->p++;
 		if (!$this->s199()) {
-			goto f919;}
-		goto k919;
-		f919:
+			goto f914;}
+		goto k914;
+		f914:
 		$this->p = $o2;
-		goto f918;
-		k919:
+		goto f913;
+		k914:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -22297,12 +21734,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e921;
+				goto e916;
 			}
 
 			$this->p++;
 		}
-		e921:
+		e916:
 		if (($this->ids[$this->p] === 40)) {
 			// s274
 			if (!($this->ids[$this->p] === 40)) {
@@ -22310,7 +21747,7 @@ abstract class GeneratedParser
 					$this->rec(274);
 				}
 
-				goto n922;}
+				goto n917;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -22321,37 +21758,37 @@ abstract class GeneratedParser
 						$this->rec(275);
 					}
 
-					goto e924;
+					goto e919;
 				}
 
 				if (!$this->s275()) {
-					goto e924;}
+					goto e919;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e924;
+					goto e919;
 				}
 
 				$k2++;
 			}
-			e924:
+			e919:
 
 			if ($k2 < 1) {
-				goto f923;
+				goto f918;
 			}
-			goto k923;
-			f923:
+			goto k918;
+			f918:
 			$this->p = $o2;
-			goto n922;
-			k923:
-			n922:
+			goto n917;
+			k918:
+			n917:
 		} elseif ($this->p > $this->f) {
 			$this->rec(274);
 		}
-		goto k918;
-		f918:
+		goto k913;
+		f913:
 		$this->p = $o1;
 		return false;
-		k918:
+		k913:
 
 		return true;
 	}
@@ -22371,87 +21808,87 @@ abstract class GeneratedParser
 				break;
 			case 1:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 2:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 3:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 4:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 5:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 6:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 7:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 8:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 9:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 10:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 11:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 12:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 13:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 14:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 15:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 16:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 17:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 18:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 21:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 22:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 			case 24:
 				$this->p++;
-				goto a1262;
+				goto a1245;
 				break;
 		}
 
@@ -22459,13 +21896,13 @@ abstract class GeneratedParser
 			$this->rec(272);
 		}
 
-		goto f1261;
-		a1262:
-		goto k1261;
-		f1261:
+		goto f1244;
+		a1245:
+		goto k1244;
+		f1244:
 		$this->p = $o1;
 		return false;
-		k1261:
+		k1244:
 
 		return true;
 	}
@@ -22485,7 +21922,7 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f1263;}
+			goto f1246;}
 
 		$this->p++;
 		// s203
@@ -22497,12 +21934,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1265;
+				goto e1248;
 			}
 
 			$this->p++;
 		}
-		e1265:
+		e1248:
 		// s276
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -22530,9 +21967,9 @@ abstract class GeneratedParser
 			case 22:
 			case 24:
 				if (!$this->s277()) {
-					goto n1268;}
-				goto a1267;
-				n1268:
+					goto n1251;}
+				goto a1250;
+				n1251:
 				break;
 			case 39:
 				if (!($this->ids[$this->p] === 39)) {
@@ -22540,9 +21977,9 @@ abstract class GeneratedParser
 						$this->rec(62);
 					}
 
-					goto n1269;}
-				goto a1267;
-				n1269:
+					goto n1252;}
+				goto a1250;
+				n1252:
 				break;
 		}
 
@@ -22550,18 +21987,18 @@ abstract class GeneratedParser
 			$this->rec(276);
 		}
 
-		goto f1266;
-		a1267:
-		goto k1266;
-		f1266:
+		goto f1249;
+		a1250:
+		goto k1249;
+		f1249:
 		$this->p = $o2;
-		goto f1263;
-		k1266:
-		goto k1263;
-		f1263:
+		goto f1246;
+		k1249:
+		goto k1246;
+		f1246:
 		$this->p = $o1;
 		return false;
-		k1263:
+		k1246:
 
 		return true;
 	}
@@ -22582,11 +22019,11 @@ abstract class GeneratedParser
 				$this->rec(271);
 			}
 
-			goto f1559;}
+			goto f1537;}
 
 		$o2 = $this->p;
 		if (!$this->s272()) {
-			goto f1560;}
+			goto f1538;}
 		if (($this->ids[$this->p] === 30)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
@@ -22597,16 +22034,16 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f1560;}
+			goto f1538;}
 
 		$this->p++;
 		if (!$this->s199()) {
-			goto f1560;}
-		goto k1560;
-		f1560:
+			goto f1538;}
+		goto k1538;
+		f1538:
 		$this->p = $o2;
-		goto f1559;
-		k1560:
+		goto f1537;
+		k1538:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -22616,17 +22053,17 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1562;
+				goto e1540;
 			}
 
 			$this->p++;
 		}
-		e1562:
-		goto k1559;
-		f1559:
+		e1540:
+		goto k1537;
+		f1537:
 		$this->p = $o1;
 		return false;
-		k1559:
+		k1537:
 
 		return true;
 	}
@@ -22641,24 +22078,24 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n659;}
-				goto a658;
-				n659:
+					goto n643;}
+				goto a642;
+				n643:
 				break;
 			case 32:
 			case 82:
 				if (!$this->s364()) {
-					goto n660;}
-				goto a658;
-				n660:
+					goto n644;}
+				goto a642;
+				n644:
 				if (($this->ids[$this->p] === 34)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n661;}
-				goto a658;
-				n661:
+					goto n645;}
+				goto a642;
+				n645:
 				break;
 			case 36:
 			case 84:
@@ -22668,7 +22105,7 @@ abstract class GeneratedParser
 						$this->rec(223);
 					}
 
-					goto n662;}
+					goto n646;}
 
 				$o2 = $this->p;
 				$k2 = 0;
@@ -22679,52 +22116,52 @@ abstract class GeneratedParser
 							$this->rec(224);
 						}
 
-						goto e664;
+						goto e648;
 					}
 
 					if (!$this->s224()) {
-						goto e664;}
+						goto e648;}
 					if ($this->p === $b2) {
 						$k2 = 1;
-						goto e664;
+						goto e648;
 					}
 
 					$k2++;
 				}
-				e664:
+				e648:
 
 				if ($k2 < 1) {
-					goto f663;
+					goto f647;
 				}
-				goto k663;
-				f663:
+				goto k647;
+				f647:
 				$this->p = $o2;
-				goto n662;
-				k663:
-				goto a658;
-				n662:
+				goto n646;
+				k647:
+				goto a642;
+				n646:
 				if (($this->ids[$this->p] === 34)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n665;}
-				goto a658;
-				n665:
+					goto n649;}
+				goto a642;
+				n649:
 				break;
 			case 34:
 				if (!$this->s282()) {
-					goto n666;}
-				goto a658;
-				n666:
+					goto n650;}
+				goto a642;
+				n650:
 				if (($this->ids[$this->p] === 34)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n667;}
-				goto a658;
-				n667:
+					goto n651;}
+				goto a642;
+				n651:
 				break;
 		}
 
@@ -22732,13 +22169,13 @@ abstract class GeneratedParser
 			$this->rec(281);
 		}
 
-		goto f657;
-		a658:
-		goto k657;
-		f657:
+		goto f641;
+		a642:
+		goto k641;
+		f641:
 		$this->p = $o1;
 		return false;
-		k657:
+		k641:
 
 		return true;
 	}
@@ -22758,14 +22195,14 @@ abstract class GeneratedParser
 				$this->rec(54);
 			}
 
-			goto f896;}
+			goto f891;}
 		// s284
 		if (!($this->ids[$this->p] === 34)) {
 			if ($this->p > $this->f) {
 				$this->rec(284);
 			}
 
-			goto f896;}
+			goto f891;}
 
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -22773,13 +22210,13 @@ abstract class GeneratedParser
 				break;
 			case 34:
 				if (!$this->s285()) {
-					goto n899;}
-				goto a898;
-				n899:
+					goto n894;}
+				goto a893;
+				n894:
 				if (!$this->s362()) {
-					goto n900;}
-				goto a898;
-				n900:
+					goto n895;}
+				goto a893;
+				n895:
 				break;
 		}
 
@@ -22787,18 +22224,18 @@ abstract class GeneratedParser
 			$this->rec(284);
 		}
 
-		goto f897;
-		a898:
-		goto k897;
-		f897:
+		goto f892;
+		a893:
+		goto k892;
+		f892:
 		$this->p = $o2;
-		goto f896;
-		k897:
-		goto k896;
-		f896:
+		goto f891;
+		k892:
+		goto k891;
+		f891:
 		$this->p = $o1;
 		return false;
-		k896:
+		k891:
 
 		return true;
 	}
@@ -22818,7 +22255,7 @@ abstract class GeneratedParser
 				$this->rec(54);
 			}
 
-			goto f1207;}
+			goto f1190;}
 
 		$this->p++;
 		// s203
@@ -22830,19 +22267,19 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1209;
+				goto e1192;
 			}
 
 			$this->p++;
 		}
-		e1209:
+		e1192:
 		// s286
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(286);
 			}
 
-			goto f1207;}
+			goto f1190;}
 
 		$o2 = $this->p;
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -22850,20 +22287,20 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1210;}
+			goto f1193;}
 
 		$this->p++;
 		if (!$this->s287()) {
-			goto f1210;}
+			goto f1193;}
 		if (!$this->s293()) {
-			goto f1210;}
+			goto f1193;}
 		if (!$this->s296()) {
-			goto f1210;}
-		goto k1210;
-		f1210:
+			goto f1193;}
+		goto k1193;
+		f1193:
 		$this->p = $o2;
-		goto f1207;
-		k1210:
+		goto f1190;
+		k1193:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -22873,12 +22310,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1212;
+				goto e1195;
 			}
 
 			$this->p++;
 		}
-		e1212:
+		e1195:
 		if (($this->ids[$this->p] === 40)) {
 			// s300
 			if (!($this->ids[$this->p] === 40)) {
@@ -22886,7 +22323,7 @@ abstract class GeneratedParser
 					$this->rec(300);
 				}
 
-				goto n1213;}
+				goto n1196;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -22897,29 +22334,29 @@ abstract class GeneratedParser
 						$this->rec(301);
 					}
 
-					goto e1215;
+					goto e1198;
 				}
 
 				if (!$this->s301()) {
-					goto e1215;}
+					goto e1198;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1215;
+					goto e1198;
 				}
 
 				$k2++;
 			}
-			e1215:
+			e1198:
 
 			if ($k2 < 1) {
-				goto f1214;
+				goto f1197;
 			}
-			goto k1214;
-			f1214:
+			goto k1197;
+			f1197:
 			$this->p = $o2;
-			goto n1213;
-			k1214:
-			n1213:
+			goto n1196;
+			k1197:
+			n1196:
 		} elseif ($this->p > $this->f) {
 			$this->rec(300);
 		}
@@ -22928,7 +22365,7 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f1207;}
+			goto f1190;}
 
 		$this->p++;
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -22936,7 +22373,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f1207;}
+			goto f1190;}
 
 		$this->p++;
 		// s203
@@ -22948,16 +22385,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1217;
+				goto e1200;
 			}
 
 			$this->p++;
 		}
-		e1217:
+		e1200:
 		if (isset(self::T7680fe2e[$this->ids[$this->p]])) {
 			if (!$this->s306()) {
-				goto n1218;}
-			n1218:
+				goto n1201;}
+			n1201:
 		} elseif ($this->p > $this->f) {
 			$this->rec(306);
 		}
@@ -22966,7 +22403,7 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f1207;}
+			goto f1190;}
 
 		$this->p++;
 		if (!($this->ids[$this->p] === 47)) {
@@ -22974,16 +22411,16 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f1207;}
+			goto f1190;}
 
 		$this->p++;
 		if (!$this->s315()) {
-			goto f1207;}
-		goto k1207;
-		f1207:
+			goto f1190;}
+		goto k1190;
+		f1190:
 		$this->p = $o1;
 		return false;
-		k1207:
+		k1190:
 
 		return true;
 	}
@@ -23003,20 +22440,20 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1645;}
+			goto f1613;}
 
 		$this->p++;
 		if (!$this->s287()) {
-			goto f1645;}
+			goto f1613;}
 		if (!$this->s293()) {
-			goto f1645;}
+			goto f1613;}
 		if (!$this->s296()) {
-			goto f1645;}
-		goto k1645;
-		f1645:
+			goto f1613;}
+		goto k1613;
+		f1613:
 		$this->p = $o1;
 		return false;
-		k1645:
+		k1613:
 
 		return true;
 	}
@@ -23034,7 +22471,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f577;}
+						goto f562;}
 				}
 				if (($this->ids[$this->p] === 14)) {
 					if (($this->ids[$this->p] === 14)) {
@@ -23042,15 +22479,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f577;}
+						goto f562;}
 				}
-				goto k577;
-				f577:
+				goto k562;
+				f562:
 				$this->p = $o2;
-				goto n576;
-				k577:
-				goto a575;
-				n576:
+				goto n561;
+				k562:
+				goto a560;
+				n561:
 				break;
 			case 13:
 				// s288
@@ -23059,7 +22496,7 @@ abstract class GeneratedParser
 						$this->rec(288);
 					}
 
-					goto n578;}
+					goto n563;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 13)) {
@@ -23067,18 +22504,18 @@ abstract class GeneratedParser
 						$this->rec(27);
 					}
 
-					goto f579;}
+					goto f564;}
 
 				$this->p++;
 				if (!$this->s199()) {
-					goto f579;}
-				goto k579;
-				f579:
+					goto f564;}
+				goto k564;
+				f564:
 				$this->p = $o2;
-				goto n578;
-				k579:
-				goto a575;
-				n578:
+				goto n563;
+				k564:
+				goto a560;
+				n563:
 				// s290
 				$o2 = $this->p;
 				if (($this->ids[$this->p] === 13)) {
@@ -23087,7 +22524,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f581;}
+						goto f566;}
 				}
 				if (($this->ids[$this->p] === 14)) {
 					if (($this->ids[$this->p] === 14)) {
@@ -23095,15 +22532,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f581;}
+						goto f566;}
 				}
-				goto k581;
-				f581:
+				goto k566;
+				f566:
 				$this->p = $o2;
-				goto n580;
-				k581:
-				goto a575;
-				n580:
+				goto n565;
+				k566:
+				goto a560;
+				n565:
 				break;
 			case 14:
 				// s289
@@ -23112,7 +22549,7 @@ abstract class GeneratedParser
 						$this->rec(289);
 					}
 
-					goto n582;}
+					goto n567;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 14)) {
@@ -23120,18 +22557,18 @@ abstract class GeneratedParser
 						$this->rec(28);
 					}
 
-					goto f583;}
+					goto f568;}
 
 				$this->p++;
 				if (!$this->s199()) {
-					goto f583;}
-				goto k583;
-				f583:
+					goto f568;}
+				goto k568;
+				f568:
 				$this->p = $o2;
-				goto n582;
-				k583:
-				goto a575;
-				n582:
+				goto n567;
+				k568:
+				goto a560;
+				n567:
 				// s290
 				$o2 = $this->p;
 				if (($this->ids[$this->p] === 13)) {
@@ -23140,7 +22577,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f585;}
+						goto f570;}
 				}
 				if (($this->ids[$this->p] === 14)) {
 					if (($this->ids[$this->p] === 14)) {
@@ -23148,15 +22585,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f585;}
+						goto f570;}
 				}
-				goto k585;
-				f585:
+				goto k570;
+				f570:
 				$this->p = $o2;
-				goto n584;
-				k585:
-				goto a575;
-				n584:
+				goto n569;
+				k570:
+				goto a560;
+				n569:
 				break;
 		}
 
@@ -23164,13 +22601,13 @@ abstract class GeneratedParser
 			$this->rec(287);
 		}
 
-		goto f574;
-		a575:
-		goto k574;
-		f574:
+		goto f559;
+		a560:
+		goto k559;
+		f559:
 		$this->p = $o1;
 		return false;
-		k574:
+		k559:
 
 		return true;
 	}
@@ -23185,9 +22622,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n588;}
-				goto a587;
-				n588:
+					goto n573;}
+				goto a572;
+				n573:
 				break;
 			case 5:
 				// s294
@@ -23196,7 +22633,7 @@ abstract class GeneratedParser
 						$this->rec(294);
 					}
 
-					goto n589;}
+					goto n574;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 5)) {
@@ -23204,26 +22641,26 @@ abstract class GeneratedParser
 						$this->rec(29);
 					}
 
-					goto f590;}
+					goto f575;}
 
 				$this->p++;
 				if (!$this->s199()) {
-					goto f590;}
-				goto k590;
-				f590:
+					goto f575;}
+				goto k575;
+				f575:
 				$this->p = $o2;
-				goto n589;
-				k590:
-				goto a587;
-				n589:
+				goto n574;
+				k575:
+				goto a572;
+				n574:
 				if (($this->ids[$this->p] === 5)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n591;}
-				goto a587;
-				n591:
+					goto n576;}
+				goto a572;
+				n576:
 				break;
 		}
 
@@ -23231,13 +22668,13 @@ abstract class GeneratedParser
 			$this->rec(293);
 		}
 
-		goto f586;
-		a587:
-		goto k586;
-		f586:
+		goto f571;
+		a572:
+		goto k571;
+		f571:
 		$this->p = $o1;
 		return false;
-		k586:
+		k571:
 
 		return true;
 	}
@@ -23252,9 +22689,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n594;}
-				goto a593;
-				n594:
+					goto n579;}
+				goto a578;
+				n579:
 				break;
 			case 46:
 				// s297
@@ -23263,7 +22700,7 @@ abstract class GeneratedParser
 						$this->rec(297);
 					}
 
-					goto n595;}
+					goto n580;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 46)) {
@@ -23271,26 +22708,26 @@ abstract class GeneratedParser
 						$this->rec(69);
 					}
 
-					goto f596;}
+					goto f581;}
 
 				$this->p++;
 				if (!$this->s199()) {
-					goto f596;}
-				goto k596;
-				f596:
+					goto f581;}
+				goto k581;
+				f581:
 				$this->p = $o2;
-				goto n595;
-				k596:
-				goto a593;
-				n595:
+				goto n580;
+				k581:
+				goto a578;
+				n580:
 				if (($this->ids[$this->p] === 46)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n597;}
-				goto a593;
-				n597:
+					goto n582;}
+				goto a578;
+				n582:
 				break;
 		}
 
@@ -23298,13 +22735,13 @@ abstract class GeneratedParser
 			$this->rec(296);
 		}
 
-		goto f592;
-		a593:
-		goto k592;
-		f592:
+		goto f577;
+		a578:
+		goto k577;
+		f577:
 		$this->p = $o1;
 		return false;
-		k592:
+		k577:
 
 		return true;
 	}
@@ -23324,7 +22761,7 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f1512;}
+			goto f1490;}
 
 		$this->p++;
 		// s203
@@ -23336,12 +22773,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1514;
+				goto e1492;
 			}
 
 			$this->p++;
 		}
-		e1514:
+		e1492:
 		// s302
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -23367,9 +22804,9 @@ abstract class GeneratedParser
 			case 18:
 			case 24:
 				if (!$this->s304()) {
-					goto n1517;}
-				goto a1516;
-				n1517:
+					goto n1495;}
+				goto a1494;
+				n1495:
 				break;
 			case 35:
 				if (!($this->ids[$this->p] === 35)) {
@@ -23377,9 +22814,9 @@ abstract class GeneratedParser
 						$this->rec(56);
 					}
 
-					goto n1518;}
-				goto a1516;
-				n1518:
+					goto n1496;}
+				goto a1494;
+				n1496:
 				break;
 		}
 
@@ -23387,18 +22824,18 @@ abstract class GeneratedParser
 			$this->rec(302);
 		}
 
-		goto f1515;
-		a1516:
-		goto k1515;
-		f1515:
+		goto f1493;
+		a1494:
+		goto k1493;
+		f1493:
 		$this->p = $o2;
-		goto f1512;
-		k1515:
-		goto k1512;
-		f1512:
+		goto f1490;
+		k1493:
+		goto k1490;
+		f1490:
 		$this->p = $o1;
 		return false;
-		k1512:
+		k1490:
 
 		return true;
 	}
@@ -23419,7 +22856,7 @@ abstract class GeneratedParser
 				$this->rec(286);
 			}
 
-			goto f1693;}
+			goto f1664;}
 
 		$o2 = $this->p;
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -23427,20 +22864,20 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1694;}
+			goto f1665;}
 
 		$this->p++;
 		if (!$this->s287()) {
-			goto f1694;}
+			goto f1665;}
 		if (!$this->s293()) {
-			goto f1694;}
+			goto f1665;}
 		if (!$this->s296()) {
-			goto f1694;}
-		goto k1694;
-		f1694:
+			goto f1665;}
+		goto k1665;
+		f1665:
 		$this->p = $o2;
-		goto f1693;
-		k1694:
+		goto f1664;
+		k1665:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -23450,17 +22887,17 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1696;
+				goto e1667;
 			}
 
 			$this->p++;
 		}
-		e1696:
-		goto k1693;
-		f1693:
+		e1667:
+		goto k1664;
+		f1664:
 		$this->p = $o1;
 		return false;
-		k1693:
+		k1664:
 
 		return true;
 	}
@@ -23481,11 +22918,11 @@ abstract class GeneratedParser
 				$this->rec(307);
 			}
 
-			goto f1168;}
+			goto f1151;}
 
 		$o2 = $this->p;
 		if (!$this->s199()) {
-			goto f1169;}
+			goto f1152;}
 		if (($this->ids[$this->p] === 27)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
@@ -23506,11 +22943,11 @@ abstract class GeneratedParser
 		} elseif ($this->p >= $this->f) {
 			$this->rec(69);
 		}
-		goto k1169;
-		f1169:
+		goto k1152;
+		f1152:
 		$this->p = $o2;
-		goto f1168;
-		k1169:
+		goto f1151;
+		k1152:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -23520,12 +22957,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1171;
+				goto e1154;
 			}
 
 			$this->p++;
 		}
-		e1171:
+		e1154:
 		if (($this->ids[$this->p] === 40)) {
 			// s311
 			if (!($this->ids[$this->p] === 40)) {
@@ -23533,7 +22970,7 @@ abstract class GeneratedParser
 					$this->rec(311);
 				}
 
-				goto n1172;}
+				goto n1155;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -23544,37 +22981,37 @@ abstract class GeneratedParser
 						$this->rec(312);
 					}
 
-					goto e1174;
+					goto e1157;
 				}
 
 				if (!$this->s312()) {
-					goto e1174;}
+					goto e1157;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1174;
+					goto e1157;
 				}
 
 				$k2++;
 			}
-			e1174:
+			e1157:
 
 			if ($k2 < 1) {
-				goto f1173;
+				goto f1156;
 			}
-			goto k1173;
-			f1173:
+			goto k1156;
+			f1156:
 			$this->p = $o2;
-			goto n1172;
-			k1173:
-			n1172:
+			goto n1155;
+			k1156:
+			n1155:
 		} elseif ($this->p > $this->f) {
 			$this->rec(311);
 		}
-		goto k1168;
-		f1168:
+		goto k1151;
+		f1151:
 		$this->p = $o1;
 		return false;
-		k1168:
+		k1151:
 
 		return true;
 	}
@@ -23594,7 +23031,7 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f1492;}
+			goto f1470;}
 
 		$this->p++;
 		// s203
@@ -23606,12 +23043,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1494;
+				goto e1472;
 			}
 
 			$this->p++;
 		}
-		e1494:
+		e1472:
 		// s313
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -23645,9 +23082,9 @@ abstract class GeneratedParser
 			case 32:
 			case 82:
 				if (!$this->s314()) {
-					goto n1497;}
-				goto a1496;
-				n1497:
+					goto n1475;}
+				goto a1474;
+				n1475:
 				break;
 			case 33:
 				if (!($this->ids[$this->p] === 33)) {
@@ -23655,9 +23092,9 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto n1498;}
-				goto a1496;
-				n1498:
+					goto n1476;}
+				goto a1474;
+				n1476:
 				break;
 		}
 
@@ -23665,18 +23102,18 @@ abstract class GeneratedParser
 			$this->rec(313);
 		}
 
-		goto f1495;
-		a1496:
-		goto k1495;
-		f1495:
+		goto f1473;
+		a1474:
+		goto k1473;
+		f1473:
 		$this->p = $o2;
-		goto f1492;
-		k1495:
-		goto k1492;
-		f1492:
+		goto f1470;
+		k1473:
+		goto k1470;
+		f1470:
 		$this->p = $o1;
 		return false;
-		k1492:
+		k1470:
 
 		return true;
 	}
@@ -23697,11 +23134,11 @@ abstract class GeneratedParser
 				$this->rec(307);
 			}
 
-			goto f1685;}
+			goto f1656;}
 
 		$o2 = $this->p;
 		if (!$this->s199()) {
-			goto f1686;}
+			goto f1657;}
 		if (($this->ids[$this->p] === 27)) {
 			$this->p++;
 		} elseif ($this->p >= $this->f) {
@@ -23722,11 +23159,11 @@ abstract class GeneratedParser
 		} elseif ($this->p >= $this->f) {
 			$this->rec(69);
 		}
-		goto k1686;
-		f1686:
+		goto k1657;
+		f1657:
 		$this->p = $o2;
-		goto f1685;
-		k1686:
+		goto f1656;
+		k1657:
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -23736,17 +23173,17 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1688;
+				goto e1659;
 			}
 
 			$this->p++;
 		}
-		e1688:
-		goto k1685;
-		f1685:
+		e1659:
+		goto k1656;
+		f1656:
 		$this->p = $o1;
 		return false;
-		k1685:
+		k1656:
 
 		return true;
 	}
@@ -23784,7 +23221,7 @@ abstract class GeneratedParser
 						$this->rec(331);
 					}
 
-					goto n1177;}
+					goto n1160;}
 
 				$o2 = $this->p;
 				if (!isset(self::T1921405e[$this->ids[$this->p]])) {
@@ -23792,7 +23229,7 @@ abstract class GeneratedParser
 						$this->rec(332);
 					}
 
-					goto f1178;}
+					goto f1161;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
@@ -23801,24 +23238,24 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1178;}
+						goto f1161;}
 				}
 				if (!$this->s318()) {
-					goto f1178;}
-				goto k1178;
-				f1178:
+					goto f1161;}
+				goto k1161;
+				f1161:
 				$this->p = $o2;
-				goto n1177;
-				k1178:
-				goto a1176;
-				n1177:
+				goto n1160;
+				k1161:
+				goto a1159;
+				n1160:
 				// s333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n1179;}
+					goto n1162;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -23834,17 +23271,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1180;}
+						goto f1163;}
 				}
 				if (!$this->s335()) {
-					goto f1180;}
-				goto k1180;
-				f1180:
+					goto f1163;}
+				goto k1163;
+				f1163:
 				$this->p = $o2;
-				goto n1179;
-				k1180:
-				goto a1176;
-				n1179:
+				goto n1162;
+				k1163:
+				goto a1159;
+				n1162:
 				break;
 			case 19:
 			case 20:
@@ -23856,7 +23293,7 @@ abstract class GeneratedParser
 						$this->rec(333);
 					}
 
-					goto n1182;}
+					goto n1165;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -23868,78 +23305,247 @@ abstract class GeneratedParser
 					$this->er = $se;
 					$this->p = $sp;
 					if ($matched) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1166;}
+				}
+				if (!$this->s335()) {
+					goto f1166;}
+				goto k1166;
+				f1166:
+				$this->p = $o2;
+				goto n1165;
+				k1166:
+				goto a1159;
+				n1165:
+				break;
+			case 3:
+			case 4:
+			case 8:
+				if (!$this->s255()) {
+					goto n1168;}
+				goto a1159;
+				n1168:
+				// s317
+				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(317);
+					}
+
+					goto n1169;}
+
+				$o2 = $this->p;
+				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(279);
+					}
+
+					goto f1170;}
+
+				$this->p++;
+				if (($this->ids[$this->p] === 43)) {
+					if (($this->ids[$this->p] === 43)) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1170;}
+				}
+				if (($this->ids[$this->p] === 38)) {
+					if (($this->ids[$this->p] === 38)) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1170;}
+				}
+				if (!$this->s318()) {
+					goto f1170;}
+				goto k1170;
+				f1170:
+				$this->p = $o2;
+				goto n1169;
+				k1170:
+				goto a1159;
+				n1169:
+				// s333
+				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(333);
+					}
+
+					goto n1171;}
+
+				$o2 = $this->p;
+				if (isset(self::T83e30518[$this->ids[$this->p]])) {
+					$sf = $this->f;
+					$se = $this->er;
+					$sp = $this->p;
+					$matched = $this->s169();
+					$this->f = $sf;
+					$this->er = $se;
+					$this->p = $sp;
+					if ($matched) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1172;}
+				}
+				if (!$this->s335()) {
+					goto f1172;}
+				goto k1172;
+				f1172:
+				$this->p = $o2;
+				goto n1171;
+				k1172:
+				goto a1159;
+				n1171:
+				break;
+			case 32:
+			case 82:
+				if (!$this->s316()) {
+					goto n1174;}
+				goto a1159;
+				n1174:
+				break;
+			case 6:
+				if (!$this->s267()) {
+					goto n1175;}
+				goto a1159;
+				n1175:
+				// s317
+				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(317);
+					}
+
+					goto n1176;}
+
+				$o2 = $this->p;
+				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(279);
+					}
+
+					goto f1177;}
+
+				$this->p++;
+				if (($this->ids[$this->p] === 43)) {
+					if (($this->ids[$this->p] === 43)) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1177;}
+				}
+				if (($this->ids[$this->p] === 38)) {
+					if (($this->ids[$this->p] === 38)) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1177;}
+				}
+				if (!$this->s318()) {
+					goto f1177;}
+				goto k1177;
+				f1177:
+				$this->p = $o2;
+				goto n1176;
+				k1177:
+				goto a1159;
+				n1176:
+				// s333
+				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(333);
+					}
+
+					goto n1178;}
+
+				$o2 = $this->p;
+				if (isset(self::T83e30518[$this->ids[$this->p]])) {
+					$sf = $this->f;
+					$se = $this->er;
+					$sp = $this->p;
+					$matched = $this->s169();
+					$this->f = $sf;
+					$this->er = $se;
+					$this->p = $sp;
+					if ($matched) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1179;}
+				}
+				if (!$this->s335()) {
+					goto f1179;}
+				goto k1179;
+				f1179:
+				$this->p = $o2;
+				goto n1178;
+				k1179:
+				goto a1159;
+				n1178:
+				break;
+			case 7:
+				if (!$this->s230()) {
+					goto n1181;}
+				goto a1159;
+				n1181:
+				// s317
+				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(317);
+					}
+
+					goto n1182;}
+
+				$o2 = $this->p;
+				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
+					if ($this->p > $this->f) {
+						$this->rec(279);
+					}
+
+					goto f1183;}
+
+				$this->p++;
+				if (($this->ids[$this->p] === 43)) {
+					if (($this->ids[$this->p] === 43)) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
 						goto f1183;}
 				}
-				if (!$this->s335()) {
+				if (($this->ids[$this->p] === 38)) {
+					if (($this->ids[$this->p] === 38)) {
+						if ($this->p > $this->f) {
+							$this->f = $this->p;
+							$this->er = [];
+						}
+						goto f1183;}
+				}
+				if (!$this->s318()) {
 					goto f1183;}
 				goto k1183;
 				f1183:
 				$this->p = $o2;
 				goto n1182;
 				k1183:
-				goto a1176;
+				goto a1159;
 				n1182:
-				break;
-			case 3:
-			case 4:
-			case 8:
-				if (!$this->s255()) {
-					goto n1185;}
-				goto a1176;
-				n1185:
-				// s317
-				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(317);
-					}
-
-					goto n1186;}
-
-				$o2 = $this->p;
-				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(279);
-					}
-
-					goto f1187;}
-
-				$this->p++;
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1187;}
-				}
-				if (($this->ids[$this->p] === 38)) {
-					if (($this->ids[$this->p] === 38)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1187;}
-				}
-				if (!$this->s318()) {
-					goto f1187;}
-				goto k1187;
-				f1187:
-				$this->p = $o2;
-				goto n1186;
-				k1187:
-				goto a1176;
-				n1186:
 				// s333
 				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(333);
 					}
 
-					goto n1188;}
+					goto n1184;}
 
 				$o2 = $this->p;
 				if (isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -23955,192 +23561,23 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f1189;}
+						goto f1185;}
 				}
 				if (!$this->s335()) {
-					goto f1189;}
-				goto k1189;
-				f1189:
+					goto f1185;}
+				goto k1185;
+				f1185:
 				$this->p = $o2;
-				goto n1188;
-				k1189:
-				goto a1176;
-				n1188:
-				break;
-			case 32:
-			case 82:
-				if (!$this->s316()) {
-					goto n1191;}
-				goto a1176;
-				n1191:
-				break;
-			case 6:
-				if (!$this->s267()) {
-					goto n1192;}
-				goto a1176;
-				n1192:
-				// s317
-				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(317);
-					}
-
-					goto n1193;}
-
-				$o2 = $this->p;
-				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(279);
-					}
-
-					goto f1194;}
-
-				$this->p++;
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1194;}
-				}
-				if (($this->ids[$this->p] === 38)) {
-					if (($this->ids[$this->p] === 38)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1194;}
-				}
-				if (!$this->s318()) {
-					goto f1194;}
-				goto k1194;
-				f1194:
-				$this->p = $o2;
-				goto n1193;
-				k1194:
-				goto a1176;
-				n1193:
-				// s333
-				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(333);
-					}
-
-					goto n1195;}
-
-				$o2 = $this->p;
-				if (isset(self::T83e30518[$this->ids[$this->p]])) {
-					$sf = $this->f;
-					$se = $this->er;
-					$sp = $this->p;
-					$matched = $this->s169();
-					$this->f = $sf;
-					$this->er = $se;
-					$this->p = $sp;
-					if ($matched) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1196;}
-				}
-				if (!$this->s335()) {
-					goto f1196;}
-				goto k1196;
-				f1196:
-				$this->p = $o2;
-				goto n1195;
-				k1196:
-				goto a1176;
-				n1195:
-				break;
-			case 7:
-				if (!$this->s230()) {
-					goto n1198;}
-				goto a1176;
-				n1198:
-				// s317
-				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(317);
-					}
-
-					goto n1199;}
-
-				$o2 = $this->p;
-				if (!isset(self::T4020d016[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(279);
-					}
-
-					goto f1200;}
-
-				$this->p++;
-				if (($this->ids[$this->p] === 43)) {
-					if (($this->ids[$this->p] === 43)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1200;}
-				}
-				if (($this->ids[$this->p] === 38)) {
-					if (($this->ids[$this->p] === 38)) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1200;}
-				}
-				if (!$this->s318()) {
-					goto f1200;}
-				goto k1200;
-				f1200:
-				$this->p = $o2;
-				goto n1199;
-				k1200:
-				goto a1176;
-				n1199:
-				// s333
-				if (!isset(self::T4546fd6c[$this->ids[$this->p]])) {
-					if ($this->p > $this->f) {
-						$this->rec(333);
-					}
-
-					goto n1201;}
-
-				$o2 = $this->p;
-				if (isset(self::T83e30518[$this->ids[$this->p]])) {
-					$sf = $this->f;
-					$se = $this->er;
-					$sp = $this->p;
-					$matched = $this->s169();
-					$this->f = $sf;
-					$this->er = $se;
-					$this->p = $sp;
-					if ($matched) {
-						if ($this->p > $this->f) {
-							$this->f = $this->p;
-							$this->er = [];
-						}
-						goto f1202;}
-				}
-				if (!$this->s335()) {
-					goto f1202;}
-				goto k1202;
-				f1202:
-				$this->p = $o2;
-				goto n1201;
-				k1202:
-				goto a1176;
-				n1201:
+				goto n1184;
+				k1185:
+				goto a1159;
+				n1184:
 				break;
 			case 25:
 				if (!$this->s229()) {
-					goto n1204;}
-				goto a1176;
-				n1204:
+					goto n1187;}
+				goto a1159;
+				n1187:
 				break;
 			case 30:
 				// s200
@@ -24149,7 +23586,7 @@ abstract class GeneratedParser
 						$this->rec(200);
 					}
 
-					goto n1205;}
+					goto n1188;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 30)) {
@@ -24157,18 +23594,18 @@ abstract class GeneratedParser
 						$this->rec(51);
 					}
 
-					goto f1206;}
+					goto f1189;}
 
 				$this->p++;
 				if (!$this->s201()) {
-					goto f1206;}
-				goto k1206;
-				f1206:
+					goto f1189;}
+				goto k1189;
+				f1189:
 				$this->p = $o2;
-				goto n1205;
-				k1206:
-				goto a1176;
-				n1205:
+				goto n1188;
+				k1189:
+				goto a1159;
+				n1188:
 				break;
 		}
 
@@ -24176,13 +23613,13 @@ abstract class GeneratedParser
 			$this->rec(315);
 		}
 
-		goto f1175;
-		a1176:
-		goto k1175;
-		f1175:
+		goto f1158;
+		a1159:
+		goto k1158;
+		f1158:
 		$this->p = $o1;
 		return false;
-		k1175:
+		k1158:
 
 		return true;
 	}
@@ -24202,17 +23639,17 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f1508;}
+			goto f1486;}
 
 		$this->p++;
 		if (!$this->s205()) {
-			goto f1508;}
+			goto f1486;}
 		if (!($this->ids[$this->p] === 33)) {
 			if ($this->p >= $this->f) {
 				$this->rec(53);
 			}
 
-			goto f1508;}
+			goto f1486;}
 
 		$this->p++;
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -24222,7 +23659,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n1509;}
+				goto n1487;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -24233,37 +23670,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e1511;
+					goto e1489;
 				}
 
 				if (!$this->s224()) {
-					goto e1511;}
+					goto e1489;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1511;
+					goto e1489;
 				}
 
 				$k2++;
 			}
-			e1511:
+			e1489:
 
 			if ($k2 < 1) {
-				goto f1510;
+				goto f1488;
 			}
-			goto k1510;
-			f1510:
+			goto k1488;
+			f1488:
 			$this->p = $o2;
-			goto n1509;
-			k1510:
-			n1509:
+			goto n1487;
+			k1488:
+			n1487:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k1508;
-		f1508:
+		goto k1486;
+		f1486:
 		$this->p = $o1;
 		return false;
-		k1508:
+		k1486:
 
 		return true;
 	}
@@ -24278,24 +23715,24 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1501;}
-				goto a1500;
-				n1501:
+					goto n1479;}
+				goto a1478;
+				n1479:
 				break;
 			case 34:
 			case 86:
 				if (!$this->s319()) {
-					goto n1502;}
-				goto a1500;
-				n1502:
+					goto n1480;}
+				goto a1478;
+				n1480:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1503;}
-				goto a1500;
-				n1503:
+					goto n1481;}
+				goto a1478;
+				n1481:
 				break;
 			case 36:
 			case 84:
@@ -24305,7 +23742,7 @@ abstract class GeneratedParser
 						$this->rec(223);
 					}
 
-					goto n1504;}
+					goto n1482;}
 
 				$o2 = $this->p;
 				$k2 = 0;
@@ -24316,38 +23753,38 @@ abstract class GeneratedParser
 							$this->rec(224);
 						}
 
-						goto e1506;
+						goto e1484;
 					}
 
 					if (!$this->s224()) {
-						goto e1506;}
+						goto e1484;}
 					if ($this->p === $b2) {
 						$k2 = 1;
-						goto e1506;
+						goto e1484;
 					}
 
 					$k2++;
 				}
-				e1506:
+				e1484:
 
 				if ($k2 < 1) {
-					goto f1505;
+					goto f1483;
 				}
-				goto k1505;
-				f1505:
+				goto k1483;
+				f1483:
 				$this->p = $o2;
-				goto n1504;
-				k1505:
-				goto a1500;
-				n1504:
+				goto n1482;
+				k1483:
+				goto a1478;
+				n1482:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1507;}
-				goto a1500;
-				n1507:
+					goto n1485;}
+				goto a1478;
+				n1485:
 				break;
 		}
 
@@ -24355,13 +23792,13 @@ abstract class GeneratedParser
 			$this->rec(318);
 		}
 
-		goto f1499;
-		a1500:
-		goto k1499;
-		f1499:
+		goto f1477;
+		a1478:
+		goto k1477;
+		f1477:
 		$this->p = $o1;
 		return false;
-		k1499:
+		k1477:
 
 		return true;
 	}
@@ -24377,7 +23814,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s320()) {
-			goto f1689;}
+			goto f1660;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// s223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -24385,7 +23822,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n1690;}
+				goto n1661;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -24396,37 +23833,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e1692;
+					goto e1663;
 				}
 
 				if (!$this->s224()) {
-					goto e1692;}
+					goto e1663;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1692;
+					goto e1663;
 				}
 
 				$k2++;
 			}
-			e1692:
+			e1663:
 
 			if ($k2 < 1) {
-				goto f1691;
+				goto f1662;
 			}
-			goto k1691;
-			f1691:
+			goto k1662;
+			f1662:
 			$this->p = $o2;
-			goto n1690;
-			k1691:
-			n1690:
+			goto n1661;
+			k1662:
+			n1661:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k1689;
-		f1689:
+		goto k1660;
+		f1660:
 		$this->p = $o1;
 		return false;
-		k1689:
+		k1660:
 
 		return true;
 	}
@@ -24446,7 +23883,7 @@ abstract class GeneratedParser
 				$this->rec(238);
 			}
 
-			goto f598;}
+			goto f583;}
 
 		$this->p++;
 		// s203
@@ -24458,14 +23895,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e600;
+				goto e585;
 			}
 
 			$this->p++;
 		}
-		e600:
+		e585:
 		if (!$this->s321()) {
-			goto f598;}
+			goto f583;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -24475,12 +23912,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e602;
+				goto e587;
 			}
 
 			$this->p++;
 		}
-		e602:
+		e587:
 		if (($this->ids[$this->p] === 40)) {
 			// s327
 			if (!($this->ids[$this->p] === 40)) {
@@ -24488,7 +23925,7 @@ abstract class GeneratedParser
 					$this->rec(327);
 				}
 
-				goto n603;}
+				goto n588;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -24499,29 +23936,29 @@ abstract class GeneratedParser
 						$this->rec(328);
 					}
 
-					goto e605;
+					goto e590;
 				}
 
 				if (!$this->s328()) {
-					goto e605;}
+					goto e590;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e605;
+					goto e590;
 				}
 
 				$k2++;
 			}
-			e605:
+			e590:
 
 			if ($k2 < 1) {
-				goto f604;
+				goto f589;
 			}
-			goto k604;
-			f604:
+			goto k589;
+			f589:
 			$this->p = $o2;
-			goto n603;
-			k604:
-			n603:
+			goto n588;
+			k589:
+			n588:
 		} elseif ($this->p > $this->f) {
 			$this->rec(327);
 		}
@@ -24530,14 +23967,14 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f598;}
+			goto f583;}
 
 		$this->p++;
-		goto k598;
-		f598:
+		goto k583;
+		f583:
 		$this->p = $o1;
 		return false;
-		k598:
+		k583:
 
 		return true;
 	}
@@ -24586,7 +24023,7 @@ abstract class GeneratedParser
 						$this->rec(324);
 					}
 
-					goto n805;}
+					goto n799;}
 
 				$o2 = $this->p;
 				if (isset(self::T05cf281c[$this->ids[$this->p]])) {
@@ -24595,17 +24032,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f806;}
+						goto f800;}
 				}
 				if (!$this->s199()) {
-					goto f806;}
-				goto k806;
-				f806:
+					goto f800;}
+				goto k800;
+				f800:
 				$this->p = $o2;
-				goto n805;
-				k806:
-				goto a804;
-				n805:
+				goto n799;
+				k800:
+				goto a798;
+				n799:
 				break;
 			case 1:
 			case 2:
@@ -24615,7 +24052,7 @@ abstract class GeneratedParser
 						$this->rec(322);
 					}
 
-					goto n807;}
+					goto n801;}
 
 				$o2 = $this->p;
 				if (!isset(self::T05cf281c[$this->ids[$this->p]])) {
@@ -24623,26 +24060,26 @@ abstract class GeneratedParser
 						$this->rec(323);
 					}
 
-					goto f808;}
+					goto f802;}
 
 				$this->p++;
 				if (!$this->s199()) {
-					goto f808;}
-				goto k808;
-				f808:
+					goto f802;}
+				goto k802;
+				f802:
 				$this->p = $o2;
-				goto n807;
-				k808:
-				goto a804;
-				n807:
+				goto n801;
+				k802:
+				goto a798;
+				n801:
 				break;
 			case 50:
 				$this->p++;
-				goto a804;
+				goto a798;
 				break;
 			case 85:
 				$this->p++;
-				goto a804;
+				goto a798;
 				break;
 		}
 
@@ -24650,13 +24087,13 @@ abstract class GeneratedParser
 			$this->rec(321);
 		}
 
-		goto f803;
-		a804:
-		goto k803;
-		f803:
+		goto f797;
+		a798:
+		goto k797;
+		f797:
 		$this->p = $o1;
 		return false;
-		k803:
+		k797:
 
 		return true;
 	}
@@ -24679,7 +24116,7 @@ abstract class GeneratedParser
 					$this->rec(328);
 				}
 
-				goto e1698;
+				goto e1669;
 			}
 
 			// s328
@@ -24688,7 +24125,7 @@ abstract class GeneratedParser
 					$this->rec(328);
 				}
 
-				goto e1698;}
+				goto e1669;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -24696,7 +24133,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1699;}
+				goto f1670;}
 
 			$this->p++;
 			// s203
@@ -24708,36 +24145,36 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e1701;
+					goto e1672;
 				}
 
 				$this->p++;
 			}
-			e1701:
+			e1672:
 			if (!$this->s329()) {
-				goto f1699;}
-			goto k1699;
-			f1699:
+				goto f1670;}
+			goto k1670;
+			f1670:
 			$this->p = $o2;
-			goto e1698;
-			k1699:
+			goto e1669;
+			k1670:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1698;
+				goto e1669;
 			}
 
 			$k1++;
 		}
-		e1698:
+		e1669:
 
 		if ($k1 < 1) {
-			goto f1697;
+			goto f1668;
 		}
-		goto k1697;
-		f1697:
+		goto k1668;
+		f1668:
 		$this->p = $o1;
 		return false;
-		k1697:
+		k1668:
 
 		return true;
 	}
@@ -24757,7 +24194,7 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f809;}
+			goto f803;}
 
 		$this->p++;
 		// s203
@@ -24769,12 +24206,12 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e811;
+				goto e805;
 			}
 
 			$this->p++;
 		}
-		e811:
+		e805:
 		// s329
 		$o2 = $this->p;
 		switch ($this->ids[$this->p]) {
@@ -24810,9 +24247,9 @@ abstract class GeneratedParser
 			case 82:
 			case 85:
 				if (!$this->s330()) {
-					goto n814;}
-				goto a813;
-				n814:
+					goto n808;}
+				goto a807;
+				n808:
 				break;
 			case 35:
 				if (!($this->ids[$this->p] === 35)) {
@@ -24820,9 +24257,9 @@ abstract class GeneratedParser
 						$this->rec(56);
 					}
 
-					goto n815;}
-				goto a813;
-				n815:
+					goto n809;}
+				goto a807;
+				n809:
 				break;
 		}
 
@@ -24830,18 +24267,18 @@ abstract class GeneratedParser
 			$this->rec(329);
 		}
 
-		goto f812;
-		a813:
-		goto k812;
-		f812:
+		goto f806;
+		a807:
+		goto k806;
+		f806:
 		$this->p = $o2;
-		goto f809;
-		k812:
-		goto k809;
-		f809:
+		goto f803;
+		k806:
+		goto k803;
+		f803:
 		$this->p = $o1;
 		return false;
-		k809:
+		k803:
 
 		return true;
 	}
@@ -24887,11 +24324,11 @@ abstract class GeneratedParser
 						$this->rec(330);
 					}
 
-					goto n1773;}
+					goto n1744;}
 
 				$o2 = $this->p;
 				if (!$this->s321()) {
-					goto f1774;}
+					goto f1745;}
 				// s203
 				$o3 = $this->p;
 				while (true) {
@@ -24901,19 +24338,19 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e1776;
+						goto e1747;
 					}
 
 					$this->p++;
 				}
-				e1776:
-				goto k1774;
-				f1774:
+				e1747:
+				goto k1745;
+				f1745:
 				$this->p = $o2;
-				goto n1773;
-				k1774:
-				goto a1772;
-				n1773:
+				goto n1744;
+				k1745:
+				goto a1743;
+				n1744:
 				break;
 			case 35:
 				if (!($this->ids[$this->p] === 35)) {
@@ -24921,9 +24358,9 @@ abstract class GeneratedParser
 						$this->rec(56);
 					}
 
-					goto n1777;}
-				goto a1772;
-				n1777:
+					goto n1748;}
+				goto a1743;
+				n1748:
 				break;
 		}
 
@@ -24931,13 +24368,13 @@ abstract class GeneratedParser
 			$this->rec(329);
 		}
 
-		goto f1771;
-		a1772:
-		goto k1771;
-		f1771:
+		goto f1742;
+		a1743:
+		goto k1742;
+		f1742:
 		$this->p = $o1;
 		return false;
-		k1771:
+		k1742:
 
 		return true;
 	}
@@ -24953,7 +24390,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s321()) {
-			goto f1049;}
+			goto f1035;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -24963,17 +24400,17 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1051;
+				goto e1037;
 			}
 
 			$this->p++;
 		}
-		e1051:
-		goto k1049;
-		f1049:
+		e1037:
+		goto k1035;
+		f1035:
 		$this->p = $o1;
 		return false;
-		k1049:
+		k1035:
 
 		return true;
 	}
@@ -25001,10 +24438,10 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f668;}
+				goto f652;}
 		}
 		if (!$this->s340()) {
-			goto f668;}
+			goto f652;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// s223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -25012,7 +24449,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n670;}
+				goto n654;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -25023,37 +24460,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e672;
+					goto e656;
 				}
 
 				if (!$this->s224()) {
-					goto e672;}
+					goto e656;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e672;
+					goto e656;
 				}
 
 				$k2++;
 			}
-			e672:
+			e656:
 
 			if ($k2 < 1) {
-				goto f671;
+				goto f655;
 			}
-			goto k671;
-			f671:
+			goto k655;
+			f655:
 			$this->p = $o2;
-			goto n670;
-			k671:
-			n670:
+			goto n654;
+			k655:
+			n654:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k668;
-		f668:
+		goto k652;
+		f652:
 		$this->p = $o1;
 		return false;
-		k668:
+		k652:
 
 		return true;
 	}
@@ -25079,7 +24516,7 @@ abstract class GeneratedParser
 						$this->rec(338);
 					}
 
-					goto n849;}
+					goto n844;}
 
 				$o2 = $this->p;
 				if (!isset(self::T1ad6c327[$this->ids[$this->p]])) {
@@ -25087,7 +24524,7 @@ abstract class GeneratedParser
 						$this->rec(339);
 					}
 
-					goto f850;}
+					goto f845;}
 
 				$this->p++;
 				if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -25095,24 +24532,24 @@ abstract class GeneratedParser
 						$this->rec(16);
 					}
 
-					goto f850;}
+					goto f845;}
 
 				$this->p++;
-				goto k850;
-				f850:
+				goto k845;
+				f845:
 				$this->p = $o2;
-				goto n849;
-				k850:
-				goto a848;
-				n849:
+				goto n844;
+				k845:
+				goto a843;
+				n844:
 				break;
 			case 36:
 				$this->p++;
-				goto a848;
+				goto a843;
 				break;
 			case 84:
 				$this->p++;
-				goto a848;
+				goto a843;
 				break;
 		}
 
@@ -25120,13 +24557,13 @@ abstract class GeneratedParser
 			$this->rec(337);
 		}
 
-		goto f847;
-		a848:
-		goto k847;
-		f847:
+		goto f842;
+		a843:
+		goto k842;
+		f842:
 		$this->p = $o1;
 		return false;
-		k847:
+		k842:
 
 		return true;
 	}
@@ -25164,7 +24601,7 @@ abstract class GeneratedParser
 						$this->rec(357);
 					}
 
-					goto n192;}
+					goto n178;}
 
 				$o2 = $this->p;
 				if (isset(self::T1ad6c327[$this->ids[$this->p]])) {
@@ -25173,37 +24610,37 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f193;}
+						goto f179;}
 				}
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(144);
 					}
 
-					goto f193;}
+					goto f179;}
 
 				$this->p++;
 				if (($this->ids[$this->p] === 43)) {
 					if (!$this->s360()) {
-						goto n194;}
-					n194:
+						goto n180;}
+					n180:
 				} elseif ($this->p > $this->f) {
 					$this->rec(360);
 				}
-				goto k193;
-				f193:
+				goto k179;
+				f179:
 				$this->p = $o2;
-				goto n192;
-				k193:
-				goto a191;
-				n192:
+				goto n178;
+				k179:
+				goto a177;
+				n178:
 				break;
 			case 7:
 			case 18:
 				if (!$this->s347()) {
-					goto n195;}
-				goto a191;
-				n195:
+					goto n181;}
+				goto a177;
+				n181:
 				break;
 			case 21:
 			case 22:
@@ -25213,7 +24650,7 @@ abstract class GeneratedParser
 						$this->rec(343);
 					}
 
-					goto n196;}
+					goto n182;}
 
 				$o2 = $this->p;
 				switch ($this->ids[$this->p]) {
@@ -25221,11 +24658,11 @@ abstract class GeneratedParser
 						break;
 					case 21:
 						$this->p++;
-						goto a198;
+						goto a184;
 						break;
 					case 22:
 						$this->p++;
-						goto a198;
+						goto a184;
 						break;
 				}
 
@@ -25233,42 +24670,42 @@ abstract class GeneratedParser
 					$this->rec(343);
 				}
 
-				goto f197;
-				a198:
-				goto k197;
-				f197:
+				goto f183;
+				a184:
+				goto k183;
+				f183:
 				$this->p = $o2;
-				goto n196;
-				k197:
-				goto a191;
-				n196:
+				goto n182;
+				k183:
+				goto a177;
+				n182:
 				break;
 			case 36:
 			case 84:
 				if (!$this->s361()) {
-					goto n199;}
-				goto a191;
-				n199:
+					goto n185;}
+				goto a177;
+				n185:
 				break;
 			case 15:
 				$this->p++;
-				goto a191;
+				goto a177;
 				break;
 			case 16:
 				$this->p++;
-				goto a191;
+				goto a177;
 				break;
 			case 17:
 				$this->p++;
-				goto a191;
+				goto a177;
 				break;
 			case 19:
 				$this->p++;
-				goto a191;
+				goto a177;
 				break;
 			case 20:
 				$this->p++;
-				goto a191;
+				goto a177;
 				break;
 		}
 
@@ -25276,13 +24713,13 @@ abstract class GeneratedParser
 			$this->rec(340);
 		}
 
-		goto f190;
-		a191:
-		goto k190;
-		f190:
+		goto f176;
+		a177:
+		goto k176;
+		f176:
 		$this->p = $o1;
 		return false;
-		k190:
+		k176:
 
 		return true;
 	}
@@ -25302,7 +24739,7 @@ abstract class GeneratedParser
 				$this->rec(339);
 			}
 
-			goto f454;}
+			goto f430;}
 
 		$this->p++;
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -25310,13 +24747,13 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f454;}
+			goto f430;}
 
 		$this->p++;
 		if (isset(self::T69bf8cc4[$this->ids[$this->p]])) {
 			if (!$this->s349()) {
-				goto n455;}
-			n455:
+				goto n431;}
+			n431:
 		} elseif ($this->p > $this->f) {
 			$this->rec(349);
 		}
@@ -25325,14 +24762,14 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f454;}
+			goto f430;}
 
 		$this->p++;
-		goto k454;
-		f454:
+		goto k430;
+		f430:
 		$this->p = $o1;
 		return false;
-		k454:
+		k430:
 
 		return true;
 	}
@@ -25353,22 +24790,22 @@ abstract class GeneratedParser
 				$this->rec(350);
 			}
 
-			goto f728;}
+			goto f712;}
 
 		$o2 = $this->p;
 		if (!$this->s340()) {
-			goto f729;}
+			goto f713;}
 		if (!$this->s351()) {
-			goto f729;}
-		goto k729;
-		f729:
+			goto f713;}
+		goto k713;
+		f713:
 		$this->p = $o2;
-		goto f728;
-		k729:
+		goto f712;
+		k713:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->s355()) {
-				goto n730;}
-			n730:
+				goto n714;}
+			n714:
 		} elseif ($this->p > $this->f) {
 			$this->rec(355);
 		}
@@ -25377,11 +24814,11 @@ abstract class GeneratedParser
 		} elseif ($this->p >= $this->f) {
 			$this->rec(63);
 		}
-		goto k728;
-		f728:
+		goto k712;
+		f712:
 		$this->p = $o1;
 		return false;
-		k728:
+		k712:
 
 		return true;
 	}
@@ -25396,9 +24833,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n969;}
-				goto a968;
-				n969:
+					goto n964;}
+				goto a963;
+				n964:
 				break;
 			case 44:
 				// s352
@@ -25407,7 +24844,7 @@ abstract class GeneratedParser
 						$this->rec(352);
 					}
 
-					goto n970;}
+					goto n965;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 44)) {
@@ -25415,26 +24852,26 @@ abstract class GeneratedParser
 						$this->rec(67);
 					}
 
-					goto f971;}
+					goto f966;}
 
 				$this->p++;
 				if (!$this->s340()) {
-					goto f971;}
-				goto k971;
-				f971:
+					goto f966;}
+				goto k966;
+				f966:
 				$this->p = $o2;
-				goto n970;
-				k971:
-				goto a968;
-				n970:
+				goto n965;
+				k966:
+				goto a963;
+				n965:
 				if (($this->ids[$this->p] === 44)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n972;}
-				goto a968;
-				n972:
+					goto n967;}
+				goto a963;
+				n967:
 				break;
 		}
 
@@ -25442,13 +24879,13 @@ abstract class GeneratedParser
 			$this->rec(351);
 		}
 
-		goto f967;
-		a968:
-		goto k967;
-		f967:
+		goto f962;
+		a963:
+		goto k962;
+		f962:
 		$this->p = $o1;
 		return false;
-		k967:
+		k962:
 
 		return true;
 	}
@@ -25471,7 +24908,7 @@ abstract class GeneratedParser
 					$this->rec(356);
 				}
 
-				goto e974;
+				goto e969;
 			}
 
 			// s356
@@ -25480,7 +24917,7 @@ abstract class GeneratedParser
 					$this->rec(356);
 				}
 
-				goto e974;}
+				goto e969;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -25488,7 +24925,7 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f975;}
+				goto f970;}
 
 			$this->p++;
 			// s350
@@ -25497,40 +24934,40 @@ abstract class GeneratedParser
 					$this->rec(350);
 				}
 
-				goto f975;}
+				goto f970;}
 
 			$o3 = $this->p;
 			if (!$this->s340()) {
-				goto f976;}
+				goto f971;}
 			if (!$this->s351()) {
-				goto f976;}
-			goto k976;
-			f976:
+				goto f971;}
+			goto k971;
+			f971:
 			$this->p = $o3;
-			goto f975;
-			k976:
-			goto k975;
-			f975:
+			goto f970;
+			k971:
+			goto k970;
+			f970:
 			$this->p = $o2;
-			goto e974;
-			k975:
+			goto e969;
+			k970:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e974;
+				goto e969;
 			}
 
 			$k1++;
 		}
-		e974:
+		e969:
 
 		if ($k1 < 1) {
-			goto f973;
+			goto f968;
 		}
-		goto k973;
-		f973:
+		goto k968;
+		f968:
 		$this->p = $o1;
 		return false;
-		k973:
+		k968:
 
 		return true;
 	}
@@ -25550,16 +24987,16 @@ abstract class GeneratedParser
 				$this->rec(66);
 			}
 
-			goto f453;}
+			goto f429;}
 
 		$this->p++;
 		if (!$this->s163()) {
-			goto f453;}
-		goto k453;
-		f453:
+			goto f429;}
+		goto k429;
+		f429:
 		$this->p = $o1;
 		return false;
-		k453:
+		k429:
 
 		return true;
 	}
@@ -25579,13 +25016,13 @@ abstract class GeneratedParser
 				$this->rec(228);
 			}
 
-			goto f456;}
+			goto f432;}
 
 		$this->p++;
 		if (isset(self::T69bf8cc4[$this->ids[$this->p]])) {
 			if (!$this->s349()) {
-				goto n457;}
-			n457:
+				goto n433;}
+			n433:
 		} elseif ($this->p > $this->f) {
 			$this->rec(349);
 		}
@@ -25594,14 +25031,14 @@ abstract class GeneratedParser
 				$this->rec(59);
 			}
 
-			goto f456;}
+			goto f432;}
 
 		$this->p++;
-		goto k456;
-		f456:
+		goto k432;
+		f432:
 		$this->p = $o1;
 		return false;
-		k456:
+		k432:
 
 		return true;
 	}
@@ -25617,7 +25054,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s363()) {
-			goto f1219;}
+			goto f1202;}
 		if (isset(self::T885cd349[$this->ids[$this->p]])) {
 			// s223
 			if (!isset(self::T885cd349[$this->ids[$this->p]])) {
@@ -25625,7 +25062,7 @@ abstract class GeneratedParser
 					$this->rec(223);
 				}
 
-				goto n1220;}
+				goto n1203;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -25636,37 +25073,37 @@ abstract class GeneratedParser
 						$this->rec(224);
 					}
 
-					goto e1222;
+					goto e1205;
 				}
 
 				if (!$this->s224()) {
-					goto e1222;}
+					goto e1205;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1222;
+					goto e1205;
 				}
 
 				$k2++;
 			}
-			e1222:
+			e1205:
 
 			if ($k2 < 1) {
-				goto f1221;
+				goto f1204;
 			}
-			goto k1221;
-			f1221:
+			goto k1204;
+			f1204:
 			$this->p = $o2;
-			goto n1220;
-			k1221:
-			n1220:
+			goto n1203;
+			k1204:
+			n1203:
 		} elseif ($this->p > $this->f) {
 			$this->rec(223);
 		}
-		goto k1219;
-		f1219:
+		goto k1202;
+		f1202:
 		$this->p = $o1;
 		return false;
-		k1219:
+		k1202:
 
 		return true;
 	}
@@ -25686,7 +25123,7 @@ abstract class GeneratedParser
 				$this->rec(54);
 			}
 
-			goto f1519;}
+			goto f1497;}
 
 		$this->p++;
 		// s203
@@ -25698,14 +25135,14 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1521;
+				goto e1499;
 			}
 
 			$this->p++;
 		}
-		e1521:
+		e1499:
 		if (!$this->s321()) {
-			goto f1519;}
+			goto f1497;}
 		// s203
 		$o2 = $this->p;
 		while (true) {
@@ -25715,16 +25152,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e1523;
+				goto e1501;
 			}
 
 			$this->p++;
 		}
-		e1523:
+		e1501:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->s327()) {
-				goto n1524;}
-			n1524:
+				goto n1502;}
+			n1502:
 		} elseif ($this->p > $this->f) {
 			$this->rec(327);
 		}
@@ -25733,14 +25170,14 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f1519;}
+			goto f1497;}
 
 		$this->p++;
-		goto k1519;
-		f1519:
+		goto k1497;
+		f1497:
 		$this->p = $o1;
 		return false;
-		k1519:
+		k1497:
 
 		return true;
 	}
@@ -25760,7 +25197,7 @@ abstract class GeneratedParser
 				$this->rec(16);
 			}
 
-			goto f884;}
+			goto f879;}
 
 		$this->p++;
 		// s203
@@ -25772,16 +25209,16 @@ abstract class GeneratedParser
 					$this->rec(204);
 				}
 
-				goto e886;
+				goto e881;
 			}
 
 			$this->p++;
 		}
-		e886:
+		e881:
 		if (isset(self::T7680fe2e[$this->ids[$this->p]])) {
 			if (!$this->s306()) {
-				goto n887;}
-			n887:
+				goto n882;}
+			n882:
 		} elseif ($this->p > $this->f) {
 			$this->rec(306);
 		}
@@ -25790,7 +25227,7 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f884;}
+			goto f879;}
 
 		$this->p++;
 		if (!($this->ids[$this->p] === 47)) {
@@ -25798,16 +25235,16 @@ abstract class GeneratedParser
 				$this->rec(70);
 			}
 
-			goto f884;}
+			goto f879;}
 
 		$this->p++;
 		if (!$this->s315()) {
-			goto f884;}
-		goto k884;
-		f884:
+			goto f879;}
+		goto k879;
+		f879:
 		$this->p = $o1;
 		return false;
-		k884:
+		k879:
 
 		return true;
 	}
@@ -25825,7 +25262,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f439;}
+						goto f413;}
 				}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
@@ -25833,15 +25270,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f439;}
+						goto f413;}
 				}
-				goto k439;
-				f439:
+				goto k413;
+				f413:
 				$this->p = $o2;
-				goto n438;
-				k439:
-				goto a437;
-				n438:
+				goto n412;
+				k413:
+				goto a411;
+				n412:
 				break;
 			case 28:
 			case 29:
@@ -25853,7 +25290,7 @@ abstract class GeneratedParser
 						$this->rec(369);
 					}
 
-					goto n440;}
+					goto n414;}
 
 				$o2 = $this->p;
 				// s203
@@ -25865,21 +25302,21 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e443;
+						goto e417;
 					}
 
 					$this->p++;
 				}
-				e443:
+				e417:
 				if (!$this->s370()) {
-					goto f441;}
-				goto k441;
-				f441:
+					goto f415;}
+				goto k415;
+				f415:
 				$this->p = $o2;
-				goto n440;
-				k441:
-				goto a437;
-				n440:
+				goto n414;
+				k415:
+				goto a411;
+				n414:
 				// s383
 				$o2 = $this->p;
 				if (($this->ids[$this->p] === 28)) {
@@ -25888,7 +25325,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f445;}
+						goto f419;}
 				}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
@@ -25896,15 +25333,15 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f445;}
+						goto f419;}
 				}
-				goto k445;
-				f445:
+				goto k419;
+				f419:
 				$this->p = $o2;
-				goto n444;
-				k445:
-				goto a437;
-				n444:
+				goto n418;
+				k419:
+				goto a411;
+				n418:
 				break;
 		}
 
@@ -25912,13 +25349,13 @@ abstract class GeneratedParser
 			$this->rec(368);
 		}
 
-		goto f436;
-		a437:
-		goto k436;
-		f436:
+		goto f410;
+		a411:
+		goto k410;
+		f410:
 		$this->p = $o1;
 		return false;
-		k436:
+		k410:
 
 		return true;
 	}
@@ -25943,26 +25380,26 @@ abstract class GeneratedParser
 						$this->rec(371);
 					}
 
-					goto n703;}
+					goto n687;}
 
 				$o2 = $this->p;
 				if (!$this->s372()) {
-					goto f704;}
+					goto f688;}
 				if (($this->ids[$this->p] === 28)) {
 					if (($this->ids[$this->p] === 28)) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f704;}
+						goto f688;}
 				}
-				goto k704;
-				f704:
+				goto k688;
+				f688:
 				$this->p = $o2;
-				goto n703;
-				k704:
-				goto a702;
-				n703:
+				goto n687;
+				k688:
+				goto a686;
+				n687:
 				break;
 			case 29:
 				// s377
@@ -25971,26 +25408,26 @@ abstract class GeneratedParser
 						$this->rec(377);
 					}
 
-					goto n705;}
+					goto n689;}
 
 				$o2 = $this->p;
 				if (!$this->s378()) {
-					goto f706;}
+					goto f690;}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
 						if ($this->p > $this->f) {
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f706;}
+						goto f690;}
 				}
-				goto k706;
-				f706:
+				goto k690;
+				f690:
 				$this->p = $o2;
-				goto n705;
-				k706:
-				goto a702;
-				n705:
+				goto n689;
+				k690:
+				goto a686;
+				n689:
 				break;
 		}
 
@@ -25998,13 +25435,13 @@ abstract class GeneratedParser
 			$this->rec(370);
 		}
 
-		goto f701;
-		a702:
-		goto k701;
-		f701:
+		goto f685;
+		a686:
+		goto k685;
+		f685:
 		$this->p = $o1;
 		return false;
-		k701:
+		k685:
 
 		return true;
 	}
@@ -26027,7 +25464,7 @@ abstract class GeneratedParser
 					$this->rec(373);
 				}
 
-				goto e936;
+				goto e931;
 			}
 
 			// s373
@@ -26036,7 +25473,7 @@ abstract class GeneratedParser
 					$this->rec(373);
 				}
 
-				goto e936;}
+				goto e931;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 28)) {
@@ -26044,11 +25481,11 @@ abstract class GeneratedParser
 					$this->rec(49);
 				}
 
-				goto f937;}
+				goto f932;}
 
 			$this->p++;
 			if (!$this->s201()) {
-				goto f937;}
+				goto f932;}
 			// s375
 			$o3 = $this->p;
 			// s203
@@ -26060,46 +25497,46 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e941;
+					goto e936;
 				}
 
 				$this->p++;
 			}
-			e941:
+			e936:
 			if (!($this->ids[$this->p] === 28)) {
 				if ($this->p > $this->f) {
 					$this->rec(49);
 				}
 
-				goto f939;}
-			goto k939;
-			f939:
+				goto f934;}
+			goto k934;
+			f934:
 			$this->p = $o3;
-			goto n938;
-			k939:
-			n938:
-			goto k937;
-			f937:
+			goto n933;
+			k934:
+			n933:
+			goto k932;
+			f932:
 			$this->p = $o2;
-			goto e936;
-			k937:
+			goto e931;
+			k932:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e936;
+				goto e931;
 			}
 
 			$k1++;
 		}
-		e936:
+		e931:
 
 		if ($k1 < 1) {
-			goto f935;
+			goto f930;
 		}
-		goto k935;
-		f935:
+		goto k930;
+		f930:
 		$this->p = $o1;
 		return false;
-		k935:
+		k930:
 
 		return true;
 	}
@@ -26122,7 +25559,7 @@ abstract class GeneratedParser
 					$this->rec(379);
 				}
 
-				goto e943;
+				goto e938;
 			}
 
 			// s379
@@ -26131,7 +25568,7 @@ abstract class GeneratedParser
 					$this->rec(379);
 				}
 
-				goto e943;}
+				goto e938;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 29)) {
@@ -26139,11 +25576,11 @@ abstract class GeneratedParser
 					$this->rec(50);
 				}
 
-				goto f944;}
+				goto f939;}
 
 			$this->p++;
 			if (!$this->s201()) {
-				goto f944;}
+				goto f939;}
 			// s381
 			$o3 = $this->p;
 			// s203
@@ -26155,46 +25592,46 @@ abstract class GeneratedParser
 						$this->rec(204);
 					}
 
-					goto e948;
+					goto e943;
 				}
 
 				$this->p++;
 			}
-			e948:
+			e943:
 			if (!($this->ids[$this->p] === 29)) {
 				if ($this->p > $this->f) {
 					$this->rec(50);
 				}
 
-				goto f946;}
-			goto k946;
-			f946:
+				goto f941;}
+			goto k941;
+			f941:
 			$this->p = $o3;
-			goto n945;
-			k946:
-			n945:
-			goto k944;
-			f944:
+			goto n940;
+			k941:
+			n940:
+			goto k939;
+			f939:
 			$this->p = $o2;
-			goto e943;
-			k944:
+			goto e938;
+			k939:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e943;
+				goto e938;
 			}
 
 			$k1++;
 		}
-		e943:
+		e938:
 
 		if ($k1 < 1) {
-			goto f942;
+			goto f937;
 		}
-		goto k942;
-		f942:
+		goto k937;
+		f937:
 		$this->p = $o1;
 		return false;
-		k942:
+		k937:
 
 		return true;
 	}
@@ -26212,7 +25649,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f361;}
+						goto f335;}
 				}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
@@ -26220,7 +25657,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f361;}
+						goto f335;}
 				}
 				if (($this->ids[$this->p] === 32)) {
 					if (($this->ids[$this->p] === 32)) {
@@ -26228,17 +25665,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f361;}
+						goto f335;}
 				}
 				if (!$this->s125()) {
-					goto f361;}
-				goto k361;
-				f361:
+					goto f335;}
+				goto k335;
+				f335:
 				$this->p = $o2;
-				goto n360;
-				k361:
-				goto a359;
-				n360:
+				goto n334;
+				k335:
+				goto a333;
+				n334:
 				break;
 			case 25:
 			case 26:
@@ -26248,7 +25685,7 @@ abstract class GeneratedParser
 						$this->rec(386);
 					}
 
-					goto n362;}
+					goto n336;}
 
 				$o2 = $this->p;
 				if (!isset(self::T29c7f960[$this->ids[$this->p]])) {
@@ -26256,18 +25693,18 @@ abstract class GeneratedParser
 						$this->rec(387);
 					}
 
-					goto f363;}
+					goto f337;}
 
 				$this->p++;
 				if (!$this->s125()) {
-					goto f363;}
-				goto k363;
-				f363:
+					goto f337;}
+				goto k337;
+				f337:
 				$this->p = $o2;
-				goto n362;
-				k363:
-				goto a359;
-				n362:
+				goto n336;
+				k337:
+				goto a333;
+				n336:
 				// s388
 				$o2 = $this->p;
 				if (($this->ids[$this->p] === 28)) {
@@ -26276,7 +25713,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f365;}
+						goto f339;}
 				}
 				if (($this->ids[$this->p] === 29)) {
 					if (($this->ids[$this->p] === 29)) {
@@ -26284,7 +25721,7 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f365;}
+						goto f339;}
 				}
 				if (($this->ids[$this->p] === 32)) {
 					if (($this->ids[$this->p] === 32)) {
@@ -26292,17 +25729,17 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f365;}
+						goto f339;}
 				}
 				if (!$this->s125()) {
-					goto f365;}
-				goto k365;
-				f365:
+					goto f339;}
+				goto k339;
+				f339:
 				$this->p = $o2;
-				goto n364;
-				k365:
-				goto a359;
-				n364:
+				goto n338;
+				k339:
+				goto a333;
+				n338:
 				break;
 		}
 
@@ -26310,13 +25747,13 @@ abstract class GeneratedParser
 			$this->rec(385);
 		}
 
-		goto f358;
-		a359:
-		goto k358;
-		f358:
+		goto f332;
+		a333:
+		goto k332;
+		f332:
 		$this->p = $o1;
 		return false;
-		k358:
+		k332:
 
 		return true;
 	}
@@ -26332,7 +25769,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s199()) {
-			goto f325;}
+			goto f299;}
 		// s388
 		$o2 = $this->p;
 		if (($this->ids[$this->p] === 28)) {
@@ -26341,7 +25778,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f326;}
+				goto f300;}
 		}
 		if (($this->ids[$this->p] === 29)) {
 			if (($this->ids[$this->p] === 29)) {
@@ -26349,7 +25786,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f326;}
+				goto f300;}
 		}
 		if (($this->ids[$this->p] === 32)) {
 			if (($this->ids[$this->p] === 32)) {
@@ -26357,20 +25794,20 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f326;}
+				goto f300;}
 		}
 		if (!$this->s125()) {
-			goto f326;}
-		goto k326;
-		f326:
+			goto f300;}
+		goto k300;
+		f300:
 		$this->p = $o2;
-		goto f325;
-		k326:
-		goto k325;
-		f325:
+		goto f299;
+		k300:
+		goto k299;
+		f299:
 		$this->p = $o1;
 		return false;
-		k325:
+		k299:
 
 		return true;
 	}
@@ -26420,20 +25857,20 @@ abstract class GeneratedParser
 						$this->rec(435);
 					}
 
-					goto n345;}
+					goto n319;}
 
 				$o2 = $this->p;
 				if (!$this->s199()) {
-					goto f346;}
+					goto f320;}
 				if (!$this->s415()) {
-					goto f346;}
-				goto k346;
-				f346:
+					goto f320;}
+				goto k320;
+				f320:
 				$this->p = $o2;
-				goto n345;
-				k346:
-				goto a344;
-				n345:
+				goto n319;
+				k320:
+				goto a318;
+				n319:
 				break;
 			case 9:
 				// s410
@@ -26442,7 +25879,7 @@ abstract class GeneratedParser
 						$this->rec(410);
 					}
 
-					goto n347;}
+					goto n321;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 9)) {
@@ -26450,7 +25887,7 @@ abstract class GeneratedParser
 						$this->rec(25);
 					}
 
-					goto f348;}
+					goto f322;}
 
 				$this->p++;
 				if (isset(self::T648acf56[$this->ids[$this->p]])) {
@@ -26466,39 +25903,39 @@ abstract class GeneratedParser
 							$this->f = $this->p;
 							$this->er = [];
 						}
-						goto f348;}
+						goto f322;}
 				}
 				if (!$this->s199()) {
-					goto f348;}
+					goto f322;}
 				if (!$this->s415()) {
-					goto f348;}
-				goto k348;
-				f348:
+					goto f322;}
+				goto k322;
+				f322:
 				$this->p = $o2;
-				goto n347;
-				k348:
-				goto a344;
-				n347:
+				goto n321;
+				k322:
+				goto a318;
+				n321:
 				// s435
 				if (!isset(self::T7680fe2e[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(435);
 					}
 
-					goto n350;}
+					goto n324;}
 
 				$o2 = $this->p;
 				if (!$this->s199()) {
-					goto f351;}
+					goto f325;}
 				if (!$this->s415()) {
-					goto f351;}
-				goto k351;
-				f351:
+					goto f325;}
+				goto k325;
+				f325:
 				$this->p = $o2;
-				goto n350;
-				k351:
-				goto a344;
-				n350:
+				goto n324;
+				k325:
+				goto a318;
+				n324:
 				break;
 		}
 
@@ -26506,13 +25943,13 @@ abstract class GeneratedParser
 			$this->rec(409);
 		}
 
-		goto f343;
-		a344:
-		goto k343;
-		f343:
+		goto f317;
+		a318:
+		goto k317;
+		f317:
 		$this->p = $o1;
 		return false;
-		k343:
+		k317:
 
 		return true;
 	}
@@ -26540,7 +25977,7 @@ abstract class GeneratedParser
 						$this->rec(413);
 					}
 
-					goto n560;}
+					goto n538;}
 
 				$o2 = $this->p;
 				// s203
@@ -26552,51 +25989,51 @@ abstract class GeneratedParser
 							$this->rec(204);
 						}
 
-						goto e563;
+						goto e541;
 					}
 
 					$this->p++;
 				}
-				e563:
+				e541:
 				if (!isset(self::Tc8c984b6[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->rec(414);
 					}
 
-					goto f561;}
+					goto f539;}
 
 				$this->p++;
-				goto k561;
-				f561:
+				goto k539;
+				f539:
 				$this->p = $o2;
-				goto n560;
-				k561:
-				goto a559;
-				n560:
+				goto n538;
+				k539:
+				goto a537;
+				n538:
 				break;
 			case 32:
 				$this->p++;
-				goto a559;
+				goto a537;
 				break;
 			case 34:
 				$this->p++;
-				goto a559;
+				goto a537;
 				break;
 			case 36:
 				$this->p++;
-				goto a559;
+				goto a537;
 				break;
 			case 43:
 				$this->p++;
-				goto a559;
+				goto a537;
 				break;
 			case 82:
 				$this->p++;
-				goto a559;
+				goto a537;
 				break;
 			case 84:
 				$this->p++;
-				goto a559;
+				goto a537;
 				break;
 		}
 
@@ -26604,13 +26041,13 @@ abstract class GeneratedParser
 			$this->rec(412);
 		}
 
-		goto f558;
-		a559:
-		goto k558;
-		f558:
+		goto f536;
+		a537:
+		goto k536;
+		f536:
 		$this->p = $o1;
 		return false;
-		k558:
+		k536:
 
 		return true;
 	}
@@ -26653,7 +26090,7 @@ abstract class GeneratedParser
 						$this->rec(416);
 					}
 
-					goto n608;}
+					goto n593;}
 
 				$o2 = $this->p;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -26661,27 +26098,27 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f609;}
+					goto f594;}
 
 				$this->p++;
 				if (!$this->s417()) {
-					goto f609;}
-				goto k609;
-				f609:
+					goto f594;}
+				goto k594;
+				f594:
 				$this->p = $o2;
-				goto n608;
-				k609:
-				goto a607;
-				n608:
+				goto n593;
+				k594:
+				goto a592;
+				n593:
 				break;
 			case 32:
 			case 34:
 			case 82:
 			case 86:
 				if (!$this->s417()) {
-					goto n610;}
-				goto a607;
-				n610:
+					goto n595;}
+				goto a592;
+				n595:
 				break;
 		}
 
@@ -26689,13 +26126,13 @@ abstract class GeneratedParser
 			$this->rec(415);
 		}
 
-		goto f606;
-		a607:
-		goto k606;
-		f606:
+		goto f591;
+		a592:
+		goto k591;
+		f591:
 		$this->p = $o1;
 		return false;
-		k606:
+		k591:
 
 		return true;
 	}
@@ -26719,24 +26156,24 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n819;}
-				goto a818;
-				n819:
+					goto n813;}
+				goto a812;
+				n813:
 				break;
 			case 34:
 			case 86:
 				if (!$this->s419()) {
-					goto n820;}
-				goto a818;
-				n820:
+					goto n814;}
+				goto a812;
+				n814:
 				if (isset(self::Tb46fb4f7[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n821;}
-				goto a818;
-				n821:
+					goto n815;}
+				goto a812;
+				n815:
 				break;
 		}
 
@@ -26744,25 +26181,25 @@ abstract class GeneratedParser
 			$this->rec(418);
 		}
 
-		goto f817;
-		a818:
-		goto k817;
-		f817:
+		goto f811;
+		a812:
+		goto k811;
+		f811:
 		$this->p = $o2;
-		goto f816;
-		k817:
+		goto f810;
+		k811:
 		if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 			if ($this->p > $this->f) {
 				$this->rec(16);
 			}
 
-			goto f816;}
+			goto f810;}
 
 		$this->p++;
 		if (isset(self::T9373805c[$this->ids[$this->p]])) {
 			if (!$this->s424()) {
-				goto n822;}
-			n822:
+				goto n816;}
+			n816:
 		} elseif ($this->p > $this->f) {
 			$this->rec(424);
 		}
@@ -26771,7 +26208,7 @@ abstract class GeneratedParser
 				$this->rec(53);
 			}
 
-			goto f816;}
+			goto f810;}
 
 		$this->p++;
 		// s125
@@ -26785,24 +26222,24 @@ abstract class GeneratedParser
 					$this->rec(116);
 				}
 
-				goto e825;
+				goto e819;
 			}
 
 			$this->p++;
 		}
-		e825:
+		e819:
 		if (($this->ids[$this->p] === 80)) {
 			if (!$this->s128()) {
-				goto n826;}
-			n826:
+				goto n820;}
+			n820:
 		} elseif ($this->p > $this->f) {
 			$this->rec(128);
 		}
-		goto k816;
-		f816:
+		goto k810;
+		f810:
 		$this->p = $o1;
 		return false;
-		k816:
+		k810:
 
 		return true;
 	}
@@ -26822,7 +26259,7 @@ abstract class GeneratedParser
 				$this->rec(238);
 			}
 
-			goto f1052;}
+			goto f1038;}
 
 		$this->p++;
 		// s286
@@ -26831,7 +26268,7 @@ abstract class GeneratedParser
 				$this->rec(286);
 			}
 
-			goto f1052;}
+			goto f1038;}
 
 		$o2 = $this->p;
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -26839,24 +26276,24 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f1053;}
+			goto f1039;}
 
 		$this->p++;
 		if (!$this->s287()) {
-			goto f1053;}
+			goto f1039;}
 		if (!$this->s293()) {
-			goto f1053;}
+			goto f1039;}
 		if (!$this->s296()) {
-			goto f1053;}
-		goto k1053;
-		f1053:
+			goto f1039;}
+		goto k1039;
+		f1039:
 		$this->p = $o2;
-		goto f1052;
-		k1053:
+		goto f1038;
+		k1039:
 		if (($this->ids[$this->p] === 40)) {
 			if (!$this->s421()) {
-				goto n1054;}
-			n1054:
+				goto n1040;}
+			n1040:
 		} elseif ($this->p > $this->f) {
 			$this->rec(421);
 		}
@@ -26865,14 +26302,14 @@ abstract class GeneratedParser
 				$this->rec(56);
 			}
 
-			goto f1052;}
+			goto f1038;}
 
 		$this->p++;
-		goto k1052;
-		f1052:
+		goto k1038;
+		f1038:
 		$this->p = $o1;
 		return false;
-		k1052:
+		k1038:
 
 		return true;
 	}
@@ -26895,7 +26332,7 @@ abstract class GeneratedParser
 					$this->rec(422);
 				}
 
-				goto e1407;
+				goto e1387;
 			}
 
 			// s422
@@ -26904,7 +26341,7 @@ abstract class GeneratedParser
 					$this->rec(422);
 				}
 
-				goto e1407;}
+				goto e1387;}
 
 			$o2 = $this->p;
 			if (!($this->ids[$this->p] === 40)) {
@@ -26912,33 +26349,33 @@ abstract class GeneratedParser
 					$this->rec(63);
 				}
 
-				goto f1408;}
+				goto f1388;}
 
 			$this->p++;
 			if (!$this->s286()) {
-				goto f1408;}
-			goto k1408;
-			f1408:
+				goto f1388;}
+			goto k1388;
+			f1388:
 			$this->p = $o2;
-			goto e1407;
-			k1408:
+			goto e1387;
+			k1388:
 			if ($this->p === $b1) {
 				$k1 = 1;
-				goto e1407;
+				goto e1387;
 			}
 
 			$k1++;
 		}
-		e1407:
+		e1387:
 
 		if ($k1 < 1) {
-			goto f1406;
+			goto f1386;
 		}
-		goto k1406;
-		f1406:
+		goto k1386;
+		f1386:
 		$this->p = $o1;
 		return false;
-		k1406:
+		k1386:
 
 		return true;
 	}
@@ -26954,7 +26391,7 @@ abstract class GeneratedParser
 
 		$o1 = $this->p;
 		if (!$this->s425()) {
-			goto f1055;}
+			goto f1041;}
 		if (($this->ids[$this->p] === 40)) {
 			// s433
 			if (!($this->ids[$this->p] === 40)) {
@@ -26962,7 +26399,7 @@ abstract class GeneratedParser
 					$this->rec(433);
 				}
 
-				goto n1056;}
+				goto n1042;}
 
 			$o2 = $this->p;
 			$k2 = 0;
@@ -26973,37 +26410,37 @@ abstract class GeneratedParser
 						$this->rec(434);
 					}
 
-					goto e1058;
+					goto e1044;
 				}
 
 				if (!$this->s434()) {
-					goto e1058;}
+					goto e1044;}
 				if ($this->p === $b2) {
 					$k2 = 1;
-					goto e1058;
+					goto e1044;
 				}
 
 				$k2++;
 			}
-			e1058:
+			e1044:
 
 			if ($k2 < 1) {
-				goto f1057;
+				goto f1043;
 			}
-			goto k1057;
-			f1057:
+			goto k1043;
+			f1043:
 			$this->p = $o2;
-			goto n1056;
-			k1057:
-			n1056:
+			goto n1042;
+			k1043:
+			n1042:
 		} elseif ($this->p > $this->f) {
 			$this->rec(433);
 		}
-		goto k1055;
-		f1055:
+		goto k1041;
+		f1041:
 		$this->p = $o1;
 		return false;
-		k1055:
+		k1041:
 
 		return true;
 	}
@@ -27049,7 +26486,7 @@ abstract class GeneratedParser
 						$this->rec(426);
 					}
 
-					goto n1411;}
+					goto n1391;}
 
 				$o2 = $this->p;
 				if (!isset(self::T34c34eee[$this->ids[$this->p]])) {
@@ -27057,9 +26494,9 @@ abstract class GeneratedParser
 						$this->rec(428);
 					}
 
-					goto f1412;}
+					goto f1392;}
 				if (!$this->s199()) {
-					goto f1412;}
+					goto f1392;}
 				if (($this->ids[$this->p] === 27)) {
 					$this->p++;
 				} elseif ($this->p >= $this->f) {
@@ -27075,18 +26512,18 @@ abstract class GeneratedParser
 						$this->rec(47);
 					}
 
-					goto f1412;}
+					goto f1392;}
 
 				$this->p++;
 				if (!$this->s429()) {
-					goto f1412;}
-				goto k1412;
-				f1412:
+					goto f1392;}
+				goto k1392;
+				f1392:
 				$this->p = $o2;
-				goto n1411;
-				k1412:
-				goto a1410;
-				n1411:
+				goto n1391;
+				k1392:
+				goto a1390;
+				n1391:
 				break;
 			case 26:
 			case 27:
@@ -27097,7 +26534,7 @@ abstract class GeneratedParser
 						$this->rec(431);
 					}
 
-					goto n1413;}
+					goto n1393;}
 
 				$o2 = $this->p;
 				if (($this->ids[$this->p] === 27)) {
@@ -27115,18 +26552,18 @@ abstract class GeneratedParser
 						$this->rec(47);
 					}
 
-					goto f1414;}
+					goto f1394;}
 
 				$this->p++;
 				if (!$this->s429()) {
-					goto f1414;}
-				goto k1414;
-				f1414:
+					goto f1394;}
+				goto k1394;
+				f1394:
 				$this->p = $o2;
-				goto n1413;
-				k1414:
-				goto a1410;
-				n1413:
+				goto n1393;
+				k1394:
+				goto a1390;
+				n1393:
 				break;
 		}
 
@@ -27134,13 +26571,13 @@ abstract class GeneratedParser
 			$this->rec(425);
 		}
 
-		goto f1409;
-		a1410:
-		goto k1409;
-		f1409:
+		goto f1389;
+		a1390:
+		goto k1389;
+		f1389:
 		$this->p = $o1;
 		return false;
-		k1409:
+		k1389:
 
 		return true;
 	}
@@ -27155,9 +26592,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1648;}
-				goto a1647;
-				n1648:
+					goto n1616;}
+				goto a1615;
+				n1616:
 				break;
 			case 46:
 				// s430
@@ -27166,7 +26603,7 @@ abstract class GeneratedParser
 						$this->rec(430);
 					}
 
-					goto n1649;}
+					goto n1617;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 46)) {
@@ -27174,26 +26611,26 @@ abstract class GeneratedParser
 						$this->rec(69);
 					}
 
-					goto f1650;}
+					goto f1618;}
 
 				$this->p++;
 				if (!$this->s340()) {
-					goto f1650;}
-				goto k1650;
-				f1650:
+					goto f1618;}
+				goto k1618;
+				f1618:
 				$this->p = $o2;
-				goto n1649;
-				k1650:
-				goto a1647;
-				n1649:
+				goto n1617;
+				k1618:
+				goto a1615;
+				n1617:
 				if (($this->ids[$this->p] === 46)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n1651;}
-				goto a1647;
-				n1651:
+					goto n1619;}
+				goto a1615;
+				n1619:
 				break;
 		}
 
@@ -27201,13 +26638,13 @@ abstract class GeneratedParser
 			$this->rec(429);
 		}
 
-		goto f1646;
-		a1647:
-		goto k1646;
-		f1646:
+		goto f1614;
+		a1615:
+		goto k1614;
+		f1614:
 		$this->p = $o1;
 		return false;
-		k1646:
+		k1614:
 
 		return true;
 	}
@@ -27227,16 +26664,16 @@ abstract class GeneratedParser
 				$this->rec(63);
 			}
 
-			goto f1415;}
+			goto f1395;}
 
 		$this->p++;
 		if (!$this->s425()) {
-			goto f1415;}
-		goto k1415;
-		f1415:
+			goto f1395;}
+		goto k1395;
+		f1395:
 		$this->p = $o1;
 		return false;
-		k1415:
+		k1395:
 
 		return true;
 	}
@@ -27256,7 +26693,7 @@ abstract class GeneratedParser
 				$this->rec(100);
 			}
 
-			goto f339;}
+			goto f313;}
 
 		$this->p++;
 		if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -27264,15 +26701,15 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f339;}
+			goto f313;}
 
 		$this->p++;
 		if (!$this->s287()) {
-			goto f339;}
+			goto f313;}
 		if (!$this->s293()) {
-			goto f339;}
+			goto f313;}
 		if (!$this->s296()) {
-			goto f339;}
+			goto f313;}
 		// s388
 		$o2 = $this->p;
 		if (($this->ids[$this->p] === 28)) {
@@ -27281,7 +26718,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f340;}
+				goto f314;}
 		}
 		if (($this->ids[$this->p] === 29)) {
 			if (($this->ids[$this->p] === 29)) {
@@ -27289,7 +26726,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f340;}
+				goto f314;}
 		}
 		if (($this->ids[$this->p] === 32)) {
 			if (($this->ids[$this->p] === 32)) {
@@ -27297,20 +26734,20 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f340;}
+				goto f314;}
 		}
 		if (!$this->s125()) {
-			goto f340;}
-		goto k340;
-		f340:
+			goto f314;}
+		goto k314;
+		f314:
 		$this->p = $o2;
-		goto f339;
-		k340:
-		goto k339;
-		f339:
+		goto f313;
+		k314:
+		goto k313;
+		f313:
 		$this->p = $o1;
 		return false;
-		k339:
+		k313:
 
 		return true;
 	}
@@ -27330,11 +26767,11 @@ abstract class GeneratedParser
 				$this->rec(144);
 			}
 
-			goto f341;}
+			goto f315;}
 
 		$this->p++;
 		if (!$this->s320()) {
-			goto f341;}
+			goto f315;}
 		// s388
 		$o2 = $this->p;
 		if (($this->ids[$this->p] === 28)) {
@@ -27343,7 +26780,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f342;}
+				goto f316;}
 		}
 		if (($this->ids[$this->p] === 29)) {
 			if (($this->ids[$this->p] === 29)) {
@@ -27351,7 +26788,7 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f342;}
+				goto f316;}
 		}
 		if (($this->ids[$this->p] === 32)) {
 			if (($this->ids[$this->p] === 32)) {
@@ -27359,20 +26796,20 @@ abstract class GeneratedParser
 					$this->f = $this->p;
 					$this->er = [];
 				}
-				goto f342;}
+				goto f316;}
 		}
 		if (!$this->s125()) {
-			goto f342;}
-		goto k342;
-		f342:
+			goto f316;}
+		goto k316;
+		f316:
 		$this->p = $o2;
-		goto f341;
-		k342:
-		goto k341;
-		f341:
+		goto f315;
+		k316:
+		goto k315;
+		f315:
 		$this->p = $o1;
 		return false;
-		k341:
+		k315:
 
 		return true;
 	}
@@ -27387,9 +26824,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n329;}
-				goto a328;
-				n329:
+					goto n303;}
+				goto a302;
+				n303:
 				break;
 			case 14:
 				// s445
@@ -27398,7 +26835,7 @@ abstract class GeneratedParser
 						$this->rec(445);
 					}
 
-					goto n330;}
+					goto n304;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 14)) {
@@ -27406,7 +26843,7 @@ abstract class GeneratedParser
 						$this->rec(28);
 					}
 
-					goto f331;}
+					goto f305;}
 
 				$this->p++;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -27414,24 +26851,24 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f331;}
+					goto f305;}
 
 				$this->p++;
-				goto k331;
-				f331:
+				goto k305;
+				f305:
 				$this->p = $o2;
-				goto n330;
-				k331:
-				goto a328;
-				n330:
+				goto n304;
+				k305:
+				goto a302;
+				n304:
 				if (($this->ids[$this->p] === 14)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n332;}
-				goto a328;
-				n332:
+					goto n306;}
+				goto a302;
+				n306:
 				break;
 		}
 
@@ -27439,13 +26876,13 @@ abstract class GeneratedParser
 			$this->rec(444);
 		}
 
-		goto f327;
-		a328:
-		goto k327;
-		f327:
+		goto f301;
+		a302:
+		goto k301;
+		f301:
 		$this->p = $o1;
 		return false;
-		k327:
+		k301:
 
 		return true;
 	}
@@ -27460,9 +26897,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n335;}
-				goto a334;
-				n335:
+					goto n309;}
+				goto a308;
+				n309:
 				break;
 			case 45:
 				// s450
@@ -27471,7 +26908,7 @@ abstract class GeneratedParser
 						$this->rec(450);
 					}
 
-					goto n336;}
+					goto n310;}
 
 				$o2 = $this->p;
 				if (!($this->ids[$this->p] === 45)) {
@@ -27479,7 +26916,7 @@ abstract class GeneratedParser
 						$this->rec(68);
 					}
 
-					goto f337;}
+					goto f311;}
 
 				$this->p++;
 				if (!isset(self::T83e30518[$this->ids[$this->p]])) {
@@ -27487,26 +26924,26 @@ abstract class GeneratedParser
 						$this->rec(144);
 					}
 
-					goto f337;}
+					goto f311;}
 
 				$this->p++;
 				if (!$this->s451()) {
-					goto f337;}
-				goto k337;
-				f337:
+					goto f311;}
+				goto k311;
+				f311:
 				$this->p = $o2;
-				goto n336;
-				k337:
-				goto a334;
-				n336:
+				goto n310;
+				k311:
+				goto a308;
+				n310:
 				if (($this->ids[$this->p] === 45)) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n338;}
-				goto a334;
-				n338:
+					goto n312;}
+				goto a308;
+				n312:
 				break;
 		}
 
@@ -27514,13 +26951,13 @@ abstract class GeneratedParser
 			$this->rec(449);
 		}
 
-		goto f333;
-		a334:
-		goto k333;
-		f333:
+		goto f307;
+		a308:
+		goto k307;
+		f307:
 		$this->p = $o1;
 		return false;
-		k333:
+		k307:
 
 		return true;
 	}
@@ -27535,9 +26972,9 @@ abstract class GeneratedParser
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n570;}
-				goto a569;
-				n570:
+					goto n555;}
+				goto a554;
+				n555:
 				break;
 			case 32:
 			case 82:
@@ -27547,7 +26984,7 @@ abstract class GeneratedParser
 						$this->rec(452);
 					}
 
-					goto n571;}
+					goto n556;}
 
 				$o2 = $this->p;
 				if (!isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
@@ -27555,7 +26992,7 @@ abstract class GeneratedParser
 						$this->rec(16);
 					}
 
-					goto f572;}
+					goto f557;}
 
 				$this->p++;
 				if (!($this->ids[$this->p] === 33)) {
@@ -27563,24 +27000,24 @@ abstract class GeneratedParser
 						$this->rec(53);
 					}
 
-					goto f572;}
+					goto f557;}
 
 				$this->p++;
-				goto k572;
-				f572:
+				goto k557;
+				f557:
 				$this->p = $o2;
-				goto n571;
-				k572:
-				goto a569;
-				n571:
+				goto n556;
+				k557:
+				goto a554;
+				n556:
 				if (isset(self::Tc8cfa1df[$this->ids[$this->p]])) {
 					if ($this->p > $this->f) {
 						$this->f = $this->p;
 						$this->er = [];
 					}
-					goto n573;}
-				goto a569;
-				n573:
+					goto n558;}
+				goto a554;
+				n558:
 				break;
 		}
 
@@ -27588,13 +27025,13 @@ abstract class GeneratedParser
 			$this->rec(451);
 		}
 
-		goto f568;
-		a569:
-		goto k568;
-		f568:
+		goto f553;
+		a554:
+		goto k553;
+		f553:
 		$this->p = $o1;
 		return false;
-		k568:
+		k553:
 
 		return true;
 	}
@@ -27614,7 +27051,7 @@ abstract class GeneratedParser
 				$this->rec(119);
 			}
 
-			goto f261;}
+			goto f247;}
 
 		$this->p++;
 		// s125
@@ -27628,24 +27065,24 @@ abstract class GeneratedParser
 					$this->rec(116);
 				}
 
-				goto e264;
+				goto e250;
 			}
 
 			$this->p++;
 		}
-		e264:
+		e250:
 		if (($this->ids[$this->p] === 80)) {
 			if (!$this->s128()) {
-				goto n265;}
-			n265:
+				goto n251;}
+			n251:
 		} elseif ($this->p > $this->f) {
 			$this->rec(128);
 		}
-		goto k261;
-		f261:
+		goto k247;
+		f247:
 		$this->p = $o1;
 		return false;
-		k261:
+		k247:
 
 		return true;
 	}

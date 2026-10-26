@@ -4,7 +4,6 @@ namespace PHPStan\PhpDocParser\Parser\Generated;
 
 use PHPStan\PhpDocParser\Ast\Comment;
 use PHPStan\PhpDocParser\Parser\Phplrt\Token;
-use Phplrt\Parser\Context;
 use function array_keys;
 use function is_array;
 use function ksort;
@@ -18,7 +17,8 @@ use function ksort;
  * phplrt would, and building its value along: a method named "b" followed by
  * the identifier of a rule reads the rule and pushes its value, one named "s"
  * only reads it. The values are built by the reducers of the class extending
- * this one.
+ * this one, which are given the index of the first and of the last token of
+ * the lexer the rule has read.
  *
  * @internal
  */
@@ -45,6 +45,9 @@ abstract class GeneratedParser
 	/** @var array<int, int> the identifier of the token at each position, the last one being -1 */
 	protected array $ids = [];
 
+	/** @var array<int, int> the index of the token of the lexer at each position */
+	protected array $indexes = [];
+
 	/** the position the reading is at */
 	protected int $p = 0;
 
@@ -65,11 +68,6 @@ abstract class GeneratedParser
 
 	abstract protected function token(int $position): Token;
 
-	/**
-	 * The context of whatever has been read from the given position up to the
-	 * given one, or up to the position the reading is at.
-	 */
-	abstract protected function context(int $from, ?int $to = null): Context;
 
 	/*REDUCERS*/
 
