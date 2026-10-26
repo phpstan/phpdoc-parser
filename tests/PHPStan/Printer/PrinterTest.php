@@ -17,6 +17,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineAnnotation;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArgument;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArray;
 use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineArrayItem;
+use PHPStan\PhpDocParser\Ast\PhpDoc\Doctrine\DoctrineTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamClosureThisTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamImmediatelyInvokedCallableTagValueNode;
@@ -1985,6 +1986,57 @@ class PrinterTest extends TestCase
 				}
 
 			},
+		];
+
+		yield [
+			'/** @\Foo\Id */',
+			'/** @\Foo\Id */',
+			$noopVisitor,
+		];
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @ORM\Column(type="string")
+			 * @\Foo\Id
+			 */'),
+			self::nowdoc('
+			/**
+			 * @ORM\Column(type="string")
+			 * @\Foo\Id
+			 */'),
+			$noopVisitor,
+		];
+
+		$changeDoctrineDescriptionVisitor = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof DoctrineTagValueNode) {
+					$node->description = 'other description';
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @Route("/path", name="x") some description */',
+			'/** @Route("/path", name="x") other description */',
+			$changeDoctrineDescriptionVisitor,
+		];
+
+		yield [
+			'/** @\Foo\Route("/path") some description */',
+			'/** @\Foo\Route("/path") other description */',
+			$changeDoctrineDescriptionVisitor,
+		];
+
+		yield [
+			'/** @\Foo\Id some description */',
+			'/** @\Foo\Id other description */',
+			$changeDoctrineDescriptionVisitor,
 		];
 
 		yield [
