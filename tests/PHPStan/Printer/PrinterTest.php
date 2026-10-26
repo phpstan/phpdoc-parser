@@ -30,6 +30,7 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessCallableIsImpureTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PureUnlessParameterIsPassedTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
@@ -193,6 +194,51 @@ class PrinterTest extends TestCase
 			 * @param Bar $bar
 			 */'),
 			$removeFirst,
+		];
+
+		$addThrows = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocNode) {
+					$node->children[] = new PhpDocTagNode('@throws', new ThrowsTagValueNode(new IdentifierTypeNode('Exception'), ''));
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @param int $foo multi
+			 *          line description
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param int $foo multi
+			 *          line description
+			 * @throws Exception
+			 */'),
+			$addThrows,
+		];
+
+		yield [
+			self::nowdoc('
+			/**
+			 *   @param int $foo multi
+			 *       line description
+			 *   @return void
+			 */'),
+			self::nowdoc('
+			/**
+			 *   @param int $foo multi
+			 *       line description
+			 *   @return void
+			 *   @throws Exception
+			 */'),
+			$addThrows,
 		];
 
 		$removeLast = new class extends AbstractNodeVisitor {

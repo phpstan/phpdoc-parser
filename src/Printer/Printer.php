@@ -76,6 +76,7 @@ use function get_object_vars;
 use function implode;
 use function in_array;
 use function is_array;
+use function preg_match;
 use function preg_match_all;
 use function preg_replace_callback;
 use function sprintf;
@@ -608,6 +609,11 @@ final class Printer
 		[$isMultiline, $beforeAsteriskIndent, $afterAsteriskIndent] = $this->isMultiline($tokenIndex, $originalNodes, $originalTokens);
 
 		if ($insertStr === "\n * ") {
+			$lastChildIndent = $this->detectLastChildIndent($originalNodes, $originalTokens);
+			if ($lastChildIndent !== null) {
+				[$beforeAsteriskIndent, $afterAsteriskIndent] = $lastChildIndent;
+			}
+
 			$insertStr = sprintf('%s%s*%s', $originalTokens->getDetectedNewline() ?? "\n", $beforeAsteriskIndent, $afterAsteriskIndent);
 		}
 
@@ -867,6 +873,39 @@ final class Printer
 		$after = strlen($after) === 0 ? '  ' : $after;
 
 		return [$isMultiline, $before, $after];
+	}
+
+	/**
+	 * Indentation before and after the asterisk on the line where the last child of a PHPDoc starts.
+	 * Other lines, e.g. the next lines of a multi-line description, can have a different indentation.
+	 *
+	 * @param Node[] $originalNodes
+	 * @return array{string, string}|null
+	 */
+	private function detectLastChildIndent(array $originalNodes, TokenIterator $originalTokens): ?array
+	{
+		$tokens = $originalTokens->getTokens();
+		for ($i = count($originalNodes) - 1; $i >= 0; $i--) {
+			$index = $originalNodes[$i]->getAttribute(Attribute::START_INDEX) - 1;
+			$lineStart = '';
+			while (isset($tokens[$index]) && $tokens[$index][Lexer::TYPE_OFFSET] === Lexer::TOKEN_HORIZONTAL_WS) {
+				$lineStart = $tokens[$index][Lexer::VALUE_OFFSET] . $lineStart;
+				$index--;
+			}
+
+			if (!isset($tokens[$index]) || $tokens[$index][Lexer::TYPE_OFFSET] !== Lexer::TOKEN_PHPDOC_EOL) {
+				continue;
+			}
+
+			$lineStart = $tokens[$index][Lexer::VALUE_OFFSET] . $lineStart;
+			if (preg_match('~\n(?<before>[\x09\x20]*)\*(?<after>[\x09\x20]*)$~', $lineStart, $match) !== 1) {
+				continue;
+			}
+
+			return [$match['before'], $match['after']];
+		}
+
+		return null;
 	}
 
 	private function printNodeFormatPreserving(Node $node, TokenIterator $originalTokens): string
