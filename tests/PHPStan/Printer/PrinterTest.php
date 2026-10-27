@@ -58,6 +58,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\TestCase;
 use function array_map;
 use function array_pop;
+use function array_shift;
 use function array_slice;
 use function array_splice;
 use function array_unshift;
@@ -2849,6 +2850,54 @@ class PrinterTest extends TestCase
 				 * } $foo
 				 */'),
 			$addCommentToObjectShapeItemMiddle,
+		];
+
+		$removeFirstType = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof UnionTypeNode || $node instanceof IntersectionTypeNode) {
+					array_shift($node->types);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @var A|B|C */',
+			'/** @var B|C */',
+			$removeFirstType,
+		];
+
+		yield [
+			'/** @var A | B | C */',
+			'/** @var B | C */',
+			$removeFirstType,
+		];
+
+		yield [
+			'/** @var (A & B & C) */',
+			'/** @var (B & C) */',
+			$removeFirstType,
+		];
+
+		yield [
+			'/** @var A|B|C|D */',
+			'/** @var C|D */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof UnionTypeNode) {
+						$node->types = [$node->types[2], $node->types[3]];
+					}
+
+					return $node;
+				}
+
+			},
 		];
 	}
 
