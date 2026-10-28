@@ -7523,6 +7523,34 @@ Finder::findFiles('*.php')
 				new PhpDocTagNode('@package', new GenericTagValueNode('foo')),
 			]),
 		];
+		yield [
+			'Quoted argument key',
+			'/** @DummyAnnotation(targetEntity=Training::class, "indexBy" = "id", "a""b"="c") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@DummyAnnotation', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@DummyAnnotation', [
+						new DoctrineArgument(new IdentifierTypeNode('targetEntity'), new ConstFetchNode('Training', 'class')),
+						new DoctrineArgument(new IdentifierTypeNode('indexBy'), new DoctrineConstExprStringNode('id')),
+						new DoctrineArgument(new IdentifierTypeNode('a"b'), new DoctrineConstExprStringNode('c')),
+					]),
+					'',
+				)),
+			]),
+		];
+
+		yield [
+			'Quoted positional argument',
+			'/** @DummyAnnotation("foo", "bar") */',
+			new PhpDocNode([
+				new PhpDocTagNode('@DummyAnnotation', new DoctrineTagValueNode(
+					new DoctrineAnnotation('@DummyAnnotation', [
+						new DoctrineArgument(null, new DoctrineConstExprStringNode('foo')),
+						new DoctrineArgument(null, new DoctrineConstExprStringNode('bar')),
+					]),
+					'',
+				)),
+			]),
+		];
 	}
 
 	public function provideSpecializedTags(): Iterator

@@ -592,8 +592,17 @@ DoctrineArgumentList
   : DoctrineArgument() Eols() ( <T_COMMA> Eols() ( &<T_CLOSE_PARENTHESES> | DoctrineArgument() Eols() ) )*
   ;
 
+/**
+ * An argument of an annotation, like:
+ *  - bar="baz"
+ *  - "bar"="baz"
+ *
+ *  Doctrine reads only a name before the "=", but a key written in quotes is
+ *  read too, as the name of the argument.
+ */
 DoctrineArgument
   : Identifier() Eols() <T_EQUAL> Eols() DoctrineValue()
+  | DoctrineString() Eols() <T_EQUAL> Eols() DoctrineValue()
   | DoctrineValue()
   ;
 
