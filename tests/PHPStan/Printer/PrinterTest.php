@@ -2899,6 +2899,44 @@ class PrinterTest extends TestCase
 
 			},
 		];
+
+		$unsetSecond = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocNode) {
+					unset($node->children[1]);
+				}
+
+				if ($node instanceof UnionTypeNode) {
+					unset($node->types[1]);
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/** @var A|B|C */',
+			'/** @var A|C */',
+			$unsetSecond,
+		];
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Bar $bar
+			 * @param Baz $baz
+			 */'),
+			self::nowdoc('
+			/**
+			 * @param Foo $foo
+			 * @param Baz $baz
+			 */'),
+			$unsetSecond,
+		];
 	}
 
 	/**
@@ -2940,6 +2978,15 @@ class PrinterTest extends TestCase
 				$node->setAttribute(Attribute::END_INDEX, null);
 				$node->setAttribute(Attribute::ORIGINAL_NODE, null);
 				$node->setAttribute(Attribute::COMMENTS, null);
+
+				// the printed result is compared with a node that can have gaps in its lists
+				if ($node instanceof PhpDocNode) {
+					$node->children = array_values($node->children);
+				}
+
+				if ($node instanceof UnionTypeNode) {
+					$node->types = array_values($node->types);
+				}
 
 				return $node;
 			}

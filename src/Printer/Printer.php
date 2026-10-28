@@ -69,6 +69,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use function array_keys;
 use function array_map;
+use function array_values;
 use function assert;
 use function count;
 use function get_class;
@@ -598,6 +599,10 @@ final class Printer
 	 */
 	private function printArrayFormatPreserving(array $nodes, array $originalNodes, TokenIterator $originalTokens, int &$tokenIndex, string $parentNodeClass, string $subNodeName): ?string
 	{
+		// unset() leaves gaps in the keys, the differ reads the lists by position
+		$nodes = array_values($nodes);
+		$originalNodes = array_values($originalNodes);
+
 		$diff = $this->differ->diffWithReplacements($originalNodes, $nodes);
 		$mapKey = $parentNodeClass . '->' . $subNodeName;
 		$insertStr = $this->listInsertionMap[$mapKey] ?? null;
