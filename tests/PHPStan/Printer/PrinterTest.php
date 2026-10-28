@@ -41,6 +41,7 @@ use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\FullyQualifiedNameNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
@@ -48,6 +49,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\RelativeNameNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -3232,6 +3234,86 @@ class PrinterTest extends TestCase
 			$this->unsetAttributes($node),
 			$this->unsetAttributes($this->typeParser->parse(new TokenIterator($lexer->tokenize($phpDoc)))),
 		);
+	}
+
+	/**
+	 * @return iterable<array{0: TypeNode, 1: string, 2?: string}>
+	 */
+	public function dataPrintNameNodes(): iterable
+	{
+		yield [new FullyQualifiedNameNode('Foo\\Bar'), '\\Foo\\Bar'];
+		yield [new RelativeNameNode('Foo\\Bar'), 'Foo\\Bar'];
+		yield [
+			new GenericTypeNode(new FullyQualifiedNameNode('Foo'), [new RelativeNameNode('Bar'), new IdentifierTypeNode('int')]),
+			'\\Foo<Bar, int>',
+		];
+		yield [
+			new CallableTypeNode(new FullyQualifiedNameNode('Closure'), [new CallableTypeParameterNode(new FullyQualifiedNameNode('Foo'), false, false, '$a', false)], new RelativeNameNode('Bar'), []),
+			'\\Closure(\\Foo $a): Bar',
+		];
+		yield [
+			new UnionTypeNode([new FullyQualifiedNameNode('Foo'), new IdentifierTypeNode('null')]),
+			'\\Foo|null',
+			'(\\Foo | null)',
+		];
+	}
+
+	/**
+	 * @dataProvider dataPrintNameNodes
+	 */
+	public function testPrintNameNodes(TypeNode $node, string $expectedResult, ?string $expectedToString = null): void
+	{
+		$this->assertSame($expectedResult, (new Printer())->print($node));
+		$this->assertSame($expectedToString ?? $expectedResult, (string) $node);
+	}
+
+	public function testPrintTypeAliasImportWithNameNode(): void
+	{
+		$node = new TypeAliasImportTagValueNode('Foo', new FullyQualifiedNameNode('Some\\Bar'), 'Baz');
+		$this->assertSame('Foo from \\Some\\Bar as Baz', (new Printer())->print($node));
+		$this->assertSame('Foo from \\Some\\Bar as Baz', (string) $node);
+	}
+
+	public function testPrintFormatPreservingNameNodes(): void
+	{
+		$visitor = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof IdentifierTypeNode && $node->name === 'Foo') {
+					return new FullyQualifiedNameNode('Some\\Foo');
+				}
+				if ($node instanceof IdentifierTypeNode && $node->name === 'Some\\Bar') {
+					return new RelativeNameNode('Bar');
+				}
+
+				return null;
+			}
+
+		};
+
+		$phpDoc = <<<'PHPDOC'
+/**
+ * @param  Foo<int,  Some\Bar>  $a  description
+ * @return array<Foo|null>
+ */
+PHPDOC;
+		$expected = <<<'PHPDOC'
+/**
+ * @param  \Some\Foo<int,  Bar>  $a  description
+ * @return array<\Some\Foo|null>
+ */
+PHPDOC;
+
+		$config = new ParserConfig(['lines' => true, 'indexes' => true, 'comments' => true]);
+		$tokens = new TokenIterator((new Lexer($config))->tokenize($phpDoc));
+		$phpDocNode = $this->phpDocParser->parse($tokens);
+		$newNodes = (new NodeTraverser([new NodeVisitor\CloningVisitor()]))->traverse([$phpDocNode]);
+
+		/** @var PhpDocNode $newNode */
+		[$newNode] = (new NodeTraverser([$visitor]))->traverse($newNodes);
+
+		$this->assertSame($expected, (new Printer())->printFormatPreserving($newNode, $phpDocNode, $tokens));
 	}
 
 	/**

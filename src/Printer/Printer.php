@@ -58,6 +58,7 @@ use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\InvalidTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NameNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
@@ -457,7 +458,7 @@ final class Printer
 				? '<' . implode(', ', array_map(fn (TemplateTagValueNode $templateNode): string => $this->print($templateNode), $node->templateTypes)) . '>'
 				: '';
 			$parameters = implode(', ', array_map(fn (CallableTypeParameterNode $parameterNode): string => $this->print($parameterNode), $node->parameters));
-			return "{$node->identifier}{$template}({$parameters}): {$returnType}";
+			return $this->printType($node->identifier) . "{$template}({$parameters}): {$returnType}";
 		}
 		if ($node instanceof ConditionalTypeForParameterNode) {
 			return sprintf(
@@ -496,10 +497,13 @@ final class Printer
 				}
 			}
 
-			return $node->type . '<' . implode(', ', $genericTypes) . '>';
+			return $this->printType($node->type) . '<' . implode(', ', $genericTypes) . '>';
 		}
 		if ($node instanceof IdentifierTypeNode) {
 			return $node->name;
+		}
+		if ($node instanceof NameNode) {
+			return $node->toCodeString();
 		}
 		if ($node instanceof IntersectionTypeNode || $node instanceof UnionTypeNode) {
 			$items = [];
