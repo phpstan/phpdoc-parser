@@ -10,6 +10,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\DoctrineConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\NodeVisitor;
@@ -2223,6 +2224,23 @@ class PrinterTest extends TestCase
 				{
 					if ($node instanceof DoctrineArray) {
 						$node->items[] = new DoctrineArrayItem(null, new ConstExprIntegerNode('4'));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			'/** @Foo("indexBy" = "id", "name"="foo") */',
+			'/** @Foo("indexBy" = "id", "name"="bar") */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof DoctrineArgument && $node->key !== null && $node->key->name === 'name') {
+						$node->value = new DoctrineConstExprStringNode('bar');
 					}
 
 					return $node;
