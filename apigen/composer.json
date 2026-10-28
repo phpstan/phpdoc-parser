@@ -1,6 +1,12 @@
 {
 	"require": {
-		"apigen/apigen": "^7.0.0"
+		"apigen/apigen": "^7.0.0",
+		"nette/schema": "~1.2.0"
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
+	"config": {
+		"platform": {
+			"php": "8.1.0"
+		}
+	}
 }
