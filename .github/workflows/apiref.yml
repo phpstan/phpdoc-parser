@@ -5,7 +5,7 @@ name: "Deploy API Reference"
 on:
   push:
     branches:
-      - "2.3.x"
+      - "2.4.x"
 
 concurrency:
   group: "pages"
@@ -24,6 +24,7 @@ jobs:
           - "2.1.x"
           - "2.2.x"
           - "2.3.x"
+          - "2.4.x"
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
