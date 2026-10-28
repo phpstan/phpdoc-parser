@@ -149,11 +149,21 @@ class PhpDocParser
 			$tagStartLine = $tokens->currentTokenLine();
 			$tagStartIndex = $tokens->currentTokenIndex();
 
+			try {
+				$tokens->pushSavePoint();
+				$tagValue = $this->parseDoctrineTagValue($tokens, $tag);
+				$tokens->dropSavePoint();
+
+			} catch (ParserException $e) {
+				$tokens->rollback();
+				$tagValue = new Ast\PhpDoc\InvalidTagValueNode($this->parseOptionalDescription($tokens, false), $e);
+			}
+
 			return $this->enrichWithAttributes($tokens, new Ast\PhpDoc\PhpDocTagNode(
 				$tag,
 				$this->enrichWithAttributes(
 					$tokens,
-					$this->parseDoctrineTagValue($tokens, $tag),
+					$tagValue,
 					$tagStartLine,
 					$tagStartIndex,
 				),

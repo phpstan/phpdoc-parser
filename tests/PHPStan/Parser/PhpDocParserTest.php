@@ -6386,6 +6386,37 @@ Finder::findFiles('*.php')
 				),
 			]),
 		];
+
+		yield [
+			'Invalid Doctrine tag with backslash keeps the next tags',
+			"/**\n * @\\ORM\\Table('user')\n * @param int \$a\n */",
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@\\ORM\\Table',
+					new InvalidTagValueNode(
+						"('user')",
+						new ParserException(
+							"'user'",
+							Lexer::TOKEN_SINGLE_QUOTED_STRING,
+							19,
+							Lexer::TOKEN_DOUBLE_QUOTED_STRING,
+							null,
+							2,
+						),
+					),
+				),
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new IdentifierTypeNode('int'),
+						false,
+						'$a',
+						'',
+						false,
+					),
+				),
+			]),
+		];
 	}
 
 	public function provideSelfOutTagsData(): Iterator
