@@ -2937,6 +2937,32 @@ class PrinterTest extends TestCase
 			 */'),
 			$unsetSecond,
 		];
+
+		yield [
+			self::nowdoc('
+			/**
+			 * Text.
+			 */'),
+			self::nowdoc('
+			/**
+			 * Text.
+			 *
+			 * @return int
+			 */'),
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof PhpDocNode) {
+						$node->children[] = new PhpDocTextNode('');
+						$node->children[] = new PhpDocTagNode('@return', new ReturnTagValueNode(new IdentifierTypeNode('int'), ''));
+					}
+
+					return $node;
+				}
+
+			},
+		];
 	}
 
 	/**

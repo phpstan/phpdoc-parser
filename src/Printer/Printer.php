@@ -672,7 +672,7 @@ final class Printer
 							}
 						}
 
-						$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens);
+						$result = $this->appendNode($result, $this->printNodeFormatPreserving($delayedAddNode, $originalTokens), $afterAsteriskIndent);
 						if ($parenthesesNeeded) {
 							$result .= ')';
 						}
@@ -747,7 +747,7 @@ final class Printer
 					$result .= '(';
 				}
 
-				$result .= $this->printNodeFormatPreserving($arrItem, $originalTokens);
+				$result = $this->appendNode($result, $this->printNodeFormatPreserving($arrItem, $originalTokens), $afterAsteriskIndent);
 				if ($parenthesesNeeded) {
 					$result .= ')';
 				}
@@ -818,13 +818,26 @@ final class Printer
 					}
 				}
 
-				$result .= $this->printNodeFormatPreserving($delayedAddNode, $originalTokens);
+				$result = $this->appendNode($result, $this->printNodeFormatPreserving($delayedAddNode, $originalTokens), $afterAsteriskIndent);
 				$first = false;
 			}
 			$result .= $extraRight;
 		}
 
 		return $result;
+	}
+
+	/**
+	 * A new empty line in a docblock is " *", without the space after the asterisk
+	 */
+	private function appendNode(string $result, string $printedNode, string $afterAsteriskIndent): string
+	{
+		$lineStart = '*' . $afterAsteriskIndent;
+		if ($printedNode !== '' || $afterAsteriskIndent === '' || substr($result, -strlen($lineStart)) !== $lineStart) {
+			return $result . $printedNode;
+		}
+
+		return substr($result, 0, -strlen($afterAsteriskIndent));
 	}
 
 	/**
