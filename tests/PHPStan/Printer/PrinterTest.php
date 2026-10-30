@@ -2200,6 +2200,59 @@ class PrinterTest extends TestCase
 			},
 		];
 
+		$renameDoctrineTagVisitor = new class extends AbstractNodeVisitor {
+
+			public function enterNode(Node $node)
+			{
+				if ($node instanceof PhpDocTagNode && $node->value instanceof DoctrineTagValueNode) {
+					$node->name = '@Bar';
+					$node->value->annotation->name = '@Bar';
+				}
+
+				return $node;
+			}
+
+		};
+
+		yield [
+			'/**' . PHP_EOL .
+			' * @\Foo\Bar(' . PHP_EOL .
+			' *     name="x",' . PHP_EOL .
+			' *     cols={@\Foo\Col("a")}' . PHP_EOL .
+			' * )' . PHP_EOL .
+			' */',
+			'/**' . PHP_EOL .
+			' * @Bar(' . PHP_EOL .
+			' *     name="x",' . PHP_EOL .
+			' *     cols={@\Foo\Col("a")}' . PHP_EOL .
+			' * )' . PHP_EOL .
+			' */',
+			$renameDoctrineTagVisitor,
+		];
+
+		yield [
+			'/** @\Foo\Bar("a")  some  description */',
+			'/** @Bar("a")  some  description */',
+			$renameDoctrineTagVisitor,
+		];
+
+		yield [
+			'/** @param  int  $a */',
+			'/** @phpstan-param  int  $a */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof PhpDocTagNode) {
+						$node->name = '@phpstan-param';
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
 		yield [
 			'/**' . PHP_EOL .
 			' * @X({' . PHP_EOL .
