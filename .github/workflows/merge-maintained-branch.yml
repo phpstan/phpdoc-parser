@@ -7,10 +7,18 @@ on:
     branches:
       - "1.22.x"
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   merge:
     name: Merge branch
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # for actions/checkout to fetch the code; the merge is made with PHPSTAN_BOT_TOKEN
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
@@ -19,6 +27,8 @@ jobs:
 
       - name: "Checkout"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: "Merge branch"
         uses: everlytic/branch-merge@c4a244dc23143f824ae6c022a10732566cb8e973 # 1.1.5
         with:

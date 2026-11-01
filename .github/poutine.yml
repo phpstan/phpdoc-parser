@@ -1,0 +1,17 @@
+skip:
+  # Actions whose owners are not GitHub verified creators. Each of them is reviewed
+  # and pinned to a full commit SHA in the workflows that use it.
+  - rule: github_action_from_unverified_creator_used
+    purl:
+      - pkg:githubactions/astral-sh/setup-uv
+      - pkg:githubactions/cbrgm/mastodon-github-action
+      - pkg:githubactions/dessant/lock-threads
+      - pkg:githubactions/eomm/why-don-t-you-tweet
+      - pkg:githubactions/everlytic/branch-merge
+      - pkg:githubactions/metcalfc/changelog-generator
+      - pkg:githubactions/peter-evans/create-pull-request
+      - pkg:githubactions/rickstaa/action-create-tag
+      - pkg:githubactions/shivammathur/setup-php
+      - pkg:githubactions/synacktiv/action-octoscan
+      - pkg:githubactions/wyrihaximus/github-action-get-previous-tag
+      - pkg:githubactions/wyrihaximus/github-action-next-semvers
