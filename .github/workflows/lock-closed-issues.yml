@@ -7,8 +7,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   lock:
+    name: Lock closed issues
     permissions:
       issues: write  # for dessant/lock-threads to lock issues
     runs-on: ubuntu-latest

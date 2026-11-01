@@ -7,6 +7,8 @@ on:
     branches:
       - "2.4.x"
 
+permissions: {}
+
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -15,6 +17,9 @@ jobs:
   build:
     name: "Build API References Pages"
     runs-on: "ubuntu-latest"
+
+    permissions:
+      contents: read # for actions/checkout to fetch the code
 
     strategy:
       matrix:
@@ -35,6 +40,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           ref: ${{ matrix.branch }}
 
       - name: "Install PHP"
@@ -53,7 +59,9 @@ jobs:
         run: "composer install --no-interaction --no-progress"
 
       - name: "Run ApiGen"
-        run: "apigen/vendor/bin/apigen -c apigen/apigen.neon --output docs/${{ matrix.branch }} -- src"
+        run: 'apigen/vendor/bin/apigen -c apigen/apigen.neon --output "docs/$BRANCH" -- src'
+        env:
+          BRANCH: ${{ matrix.branch }}
 
       - name: "Copy favicon"
         run: "cp apigen/favicon.png docs/favicon.png"
@@ -87,13 +95,14 @@ jobs:
           path: 'docs'
 
   deploy:
+    name: "Deploy"
     needs: merge
 
     # from https://github.com/actions/deploy-pages
 
     permissions:
-      pages: write
-      id-token: write
+      pages: write # for actions/deploy-pages to deploy to GitHub Pages
+      id-token: write # for actions/deploy-pages to verify the deployment originates from an appropriate source
 
     environment:
       name: github-pages

@@ -1,0 +1,13 @@
+rules:
+  secrets-outside-env:
+    config:
+      # These are repository secrets used by the release workflows (create-tag, release,
+      # send-pr, merge-maintained-branch, release-toot, release-tweet). Moving them into
+      # dedicated environments has to be done in the repository settings first.
+      allow:
+        - PHPSTAN_BOT_TOKEN
+        - MASTODON_ACCESS_TOKEN
+        - TWITTER_CONSUMER_API_KEY
+        - TWITTER_CONSUMER_API_SECRET
+        - TWITTER_ACCESS_TOKEN
+        - TWITTER_ACCESS_TOKEN_SECRET

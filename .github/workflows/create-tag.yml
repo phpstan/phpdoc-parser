@@ -15,10 +15,18 @@ on:
           - patch
           - minor
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   create-tag:
     name: "Create tag"
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: read # for actions/checkout to fetch the code; the tag is pushed with PHPSTAN_BOT_TOKEN
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
@@ -30,6 +38,9 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+          # rickstaa/action-create-tag pushes the tag with these credentials. A tag pushed by
+          # PHPSTAN_BOT_TOKEN, unlike one pushed by GITHUB_TOKEN, triggers release.yml.
+          persist-credentials: true # zizmor: ignore[artipacked]
 
       - name: 'Get Previous tag'
         id: previoustag

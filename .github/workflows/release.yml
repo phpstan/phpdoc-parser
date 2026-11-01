@@ -7,10 +7,18 @@ on:
     tags:
       - '*'
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: "Deploy"
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: read # for actions/checkout to fetch the code; the release is created with PHPSTAN_BOT_TOKEN
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -20,6 +28,8 @@ jobs:
 
       - name: "Checkout"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Generate changelog
         id: changelog
@@ -28,9 +38,9 @@ jobs:
           myToken: ${{ secrets.PHPSTAN_BOT_TOKEN }}
 
       - name: "Create release"
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        with:
-          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.changelog }}
+        run: 'gh release create "$TAG" --verify-tag --title "$TAG" --notes "$CHANGELOG"'
+        env:
+          GH_TOKEN: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}

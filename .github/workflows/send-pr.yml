@@ -6,8 +6,13 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
+# GITHUB_TOKEN needs no permissions: phpstan-src is checked out and the pull request
+# is sent with PHPSTAN_BOT_TOKEN.
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   send-pr:
@@ -28,6 +33,7 @@ jobs:
       - name: "Checkout phpstan-src"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           repository: phpstan/phpstan-src
           path: phpstan-src
           token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
@@ -39,9 +45,13 @@ jobs:
 
       - name: "Change composer.json"
         working-directory: ./phpstan-src
-        run: "composer require phpstan/phpdoc-parser:${{ github.ref_name }}"
+        run: 'composer require "phpstan/phpdoc-parser:$TAG"'
+        env:
+          TAG: ${{ github.ref_name }}
 
-      - name: "Create Pull Request"
+      # It commits, pushes a branch and opens the pull request in one step, which `gh pr create`
+      # alone does not do.
+      - name: "Create Pull Request" # zizmor: ignore[superfluous-actions]
         id: create-pr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:

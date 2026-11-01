@@ -6,8 +6,15 @@ on:
   release:
     types: [published]
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   tweet:
+    name: Tweet release
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
