@@ -11,6 +11,7 @@ use function in_array;
 use function str_replace;
 use function strlen;
 use function strpos;
+use function substr;
 use function substr_compare;
 
 class TypeParser
@@ -113,27 +114,66 @@ class TypeParser
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_NULLABLE)) {
 			$type = $this->parseNullable($tokens);
 
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+			$propertyExpression = $this->parsePropertyExpression($tokens);
+
+			if ($propertyExpression !== null && $tokens->isCurrentTokenValue('is')) {
+				$type = $this->parseConditionalForProperty($tokens, $propertyExpression);
+			} else {
+				$type = $this->parseAtomic($tokens);
+				$type = $this->parseUnionOrIntersectionIfPresent($tokens, $type);
+			}
+
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
-			$type = $this->parseConditionalForParameter($tokens, $tokens->currentTokenValue());
+			$parameterName = $tokens->currentTokenValue();
+			$propertyExpression = $this->parsePropertyExpression($tokens);
+
+			if ($propertyExpression !== null && $tokens->isCurrentTokenValue('is')) {
+				$type = $this->parseConditionalForProperty($tokens, $propertyExpression);
+			} else {
+				$type = $this->parseConditionalForParameter($tokens, $parameterName);
+			}
 
 		} else {
-			$type = $this->parseAtomic($tokens);
+			if ($tokens->isCurrentTokenValue('self') ||
+				$tokens->isCurrentTokenValue('parent') ||
+				$tokens->isCurrentTokenValue('static')) {
+				$propertyExpression = $this->parsePropertyExpression($tokens);
 
-			if ($tokens->isCurrentTokenValue('is')) {
-				$type = $this->parseConditional($tokens, $type);
-			} else {
-				$tokens->skipNewLineTokensAndConsumeComments();
-
-				if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
-					$type = $this->subParseUnion($tokens, $type);
-
-				} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
-					$type = $this->subParseIntersection($tokens, $type);
+				if ($propertyExpression !== null && $tokens->isCurrentTokenValue('is')) {
+					$type = $this->parseConditionalForProperty($tokens, $propertyExpression);
+				} else {
+					$type = $this->parseAtomic($tokens);
+					$type = $this->parseUnionOrIntersectionIfPresent($tokens, $type);
 				}
+			} else {
+				$type = $this->parseAtomic($tokens);
+				$type = $this->parseUnionOrIntersectionIfPresent($tokens, $type);
 			}
 		}
 
 		return $this->enrichWithAttributes($tokens, $type, $startLine, $startIndex);
+	}
+
+	/** @phpstan-impure */
+	private function parseUnionOrIntersectionIfPresent(
+		TokenIterator $tokens,
+		Ast\Type\TypeNode $type
+	): Ast\Type\TypeNode
+	{
+		if ($tokens->isCurrentTokenValue('is')) {
+			return $this->parseConditional($tokens, $type);
+		}
+
+		$tokens->skipNewLineTokensAndConsumeComments();
+
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_UNION)) {
+			return $this->subParseUnion($tokens, $type);
+		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_INTERSECTION)) {
+			return $this->subParseIntersection($tokens, $type);
+		}
+
+		return $type;
 	}
 
 	/** @phpstan-impure */
@@ -390,6 +430,135 @@ class TypeParser
 		$elseType = $this->subParse($tokens);
 
 		return new Ast\Type\ConditionalTypeForParameterNode($parameterName, $targetType, $ifType, $elseType, $negated);
+	}
+
+	/** @phpstan-impure */
+	private function parsePropertyExpression(TokenIterator $tokens): ?Ast\Type\PropertyAccessNode
+	{
+		$tokens->pushSavePoint();
+
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE) || $tokens->isCurrentTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+			$startLine = $tokens->currentTokenLine();
+			$startIndex = $tokens->currentTokenIndex();
+			$varName = $tokens->currentTokenValue();
+
+			if ($varName !== '$this') {
+				$tokens->dropSavePoint();
+				return null;
+			}
+
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_THIS_VARIABLE)) {
+				$tokens->consumeTokenType(Lexer::TOKEN_THIS_VARIABLE);
+			} else {
+				$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
+			}
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_ARROW)) {
+				$tokens->rollback();
+				return null;
+			}
+
+			$path = [];
+
+			while ($tokens->isCurrentTokenType(Lexer::TOKEN_ARROW)) {
+				$tokens->consumeTokenType(Lexer::TOKEN_ARROW);
+
+				if (!$tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
+					$tokens->rollback();
+					return null;
+				}
+
+				$itemStartLine = $tokens->currentTokenLine();
+				$itemStartIndex = $tokens->currentTokenIndex();
+				$propertyName = $tokens->currentTokenValue();
+				$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+				$item = new Ast\Type\PropertyAccessPathItem($propertyName);
+				$path[] = $this->enrichWithAttributes($tokens, $item, $itemStartLine, $itemStartIndex);
+			}
+
+			$tokens->dropSavePoint();
+			$node = new Ast\Type\PropertyAccessNode(false, null, $path);
+			return $this->enrichWithAttributes($tokens, $node, $startLine, $startIndex);
+
+		} elseif ($tokens->isCurrentTokenValue('self') ||
+			$tokens->isCurrentTokenValue('parent') ||
+			$tokens->isCurrentTokenValue('static')) {
+
+			$startLine = $tokens->currentTokenLine();
+			$startIndex = $tokens->currentTokenIndex();
+			$holder = $tokens->currentTokenValue();
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+				$tokens->rollback();
+				return null;
+			}
+
+			$tokens->consumeTokenType(Lexer::TOKEN_DOUBLE_COLON);
+
+			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)) {
+				$tokens->rollback();
+				return null;
+			}
+
+			$itemStartLine = $tokens->currentTokenLine();
+			$itemStartIndex = $tokens->currentTokenIndex();
+			$propertyName = substr($tokens->currentTokenValue(), 1);
+			$tokens->consumeTokenType(Lexer::TOKEN_VARIABLE);
+
+			$tokens->dropSavePoint();
+			$item = new Ast\Type\PropertyAccessPathItem($propertyName);
+			$enrichedItem = $this->enrichWithAttributes($tokens, $item, $itemStartLine, $itemStartIndex);
+
+			/** @var 'self'|'parent'|'static' $holder */
+			$node = new Ast\Type\PropertyAccessNode(
+				true,
+				$holder,
+				[$enrichedItem],
+			);
+			return $this->enrichWithAttributes($tokens, $node, $startLine, $startIndex);
+		}
+
+		$tokens->dropSavePoint();
+		return null;
+	}
+
+	/** @phpstan-impure */
+	private function parseConditionalForProperty(
+		TokenIterator $tokens,
+		Ast\Type\PropertyAccessNode $subject
+	): Ast\Type\TypeNode
+	{
+		$tokens->consumeTokenValue(Lexer::TOKEN_IDENTIFIER, 'is');
+
+		$negated = false;
+		if ($tokens->isCurrentTokenValue('not')) {
+			$negated = true;
+			$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+		}
+
+		$targetType = $this->parse($tokens);
+
+		$tokens->skipNewLineTokensAndConsumeComments();
+		$tokens->consumeTokenType(Lexer::TOKEN_NULLABLE);
+		$tokens->skipNewLineTokensAndConsumeComments();
+
+		$ifType = $this->parse($tokens);
+
+		$tokens->skipNewLineTokensAndConsumeComments();
+		$tokens->consumeTokenType(Lexer::TOKEN_COLON);
+		$tokens->skipNewLineTokensAndConsumeComments();
+
+		$elseType = $this->subParse($tokens);
+
+		return new Ast\Type\ConditionalTypeForPropertyNode(
+			$subject,
+			$targetType,
+			$ifType,
+			$elseType,
+			$negated,
+		);
 	}
 
 	/** @phpstan-impure */
