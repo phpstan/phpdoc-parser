@@ -144,36 +144,18 @@ class ConstExprParser
 					return $this->parseArray($tokens, Lexer::TOKEN_CLOSE_PARENTHESES, $startIndex);
 			}
 
+			if ($tokens->isCurrentTokenType(Lexer::TOKEN_WILDCARD) && !$tokens->isPrecededByHorizontalWhitespace()) {
+				// a global constant name pattern like PHP_ROUND_*
+				return $this->enrichWithAttributes(
+					$tokens,
+					new Ast\ConstExpr\ConstFetchNode('', $this->parseConstantNamePattern($tokens, $identifier, Lexer::TOKEN_IDENTIFIER)),
+					$startLine,
+					$startIndex,
+				);
+			}
+
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
-				$classConstantName = '';
-				$lastType = null;
-				while (true) {
-					if ($lastType !== Lexer::TOKEN_IDENTIFIER && $tokens->currentTokenType() === Lexer::TOKEN_IDENTIFIER) {
-						$classConstantName .= $tokens->currentTokenValue();
-						$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
-						$lastType = Lexer::TOKEN_IDENTIFIER;
-
-						continue;
-					}
-
-					if ($lastType !== Lexer::TOKEN_WILDCARD && $tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
-						$classConstantName .= '*';
-						$lastType = Lexer::TOKEN_WILDCARD;
-
-						if ($tokens->getSkippedHorizontalWhiteSpaceIfAny() !== '') {
-							break;
-						}
-
-						continue;
-					}
-
-					if ($lastType === null) {
-						// trigger parse error if nothing valid was consumed
-						$tokens->consumeTokenType(Lexer::TOKEN_WILDCARD);
-					}
-
-					break;
-				}
+				$classConstantName = $this->parseConstantNamePattern($tokens, '', null);
 
 				return $this->enrichWithAttributes(
 					$tokens,
@@ -203,6 +185,44 @@ class ConstExprParser
 			null,
 			$tokens->currentTokenLine(),
 		);
+	}
+
+	/**
+	 * Reads the rest of a constant name in which * stands for any sequence of characters.
+	 *
+	 * @param Lexer::TOKEN_IDENTIFIER|Lexer::TOKEN_WILDCARD|null $lastType the token $name ends with, null when it is empty
+	 */
+	private function parseConstantNamePattern(TokenIterator $tokens, string $name, ?int $lastType): string
+	{
+		while (true) {
+			if ($lastType !== Lexer::TOKEN_IDENTIFIER && $tokens->currentTokenType() === Lexer::TOKEN_IDENTIFIER) {
+				$name .= $tokens->currentTokenValue();
+				$tokens->consumeTokenType(Lexer::TOKEN_IDENTIFIER);
+				$lastType = Lexer::TOKEN_IDENTIFIER;
+
+				continue;
+			}
+
+			if ($lastType !== Lexer::TOKEN_WILDCARD && $tokens->tryConsumeTokenType(Lexer::TOKEN_WILDCARD)) {
+				$name .= '*';
+				$lastType = Lexer::TOKEN_WILDCARD;
+
+				if ($tokens->getSkippedHorizontalWhiteSpaceIfAny() !== '') {
+					break;
+				}
+
+				continue;
+			}
+
+			if ($lastType === null) {
+				// trigger parse error if nothing valid was consumed
+				$tokens->consumeTokenType(Lexer::TOKEN_WILDCARD);
+			}
+
+			break;
+		}
+
+		return $name;
 	}
 
 	private function parseArray(TokenIterator $tokens, int $endToken, int $startIndex): Ast\ConstExpr\ConstExprArrayNode

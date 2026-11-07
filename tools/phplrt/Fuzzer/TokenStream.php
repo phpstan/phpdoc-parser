@@ -353,6 +353,10 @@ final class TokenStream
                 return $this->id(self::isPrecededByWhitespace($tokens, $index) ? 'T_OPEN_SQUARE_BRACKET_WS' : 'T_OPEN_SQUARE_BRACKET');
 
             case Lexer::TOKEN_WILDCARD:
+                if (self::isPrecededByName($tokens, $index)) {
+                    return $this->id(self::isFollowedByWhitespace($tokens, $index) ? 'T_NAME_WILDCARD_WS' : 'T_NAME_WILDCARD');
+                }
+
                 return $this->id(self::isFollowedByWhitespace($tokens, $index) ? 'T_WILDCARD_WS' : 'T_WILDCARD');
 
             case Lexer::TOKEN_OPEN_ANGLE_BRACKET:
@@ -369,6 +373,16 @@ final class TokenStream
     private static function isPrecededByWhitespace(array $tokens, int $index): bool
     {
         return ($tokens[$index - 1][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_HORIZONTAL_WS;
+    }
+
+    /**
+     * Whether a name comes right before the token, with no whitespace in between.
+     *
+     * @param list<array{string, int, int}> $tokens
+     */
+    private static function isPrecededByName(array $tokens, int $index): bool
+    {
+        return ($tokens[$index - 1][Lexer::TYPE_OFFSET] ?? -1) === Lexer::TOKEN_IDENTIFIER;
     }
 
     /**
