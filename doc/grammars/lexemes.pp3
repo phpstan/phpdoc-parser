@@ -197,12 +197,16 @@
  *    followed by something the type says nothing about;
  *  - "Foo[0]" reads an offset while "Foo [0]" does not;
  *  - "Foo::BAR*" goes on reading the name of the constant while "Foo::BAR* "
- *    ends it.
+ *    ends it;
+ *  - "FOO*" is the name of a global constant written with an asterisk while
+ *    "FOO *" is the name "FOO" followed by an asterisk.
  */
 %token T_OPEN_PARENTHESES_WS         (?<=[\x09\x20])\(
 %token T_OPEN_CURLY_BRACKET_WS       (?<=[\x09\x20])\{
 %token T_OPEN_SQUARE_BRACKET_WS      (?<=[\x09\x20])\[
 %token T_WILDCARD_WS                 \*(?=[\x09\x20])
+%token T_NAME_WILDCARD               (?<=[0-9a-z_\x80-\xFF-])\*(?![\x09\x20])
+%token T_NAME_WILDCARD_WS            (?<=[0-9a-z_\x80-\xFF-])\*(?=[\x09\x20])
 
 /**
  * A "<" opening what the hand-written parser recognizes as an HTML tag, that is

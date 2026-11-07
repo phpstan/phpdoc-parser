@@ -454,6 +454,21 @@ class ConstExprParserTest extends TestCase
 			'self::CLASS_CONSTANT',
 			new ConstFetchNode('self', 'CLASS_CONSTANT'),
 		];
+
+		yield [
+			'GLOBAL_*',
+			new ConstFetchNode('', 'GLOBAL_*'),
+		];
+
+		yield [
+			'GLOBAL_*_CONSTANT',
+			new ConstFetchNode('', 'GLOBAL_*_CONSTANT'),
+		];
+
+		yield [
+			'Foo\\Bar\\GLOBAL_*',
+			new ConstFetchNode('', 'Foo\\Bar\\GLOBAL_*'),
+		];
 	}
 
 }

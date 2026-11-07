@@ -105,6 +105,8 @@ final class Generator
         'T_OPEN_CURLY_BRACKET_WS' => ['{'],
         'T_OPEN_SQUARE_BRACKET_WS' => ['['],
         'T_WILDCARD_WS' => ['*'],
+        'T_NAME_WILDCARD' => ['*'],
+        'T_NAME_WILDCARD_WS' => ['*'],
         'T_OPEN_ANGLE_BRACKET_HTML' => ['<'],
 
         'T_TAG_PARAM' => ['@param', '@phpstan-param'],
@@ -147,6 +149,8 @@ final class Generator
         'T_OPEN_SQUARE_BRACKET' => '',
         'T_OPEN_CURLY_BRACKET_WS' => ' ',
         'T_OPEN_SQUARE_BRACKET_WS' => ' ',
+        'T_NAME_WILDCARD' => '',
+        'T_NAME_WILDCARD_WS' => '',
         'T_PHPDOC_EOL' => '',
     ];
 
@@ -156,6 +160,8 @@ final class Generator
     private const SPACING_AFTER = [
         'T_WILDCARD' => '',
         'T_WILDCARD_WS' => ' ',
+        'T_NAME_WILDCARD' => '',
+        'T_NAME_WILDCARD_WS' => ' ',
         'T_PHPDOC_EOL' => '',
     ];
 

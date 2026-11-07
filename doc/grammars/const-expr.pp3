@@ -86,10 +86,24 @@ ConstantArrayItem
  *  - Foo::BAR
  *  - Foo::BAR_*
  *  - BAR
+ *  - BAR_*
  */
 ConstantFetch
   : !ArrayKeyword() Identifier() <T_DOUBLE_COLON> ClassConstantName()
-  | !ArrayKeyword() Identifier()
+  | !ArrayKeyword() Identifier() GlobalConstantNameAfterIdentifier()?
+  ;
+
+/**
+ * The rest of the name of a global constant written with asterisks standing
+ * for any part of it, like the "*_ERROR" of:
+ *  - E_*_ERROR
+ *
+ *  The first asterisk has to follow the name with no space in between, so that
+ *  "FOO *" stays the constant "FOO" followed by an asterisk.
+ */
+GlobalConstantNameAfterIdentifier
+  : <T_NAME_WILDCARD_WS>
+  | <T_NAME_WILDCARD> ConstantNameAfterWildcard()?
   ;
 
 /**
@@ -104,15 +118,21 @@ ConstantFetch
  */
 ClassConstantName
   : <T_WILDCARD_WS>
-  | <T_WILDCARD> ClassConstantNameAfterWildcard()?
-  | Identifier() ClassConstantNameAfterIdentifier()?
+  | <T_WILDCARD> ConstantNameAfterWildcard()?
+  | Identifier() ConstantNameAfterIdentifier()?
   ;
 
-ClassConstantNameAfterWildcard
-  : Identifier() ClassConstantNameAfterIdentifier()?
+ConstantNameAfterWildcard
+  : Identifier() ConstantNameAfterIdentifier()?
   ;
 
-ClassConstantNameAfterIdentifier
+/**
+ * An asterisk after a name goes on with the name of the constant, whether or not
+ * there is a space between the two.
+ */
+ConstantNameAfterIdentifier
   : <T_WILDCARD_WS>
-  | <T_WILDCARD> ClassConstantNameAfterWildcard()?
+  | <T_WILDCARD> ConstantNameAfterWildcard()?
+  | <T_NAME_WILDCARD_WS>
+  | <T_NAME_WILDCARD> ConstantNameAfterWildcard()?
   ;

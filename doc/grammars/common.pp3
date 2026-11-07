@@ -51,6 +51,15 @@ Wildcard
   ;
 
 /**
+ * An asterisk written right after a name, with no space in between, whether or
+ * not whitespace follows it.
+ */
+NameWildcard
+  : <T_NAME_WILDCARD>
+  | <T_NAME_WILDCARD_WS>
+  ;
+
+/**
  * A "(" whether or not whitespace precedes it.
  */
 ParenthesesOpen

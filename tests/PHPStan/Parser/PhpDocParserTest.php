@@ -197,6 +197,23 @@ class PhpDocParserTest extends TestCase
 		];
 
 		yield [
+			'OK with a global constant pattern',
+			'/** @param PHP_ROUND_* $mode */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@param',
+					new ParamTagValueNode(
+						new ConstTypeNode(new ConstFetchNode('', 'PHP_ROUND_*')),
+						false,
+						'$mode',
+						'',
+						false,
+					),
+				),
+			]),
+		];
+
+		yield [
 			'OK variadic without description',
 			'/** @param Foo ...$foo */',
 			new PhpDocNode([
@@ -1392,6 +1409,37 @@ class PhpDocParserTest extends TestCase
 
 	public function provideReturnTagsData(): Iterator
 	{
+		yield [
+			'OK with a global constant pattern',
+			'/** @return PHP_ROUND_*|null */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new UnionTypeNode([
+							new ConstTypeNode(new ConstFetchNode('', 'PHP_ROUND_*')),
+							new IdentifierTypeNode('null'),
+						]),
+						'',
+					),
+				),
+			]),
+		];
+
+		yield [
+			'OK with an asterisk opening the description',
+			'/** @return string *emphasized* description */',
+			new PhpDocNode([
+				new PhpDocTagNode(
+					'@return',
+					new ReturnTagValueNode(
+						new IdentifierTypeNode('string'),
+						'*emphasized* description',
+					),
+				),
+			]),
+		];
+
 		yield [
 			'OK without description',
 			'/** @return Foo */',

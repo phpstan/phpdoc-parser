@@ -171,7 +171,7 @@ class TypeParser
 		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_IDENTIFIER)) {
 			$type = $this->enrichWithAttributes($tokens, new Ast\Type\IdentifierTypeNode($currentTokenValue), $startLine, $startIndex);
 
-			if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+			if (!$this->isConstantFetchAfterName($tokens)) {
 				$tokens->dropSavePoint(); // because of ConstFetchNode
 				if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 					$tokens->pushSavePoint();
@@ -265,6 +265,20 @@ class TypeParser
 				$currentTokenLine,
 			);
 		}
+	}
+
+	/**
+	 * Whether the name just read starts a constant expression rather than a type: a class constant
+	 * like Foo::BAR, or a global constant pattern like FOO_* whose asterisk follows the name with
+	 * no space in between.
+	 */
+	private function isConstantFetchAfterName(TokenIterator $tokens): bool
+	{
+		if ($tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+			return true;
+		}
+
+		return $tokens->isCurrentTokenType(Lexer::TOKEN_WILDCARD) && !$tokens->isPrecededByHorizontalWhitespace();
 	}
 
 	/** @phpstan-impure */
@@ -692,7 +706,7 @@ class TypeParser
 			if ($tokens->tryConsumeTokenType(Lexer::TOKEN_IDENTIFIER)) {
 				$type = new Ast\Type\IdentifierTypeNode($currentTokenValue);
 
-				if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+				if (!$this->isConstantFetchAfterName($tokens)) {
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 						$type = $this->parseGeneric(
 							$tokens,

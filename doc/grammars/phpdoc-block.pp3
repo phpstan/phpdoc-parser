@@ -554,6 +554,8 @@ NonTagTextToken
   | <T_COLON>
   | <T_WILDCARD>
   | <T_WILDCARD_WS>
+  | <T_NAME_WILDCARD>
+  | <T_NAME_WILDCARD_WS>
   | <T_OPEN_PHPDOC>
   | <T_OTHER>
   ;

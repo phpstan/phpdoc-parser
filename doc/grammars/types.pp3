@@ -103,13 +103,13 @@ Atomic
 /**
  * A name standing for a type rather than for the class of a constant.
  *
- * A name is only ever read as a constant expression when a "::" follows it, so
- * a name written without one is a type and stays a type: whatever the reading
+ * A name is only ever read as a constant expression when a "::" follows it, or
+ * an asterisk with no space in between, so a name written without one is a type and stays a type: whatever the reading
  * fails at after it is an error rather than a reason to read the name again as
  * something else.
  */
 PlainName
-  : Identifier() !<T_DOUBLE_COLON>
+  : Identifier() !<T_DOUBLE_COLON> !NameWildcard()
   ;
 
 ParenthesizedAtomic
@@ -132,8 +132,8 @@ IdentifierAtomic
   : <T_KEYWORD_ARRAY> !<T_DOUBLE_COLON> ArrayShape() ArrayOrOffsetAccess()?
   | ListShapeIdentifier() !<T_DOUBLE_COLON> ListShape() ArrayOrOffsetAccess()?
   | <T_KEYWORD_OBJECT> !<T_DOUBLE_COLON> ObjectShape() ArrayOrOffsetAccess()?
-  | ShapeIdentifier() !<T_DOUBLE_COLON> !<T_OPEN_CURLY_BRACKET> IdentifierTail()
-  | PlainIdentifier() !<T_DOUBLE_COLON> IdentifierTail()
+  | ShapeIdentifier() !<T_DOUBLE_COLON> !NameWildcard() !<T_OPEN_CURLY_BRACKET> IdentifierTail()
+  | PlainIdentifier() !<T_DOUBLE_COLON> !NameWildcard() IdentifierTail()
   ;
 
 /**
@@ -358,8 +358,8 @@ CallableReturnType
   | <T_KEYWORD_ARRAY> !<T_DOUBLE_COLON> ArrayShape() ArrayOrOffsetAccess()?
   | ListShapeIdentifier() !<T_DOUBLE_COLON> ListShape() ArrayOrOffsetAccess()?
   | <T_KEYWORD_OBJECT> !<T_DOUBLE_COLON> ObjectShape() ArrayOrOffsetAccess()?
-  | ShapeIdentifier() !<T_DOUBLE_COLON> !<T_OPEN_CURLY_BRACKET> CallableReturnTypeTail()
-  | PlainIdentifier() !<T_DOUBLE_COLON> CallableReturnTypeTail()
+  | ShapeIdentifier() !<T_DOUBLE_COLON> !NameWildcard() !<T_OPEN_CURLY_BRACKET> CallableReturnTypeTail()
+  | PlainIdentifier() !<T_DOUBLE_COLON> !NameWildcard() CallableReturnTypeTail()
   | !PlainName() ConstantAtomic()
   ;
 

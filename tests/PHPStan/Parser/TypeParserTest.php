@@ -1982,6 +1982,55 @@ class TypeParserTest extends TestCase
 				new ConstTypeNode(new ConstFetchNode('Foo', '*a')),
 			],
 			[
+				'FOO_*',
+				new ConstTypeNode(new ConstFetchNode('', 'FOO_*')),
+			],
+			[
+				'FOO_*BAR',
+				new ConstTypeNode(new ConstFetchNode('', 'FOO_*BAR')),
+			],
+			[
+				'E_*_ERROR',
+				new ConstTypeNode(new ConstFetchNode('', 'E_*_ERROR')),
+			],
+			[
+				'A*B*C',
+				new ConstTypeNode(new ConstFetchNode('', 'A*B*C')),
+			],
+			[
+				'\\Foo\\BAR_*',
+				new ConstTypeNode(new ConstFetchNode('', '\\Foo\\BAR_*')),
+			],
+			[
+				'Foo\\BAR_*',
+				new ConstTypeNode(new ConstFetchNode('', 'Foo\\BAR_*')),
+			],
+			[
+				'FOO**',
+				new ConstTypeNode(new ConstFetchNode('', 'FOO*')), // fails later in PhpDocParser
+				Lexer::TOKEN_WILDCARD,
+			],
+			[
+				'FOO *',
+				new IdentifierTypeNode('FOO'), // the asterisk has to follow the name with no space in between
+				Lexer::TOKEN_WILDCARD,
+			],
+			[
+				'PHP_ROUND_*|null',
+				new UnionTypeNode([
+					new ConstTypeNode(new ConstFetchNode('', 'PHP_ROUND_*')),
+					new IdentifierTypeNode('null'),
+				]),
+			],
+			[
+				'list<JSON_*>',
+				new GenericTypeNode(new IdentifierTypeNode('list'), [
+					new ConstTypeNode(new ConstFetchNode('', 'JSON_*')),
+				], [
+					GenericTypeNode::VARIANCE_INVARIANT,
+				]),
+			],
+			[
 				'( "foo" | Foo::FOO_* )',
 				new UnionTypeNode([
 					new ConstTypeNode(new ConstExprStringNode('foo', ConstExprStringNode::DOUBLE_QUOTED)),
@@ -3045,6 +3094,10 @@ class TypeParserTest extends TestCase
 			[
 				'callable(): Foo::*',
 				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('Foo', '*')), []),
+			],
+			[
+				'callable(): FOO_*',
+				new CallableTypeNode(new IdentifierTypeNode('callable'), [], new ConstTypeNode(new ConstFetchNode('', 'FOO_*')), []),
 			],
 			[
 				'?Foo[]',
