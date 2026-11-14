@@ -45,3 +45,16 @@ phpstan-generate-baseline:
 .PHONY: grammars-install
 grammars-install:
 	composer install --no-interaction --working-dir tools/phplrt
+
+# ---------------------------------------------------------------------------
+#  The benchmarks
+# ---------------------------------------------------------------------------
+
+# Tally is a development dependency of its own too, because it needs PHP 8.2.
+.PHONY: bench-install
+bench-install:
+	composer install --no-interaction --working-dir tools/tally
+
+.PHONY: bench
+bench:
+	php tools/tally/vendor/bin/tally run

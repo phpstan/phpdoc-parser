@@ -1,0 +1,11 @@
+{
+	"description": "Dev-only Tally, which counts the benchmarks in benchmarks/ and asks for a PHP this library still runs without.",
+	"require": {
+		"phpstan/tally": "dev-release/1.x"
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"config": {
+		"sort-packages": true
+	}
+}

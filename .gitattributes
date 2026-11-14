@@ -3,6 +3,7 @@
 
 .github export-ignore
 apigen export-ignore
+benchmarks export-ignore
 phpcs.xml export-ignore
 doc export-ignore
 tests export-ignore
@@ -17,3 +18,4 @@ Makefile export-ignore
 phpstan-baseline.neon export-ignore
 phpstan.neon export-ignore
 phpunit.xml export-ignore
+tally.php export-ignore

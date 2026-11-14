@@ -198,6 +198,7 @@ make check
 - `make lint` - Check PHP syntax only
 - `make cs` - Check code style only
 - `make phpstan-generate-baseline` - Generate PHPStan baseline (use sparingly)
+- `make bench-install`, then `make bench` - Count the benchmarks in `benchmarks/` with [Tally](https://github.com/phpstan/tally) (needs PHP 8.2 on Linux). They cover parsing large and typical PHPDocs. Take their expected numbers from the Benchmarks workflow, not from a local run: a benchmark without numbers gets a patch in the job's output
 
 ## Workflow Summary
 
