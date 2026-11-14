@@ -5,6 +5,7 @@ namespace PHPStan\PhpDocParser\Benchmarks;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\ParserConfig;
 use Tally\Attribute\Before;
+use Tally\Attribute\Expected;
 use Tally\Attribute\Warmup;
 
 /**
@@ -27,6 +28,7 @@ final class LexerBench
 	}
 
 	#[Warmup(1)]
+	#[Expected(instructions: '25.27M', cycles: '26.59M', memory: '108.0KiB')]
 	public function benchTokenizeTypicalPhpDocs(): void
 	{
 		foreach ($this->phpDocs as $phpDoc) {

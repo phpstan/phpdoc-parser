@@ -9,6 +9,7 @@ use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
 use Tally\Attribute\Before;
+use Tally\Attribute\Expected;
 use Tally\Attribute\Warmup;
 
 /**
@@ -38,6 +39,7 @@ final class SymfonyConfigReferenceBench
 	}
 
 	#[Warmup(1)]
+	#[Expected(instructions: '98.66M', cycles: '112.5M', memory: '4.123MiB')]
 	public function benchParse(): void
 	{
 		foreach ($this->phpDocs as $phpDoc) {
