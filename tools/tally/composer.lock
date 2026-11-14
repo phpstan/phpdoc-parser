@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7746d1dd0595500782c29bf94c17c00",
+    "content-hash": "ec3506afa6f7a44a4e0a38bfffad2556",
     "packages": [
         {
             "name": "phpstan/tally",
-            "version": "dev-release/1.x",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/tally.git",
-                "reference": "b4807df7eac302f3e61258bf7187b5be0defe3d9"
+                "reference": "e5f91f6e91b2e10aaa24032b881368a6228c37c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/tally/zipball/b4807df7eac302f3e61258bf7187b5be0defe3d9",
-                "reference": "b4807df7eac302f3e61258bf7187b5be0defe3d9",
+                "url": "https://api.github.com/repos/phpstan/tally/zipball/e5f91f6e91b2e10aaa24032b881368a6228c37c4",
+                "reference": "e5f91f6e91b2e10aaa24032b881368a6228c37c4",
                 "shasum": ""
             },
             "require": {
@@ -38,6 +38,11 @@
                 "bin/tally"
             ],
             "type": "library",
+            "extra": {
+                "skills": {
+                    "source": "skills"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Tally\\": "src/"
@@ -55,19 +60,17 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/tally/issues",
-                "source": "https://github.com/phpstan/tally/tree/release/1.x"
+                "source": "https://github.com/phpstan/tally/tree/1.0.0"
             },
-            "time": "2026-11-14T12:13:34+00:00",
-            "published-time": "2026-11-14T12:13:40+00:00"
+            "time": "2026-11-14T22:23:02+00:00",
+            "published-time": "2026-11-14T22:24:20+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "phpstan/tally": 20
-    },
-    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "stability-flags": {},
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {},
     "platform-dev": {},
