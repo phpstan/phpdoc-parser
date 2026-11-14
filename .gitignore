@@ -7,3 +7,4 @@
 /composer.lock
 .phpunit.result.cache
 /.amp/portals/*
+/tools/tally/vendor

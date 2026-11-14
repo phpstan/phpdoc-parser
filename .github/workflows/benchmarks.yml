@@ -1,0 +1,57 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Benchmarks"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "2.4.x"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  benchmarks:
+    name: "Benchmarks"
+    # Tally's counts depend on the system libraries and the PHP build, so both stay fixed:
+    # a new image or PHP release means accepting new numbers
+    runs-on: "ubuntu-24.04"
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: "Checkout"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962" # v2
+        with:
+          coverage: "none"
+          php-version: "8.5"
+          extensions: "posix"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "Install Tally"
+        run: "make bench-install"
+
+      - name: "Run the benchmarks"
+        run: "php tools/tally/vendor/bin/tally run --output=tmp/tally-results"
+
+      - name: "Upload the results"
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: "tally-results"
+          path: "tmp/tally-results"
