@@ -185,7 +185,7 @@ class TypeParser
 					$origType = $type;
 					$type = $this->tryParseCallable($tokens, $type, true);
 					if ($type === $origType) {
-						$type = $this->parseGeneric($tokens, $type);
+						$type = $this->tryParseClassStringMap($tokens, $type) ?? $this->parseGeneric($tokens, $type);
 
 						if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 							$type = $this->tryParseArrayOrOffsetAccess($tokens, $type);
@@ -488,6 +488,69 @@ class TypeParser
 	}
 
 	/**
+	 * Reads class-string-map<T of Foo, V>, whose first argument declares a template
+	 * with a bound. Returns null when the first argument is not written that way,
+	 * so the type is read as an ordinary generic type instead.
+	 *
+	 * @phpstan-impure
+	 */
+	private function tryParseClassStringMap(TokenIterator $tokens, Ast\Type\IdentifierTypeNode $baseType): ?Ast\Type\ClassStringMapTypeNode
+	{
+		if ($baseType->name !== 'class-string-map') {
+			return null;
+		}
+
+		$tokens->pushSavePoint();
+		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
+		$tokens->skipNewLineTokensAndConsumeComments();
+
+		$templateStartLine = $tokens->currentTokenLine();
+		$templateStartIndex = $tokens->currentTokenIndex();
+		$name = $tokens->currentTokenValue();
+		if (
+			$name === ''
+			|| !$tokens->tryConsumeTokenType(Lexer::TOKEN_IDENTIFIER)
+			|| !($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as'))
+		) {
+			$tokens->rollback();
+			return null;
+		}
+		$tokens->dropSavePoint();
+
+		$bound = $this->parse($tokens);
+		$template = $this->enrichWithAttributes(
+			$tokens,
+			new Ast\PhpDoc\TemplateTagValueNode($name, $bound, ''),
+			$templateStartLine,
+			$templateStartIndex,
+		);
+		$tokens->skipNewLineTokensAndConsumeComments();
+		$tokens->consumeTokenType(Lexer::TOKEN_COMMA);
+		$tokens->skipNewLineTokensAndConsumeComments();
+
+		$valueType = $this->parse($tokens);
+		$tokens->skipNewLineTokensAndConsumeComments();
+
+		// trailing comma case
+		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+			$tokens->skipNewLineTokensAndConsumeComments();
+		}
+
+		$type = new Ast\Type\ClassStringMapTypeNode($baseType, $template, $valueType);
+		$startLine = $baseType->getAttribute(Ast\Attribute::START_LINE);
+		$startIndex = $baseType->getAttribute(Ast\Attribute::START_INDEX);
+		if ($startLine !== null && $startIndex !== null) {
+			$type = $this->enrichWithAttributes($tokens, $type, $startLine, $startIndex);
+		} else {
+			$tokens->flushComments();
+		}
+
+		$tokens->consumeTokenType(Lexer::TOKEN_CLOSE_ANGLE_BRACKET);
+
+		return $type;
+	}
+
+	/**
 	 * @phpstan-impure
 	 * @return array{Ast\Type\TypeNode, Ast\Type\GenericTypeNode::VARIANCE_*}
 	 */
@@ -694,15 +757,13 @@ class TypeParser
 
 				if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
-						$type = $this->parseGeneric(
+						$type = $this->enrichWithAttributes(
 							$tokens,
-							$this->enrichWithAttributes(
-								$tokens,
-								$type,
-								$startLine,
-								$startIndex,
-							),
+							$type,
+							$startLine,
+							$startIndex,
 						);
+						$type = $this->tryParseClassStringMap($tokens, $type) ?? $this->parseGeneric($tokens, $type);
 						if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_SQUARE_BRACKET)) {
 							$type = $this->tryParseArrayOrOffsetAccess($tokens, $this->enrichWithAttributes(
 								$tokens,

@@ -8,11 +8,13 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNullNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
 use PHPStan\PhpDocParser\Ast\Node;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ClassStringMapTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
@@ -153,6 +155,14 @@ class TypeToStringTest extends TestCase
 					new IdentifierTypeNode('Foo\\Bar'),
 					[new IdentifierTypeNode('string'), new IdentifierTypeNode('int')],
 					[GenericTypeNode::VARIANCE_COVARIANT, GenericTypeNode::VARIANCE_CONTRAVARIANT],
+				),
+			],
+			[
+				'class-string-map<T of Foo, T>',
+				new ClassStringMapTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					new TemplateTagValueNode('T', new IdentifierTypeNode('Foo'), ''),
+					new IdentifierTypeNode('T'),
 				),
 			],
 		];

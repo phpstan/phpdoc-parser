@@ -21,6 +21,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ClassStringMapTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
@@ -1621,6 +1622,86 @@ class TypeParserTest extends TestCase
 					],
 					new IdentifierTypeNode('Foo'),
 					[],
+				),
+			],
+			[
+				'class-string-map<T of Foo, T>',
+				new ClassStringMapTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					new TemplateTagValueNode('T', new IdentifierTypeNode('Foo'), ''),
+					new IdentifierTypeNode('T'),
+				),
+			],
+			[
+				'class-string-map<T as Foo, list<T>>',
+				new ClassStringMapTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					new TemplateTagValueNode('T', new IdentifierTypeNode('Foo'), ''),
+					new GenericTypeNode(
+						new IdentifierTypeNode('list'),
+						[new IdentifierTypeNode('T')],
+						[GenericTypeNode::VARIANCE_INVARIANT],
+					),
+				),
+			],
+			[
+				'class-string-map<
+					T of Foo,
+					T,
+				>',
+				new ClassStringMapTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					new TemplateTagValueNode('T', new IdentifierTypeNode('Foo'), ''),
+					new IdentifierTypeNode('T'),
+				),
+			],
+			[
+				'class-string-map<T, V>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					[
+						new IdentifierTypeNode('T'),
+						new IdentifierTypeNode('V'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'callable(): class-string-map<T of Foo, T>',
+				new CallableTypeNode(
+					new IdentifierTypeNode('callable'),
+					[],
+					new ClassStringMapTypeNode(
+						new IdentifierTypeNode('class-string-map'),
+						new TemplateTagValueNode('T', new IdentifierTypeNode('Foo'), ''),
+						new IdentifierTypeNode('T'),
+					),
+					[],
+				),
+			],
+			[
+				'class-string-map<T of Foo>',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					25,
+					Lexer::TOKEN_COMMA,
+					null,
+					null,
+				),
+			],
+			[
+				'array<T of Foo>',
+				new ParserException(
+					'of',
+					Lexer::TOKEN_IDENTIFIER,
+					8,
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					null,
+					null,
 				),
 			],
 			[
