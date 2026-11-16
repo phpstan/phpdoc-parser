@@ -1656,6 +1656,23 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'class-string-map<T of callable(): int, T>',
+				new ClassStringMapTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					new TemplateTagValueNode(
+						'T',
+						new CallableTypeNode(
+							new IdentifierTypeNode('callable'),
+							[],
+							new IdentifierTypeNode('int'),
+							[],
+						),
+						'',
+					),
+					new IdentifierTypeNode('T'),
+				),
+			],
+			[
 				'class-string-map<T, V>',
 				new GenericTypeNode(
 					new IdentifierTypeNode('class-string-map'),

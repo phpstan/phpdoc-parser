@@ -756,6 +756,7 @@ class TypeParser
 				$type = new Ast\Type\IdentifierTypeNode($currentTokenValue);
 
 				if (!$tokens->isCurrentTokenType(Lexer::TOKEN_DOUBLE_COLON)) {
+					$tokens->dropSavePoint(); // because of ConstFetchNode
 					if ($tokens->isCurrentTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET)) {
 						$type = $this->enrichWithAttributes(
 							$tokens,
