@@ -133,6 +133,7 @@ IdentifierAtomic
   | ListShapeIdentifier() !<T_DOUBLE_COLON> ListShape() ArrayOrOffsetAccess()?
   | <T_KEYWORD_OBJECT> !<T_DOUBLE_COLON> ObjectShape() ArrayOrOffsetAccess()?
   | ShapeIdentifier() !<T_DOUBLE_COLON> !<T_OPEN_CURLY_BRACKET> IdentifierTail()
+  | <T_KEYWORD_CLASS_STRING_MAP> !<T_DOUBLE_COLON> ClassStringMap() ArrayOrOffsetAccess()?
   | PlainIdentifier() !<T_DOUBLE_COLON> IdentifierTail()
   ;
 
@@ -154,6 +155,7 @@ PlainIdentifier
   | <T_KEYWORD_COVARIANT>
   | <T_KEYWORD_CONTRAVARIANT>
   | <T_KEYWORD_ARRAY_ANY_CASE>
+  | <T_KEYWORD_CLASS_STRING_MAP>
   | <T_KEYWORD_TRUE>
   | <T_KEYWORD_FALSE>
   | <T_KEYWORD_NULL>
@@ -283,6 +285,28 @@ Variance
   | <T_KEYWORD_CONTRAVARIANT>
   ;
 
+/**
+ * A class-string-map whose first argument declares its template with a bound,
+ * like class-string-map<T of Foo, T>. Written without a bound, it is read as an
+ * ordinary generic type instead.
+ */
+ClassStringMap
+  : <T_OPEN_ANGLE_BRACKET> Trivia() ClassStringMapArguments()
+  ;
+
+/**
+ * The very same rule for the return type of a callable, where a "<" opening
+ * what looks like an HTML tag still opens it.
+ */
+ClassStringMapInReturnType
+  : AngleBracketOpen() Trivia() ClassStringMapArguments()
+  ;
+
+ClassStringMapArguments
+  : Identifier() ( <T_KEYWORD_OF> | <T_KEYWORD_AS> ) Type() Trivia()
+    <T_COMMA> Trivia() Type() Trivia() ( <T_COMMA> Trivia() )? <T_CLOSE_ANGLE_BRACKET>
+  ;
+
 // -----------------------------------------------------------------------------
 //  Callable types
 // -----------------------------------------------------------------------------
@@ -359,6 +383,7 @@ CallableReturnType
   | ListShapeIdentifier() !<T_DOUBLE_COLON> ListShape() ArrayOrOffsetAccess()?
   | <T_KEYWORD_OBJECT> !<T_DOUBLE_COLON> ObjectShape() ArrayOrOffsetAccess()?
   | ShapeIdentifier() !<T_DOUBLE_COLON> !<T_OPEN_CURLY_BRACKET> CallableReturnTypeTail()
+  | <T_KEYWORD_CLASS_STRING_MAP> !<T_DOUBLE_COLON> ClassStringMapInReturnType() ArrayOrOffsetAccess()?
   | PlainIdentifier() !<T_DOUBLE_COLON> CallableReturnTypeTail()
   | !PlainName() ConstantAtomic()
   ;

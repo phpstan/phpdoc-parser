@@ -52,6 +52,7 @@
 %token T_KEYWORD_COVARIANT           covariant(?![0-9a-z_\x80-\xFF-])
 %token T_KEYWORD_NON_EMPTY_ARRAY     non-empty-array(?![0-9a-z_\x80-\xFF-])
 %token T_KEYWORD_NON_EMPTY_LIST      non-empty-list(?![0-9a-z_\x80-\xFF-])
+%token T_KEYWORD_CLASS_STRING_MAP    class-string-map(?![0-9a-z_\x80-\xFF-])
 %token T_KEYWORD_SUPER               super(?![0-9a-z_\x80-\xFF-])
 %token T_KEYWORD_OBJECT              object(?![0-9a-z_\x80-\xFF-])
 %token T_KEYWORD_ARRAY               array(?![0-9a-z_\x80-\xFF-])
