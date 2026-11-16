@@ -507,8 +507,12 @@ class TypeParser
 		$templateStartLine = $tokens->currentTokenLine();
 		$templateStartIndex = $tokens->currentTokenIndex();
 		$name = $tokens->currentTokenValue();
+		// "covariant of" and "contravariant of" stay a variance on an ordinary
+		// generic argument, as in class-string-map<covariant of[], int>
 		if (
 			$name === ''
+			|| $name === 'covariant'
+			|| $name === 'contravariant'
 			|| !$tokens->tryConsumeTokenType(Lexer::TOKEN_IDENTIFIER)
 			|| !($tokens->tryConsumeTokenValue('of') || $tokens->tryConsumeTokenValue('as'))
 		) {

@@ -1673,6 +1673,20 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'class-string-map<covariant of[], int>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					[
+						new ArrayTypeNode(new IdentifierTypeNode('of')),
+						new IdentifierTypeNode('int'),
+					],
+					[
+						GenericTypeNode::VARIANCE_COVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
 				'class-string-map<T, V>',
 				new GenericTypeNode(
 					new IdentifierTypeNode('class-string-map'),

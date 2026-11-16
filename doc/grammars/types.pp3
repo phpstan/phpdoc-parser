@@ -302,8 +302,13 @@ ClassStringMapInReturnType
   : AngleBracketOpen() Trivia() ClassStringMapArguments()
   ;
 
+/**
+ * A template named "covariant" or "contravariant" is not one: those words stay
+ * the variance of an ordinary generic argument, so class-string-map<covariant
+ * of[], int> is read as before.
+ */
 ClassStringMapArguments
-  : Identifier() ( <T_KEYWORD_OF> | <T_KEYWORD_AS> ) Type() Trivia()
+  : !Variance() Identifier() ( <T_KEYWORD_OF> | <T_KEYWORD_AS> ) Type() Trivia()
     <T_COMMA> Trivia() Type() Trivia() ( <T_COMMA> Trivia() )? <T_CLOSE_ANGLE_BRACKET>
   ;
 
