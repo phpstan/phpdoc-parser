@@ -303,12 +303,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65"
+                "reference": "3164fa3d41d78857384a29e1c606c456cbab9600"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/40821b7606d8d946bac57dbd2290076c722e3a65",
-                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/3164fa3d41d78857384a29e1c606c456cbab9600",
+                "reference": "3164fa3d41d78857384a29e1c606c456cbab9600",
                 "shasum": ""
             },
             "require": {
@@ -402,7 +402,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-17T19:59:50+00:00"
+            "time": "2026-10-31T14:14:00+00:00"
         },
         {
             "name": "league/config",
@@ -410,12 +410,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/config.git",
-                "reference": "b16faf308b671600f500bec843cfcbd389344092"
+                "reference": "0ee44d88286813109012e145900e255a7df06f0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/config/zipball/b16faf308b671600f500bec843cfcbd389344092",
-                "reference": "b16faf308b671600f500bec843cfcbd389344092",
+                "url": "https://api.github.com/repos/thephpleague/config/zipball/0ee44d88286813109012e145900e255a7df06f0e",
+                "reference": "0ee44d88286813109012e145900e255a7df06f0e",
                 "shasum": ""
             },
             "require": {
@@ -425,7 +425,7 @@
             },
             "require-dev": {
                 "phpstan/phpstan": "^1.8.2",
-                "phpunit/phpunit": "^9.5.5 || ^10.0.0 || ^11.0.0",
+                "phpunit/phpunit": "^9.5.5 || ^10.0.0 || ^11.0.0 || ^13.0.0",
                 "scrutinizer/ocular": "^1.8.1",
                 "unleashedtech/php-coding-standard": "^3.1",
                 "vimeo/psalm": "^4.7.3"
@@ -485,7 +485,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-22T00:27:57+00:00"
+            "time": "2026-11-08T18:07:19+00:00"
         },
         {
             "name": "nette/di",
@@ -493,12 +493,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/di.git",
-                "reference": "1cfb1c167930957d8dffde5e617e8173a6da5e2d"
+                "reference": "621500f7015a4225583bfb92e129f171c57bab16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/di/zipball/1cfb1c167930957d8dffde5e617e8173a6da5e2d",
-                "reference": "1cfb1c167930957d8dffde5e617e8173a6da5e2d",
+                "url": "https://api.github.com/repos/nette/di/zipball/621500f7015a4225583bfb92e129f171c57bab16",
+                "reference": "621500f7015a4225583bfb92e129f171c57bab16",
                 "shasum": ""
             },
             "require": {
@@ -559,9 +559,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/di/issues",
-                "source": "https://github.com/nette/di/tree/v3.2.8"
+                "source": "https://github.com/nette/di/tree/v3.2"
             },
-            "time": "2026-10-26T00:44:01+00:00"
+            "time": "2026-11-06T00:27:20+00:00"
         },
         {
             "name": "nette/finder",
@@ -623,12 +623,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/neon.git",
-                "reference": "b10d42cdb693b20a4e99c4ce9acaaf9d65b3fc2a"
+                "reference": "696afbe4b23efae7610af08fa4f016b90c2449f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/neon/zipball/b10d42cdb693b20a4e99c4ce9acaaf9d65b3fc2a",
-                "reference": "b10d42cdb693b20a4e99c4ce9acaaf9d65b3fc2a",
+                "url": "https://api.github.com/repos/nette/neon/zipball/696afbe4b23efae7610af08fa4f016b90c2449f4",
+                "reference": "696afbe4b23efae7610af08fa4f016b90c2449f4",
                 "shasum": ""
             },
             "require": {
@@ -684,20 +684,20 @@
                 "issues": "https://github.com/nette/neon/issues",
                 "source": "https://github.com/nette/neon/tree/v3.4"
             },
-            "time": "2026-10-25T23:35:31+00:00"
+            "time": "2026-11-06T01:03:19+00:00"
         },
         {
             "name": "nette/php-generator",
-            "version": "v4.2.4",
+            "version": "v4.2.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/php-generator.git",
-                "reference": "19818e4924f9620d016b874e5b7518e78dbb3b24"
+                "reference": "53716fead1bbf43f05917ca21b4582639c74efca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/php-generator/zipball/19818e4924f9620d016b874e5b7518e78dbb3b24",
-                "reference": "19818e4924f9620d016b874e5b7518e78dbb3b24",
+                "url": "https://api.github.com/repos/nette/php-generator/zipball/53716fead1bbf43f05917ca21b4582639c74efca",
+                "reference": "53716fead1bbf43f05917ca21b4582639c74efca",
                 "shasum": ""
             },
             "require": {
@@ -753,9 +753,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/php-generator/issues",
-                "source": "https://github.com/nette/php-generator/tree/v4.2.4"
+                "source": "https://github.com/nette/php-generator/tree/v4.2"
             },
-            "time": "2026-10-26T22:16:39+00:00"
+            "time": "2026-11-06T01:43:29+00:00"
         },
         {
             "name": "nette/robot-loader",
@@ -763,12 +763,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/robot-loader.git",
-                "reference": "7198a7e9108b6dedb5929c78c68f68b087cbec7e"
+                "reference": "1d5bf374da583b1f4e94ea3a931850c5d6668639"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/robot-loader/zipball/7198a7e9108b6dedb5929c78c68f68b087cbec7e",
-                "reference": "7198a7e9108b6dedb5929c78c68f68b087cbec7e",
+                "url": "https://api.github.com/repos/nette/robot-loader/zipball/1d5bf374da583b1f4e94ea3a931850c5d6668639",
+                "reference": "1d5bf374da583b1f4e94ea3a931850c5d6668639",
                 "shasum": ""
             },
             "require": {
@@ -823,7 +823,7 @@
                 "issues": "https://github.com/nette/robot-loader/issues",
                 "source": "https://github.com/nette/robot-loader/tree/master"
             },
-            "time": "2026-10-25T16:47:05+00:00"
+            "time": "2026-11-05T02:17:20+00:00"
         },
         {
             "name": "nette/schema",
@@ -1219,12 +1219,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "f64690a5920b2914aa1548b91c4cf9f0c4116350"
+                "reference": "3176cb05763b4690fd0b9f4073fa452c4c9163bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/f64690a5920b2914aa1548b91c4cf9f0c4116350",
-                "reference": "f64690a5920b2914aa1548b91c4cf9f0c4116350",
+                "url": "https://api.github.com/repos/symfony/console/zipball/3176cb05763b4690fd0b9f4073fa452c4c9163bb",
+                "reference": "3176cb05763b4690fd0b9f4073fa452c4c9163bb",
                 "shasum": ""
             },
             "require": {
@@ -1309,7 +1309,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-27T13:28:05+00:00"
+            "time": "2026-11-06T16:06:30+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
