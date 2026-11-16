@@ -39,6 +39,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ClassStringMapTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\FullyQualifiedNameNode;
@@ -773,6 +774,23 @@ class PrinterTest extends TestCase
 			'/** @var Closure(): T */',
 			'/** @var Closure<T of int>(): T */',
 			$addCallableTemplateType,
+		];
+
+		yield [
+			'/** @var class-string-map<T of Foo, T> */',
+			'/** @var class-string-map<T of Bar, T> */',
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof ClassStringMapTypeNode) {
+						$node->template->bound = new IdentifierTypeNode('Bar');
+					}
+
+					return $node;
+				}
+
+			},
 		];
 
 		yield [

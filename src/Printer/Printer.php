@@ -51,6 +51,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeUnsealedTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ClassStringMapTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
 use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
@@ -482,6 +483,9 @@ final class Printer
 		}
 		if ($node instanceof ConstTypeNode) {
 			return $this->printConstExpr($node->constExpr);
+		}
+		if ($node instanceof ClassStringMapTypeNode) {
+			return $this->printType($node->type) . '<' . $this->print($node->template) . ', ' . $this->printType($node->valueType) . '>';
 		}
 		if ($node instanceof GenericTypeNode) {
 			$genericTypes = [];

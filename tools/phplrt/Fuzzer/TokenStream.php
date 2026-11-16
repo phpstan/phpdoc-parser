@@ -103,6 +103,7 @@ final class TokenStream
         'list' => 'T_KEYWORD_LIST',
         'non-empty-array' => 'T_KEYWORD_NON_EMPTY_ARRAY',
         'non-empty-list' => 'T_KEYWORD_NON_EMPTY_LIST',
+        'class-string-map' => 'T_KEYWORD_CLASS_STRING_MAP',
         'object' => 'T_KEYWORD_OBJECT',
         'true' => 'T_KEYWORD_TRUE',
         'false' => 'T_KEYWORD_FALSE',

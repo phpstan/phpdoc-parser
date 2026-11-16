@@ -39,6 +39,7 @@ final class Generator
         'T_KEYWORD_COVARIANT' => ['covariant'],
         'T_KEYWORD_NON_EMPTY_ARRAY' => ['non-empty-array'],
         'T_KEYWORD_NON_EMPTY_LIST' => ['non-empty-list'],
+        'T_KEYWORD_CLASS_STRING_MAP' => ['class-string-map'],
         'T_KEYWORD_SUPER' => ['super'],
         'T_KEYWORD_STATIC' => ['static'],
         'T_KEYWORD_FROM' => ['from'],
