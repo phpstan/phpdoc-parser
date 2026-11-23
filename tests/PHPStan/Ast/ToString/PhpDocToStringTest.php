@@ -229,6 +229,10 @@ class PhpDocToStringTest extends TestCase
 
 		yield from [
 			['Foo array<string>', new TypeAliasTagValueNode('Foo', $arrayOfStrings)],
+			['Wrapper<T> T', new TypeAliasTagValueNode('Wrapper', new IdentifierTypeNode('T'), [new TemplateTagValueNode('T', null, '')])],
+			['Pair<TFirst, TSecond> TFirst', new TypeAliasTagValueNode('Pair', new IdentifierTypeNode('TFirst'), [new TemplateTagValueNode('TFirst', null, ''), new TemplateTagValueNode('TSecond', null, '')])],
+			['Collection<T of object> array<string>', new TypeAliasTagValueNode('Collection', $arrayOfStrings, [new TemplateTagValueNode('T', new IdentifierTypeNode('object'), '')])],
+			['WithDefault<T = string> T', new TypeAliasTagValueNode('WithDefault', new IdentifierTypeNode('T'), [new TemplateTagValueNode('T', null, '', new IdentifierTypeNode('string'))])],
 			['Test from Foo\Bar', new TypeAliasImportTagValueNode('Test', $bar, null)],
 			['Test from Foo\Bar as Foo', new TypeAliasImportTagValueNode('Test', $bar, 'Foo')],
 		];
