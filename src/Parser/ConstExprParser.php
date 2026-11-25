@@ -55,7 +55,7 @@ class ConstExprParser
 
 			return $this->enrichWithAttributes(
 				$tokens,
-				new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $value)),
+				new Ast\ConstExpr\ConstExprIntegerNode(IntegerLiteralNormalizer::normalizeToDecimal($value)),
 				$startLine,
 				$startIndex,
 			);

@@ -8,7 +8,6 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\ParserConfig;
 use function in_array;
-use function str_replace;
 use function strlen;
 use function strpos;
 use function substr_compare;
@@ -971,7 +970,7 @@ class TypeParser
 		$startLine = $tokens->currentTokenLine();
 
 		if ($tokens->isCurrentTokenType(Lexer::TOKEN_INTEGER)) {
-			$key = new Ast\ConstExpr\ConstExprIntegerNode(str_replace('_', '', $tokens->currentTokenValue()));
+			$key = new Ast\ConstExpr\ConstExprIntegerNode(IntegerLiteralNormalizer::normalizeToDecimal($tokens->currentTokenValue()));
 			$tokens->next();
 
 		} elseif ($tokens->isCurrentTokenType(Lexer::TOKEN_SINGLE_QUOTED_STRING)) {

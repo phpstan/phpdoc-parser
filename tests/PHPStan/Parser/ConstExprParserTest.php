@@ -147,7 +147,7 @@ class ConstExprParserTest extends TestCase
 
 		yield [
 			'+123',
-			new ConstExprIntegerNode('+123'),
+			new ConstExprIntegerNode('123'),
 		];
 
 		yield [
@@ -157,27 +157,27 @@ class ConstExprParserTest extends TestCase
 
 		yield [
 			'0b0110101',
-			new ConstExprIntegerNode('0b0110101'),
+			new ConstExprIntegerNode('53'),
 		];
 
 		yield [
 			'0o777',
-			new ConstExprIntegerNode('0o777'),
+			new ConstExprIntegerNode('511'),
 		];
 
 		yield [
 			'0x7Fb4',
-			new ConstExprIntegerNode('0x7Fb4'),
+			new ConstExprIntegerNode('32692'),
 		];
 
 		yield [
 			'-0O777',
-			new ConstExprIntegerNode('-0O777'),
+			new ConstExprIntegerNode('-511'),
 		];
 
 		yield [
 			'-0X7Fb4',
-			new ConstExprIntegerNode('-0X7Fb4'),
+			new ConstExprIntegerNode('-32692'),
 		];
 
 		yield [
@@ -187,17 +187,32 @@ class ConstExprParserTest extends TestCase
 
 		yield [
 			'0b01_01_01',
-			new ConstExprIntegerNode('0b010101'),
+			new ConstExprIntegerNode('21'),
 		];
 
 		yield [
 			'-0X7_Fb_4',
-			new ConstExprIntegerNode('-0X7Fb4'),
+			new ConstExprIntegerNode('-32692'),
 		];
 
 		yield [
 			'18_446_744_073_709_551_616', // 64-bit unsigned long + 1, larger than PHP_INT_MAX
 			new ConstExprIntegerNode('18446744073709551616'),
+		];
+
+		yield [
+			'017', // legacy octal, as in PHP
+			new ConstExprIntegerNode('15'),
+		];
+
+		yield [
+			'0xFFFF_FFFF_FFFF_FFFF', // larger than PHP_INT_MAX
+			new ConstExprIntegerNode('18446744073709551615'),
+		];
+
+		yield [
+			'-0b0',
+			new ConstExprIntegerNode('0'),
 		];
 	}
 
