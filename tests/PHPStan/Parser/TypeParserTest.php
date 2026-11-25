@@ -1932,9 +1932,9 @@ class TypeParserTest extends TestCase
 			[
 				'+0x10_20|+8e+2 | -0b11',
 				new UnionTypeNode([
-					new ConstTypeNode(new ConstExprIntegerNode('+0x1020')),
+					new ConstTypeNode(new ConstExprIntegerNode('4128')),
 					new ConstTypeNode(new ConstExprFloatNode('+8e+2')),
-					new ConstTypeNode(new ConstExprIntegerNode('-0b11')),
+					new ConstTypeNode(new ConstExprIntegerNode('-3')),
 				]),
 			],
 			[
