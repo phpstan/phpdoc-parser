@@ -1068,6 +1068,52 @@ class TypeParserTest extends TestCase
 				),
 			],
 			[
+				'array{a: int, ...<K of key-of<Config>|int, Config[K]>}',
+				ArrayShapeNode::createUnsealed(
+					[
+						new ArrayShapeItemNode(
+							new IdentifierTypeNode('a'),
+							false,
+							new IdentifierTypeNode('int'),
+						),
+					],
+					new ArrayShapeUnsealedTypeNode(
+						new OffsetAccessTypeNode(new IdentifierTypeNode('Config'), new IdentifierTypeNode('K')),
+						new TemplateDeclarationTypeNode('K', new UnionTypeNode([
+							new GenericTypeNode(
+								new IdentifierTypeNode('key-of'),
+								[new IdentifierTypeNode('Config')],
+								[GenericTypeNode::VARIANCE_INVARIANT],
+							),
+							new IdentifierTypeNode('int'),
+						])),
+					),
+					ArrayShapeNode::KIND_ARRAY,
+				),
+			],
+			[
+				'array{...<K of int>}',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					18,
+					Lexer::TOKEN_COMMA,
+					null,
+					null,
+				),
+			],
+			[
+				'array{...<of, string>}',
+				ArrayShapeNode::createUnsealed(
+					[],
+					new ArrayShapeUnsealedTypeNode(
+						new IdentifierTypeNode('string'),
+						new IdentifierTypeNode('of'),
+					),
+					ArrayShapeNode::KIND_ARRAY,
+				),
+			],
+			[
 				'array{...<string>}',
 				ArrayShapeNode::createUnsealed(
 					[],
