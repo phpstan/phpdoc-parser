@@ -1,8 +1,16 @@
 # https://help.github.com/en/categories/automating-your-workflow-with-github-actions
 
+# Tags are created only by the phpstan-release GitHub App, from the
+# tag.yml workflow in phpstan/release, after the release environment there
+# is approved. This workflow only computes the next version and asks
+# phpstan/release to tag the head of the branch it runs on; the tag push
+# then triggers the release workflows here as before.
+# RELEASE_DISPATCH_TOKEN is a fine-grained token limited to phpstan/release
+# with Actions: write, which can start that workflow but not approve it.
+
 name: "Create tag"
 
-on:
+on: # zizmor: ignore[concurrency-limits] -- manually dispatched one-off runs; a newer run does not supersede an older one
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
   workflow_dispatch:
     inputs:
@@ -17,53 +25,39 @@ on:
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
-  create-tag:
-    name: "Create tag"
+  request-tag:
+    name: "Request the tag from phpstan/release"
     runs-on: "ubuntu-latest"
-    permissions:
-      contents: read # for actions/checkout to fetch the code; the tag is pushed with PHPSTAN_BOT_TOKEN
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           egress-policy: audit
 
-      - name: "Checkout"
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.PHPSTAN_BOT_TOKEN }}
-          # rickstaa/action-create-tag pushes the tag with these credentials. A tag pushed by
-          # PHPSTAN_BOT_TOKEN, unlike one pushed by GITHUB_TOKEN, triggers release.yml.
-          persist-credentials: true # zizmor: ignore[artipacked]
-
-      - name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@83f26fea93bc7efcbca2eb5591f5eaaf66b8f206" # v2.1.0
+      - name: "Compute the next version and dispatch"
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: 'Get next versions'
-        id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@18aa9ed4152808ab99b88d71f5481e41f8d89930" # v1.2.1
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
-
-      - name: "Create new minor tag"
-        uses: rickstaa/action-create-tag@a1c7777fcb2fee4f19b0f283ba888afa11678b72 # v1.7.2
-        if: inputs.version == 'minor'
-        with:
-          tag: ${{ steps.semvers.outputs.minor }}
-          message: ${{ steps.semvers.outputs.minor }}
-
-      - name: "Create new patch tag"
-        uses: rickstaa/action-create-tag@a1c7777fcb2fee4f19b0f283ba888afa11678b72 # v1.7.2
-        if: inputs.version == 'patch'
-        with:
-          tag: ${{ steps.semvers.outputs.patch }}
-          message: ${{ steps.semvers.outputs.patch }}
+          GH_TOKEN: ${{ secrets.RELEASE_DISPATCH_TOKEN }}
+          BUMP: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          # On a maintained branch like 2.3.x, look only at 2.3.* tags
+          if [[ "$GITHUB_REF_NAME" =~ ^([0-9]+\.[0-9]+)\.x$ ]]; then
+            series="^${BASH_REMATCH[1]//./\\.}\\."
+          else
+            series='^[0-9]'
+          fi
+          prev="$(git ls-remote --tags --refs "https://github.com/$GITHUB_REPOSITORY.git" | sed 's|.*refs/tags/||' | grep -E "$series" | sort -V | tail -n 1 || true)"
+          if [ -z "$prev" ]; then
+            echo "::error::No previous tag matches $series on $GITHUB_REF_NAME"
+            exit 1
+          fi
+          IFS=. read -r major minor patch <<< "$prev"
+          if [ "$BUMP" = minor ]; then
+            next="$major.$((minor + 1)).0"
+          else
+            next="$major.$minor.$((patch + 1))"
+          fi
+          gh workflow run tag.yml --repo phpstan/release \
+            -f repository="${GITHUB_REPOSITORY#*/}" -f tag="$next" -f branch="$GITHUB_REF_NAME"
+          echo "Requested $next (previous: $prev). Approve it at https://github.com/phpstan/release/actions" >> "$GITHUB_STEP_SUMMARY"
