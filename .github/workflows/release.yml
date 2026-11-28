@@ -18,7 +18,7 @@ jobs:
     name: "Deploy"
     runs-on: "ubuntu-latest"
     permissions:
-      contents: read # for actions/checkout to fetch the code; the release is created with PHPSTAN_BOT_TOKEN
+      contents: read # for actions/checkout to fetch the code; the release is created as phpstan-bot with PHPSTAN_BOT_CONTENTS_TOKEN
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -35,12 +35,12 @@ jobs:
         id: changelog
         uses: metcalfc/changelog-generator@bb7a08e07e326061351dab6ce89c72f13797043c # v4.9.1
         with:
-          myToken: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+          myToken: ${{ github.token }}
 
       - name: "Create release"
         run: 'gh release create "$TAG" --verify-tag --title "$TAG" --notes "$CHANGELOG"'
         env:
-          GH_TOKEN: ${{ secrets.PHPSTAN_BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.PHPSTAN_BOT_CONTENTS_TOKEN }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
           CHANGELOG: ${{ steps.changelog.outputs.changelog }}

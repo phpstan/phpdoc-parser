@@ -17,8 +17,11 @@ jobs:
   merge:
     name: Merge branch
     runs-on: ubuntu-latest
+    environment:
+      name: push
+      deployment: false
     permissions:
-      contents: read # for actions/checkout to fetch the code; the merge is made with PHPSTAN_BOT_TOKEN
+      contents: read # for actions/checkout to fetch the code; the merge is made with a phpstan-push App token
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
@@ -29,10 +32,19 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: "Mint a push token for phpstan/phpdoc-parser"
+        id: push-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.PUSH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.PUSH_APP_PRIVATE_KEY }}
+          repositories: phpdoc-parser
+          permission-contents: write
+
       - name: "Merge branch"
         uses: everlytic/branch-merge@c4a244dc23143f824ae6c022a10732566cb8e973 # 1.1.5
         with:
-          github_token: "${{ secrets.PHPSTAN_BOT_TOKEN }}"
+          github_token: ${{ steps.push-token.outputs.token }}
           source_ref: ${{ github.ref }}
           target_branch: '1.23.x'
           commit_message_template: 'Merge branch {source_ref} into {target_branch}'

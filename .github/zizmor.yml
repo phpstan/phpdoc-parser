@@ -5,7 +5,8 @@ rules:
       # send-pr, merge-maintained-branch, release-toot, release-tweet). Moving them into
       # dedicated environments has to be done in the repository settings first.
       allow:
-        - PHPSTAN_BOT_TOKEN
+        - PHPSTAN_BOT_CONTENTS_TOKEN
+        - RELEASE_DISPATCH_TOKEN
         - MASTODON_ACCESS_TOKEN
         - TWITTER_CONSUMER_API_KEY
         - TWITTER_CONSUMER_API_SECRET
