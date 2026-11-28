@@ -507,10 +507,55 @@ class TypeParser
 			$variance = Ast\Type\GenericTypeNode::VARIANCE_COVARIANT;
 		} else {
 			$variance = Ast\Type\GenericTypeNode::VARIANCE_INVARIANT;
+
+			$templateDeclaration = $this->tryParseTemplateDeclaration($tokens);
+			if ($templateDeclaration !== null) {
+				return [$templateDeclaration, $variance];
+			}
 		}
 
 		$type = $this->parse($tokens);
 		return [$type, $variance];
+	}
+
+	/**
+	 * Reads a template declared in a generic type argument, like "T of Foo".
+	 * Returns null when the argument is not one, leaving the tokens untouched.
+	 *
+	 * @phpstan-impure
+	 */
+	private function tryParseTemplateDeclaration(TokenIterator $tokens): ?Ast\Type\TemplateDeclarationTypeNode
+	{
+		if (!$tokens->isCurrentTokenType(Lexer::TOKEN_IDENTIFIER)) {
+			return null;
+		}
+
+		$startLine = $tokens->currentTokenLine();
+		$startIndex = $tokens->currentTokenIndex();
+		$name = $tokens->currentTokenValue();
+
+		$tokens->pushSavePoint();
+		$tokens->next();
+		if (!$tokens->tryConsumeTokenValue('of') && !$tokens->tryConsumeTokenValue('as')) {
+			$tokens->rollback();
+			return null;
+		}
+		$tokens->dropSavePoint();
+
+		// The comments written before the template belong to it, not to its bound
+		$comments = $tokens->flushComments();
+		$bound = $this->parse($tokens);
+		$template = $this->enrichWithAttributes(
+			$tokens,
+			new Ast\Type\TemplateDeclarationTypeNode($name, $bound),
+			$startLine,
+			$startIndex,
+		);
+		if ($this->config->useCommentsAttributes) {
+			$template->setAttribute(Ast\Attribute::COMMENTS, $comments);
+		}
+
+		return $template;
 	}
 
 	/**
