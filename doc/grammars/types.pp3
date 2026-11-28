@@ -421,8 +421,17 @@ ArrayShapeUnsealed
  * What the keys and the values of whatever is left over are written as.
  */
 ArrayShapeUnsealedType
-  : AngleBracketOpen() Trivia() Type() Trivia()
-    ( <T_COMMA> Trivia() Type() Trivia() )? <T_CLOSE_ANGLE_BRACKET>
+  : AngleBracketOpen() Trivia() ArrayShapeUnsealedArguments() <T_CLOSE_ANGLE_BRACKET>
+  ;
+
+/**
+ * The key may declare a template the value is written with, as in
+ * ...<K of key-of<Config>, Config[K]>; a declared template is always a key, so
+ * the value has to follow it.
+ */
+ArrayShapeUnsealedArguments
+  : TemplateDeclaration() Trivia() <T_COMMA> Trivia() Type() Trivia()
+  | !TemplateDeclarationStart() Type() Trivia() ( <T_COMMA> Trivia() Type() Trivia() )?
   ;
 
 /**

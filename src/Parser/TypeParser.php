@@ -1060,11 +1060,21 @@ class TypeParser
 		$tokens->consumeTokenType(Lexer::TOKEN_OPEN_ANGLE_BRACKET);
 		$tokens->skipNewLineTokensAndConsumeComments();
 
-		$valueType = $this->parse($tokens);
+		// a template may be declared by the key, as in ...<K of key-of<Config>, Config[K]>,
+		// so a declaration has to be followed by the value type
+		$templateDeclaration = $this->tryParseTemplateDeclaration($tokens);
+		$valueType = $templateDeclaration ?? $this->parse($tokens);
 		$tokens->skipNewLineTokensAndConsumeComments();
 
 		$keyType = null;
-		if ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
+		if ($templateDeclaration !== null) {
+			$tokens->consumeTokenType(Lexer::TOKEN_COMMA);
+			$tokens->skipNewLineTokensAndConsumeComments();
+
+			$keyType = $valueType;
+			$valueType = $this->parse($tokens);
+			$tokens->skipNewLineTokensAndConsumeComments();
+		} elseif ($tokens->tryConsumeTokenType(Lexer::TOKEN_COMMA)) {
 			$tokens->skipNewLineTokensAndConsumeComments();
 
 			$keyType = $valueType;
