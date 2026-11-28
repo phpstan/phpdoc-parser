@@ -63,6 +63,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TemplateDeclarationTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -501,6 +502,9 @@ final class Printer
 		}
 		if ($node instanceof IdentifierTypeNode) {
 			return $node->name;
+		}
+		if ($node instanceof TemplateDeclarationTypeNode) {
+			return $node->name . ' of ' . $this->printType($node->bound);
 		}
 		if ($node instanceof NameNode) {
 			return $node->toCodeString();

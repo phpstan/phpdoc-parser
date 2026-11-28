@@ -50,6 +50,7 @@ use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\RelativeNameNode;
+use PHPStan\PhpDocParser\Ast\Type\TemplateDeclarationTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -3029,6 +3030,29 @@ class PrinterTest extends TestCase
 					if ($node instanceof PhpDocNode) {
 						$node->children[] = new PhpDocTextNode('');
 						$node->children[] = new PhpDocTagNode('@return', new ReturnTagValueNode(new IdentifierTypeNode('int'), ''));
+					}
+
+					return $node;
+				}
+
+			},
+		];
+
+		yield [
+			self::nowdoc('
+			/**
+			 * @var class-string-map<T as  Foo, list<T>>
+			 */'),
+			self::nowdoc('
+			/**
+			 * @var class-string-map<T as  Bar, list<T>>
+			 */'),
+			new class extends AbstractNodeVisitor {
+
+				public function enterNode(Node $node)
+				{
+					if ($node instanceof TemplateDeclarationTypeNode) {
+						$node->bound = new IdentifierTypeNode('Bar');
 					}
 
 					return $node;

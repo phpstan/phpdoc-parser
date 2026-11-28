@@ -275,7 +275,21 @@ GenericArgumentTail
 GenericArgument
   : Wildcard()
   | Variance() Type()
-  | !Variance() Type()
+  | !Variance() TemplateDeclaration()
+  | !Variance() !TemplateDeclarationStart() Type()
+  ;
+
+/**
+ * A template declared in a generic type argument, like the "T of Foo" in
+ * class-string-map<T of Foo, T>. Every generic type reads it; which of them give
+ * it a meaning is left to the tool resolving the types.
+ */
+TemplateDeclaration
+  : TemplateDeclarationStart() Type()
+  ;
+
+TemplateDeclarationStart
+  : Identifier() ( <T_KEYWORD_OF> | <T_KEYWORD_AS> )
   ;
 
 Variance

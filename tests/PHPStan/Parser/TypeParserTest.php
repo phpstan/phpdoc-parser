@@ -31,6 +31,7 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TemplateDeclarationTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -2559,6 +2560,87 @@ class TypeParserTest extends TestCase
 					'>',
 					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
 					13,
+					Lexer::TOKEN_IDENTIFIER,
+					null,
+					null,
+				),
+			],
+			[
+				'class-string-map<T of Foo, T>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					[
+						new TemplateDeclarationTypeNode('T', new IdentifierTypeNode('Foo')),
+						new IdentifierTypeNode('T'),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'class-string-map<T as Foo, list<T>>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('class-string-map'),
+					[
+						new TemplateDeclarationTypeNode('T', new IdentifierTypeNode('Foo')),
+						new GenericTypeNode(
+							new IdentifierTypeNode('list'),
+							[new IdentifierTypeNode('T')],
+							[GenericTypeNode::VARIANCE_INVARIANT],
+						),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'array<
+					K of key-of<Config>|int,
+					Config[K],
+				>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('array'),
+					[
+						new TemplateDeclarationTypeNode('K', new UnionTypeNode([
+							new GenericTypeNode(
+								new IdentifierTypeNode('key-of'),
+								[new IdentifierTypeNode('Config')],
+								[GenericTypeNode::VARIANCE_INVARIANT],
+							),
+							new IdentifierTypeNode('int'),
+						])),
+						new OffsetAccessTypeNode(new IdentifierTypeNode('Config'), new IdentifierTypeNode('K')),
+					],
+					[
+						GenericTypeNode::VARIANCE_INVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'Foo<covariant of, of>',
+				new GenericTypeNode(
+					new IdentifierTypeNode('Foo'),
+					[
+						new IdentifierTypeNode('of'),
+						new IdentifierTypeNode('of'),
+					],
+					[
+						GenericTypeNode::VARIANCE_COVARIANT,
+						GenericTypeNode::VARIANCE_INVARIANT,
+					],
+				),
+			],
+			[
+				'Foo<T of>',
+				new ParserException(
+					'>',
+					Lexer::TOKEN_CLOSE_ANGLE_BRACKET,
+					8,
 					Lexer::TOKEN_IDENTIFIER,
 					null,
 					null,
